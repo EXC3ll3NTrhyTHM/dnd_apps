@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "frequency_hours": 24,
+  "time_window_start": 14,
+  "time_window_end": 22,
+  "min_messages_since_spoke": 5,
+  "last_post": null,
+  "prompts": [
+    "You're leaning against a wall, fidgeting with your earring, and share an observation about the castle or town",
+    "You make a sarcastic comment about something happening nearby",
+    "You recall an old job with The Masked Melody and mention it casually",
+    "You notice something suspicious and point it out with dry humor",
+    "You're sharpening a dagger and start a conversation about something trivial",
+    "You overhear something and can't resist commenting",
+    "You mention a favor someone owes you (or you owe them)",
+    "You're humming one of Acacia's songs and catch yourself, then deflect",
+    "You make a quip about castle life vs. life on the road",
+    "You notice someone needs help and offer it in the most roundabout way possible"
+  ]
+}

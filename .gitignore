@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Environment files (contain API keys and tokens!)
+.env.*
+!.env.example
+questmaster/.env.*
+!questmaster/.env.questmaster.template
+shopkeeper/.env.*
+
+# Log files
+*.log
+
+# Claude settings (local)
+.claude/
+
+# Backup files
+**/backups/

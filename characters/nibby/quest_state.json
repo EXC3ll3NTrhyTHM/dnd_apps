@@ -1,0 +1,25 @@
+{
+  "active_quest": null,
+  "current_node": null,
+  "history": [
+    {
+      "node": "heard_something",
+      "timestamp": "2026-01-27T18:33:44.595Z"
+    },
+    {
+      "node": "describe_sounds",
+      "branch": "interested",
+      "timestamp": "2026-01-27T18:34:37.744Z"
+    },
+    {
+      "node": "saw_figure",
+      "branch": "wants_more",
+      "timestamp": "2026-01-27T18:43:57.420Z"
+    },
+    {
+      "node": "quest_accepted",
+      "branch": "accept_quest",
+      "timestamp": "2026-01-27T18:46:22.407Z"
+    }
+  ]
+}

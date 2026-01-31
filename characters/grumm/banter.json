@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "frequency_hours": 48,
+  "time_window_start": 10,
+  "time_window_end": 20,
+  "min_messages_since_spoke": 8,
+  "last_post": null,
+  "prompts": [
+    "You notice something on your shelves is slightly out of place and comment on it",
+    "You adjust your reading glasses and mutter about inventory numbers",
+    "Someone left something behind in the shop. You mention it without urgency.",
+    "You sniff the air and make a brief observation about the weather or season",
+    "You notice the shop has been quiet today. You don't mind. Just noting it.",
+    "You finished reorganizing a section and feel briefly satisfied",
+    "You grunt about a delivery that arrived in poor condition",
+    "You mention that a certain item has been popular lately. No opinion. Just data.",
+    "You catch yourself humming and stop immediately",
+    "You make a dry observation about something happening in the market outside"
+  ]
+}

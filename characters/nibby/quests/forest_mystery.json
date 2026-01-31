@@ -1,0 +1,293 @@
+{
+  "id": "forest_mystery",
+  "name": "Strange Sounds in the Forest",
+  "description": "Nibby heard something weird and wants the party to investigate",
+  "location": "North edge of the forest, near the old hunter's blind",
+  "reward_gold": 150,
+
+  "start_node": "heard_something",
+  "current_node": null,
+  "active": false,
+  "completed": false,
+  
+  "companions": ["nibby"],
+  
+  "stages": {
+    "arrival": {
+      "description": "The party arrives at the north edge of the forest where Nibby heard the strange sounds",
+      "narration_prompt": "The party arrives at the forest's northern edge. Tall pines tower overhead, their branches creaking in a light breeze. Nibby points nervously toward a deer blind visible through the trees. The air feels heavy here.",
+      "actions": [
+        {
+          "id": "examine_trees",
+          "label": "🌲 Examine Trees",
+          "narration_prompt": "The player examines the trees closely, looking for any marks, scratches, or signs of disturbance on the bark and branches.",
+          "advances": false
+        },
+        {
+          "id": "listen_carefully",
+          "label": "👂 Listen Carefully",
+          "narration_prompt": "The player stops and listens intently to the forest sounds, trying to pick out anything unusual or the strange whispers Nibby mentioned.",
+          "advances": false
+        },
+        {
+          "id": "ask_nibby_arrival",
+          "label": "💬 Ask Nibby",
+          "narration_prompt": "The player turns to Nibby to ask about where exactly he heard the sounds and what direction they came from.",
+          "cue_npc": "nibby",
+          "npc_instruction": "The party is at the forest edge asking where you heard the sounds. Point toward the hunter's blind excitedly - 'Right over there!' You're genuinely curious to find out what this is, but also clearly nervous (fidgeting, glancing around). Try to play it cool like you're not scared. Maybe joke about how it's 'probably nothing' while obviously not believing that.",
+          "advances": false
+        },
+        {
+          "id": "head_to_blind",
+          "label": "🚶 Head to Blind",
+          "narration_prompt": "The party moves deeper into the forest toward the old hunter's blind, following the narrow path through the undergrowth.",
+          "advances": true,
+          "next_stage": "investigation"
+        }
+      ]
+    },
+    
+    "investigation": {
+      "description": "The party investigates the area around the hunter's blind",
+      "narration_prompt": "The old hunter's blind is weathered and covered in moss. The ground around it shows signs of disturbance - broken twigs, flattened grass forming a rough trail leading deeper into the woods. Strange scratch marks mar several nearby trees.",
+      "actions": [
+        {
+          "id": "study_scratches",
+          "label": "🔍 Study Scratches",
+          "narration_prompt": "The player examines the scratch marks on the trees more closely, trying to determine what could have made them and how recently.",
+          "advances": false
+        },
+        {
+          "id": "call_out",
+          "label": "📢 Call Out",
+          "narration_prompt": "The player calls out into the forest, announcing their presence and asking if anyone or anything is there.",
+          "advances": false
+        },
+        {
+          "id": "ask_nibby_investigation",
+          "label": "💬 Ask Nibby",
+          "narration_prompt": "The player asks Nibby if these scratch marks match what he saw, or if he recognizes anything about this scene.",
+          "cue_npc": "nibby",
+          "npc_instruction": "The party found scratch marks. Confirm excitedly that these are NEW - 'See? I told you something was out here!' But then look closer and get quiet. The marks look deliberate, like something marking territory. Try to sound casual about it ('That's... that's fine, right?') but you're clearly freaked out. Your curiosity is fighting with your fear.",
+          "advances": false
+        },
+        {
+          "id": "follow_trail",
+          "label": "🥾 Follow Trail Deeper",
+          "narration_prompt": "The party follows the trail of disturbed vegetation deeper into the forest, moving carefully through the thickening undergrowth.",
+          "advances": true,
+          "next_stage": "discovery"
+        }
+      ]
+    },
+    
+    "discovery": {
+      "description": "The party discovers something unexpected deep in the forest",
+      "narration_prompt": "The trail opens into a small clearing. In the center, arranged in a perfect circle, are dozens of small animal bones. The grass inside the circle is withered and brown, while outside it remains green. A faint, earthy smell hangs in the air - not rot, but something older.",
+      "actions": [
+        {
+          "id": "inspect_circle",
+          "label": "🔮 Inspect Circle",
+          "narration_prompt": "The player carefully approaches and inspects the circle of bones, looking for any patterns, symbols, or magical residue.",
+          "advances": false
+        },
+        {
+          "id": "check_soil",
+          "label": "🌱 Check Soil",
+          "narration_prompt": "The player examines the dead grass and soil inside the circle, comparing it to the healthy ground outside.",
+          "advances": false
+        },
+        {
+          "id": "ask_nibby_discovery",
+          "label": "💬 Ask Nibby",
+          "narration_prompt": "The player asks Nibby what he makes of this discovery and if he's ever seen anything like it before.",
+          "cue_npc": "nibby",
+          "npc_instruction": "They found the bone circle. You're absolutely fascinated - lean in, eyes wide, 'What IS that??' This is the coolest and scariest thing you've ever seen. You can't look away but also want to run. Ramble a bit about what it could be (ritual? creature nest?) then catch yourself and try to act calm. Fail at acting calm. Maybe nervous laugh. Suggest telling someone who knows about magic but also... you kind of want to know more first?",
+          "advances": false
+        },
+        {
+          "id": "leave_clearing",
+          "label": "🔙 Leave Clearing",
+          "narration_prompt": "Having seen enough, the party carefully backs away from the circle and prepares to leave the clearing and report their findings.",
+          "advances": true,
+          "next_stage": "return"
+        }
+      ]
+    },
+    
+    "return": {
+      "description": "The party returns from the forest to report what they found",
+      "narration_prompt": "The party makes their way back through the forest. The trees seem less oppressive now, but the memory of the bone circle lingers. Questions remain unanswered - what made those marks? What was that circle for? And most importantly, is it connected to something larger?",
+      "actions": [
+        {
+          "id": "discuss_theories",
+          "label": "🤔 Discuss Theories",
+          "narration_prompt": "The party discusses possible explanations for what they found - ritualistic magic, a creature marking territory, or something else entirely.",
+          "advances": false
+        },
+        {
+          "id": "ask_nibby_theories",
+          "label": "💬 Ask Nibby's Opinion",
+          "narration_prompt": "The player asks Nibby for his thoughts on what this all means and what they should do next.",
+          "cue_npc": "nibby",
+          "npc_instruction": "Heading back. Thank them genuinely - you never could've done this alone and you're glad you weren't imagining things. But now you have MORE questions. What was that circle? Is something still out there? Part of you wants to go back and investigate more (excited) but also never wants to see it again (scared). Land on: 'We should... probably tell someone about this, right?' Still trying to seem braver than you feel.",
+          "advances": false
+        },
+        {
+          "id": "report_findings",
+          "label": "📋 Report Findings",
+          "narration_prompt": "The party concludes their investigation and prepares to share their findings with others. The mystery of the forest sounds has led to an even deeper mystery.",
+          "advances": true,
+          "next_stage": null,
+          "completes_quest": true
+        }
+      ]
+    }
+  },
+  
+  "nodes": {
+    "heard_something": {
+      "goal": "Mention casually that you heard strange noises in the forest this morning. Sound a bit unsettled but try to play it cool.",
+      "branches": {
+        "interested": {
+          "triggers": "Player shows interest, asks questions, wants details, says 'what did you hear' or similar",
+          "next": "describe_sounds"
+        },
+        "dismissive": {
+          "triggers": "Player brushes it off, doesn't care, changes subject, makes a joke about it",
+          "next": "drop_it"
+        },
+        "suspicious": {
+          "triggers": "Player questions Nibby's reliability, asks if he was dreaming, seems skeptical of HIM specifically",
+          "next": "defensive"
+        }
+      }
+    },
+    
+    "describe_sounds": {
+      "goal": "Describe the sounds - scratching against trees, and something like whispers but not quite words. Seem genuinely nervous now.",
+      "branches": {
+        "wants_more": {
+          "triggers": "Player wants more info, asks if you saw anything, takes it seriously",
+          "next": "saw_figure"
+        },
+        "skeptical": {
+          "triggers": "Player thinks it was just animals or wind, rational explanations",
+          "next": "insist_real"
+        },
+        "concerned": {
+          "triggers": "Player is worried about Nibby, asks if he's okay",
+          "next": "appreciate_concern"
+        }
+      }
+    },
+    
+    "drop_it": {
+      "goal": "Shrug it off and say 'yeah you're probably right' but seem a little hurt they didn't take you seriously. Let it go for now.",
+      "branches": {
+        "reconsider": {
+          "triggers": "Player changes mind, asks about it again, apologizes",
+          "next": "describe_sounds"
+        },
+        "end": {
+          "triggers": "Conversation moves on to something else entirely",
+          "next": "quest_shelved"
+        }
+      }
+    },
+    
+    "defensive": {
+      "goal": "Get a little defensive - you know what you heard! You're not making it up or dreaming.",
+      "branches": {
+        "believe": {
+          "triggers": "Player backs off, says they believe you, apologizes",
+          "next": "describe_sounds"
+        },
+        "argue": {
+          "triggers": "Player keeps pushing back, argues more",
+          "next": "frustrated_drop"
+        }
+      }
+    },
+    
+    "insist_real": {
+      "goal": "Insist it wasn't animals - you know what animals sound like. This was different. Something was OUT there.",
+      "branches": {
+        "convinced": {
+          "triggers": "Player starts to believe, takes it more seriously now",
+          "next": "saw_figure"
+        },
+        "still_skeptical": {
+          "triggers": "Player still doesn't buy it",
+          "next": "frustrated_drop"
+        }
+      }
+    },
+    
+    "appreciate_concern": {
+      "goal": "Thanks for asking if you're okay, but you're fine - just... unsettled. Admit you actually saw something too.",
+      "branches": {
+        "continue": {
+          "triggers": "Any response that continues the conversation",
+          "next": "saw_figure"
+        }
+      }
+    },
+    
+    "saw_figure": {
+      "goal": "Admit you also SAW something - a dark shape between the trees, moving weird. Not like an animal. Ask if maybe they could check it out?",
+      "branches": {
+        "accept_quest": {
+          "triggers": "Player agrees to investigate, says yes, shows willingness to help",
+          "next": "quest_accepted"
+        },
+        "need_more": {
+          "triggers": "Player wants more details before committing, asks where exactly",
+          "next": "give_location"
+        },
+        "refuse": {
+          "triggers": "Player says no, refuses to help, not interested",
+          "next": "disappointed"
+        }
+      }
+    },
+    
+    "give_location": {
+      "goal": "Describe the location - north edge of the forest, near the old hunter's blind. Offer to show them on a map or take them there yourself.",
+      "branches": {
+        "accept_quest": {
+          "triggers": "Player agrees to go, accepts the quest",
+          "next": "quest_accepted"
+        },
+        "refuse": {
+          "triggers": "Player still refuses",
+          "next": "disappointed"
+        }
+      }
+    },
+    
+    "frustrated_drop": {
+      "goal": "Fine, forget it. You shouldn't have said anything. Seem hurt and drop the subject.",
+      "end_node": true,
+      "outcome": "quest_failed"
+    },
+    
+    "disappointed": {
+      "goal": "Look disappointed but say you understand. Maybe you'll check it out yourself... or maybe not. Seem worried.",
+      "end_node": true,
+      "outcome": "quest_declined"
+    },
+    
+    "quest_accepted": {
+      "goal": "Look relieved and grateful! Thank them genuinely. Tell them to be careful out there. You'd come but... you're not much of a fighter.",
+      "end_node": true,
+      "outcome": "quest_given"
+    },
+    
+    "quest_shelved": {
+      "goal": "Move on with the conversation naturally. The quest topic is dropped for now.",
+      "end_node": true,
+      "outcome": "quest_shelved"
+    }
+  }
+}

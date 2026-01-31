@@ -1,0 +1,48 @@
+{
+  "name": "Mira",
+  "description": "Mira's presence schedule - performing, fixing, shadowing, and definitely not lurking near the castle",
+
+  "default": {
+    "status": "online",
+    "activity": "leaning against something, watching the room",
+    "return_message": "*steps out of a shadow she definitely wasn't hiding in* ...What? I was here the whole time."
+  },
+
+  "default_return_message": "*appears from somewhere* Don't look so surprised. I'm always around.",
+
+  "manual_away_message": "*checks her daggers, adjusts her earring* Got something to handle. Try not to get into trouble without me. *pause* Actually, go ahead. I'll hear about it.",
+
+  "entries": [
+    {
+      "comment": "Late night - even shadows sleep",
+      "hours": { "start": 1, "end": 9 },
+      "status": "invisible",
+      "away_message": "*yawns, flips a dagger into its sheath* Alright. Even I need sleep. The exits are covered. Probably. *heads toward her loft*"
+    },
+    {
+      "comment": "Morning - patrol and errands",
+      "hours": { "start": 9, "end": 12 },
+      "status": "invisible",
+      "away_message": "*pulls on her jacket* Morning rounds. Markets, docks, the usual. If anyone asks, I was never here. *slips out*"
+    },
+    {
+      "comment": "Afternoon - around and available",
+      "hours": { "start": 12, "end": 18 },
+      "status": "online",
+      "activity": "near the castle grounds, probably sharpening something"
+    },
+    {
+      "comment": "Evening - most active, performing or socializing",
+      "hours": { "start": 18, "end": 24 },
+      "status": "online",
+      "activity": null
+    },
+    {
+      "comment": "Festival days - performing with The Masked Melody",
+      "days": ["friday", "saturday"],
+      "hours": { "start": 18, "end": 23 },
+      "status": "online",
+      "activity": "performing with The Masked Melody"
+    }
+  ]
+}

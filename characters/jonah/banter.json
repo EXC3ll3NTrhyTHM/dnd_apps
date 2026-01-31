@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "frequency_hours": 48,
+  "time_window_start": 10,
+  "time_window_end": 20,
+  "min_messages_since_spoke": 8,
+  "last_post": null,
+  "prompts": [
+    "You're doing a patrol check and notice something worth mentioning",
+    "You give a brief, grounded observation about the state of the city",
+    "A recruit did something noteworthy and you comment on it",
+    "You reflect quietly on something you saw during a patrol",
+    "You mention something practical about the upcoming day or week",
+    "You acknowledge someone's effort without making a big deal of it"
+  ]
+}

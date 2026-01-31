@@ -1,0 +1,10 @@
+{
+  "announce_channel_id": "<dev-announce-channel-id>",
+  "npc_characters_path": "../characters",
+  "narration_style": "dramatic but concise",
+  "auto_cue_npcs": true,
+  "board_channel_id": "1465967726974734502",
+  "board_title_message_id": "1466280024549228584",
+  "quest_category_id": "1465854749130756096",
+  "npc_discord_ids": {}
+}

@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "frequency_hours": 36,
+  "time_window_start": 10,
+  "time_window_end": 22,
+  "min_messages_since_spoke": 6,
+  "last_post": null,
+  "prompts": [
+    "You just came back from the docks and have a quick story",
+    "You recall something your father used to say and share it",
+    "You tease Jonah or check in with Reah about something",
+    "You mention something about the fleet or the harbor today",
+    "You're in a good mood and say something to lift the room",
+    "You overheard something at the docks worth mentioning"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "frequency_hours": 48,
+  "time_window_start": 8,
+  "time_window_end": 20,
+  "min_messages_since_spoke": 8,
+  "last_post": null,
+  "prompts": [
+    "You just finished a training drill and have a quick observation",
+    "A recruit impressed you today and you mention it briefly",
+    "You're cleaning your bow and reflect on something",
+    "You check in with Jonah or Cena about how their side is running",
+    "You notice something about the state of readiness and comment",
+    "You recall a moment from early in the Ranger Corps and share it"
+  ]
+}

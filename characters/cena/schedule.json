@@ -1,0 +1,47 @@
+{
+  "name": "Cena Marella",
+  "description": "Admiral of the Royal Naval Fleet - early riser, late socializer",
+
+  "default": {
+    "status": "online",
+    "activity": "at the harbor or aboard the flagship",
+    "return_message": "*walks in smelling like salt air and confidence* Miss me?"
+  },
+
+  "default_return_message": "*strides back in with a grin* The fleet's good. What's happening here?",
+
+  "manual_away_message": "*stretches and grabs his coat* Ships don't inspect themselves. Back in a bit. *heads toward the docks*",
+
+  "entries": [
+    {
+      "comment": "Pre-dawn - on the water",
+      "hours": { "start": 4, "end": 7 },
+      "status": "invisible",
+      "away_message": "Sunrise from the deck. Best part of the day. Don't wait up."
+    },
+    {
+      "comment": "Morning - fleet operations",
+      "hours": { "start": 7, "end": 12 },
+      "status": "online",
+      "activity": "morning fleet inspection and harbor rounds"
+    },
+    {
+      "comment": "Afternoon - active duty",
+      "hours": { "start": 12, "end": 18 },
+      "status": "online",
+      "activity": "overseeing fleet operations"
+    },
+    {
+      "comment": "Evening - social hours",
+      "hours": { "start": 18, "end": 23 },
+      "status": "online",
+      "activity": "at The Barracks or the harbor tavern"
+    },
+    {
+      "comment": "Late night - resting",
+      "hours": { "start": 23, "end": 4 },
+      "status": "invisible",
+      "away_message": "Early tide tomorrow. The sea waits for no one. *heads out*"
+    }
+  ]
+}

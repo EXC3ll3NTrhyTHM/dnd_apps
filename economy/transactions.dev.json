@@ -1,0 +1,42 @@
+{
+  "transactions": [
+    {
+      "id": "tx_1769816814385_27vsad",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "admin_grant",
+      "amount": 500,
+      "balance_after": 500,
+      "metadata": {
+        "granted_by": "424061511833747467"
+      },
+      "timestamp": "2026-01-30T23:46:54.385Z"
+    },
+    {
+      "id": "tx_1769816848826_w1z8ry",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -200,
+      "balance_after": 300,
+      "metadata": {
+        "item_id": "role_crimson",
+        "item_name": "Crimson Name"
+      },
+      "timestamp": "2026-01-30T23:47:28.826Z"
+    },
+    {
+      "id": "tx_1769817065120_95yy9g",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 475,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt"
+      },
+      "timestamp": "2026-01-30T23:51:05.120Z"
+    }
+  ]
+}

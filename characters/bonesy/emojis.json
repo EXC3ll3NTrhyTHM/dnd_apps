@@ -1,0 +1,34 @@
+{
+  "emojis": [
+    {
+      "code": "<:blunt:1466965357473435729>",
+      "meaning": "chillin, vibing, relaxed mood"
+    },
+    {
+      "code": "<:bonesy_laugh:1466970482275258398>",
+      "meaning": "laughing, finding something funny"
+    },
+    {
+      "code": "<:bonesy_thumb:1466973065203417242>",
+      "meaning": "approval, agreement, thumbs up"
+    },
+    {
+      "code": "<:bonesy_point:1466976412987818048>",
+      "meaning": "pointing something out, making a point"
+    },
+    {
+      "code": "<:heart_nalyd:1467001334309064724>",
+      "meaning": "showing love or affection"
+    },
+    {
+      "code": "<:yeet:1467021823722917999>",
+      "meaning": "excitement, throwing something, sending it, let's go energy"
+    }
+  ],
+  "combos": [
+    {
+      "code": "<:blunt:1466965357473435729><:bonesy_laugh:1466970482275258398>",
+      "meaning": "laughing while smoking — use when something's funny and you're feeling chill. Can be sent on its own line before or after your message as a reaction"
+    }
+  ]
+}

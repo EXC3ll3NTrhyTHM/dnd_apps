@@ -1,0 +1,325 @@
+{
+  "id": "good_vibes_spot",
+  "name": "The Good Vibes Spot",
+  "description": "Bonesy knows about a chill spot with... unusual properties",
+  "location": "Deep in the woods, off the main trail",
+  "reward_gold": 100,
+
+  "start_node": "mention_spot",
+  "current_node": null,
+  "active": false,
+  "completed": false,
+
+  "companions": ["bonesy"],
+
+  "stages": {
+    "the_trek": {
+      "description": "Bonesy leads the party off the main trail into thicker woods. The path isn't obvious - he just knows where to go.",
+      "narration_prompt": "Bonesy leads the party off the main trail, turning at a mossy rock that looks like any other mossy rock. The forest thickens around you. No path. No markers. He just... knows. The canopy closes overhead, dappling everything in green-gold light. The sounds of the trail - birds, wind, distant voices - fade behind you. It's getting quieter out here. Not eerie. Just... calm.",
+      "actions": [
+        {
+          "id": "examine_surroundings_trek",
+          "label": "🌿 Examine Surroundings",
+          "narration_prompt": "The player pauses to take in the forest around them. The trees are older here, thicker. The undergrowth has thinned out - less fighting for sunlight, more just existing. The air feels different. Still. The kind of quiet that isn't empty, just unhurried. Even the light seems to move slower through the leaves.",
+          "advances": false
+        },
+        {
+          "id": "ask_bonesy_trek",
+          "label": "💬 Ask Bonesy",
+          "narration_prompt": "The player turns to Bonesy and asks how he even found this place.",
+          "cue_npc": "bonesy",
+          "npc_instruction": "The party asks how you found this spot. Tell the story casually - you were just wandering one night, couldn't sleep (well, you don't sleep, but you know what you mean), and you just... ended up here. Felt something pulling you, not in a creepy way, more like when you smell cookies and just kinda drift toward the kitchen. Except you can't smell either. But the vibes, man. The vibes led you there. Ramble a little. You're not great at explaining it. End with something like 'you'll see when we get there.'",
+          "advances": false
+        },
+        {
+          "id": "keep_moving",
+          "label": "🥾 Keep Moving",
+          "narration_prompt": "The party continues following Bonesy deeper into the woods. He walks with surprising confidence for someone with no eyes - ducking branches, stepping over roots, making turns at trees that all look the same. The forest keeps getting quieter. Stiller. Like the world is slowly turning the volume down.",
+          "advances": true,
+          "next_stage": "the_clearing"
+        }
+      ]
+    },
+
+    "the_clearing": {
+      "description": "A glade opens up with an ancient tree at its center. The grass is greener than it should be. The air feels different here - lighter.",
+      "image": "the_clearing.png",
+      "narration_prompt": "The trees part, and you step into a glade that doesn't feel like it belongs to the same forest. An ancient tree dominates the center - massive, gnarled, its roots spreading across the ground like veins. The grass here is impossibly green, almost luminous in the fading light. And the air... it's lighter. Like stepping through a curtain you didn't know was there. Something about this place feels held. Protected. Old.",
+      "actions": [
+        {
+          "id": "examine_tree",
+          "label": "🌳 Examine the Tree",
+          "narration_prompt": "The player approaches the ancient tree and examines it closely. The bark is thick, deeply furrowed, covered in patches of pale lichen. But there's something else - faint patterns in the wood, almost like grain but too deliberate. They could be natural. They could be something else entirely. The tree is old. Really old. It feels less like a tree and more like a landmark - something the forest grew around, not the other way around.",
+          "advances": false
+        },
+        {
+          "id": "feel_the_air",
+          "label": "🌬️ Feel the Air",
+          "narration_prompt": "The player stands still and focuses on the air in the clearing. There's something here. Not a sound exactly - more like a pressure. A hum that lives below hearing, felt in the chest more than the ears. It's steady. Patient. Like a heartbeat that belongs to the ground itself. It doesn't feel threatening. It feels like the clearing is breathing.",
+          "advances": false
+        },
+        {
+          "id": "ask_bonesy_clearing",
+          "label": "💬 Ask Bonesy",
+          "narration_prompt": "The player asks Bonesy how he knew this place was special.",
+          "cue_npc": "bonesy",
+          "npc_instruction": "They ask how you knew this place was special. Be honest - you just felt it. In your bones. Literally. Like a hum. You walked in and everything just... slowed down. Your thoughts got quiet. For a skeleton who's always kinda rattling around (physically and mentally), that's something. You didn't know WHY it was special. You just knew it WAS. And that was enough. Maybe say something about how not everything needs an explanation to be real. Keep it simple and genuine.",
+          "advances": false
+        },
+        {
+          "id": "settle_in",
+          "label": "🏕️ Settle In",
+          "narration_prompt": "The party settles into the clearing, finding comfortable spots among the roots of the ancient tree. Bonesy seems more at ease here than anywhere else - like the clearing is his living room and he's finally home. The light is getting amber now, the sun beginning its descent. No one's in a hurry. For once, there's nowhere else to be.",
+          "advances": true,
+          "next_stage": "nightfall"
+        }
+      ]
+    },
+
+    "nightfall": {
+      "description": "The sun dips. The forest goes from quiet to silent. Not threatening - expectant.",
+      "narration_prompt": "The sun slides below the treeline and the clearing dims. Not dark - the sky still holds a deep blue - but the forest has gone from quiet to *silent*. No wind. No insects. No rustling. It's the kind of silence that has weight to it. Not threatening. Not empty. Expectant. Like the clearing is holding its breath, waiting for something it's waited for a thousand times before.",
+      "actions": [
+        {
+          "id": "start_fire",
+          "label": "🔥 Start a Fire",
+          "narration_prompt": "The player gathers some sticks and starts a small fire. The flames catch easily - the wood here is dry and willing. The warmth is immediate and comforting, throwing soft orange light across the roots and grass. Bonesy watches the flames with empty eye sockets that somehow look content. 'You don't need that here,' he says. 'But... it's nice. The warmth is nice.' He holds his bony hands toward the fire anyway.",
+          "advances": false
+        },
+        {
+          "id": "share_snacks",
+          "label": "🍎 Share Snacks",
+          "narration_prompt": "The player pulls out some snacks to share. Bonesy perks up immediately.",
+          "cue_npc": "bonesy",
+          "npc_instruction": "SNACKS! You're so hyped. You can't eat them - no stomach, no tongue, the whole skeleton thing - but that's not the point. Snacks make the vibes better. It's a scientific fact. (It's not.) Insist they eat. Tell them the clearing responds to good energy and snacks are PEAK good energy. You appreciate the energy of snacks. The concept of snacks. The vibe of someone sharing food. Get a little philosophical about it in a stoner-wisdom kind of way. Maybe hold a piece of bread and just... appreciate it for a second before putting it down.",
+          "advances": false
+        },
+        {
+          "id": "listen_nightfall",
+          "label": "👂 Listen",
+          "narration_prompt": "The player closes their eyes and listens to the silence. It's not empty. The silence has texture. Layers. There's the absence of sound on top, but underneath that, something is building. Not a noise - more like a feeling. A gathering. Like the moment before music starts, when the conductor raises the baton and the whole room leans forward. Something is about to happen. The clearing knows. It's been waiting.",
+          "advances": false
+        },
+        {
+          "id": "wait_and_watch",
+          "label": "✨ Wait and Watch",
+          "narration_prompt": "The party waits. Bonesy hasn't said a word in a while. He's just sitting there, perfectly still - which for a skeleton is very still indeed. His skull is tilted slightly upward, like he's watching the sky. Then he raises one bony finger and points at the grass. 'Watch,' he whispers. And the first light appears.",
+          "advances": true,
+          "next_stage": "the_lights"
+        }
+      ]
+    },
+
+    "the_lights": {
+      "description": "Soft lights begin rising from the grass - blue, green, gold. Dozens of them, floating like embers in reverse.",
+      "image": "the_lights.png",
+      "narration_prompt": "It starts slow. One soft blue glow drifts up from the grass, lazy and unhurried. Then another - green this time, brighter. A gold one near the tree roots. Then dozens. They rise from the ground like embers falling in reverse, each one a different shade - sapphire, emerald, amber, pale violet. They float at different heights, drifting with no wind, pulsing gently like they're breathing. The whole clearing is alive with soft, wandering light. No heat. No sound. Just beauty, unhurried and unexplained.",
+      "actions": [
+        {
+          "id": "reach_out",
+          "label": "🤚 Reach Out",
+          "narration_prompt": "The player slowly extends their hand toward one of the drifting lights. A pale blue one shifts course - not startled, not attracted, just... acknowledging. It drifts toward the outstretched palm and hovers there. Warm. Not hot. Like holding a memory of sunlight. It pulses once, gently, in time with something - a heartbeat? The clearing's heartbeat? Then it floats away, unhurried, rejoining the others. The warmth lingers on the skin for a long moment after.",
+          "image": "reach_out.png",
+          "advances": false
+        },
+        {
+          "id": "study_lights",
+          "label": "🔍 Study Them",
+          "narration_prompt": "The player examines the lights with a careful eye, looking for patterns, magical signatures, anything identifiable. Nothing. No arcane residue. No spell signature. No elemental origin. They don't register as magical in any traditional sense. They don't behave like will-o-wisps or faerie fire or any catalogued phenomenon. They just... are. They exist the way moss exists, the way wind exists. Part of the place. Not summoned, not sustained. Just present. Like they've always been here, and you're just now seeing them.",
+          "advances": false
+        },
+        {
+          "id": "follow_one",
+          "label": "🚶 Follow One",
+          "narration_prompt": "A golden light - brighter than the others, steadier - drifts away from the group toward the ancient tree. It moves with purpose, or something like purpose. The player follows it, stepping carefully between the other lights. It leads to the base of the tree, where the roots are thickest, and settles against the bark. Where it touches, the faint patterns in the wood begin to glow.",
+          "advances": true,
+          "next_stage": "the_heart"
+        },
+        {
+          "id": "ask_bonesy_lights",
+          "label": "💬 Ask Bonesy",
+          "narration_prompt": "The player looks at Bonesy, surrounded by floating lights, and asks what he thinks they are.",
+          "cue_npc": "bonesy",
+          "npc_instruction": "They ask what you think the lights are. You've thought about this before. A lot, actually. And you landed on... not needing to know. Say something like 'I dunno man. I stopped asking and just started watching. That helped.' You're not being dismissive - you genuinely think that's the right approach. Some things aren't puzzles to solve. They're just things to be with. Maybe add that you used to try to figure it out and it made the lights feel further away. When you stopped trying, they came closer. Keep it real. This is the most sincere you get.",
+          "advances": false
+        }
+      ]
+    },
+
+    "the_heart": {
+      "description": "The lights gather around the ancient tree. Where they touch the bark, the faint patterns glow. For one moment, the whole clearing breathes with soft light.",
+      "image": "the_heart.png",
+      "narration_prompt": "The lights are gathering. All of them, drifting slowly toward the ancient tree like rivers finding the sea. Where they touch the bark, the faint patterns ignite - not with fire, but with a deep, steady luminescence. Blues and golds and greens trace lines up the trunk, along the branches, out to the very tips of the leaves. For one perfect, suspended moment, the entire tree is alive with light. The clearing *breathes*. You feel it - in the ground, in the air, in your chest. A single, enormous pulse of warmth. Old and steady and unbothered by time. Then it fades. Slowly. Gently. Like a sigh. The lights dim. The patterns recede. The clearing returns to darkness, but it's a different darkness now. Softer. Full.",
+      "actions": [
+        {
+          "id": "touch_tree",
+          "label": "🌳 Touch the Tree",
+          "narration_prompt": "The player places their hand against the bark of the ancient tree. It's warm. Not hot, not fading - warm the way something alive is warm. The patterns are gone from sight but the player can feel them under their palm, like a pulse. Old and steady. A heartbeat that has been beating since before anyone alive can remember. It doesn't communicate. It doesn't grant power or wisdom. It just beats. And for a moment, the player's own heartbeat syncs with it. Two pulses, perfectly aligned. Then the warmth fades, and it's just a tree again. But the feeling stays.",
+          "advances": false
+        },
+        {
+          "id": "sit_in_silence",
+          "label": "🤫 Sit in Silence",
+          "narration_prompt": "The player sits down at the base of the tree and says nothing. Sometimes the best thing to do is nothing. The residual glow fades around them. The night sounds begin to return - crickets first, then a distant owl, then the soft rustle of wind through leaves. The world comes back gently, like waking from a dream you didn't want to leave. But the peace of the clearing doesn't leave. It settles in. Becomes part of you. The moment was enough. It was always going to be enough.",
+          "advances": false
+        },
+        {
+          "id": "look_at_bonesy",
+          "label": "💀 Look at Bonesy",
+          "narration_prompt": "The player looks over at Bonesy. He's sitting cross-legged near the roots, perfectly still. The last traces of light reflect in his empty eye sockets - two faint points of gold in the dark.",
+          "cue_npc": "bonesy",
+          "npc_instruction": "The player looks at you after the lights faded. You're just sitting there. At peace. Genuinely, fully at peace. Say something simple and real. Not a joke, not a ramble. Something like 'thanks for coming out here with me' or 'I'm glad you got to see it.' You found something beautiful and you wanted to share it. That's all this ever was. You don't need to explain the lights. You don't need to understand the tree. You just needed someone else to sit here with you and feel it. Maybe the simplest, most honest thing you've ever said. Let it land.",
+          "advances": false
+        },
+        {
+          "id": "head_home",
+          "label": "🏠 Head Home",
+          "narration_prompt": "The party rises, quietly, and begins the walk back. Bonesy leads the way again, just as sure-footed in the dark. Nobody talks much. The forest is just a forest again - crickets, rustling leaves, the crunch of footfall. But the clearing stays with you. Not as a memory you'll analyze or a mystery you'll solve. Just as a feeling. A good one. The kind you carry without trying. Bonesy glances back once, and even without a face, you can tell he's smiling.",
+          "advances": true,
+          "next_stage": null,
+          "completes_quest": true
+        }
+      ]
+    }
+  },
+
+  "nodes": {
+    "mention_spot": {
+      "goal": "You NEED to tell them about this spot you found. You're genuinely excited - not frantic, but like you discovered something special and you can't keep it to yourself. Tell them you found this incredible spot deep in the woods where the energy is just... wild. You saw LIGHTS coming out of the ground, man. Glowing. Floating. You've never seen anything like it. Make it clear this isn't just some nice clearing - something magical is happening out there and they HAVE to see it.",
+      "branches": {
+        "curious": {
+          "triggers": "Player responds at all, asks about it, seems even slightly interested, says anything acknowledging what you said, any response that isn't a flat refusal",
+          "next": "describe_vibes"
+        },
+        "dismissive": {
+          "triggers": "Player explicitly says they don't care, tells you to stop, or completely ignores you to talk about something unrelated",
+          "next": "shrug_it_off"
+        },
+        "suspicious": {
+          "triggers": "Player thinks it sounds sketchy, dangerous, or like a trap",
+          "next": "reassure"
+        }
+      }
+    },
+
+    "describe_vibes": {
+      "goal": "Paint the picture. This place is ALIVE. The air feels different - lighter, warmer. The trees are ancient, massive. And at night, these lights rise up from the ground like glowing embers floating upward - blues, greens, golds. They drift and pulse like they're breathing. You sat there for hours just watching. It changed something in you. You felt more at peace than you've ever felt. You really want to share this with them. Ask them directly: would they come check it out with you?",
+      "branches": {
+        "wants_to_go": {
+          "triggers": "Player wants to check it out, asks to go there, says yes, shows enthusiasm, agrees, or says anything positive about going",
+          "next": "offer_to_show"
+        },
+        "asks_more": {
+          "triggers": "Player wants more details about the lights or asks questions",
+          "next": "describe_lights"
+        },
+        "worried": {
+          "triggers": "Player is concerned it might be dangerous or sounds unsure",
+          "next": "calm_concerns"
+        }
+      }
+    },
+
+    "shrug_it_off": {
+      "goal": "Act a little hurt but don't guilt trip. Say okay, that's cool. But then after a beat, add one more detail you 'forgot' to mention - you touched one of the lights once and it was warm, like holding a memory of sunlight. It was the most beautiful thing you've ever experienced and you just wanted someone else to feel that too. Leave it there. If they still don't bite, that's okay.",
+      "branches": {
+        "interested": {
+          "triggers": "Player shows any interest, curiosity, softens, asks about the light you touched, or responds with anything other than a hard no",
+          "next": "describe_vibes"
+        },
+        "done": {
+          "triggers": "Player explicitly shuts it down, says stop, or firmly says no",
+          "next": "quest_shelved"
+        }
+      }
+    },
+
+    "quest_shelved": {
+      "goal": "Alright, alright, you get it. No worries for real. The spot isn't going anywhere. Change the subject naturally.",
+      "end_node": true,
+      "outcome": "quest_shelved"
+    },
+
+    "reassure": {
+      "goal": "Be real with them - you've been there a DOZEN times. Nothing bad has ever happened. Not even close. The energy there is purely peaceful. You're a skeleton who wanders the woods alone at night and YOU feel safe there. That's saying something. Look them in the eye (well, eye sockets) and tell them you would never bring them somewhere dangerous. You care about them too much for that.",
+      "branches": {
+        "convinced": {
+          "triggers": "Player is reassured, softens, shows any interest, or responds positively",
+          "next": "describe_vibes"
+        },
+        "still_worried": {
+          "triggers": "Player is still explicitly refusing or very worried",
+          "next": "shrug_it_off"
+        }
+      }
+    },
+
+    "describe_lights": {
+      "goal": "Get more animated than usual. The lights are soft, they float up from the grass like reverse rain. Different colors - sapphire, emerald, gold, violet. They drift around you like they KNOW you're there. One time, one floated right up to your hand and just hovered. Warm. Gentle. Like it was saying hello. You've never told anyone about this place before - they're the first person you've wanted to share it with. Ask them again: come with you tonight?",
+      "branches": {
+        "wants_to_go": {
+          "triggers": "Player wants to see them, agrees to go, shows enthusiasm, says yes, or responds positively",
+          "next": "offer_to_show"
+        },
+        "theory": {
+          "triggers": "Player has a theory about what they are (magic, spirits, etc) or asks analytical questions",
+          "next": "ponder_theory"
+        }
+      }
+    },
+
+    "calm_concerns": {
+      "goal": "Get a little serious - which is rare for you. Tell them you may be a laid-back skeleton but you're not careless. You've survived this long by knowing what's dangerous and what's not. This place? It's the opposite of dangerous. It's healing. Tell them you actually feel BETTER after visiting - calmer, more centered. You genuinely believe it could help them too. You wouldn't ask if you didn't mean it.",
+      "branches": {
+        "convinced": {
+          "triggers": "Player relaxes, shows any interest, softens at all, or responds with anything other than a firm no",
+          "next": "offer_to_show"
+        },
+        "decline": {
+          "triggers": "Player firmly and explicitly says no or refuses to go",
+          "next": "no_pressure"
+        }
+      }
+    },
+
+    "ponder_theory": {
+      "goal": "Their theory actually makes you think. Consider it out loud - maybe they're right. But here's the thing: whether it's magic, spirits, or something nobody has a name for... it's REAL and it's BEAUTIFUL and you want them to see it with their own eyes instead of just theorizing. Knowing what the lights are matters less than experiencing them. Tell them you'll take them there tonight - it's best at night. What do you say?",
+      "branches": {
+        "accept": {
+          "triggers": "Player agrees, says yes, shows willingness, or responds positively in any way",
+          "next": "quest_accepted"
+        },
+        "decline": {
+          "triggers": "Player explicitly says no or refuses",
+          "next": "no_pressure"
+        }
+      }
+    },
+
+    "offer_to_show": {
+      "goal": "This is your moment - be direct. Tell them you want to take them there TONIGHT. The lights are best after sunset. You know the way by heart. It's not far. You'll bring snacks, they just need to show up. You're genuinely excited - this is the most enthusiastic you've been about anything. Make it easy to say yes. Tell them it'll be worth it, you promise.",
+      "branches": {
+        "accept": {
+          "triggers": "Player agrees, says yes, shows any willingness, says okay, sure, why not, or anything that isn't a clear refusal",
+          "next": "quest_accepted"
+        },
+        "decline": {
+          "triggers": "Player explicitly says no, refuses, or firmly declines",
+          "next": "no_pressure"
+        }
+      }
+    },
+
+    "no_pressure": {
+      "goal": "Look a little disappointed but respect their choice. Say you understand. But leave the door open - tell them the offer stands, anytime. If they ever change their mind, just say the word and you'll take them there. You'll be around. End with something genuine like 'I just think you'd really love it, that's all.'",
+      "end_node": true,
+      "outcome": "quest_declined"
+    },
+
+    "quest_accepted": {
+      "goal": "Light up with genuine excitement. YES! This is going to be amazing. Tell them to meet you at the edge of the woods at sunset. Bring warm clothes, it gets cool out there at night. And SNACKS - the vibes are always better with snacks. You're so hyped. This is going to be the best night ever. You can't wait to show them.",
+      "end_node": true,
+      "outcome": "quest_given"
+    }
+  }
+}

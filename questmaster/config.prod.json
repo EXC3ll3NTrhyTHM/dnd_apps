@@ -1,0 +1,13 @@
+{
+  "announce_channel_id": "1465394023714783364",
+  "npc_characters_path": "../characters",
+  "narration_style": "dramatic but concise",
+  "auto_cue_npcs": true,
+  "board_channel_id": "1466137013676933495",
+  "board_title_message_id": "1466293287949307998",
+  "quest_category_id": "1465860847565017274",
+  "npc_discord_ids": {
+    "nibby": "1465254622401663081",
+    "bonesy": "1465510974336270532"
+  }
+}

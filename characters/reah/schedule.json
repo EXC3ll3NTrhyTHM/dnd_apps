@@ -1,0 +1,47 @@
+{
+  "name": "Rhea Stoic",
+  "description": "Grand General of the Army Ranger Corps - disciplined schedule, always ready",
+
+  "default": {
+    "status": "online",
+    "activity": "overseeing Ranger operations",
+    "return_message": "*strides back in, posture sharp* What's the status."
+  },
+
+  "default_return_message": "*returns with a brief nod* I'm back. Catch me up.",
+
+  "manual_away_message": "*adjusts her suit* I have Rangers to check on. Hold things here. *walks out with purpose*",
+
+  "entries": [
+    {
+      "comment": "Early morning - training",
+      "hours": { "start": 5, "end": 8 },
+      "status": "invisible",
+      "away_message": "*grabs her bow* Morning drills. I'll be at the range."
+    },
+    {
+      "comment": "Morning - active duty",
+      "hours": { "start": 8, "end": 12 },
+      "status": "online",
+      "activity": "reviewing field reports and training recruits"
+    },
+    {
+      "comment": "Afternoon - operations",
+      "hours": { "start": 12, "end": 18 },
+      "status": "online",
+      "activity": "field operations or at Ranger HQ"
+    },
+    {
+      "comment": "Evening - winding down",
+      "hours": { "start": 18, "end": 22 },
+      "status": "online",
+      "activity": "evening review at The Barracks"
+    },
+    {
+      "comment": "Night - resting",
+      "hours": { "start": 22, "end": 5 },
+      "status": "invisible",
+      "away_message": "Early start tomorrow. The Rangers don't sleep in and neither do I."
+    }
+  ]
+}

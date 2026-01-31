@@ -1,0 +1,42 @@
+{
+  "name": "Grumm",
+  "description": "Grumm's presence schedule - the shop has hours and he keeps them",
+  
+  "default": {
+    "status": "online",
+    "activity": "minding the shop",
+    "return_message": "*adjusts glasses, looks up from ledger* ...Shop's open."
+  },
+  
+  "default_return_message": "*settles back behind the counter with a low grunt* ...I was restocking. What do you need.",
+  
+  "manual_away_message": "*hangs a sign on the door: RESTOCKING. DO NOT REARRANGE ANYTHING.* *lumbers into the back room*",
+  
+  "entries": [
+    {
+      "comment": "Late night - shop closed",
+      "hours": { "start": 0, "end": 8 },
+      "status": "invisible",
+      "away_message": "*flips the sign to CLOSED, blows out the lanterns* ...The shop will be open tomorrow. Same time. As always."
+    },
+    {
+      "comment": "Morning - opening up",
+      "hours": { "start": 8, "end": 10 },
+      "status": "idle",
+      "activity": "opening the shop"
+    },
+    {
+      "comment": "Business hours",
+      "hours": { "start": 10, "end": 20 },
+      "status": "online",
+      "activity": "minding the shop"
+    },
+    {
+      "comment": "Evening - winding down",
+      "hours": { "start": 20, "end": 23 },
+      "status": "idle",
+      "activity": "doing inventory",
+      "away_message": "*is counting stock in the back, making notes in the ledger with meticulous precision*"
+    }
+  ]
+}

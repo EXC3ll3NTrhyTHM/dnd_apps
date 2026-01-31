@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "frequency_hours": 24,
+  "time_window_start": 14,
+  "time_window_end": 20,
+  "min_messages_since_spoke": 5,
+  "last_post": "2026-01-31T01:33:28.217Z",
+  "prompts": [
+    "You're fidgeting with your bow and accidentally say a thought out loud",
+    "You remember a question you meant to ask the group days ago",
+    "You're bored and try to start a conversation about something trivial",
+    "You notice something about camp or the surroundings worth pointing out",
+    "You're hungry and mention it dramatically like it's a crisis",
+    "You recall a funny or embarrassing moment and react to it",
+    "You're practicing a move and want someone to watch",
+    "You have a random observation about one of the party members",
+    "You're restless and complain about having nothing to do",
+    "You wonder out loud about something mysterious or weird you noticed lately"
+  ]
+}

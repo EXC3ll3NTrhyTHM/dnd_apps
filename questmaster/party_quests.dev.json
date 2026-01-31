@@ -1,0 +1,20 @@
+{
+  "quests": [
+    {
+      "id": "good_vibes_spot",
+      "name": "The Good Vibes Spot",
+      "description": "Bonesy knows about a chill spot with... unusual properties",
+      "location": "Deep in the woods, off the main trail",
+      "given_by": "bonesy",
+      "status": "available",
+      "current_stage": null,
+      "stages_completed": [],
+      "started_at": null,
+      "added_at": "2026-01-30T04:27:23.859Z",
+      "notes": [],
+      "board_message_id": "1466650988265078878"
+    }
+  ],
+  "completed": [],
+  "failed": []
+}

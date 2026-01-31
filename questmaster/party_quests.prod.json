@@ -1,0 +1,46 @@
+{
+  "quests": [
+    {
+      "id": "forest_mystery",
+      "name": "Strange Sounds in the Forest",
+      "description": "Nibby heard something weird and wants the party to investigate",
+      "location": "North edge of the forest, near the old hunter's blind",
+      "given_by": "nibby",
+      "status": "completed",
+      "current_stage": "return",
+      "stages_completed": [
+        "arrival",
+        "investigation",
+        "discovery"
+      ],
+      "board_message_id": "1466293289488617533",
+      "started_at": "2026-01-30T23:35:50.628Z",
+      "channel_id": "1466940006168793238",
+      "notes": [],
+      "completed_at": "2026-01-30T23:36:54.815Z"
+    },
+    {
+      "id": "good_vibes_spot",
+      "name": "The Good Vibes Spot",
+      "description": "Bonesy knows about a chill spot with... unusual properties",
+      "location": "Deep in the woods, off the main trail",
+      "given_by": "bonesy",
+      "status": "completed",
+      "current_stage": "the_heart",
+      "stages_completed": [
+        "the_trek",
+        "the_clearing",
+        "nightfall",
+        "the_lights"
+      ],
+      "started_at": "2026-01-30T05:28:33.870Z",
+      "added_at": "2026-01-30T05:26:34.659Z",
+      "notes": [],
+      "board_message_id": "1466665882099912878",
+      "channel_id": "1466666382690091073",
+      "completed_at": "2026-01-30T06:42:52.658Z"
+    }
+  ],
+  "completed": [],
+  "failed": []
+}

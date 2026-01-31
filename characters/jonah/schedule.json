@@ -1,0 +1,47 @@
+{
+  "name": "Jonah Varrow",
+  "description": "Chief of The Okhan Shield - always on duty, rarely off the clock",
+
+  "default": {
+    "status": "online",
+    "activity": "overseeing Shield operations",
+    "return_message": "*walks back in, cloak settled, hammer at his side* What did I miss."
+  },
+
+  "default_return_message": "*returns with a brief nod* I'm here.",
+
+  "manual_away_message": "*adjusts his cloak* I need to handle something. Carry on. *strides out*",
+
+  "entries": [
+    {
+      "comment": "Late night - Jonah resting (rare)",
+      "hours": { "start": 1, "end": 6 },
+      "status": "invisible",
+      "away_message": "*nods once* The night watch has it. I'll be back before dawn."
+    },
+    {
+      "comment": "Early morning - first patrol review",
+      "hours": { "start": 6, "end": 9 },
+      "status": "online",
+      "activity": "reviewing night patrol reports"
+    },
+    {
+      "comment": "Daytime - active duty",
+      "hours": { "start": 9, "end": 18 },
+      "status": "online",
+      "activity": "on patrol or at Shield headquarters"
+    },
+    {
+      "comment": "Evening - wrapping up",
+      "hours": { "start": 18, "end": 22 },
+      "status": "online",
+      "activity": "evening rounds"
+    },
+    {
+      "comment": "Late evening - still around",
+      "hours": { "start": 22, "end": 1 },
+      "status": "idle",
+      "activity": "finishing reports"
+    }
+  ]
+}

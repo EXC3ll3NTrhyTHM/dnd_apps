@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "frequency_hours": 24,
+  "time_window_start": 14,
+  "time_window_end": 22,
+  "min_messages_since_spoke": 5,
+  "last_post": "2026-01-31T01:33:27.375Z",
+  "prompts": [
+    "You're staring at something ordinary like it's the most fascinating thing ever",
+    "You have a deep thought that goes nowhere but feels important",
+    "You offer snacks to nobody in particular",
+    "You forgot what you were about to say but try to recover",
+    "You notice something mundane and comment on it philosophically",
+    "You remember something funny and laugh to yourself",
+    "You ask a random deep question to whoever's listening",
+    "You compliment something in the vaguest possible way",
+    "You zone out and then snap back with a random observation",
+    "You share unsolicited life advice that's accidentally profound"
+  ]
+}

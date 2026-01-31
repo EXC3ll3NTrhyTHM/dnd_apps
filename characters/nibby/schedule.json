@@ -1,0 +1,48 @@
+{
+  "name": "Nibby",
+  "description": "Nibby's presence schedule - training, hanging out, and occasionally disappearing",
+  
+  "default": {
+    "status": "online",
+    "activity": "lurking around camp",
+    "return_message": "*wanders back into camp, looking like he's been up to something*"
+  },
+  
+  "default_return_message": "*returns, trying to look casual* ...What? I wasn't gone that long.",
+  
+  "manual_away_message": "*glances around* I've got something I need to take care of. Be back later. *slips away*",
+  
+  "entries": [
+    {
+      "comment": "Weekend training with Tyren",
+      "days": ["saturday", "sunday"],
+      "status": "invisible",
+      "away_message": "*grabs his bow and pack* Tyren wants me for training this weekend. Try not to have too much fun without me. *rolls eyes but looks a little excited*"
+    },
+    {
+      "comment": "Late night - Nibby sleeping",
+      "hours": { "start": 0, "end": 8 },
+      "status": "invisible",
+      "away_message": "*yawns and stretches* Alright, I'm gonna crash. Don't do anything interesting without me. *heads to his tent*"
+    },
+    {
+      "comment": "Morning training",
+      "days": ["monday", "wednesday", "friday"],
+      "hours": { "start": 8, "end": 12 },
+      "status": "invisible",
+      "away_message": "*grabs his bow* Off to the range. Gotta keep these skills sharp. *jogs off toward the practice field*"
+    },
+    {
+      "comment": "Afternoon hangout",
+      "hours": { "start": 12, "end": 18 },
+      "status": "online",
+      "activity": "hanging around"
+    },
+    {
+      "comment": "Evening - most active",
+      "hours": { "start": 18, "end": 23 },
+      "status": "online",
+      "activity": null
+    }
+  ]
+}

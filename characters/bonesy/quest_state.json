@@ -1,0 +1,30 @@
+{
+  "active_quest": null,
+  "current_node": null,
+  "history": [
+    {
+      "node": "mention_spot",
+      "timestamp": "2026-01-30T05:17:12.513Z"
+    },
+    {
+      "node": "reassure",
+      "branch": "suspicious",
+      "timestamp": "2026-01-30T05:20:26.273Z"
+    },
+    {
+      "node": "describe_vibes",
+      "branch": "convinced",
+      "timestamp": "2026-01-30T05:21:33.725Z"
+    },
+    {
+      "node": "offer_to_show",
+      "branch": "wants_to_go",
+      "timestamp": "2026-01-30T05:23:36.290Z"
+    },
+    {
+      "node": "quest_accepted",
+      "branch": "accept",
+      "timestamp": "2026-01-30T05:26:34.537Z"
+    }
+  ]
+}
