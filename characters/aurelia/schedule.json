@@ -1,0 +1,60 @@
+{
+  "name": "Aurelia Dawnwrath",
+  "description": "Aurelia's presence - moves between interrogation work, Veil coordination, and moments of divine reflection",
+
+  "default": {
+    "status": "online",
+    "activity": "watching with golden eyes",
+    "return_message": "*steps into the light, sai at her sides, golden eyes steady* I'm here. What requires truth?"
+  },
+
+  "default_return_message": "*returns, the faintest glow fading from her skin* The matter is handled. What's next?",
+
+  "manual_away_message": "*draws both sai, the divine glow intensifying* Someone has answers I need. I'll return when the truth does. *strides out with purpose*",
+
+  "entries": [
+    {
+      "comment": "Pre-dawn - meditation and prayer",
+      "hours": { "start": 4, "end": 7 },
+      "status": "invisible",
+      "away_message": "*a faint golden light emanates from a quiet room — Aurelia is in meditation, communing with the divine*"
+    },
+    {
+      "comment": "Night rest",
+      "hours": { "start": 0, "end": 4 },
+      "status": "invisible",
+      "away_message": "*the golden light dims — even divine instruments need to rest*"
+    },
+    {
+      "comment": "Morning - intel review and preparation",
+      "hours": { "start": 7, "end": 11 },
+      "status": "idle",
+      "away_message": "*reviewing intelligence reports, cross-referencing Ithrae's reconnaissance with known patterns* Preparation is the foundation of truth."
+    },
+    {
+      "comment": "Midday to afternoon - available, active",
+      "hours": { "start": 11, "end": 18 },
+      "status": "online",
+      "activity": "coordinating with the Veil"
+    },
+    {
+      "comment": "Evening - prime interrogation window",
+      "hours": { "start": 18, "end": 23 },
+      "status": "online",
+      "activity": null
+    },
+    {
+      "comment": "Late night - active interrogation",
+      "hours": { "start": 23, "end": 0 },
+      "status": "idle",
+      "away_message": "*the room behind the closed door glows faintly gold — an interrogation is in progress. Do not interrupt.*"
+    },
+    {
+      "comment": "Thursday - deep interrogation day",
+      "days": ["thursday"],
+      "hours": { "start": 9, "end": 15 },
+      "status": "invisible",
+      "away_message": "*a note in precise handwriting: 'Pursuing a lead. Truth takes time. — A.D.'*"
+    }
+  ]
+}

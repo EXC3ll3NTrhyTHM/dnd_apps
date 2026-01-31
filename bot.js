@@ -127,9 +127,11 @@ const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 async function generateTTS(text) {
   try {
     const voiceName = process.env.TTS_VOICE || 'Enceladus';
+    const accentCue = process.env.TTS_ACCENT || '';
+    const ttsInput = accentCue ? `${accentCue} ${text}` : text;
     const response = await gemini.models.generateContent({
       model: 'gemini-2.5-flash-preview-tts',
-      contents: [{ parts: [{ text }] }],
+      contents: [{ parts: [{ text: ttsInput }] }],
       config: {
         responseModalities: ['AUDIO'],
         speechConfig: {

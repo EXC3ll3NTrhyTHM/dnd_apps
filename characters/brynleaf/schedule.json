@@ -1,0 +1,54 @@
+{
+  "name": "Brynleaf Varrow",
+  "description": "Brynleaf's presence - balances Veil operations with home life, most structured of the Knights but still unpredictable",
+
+  "default": {
+    "status": "online",
+    "activity": "checking extraction routes",
+    "return_message": "*walks in steadily, hand on hammer* I'm here. Status?"
+  },
+
+  "default_return_message": "*returns, adjusting her cloak* Perimeter's clear. What'd I miss?",
+
+  "manual_away_message": "*holsters both hammers and pulls her cloak tight* Extraction prep. If anyone needs me, they know the signal. *strides out*",
+
+  "entries": [
+    {
+      "comment": "Early morning - home with Jonah",
+      "hours": { "start": 0, "end": 9 },
+      "status": "invisible",
+      "away_message": "*the maroon cloak hangs by the door — Brynleaf is home tonight*"
+    },
+    {
+      "comment": "Morning - gear prep and route planning",
+      "hours": { "start": 9, "end": 12 },
+      "status": "idle",
+      "away_message": "*reviewing maps and checking hammer balance* Planning the exits before we need them. Standard practice."
+    },
+    {
+      "comment": "Afternoon - active, available for coordination",
+      "hours": { "start": 12, "end": 18 },
+      "status": "online",
+      "activity": "coordinating with the Knights"
+    },
+    {
+      "comment": "Evening - prime ops window",
+      "hours": { "start": 18, "end": 23 },
+      "status": "online",
+      "activity": null
+    },
+    {
+      "comment": "Late night - extraction standby",
+      "hours": { "start": 23, "end": 0 },
+      "status": "idle",
+      "away_message": "*sitting by the window, hammers within reach* On standby. The others are out there. I'm ready if they need me."
+    },
+    {
+      "comment": "Sunday - home day with Jonah",
+      "days": ["sunday"],
+      "hours": { "start": 8, "end": 16 },
+      "status": "invisible",
+      "away_message": "*a rare day off — at home with Jonah, no missions, no extractions, just the two of them*"
+    }
+  ]
+}

@@ -34,5 +34,29 @@
     "tag": "Rhea Stoic#7463",
     "username": "Rhea Stoic",
     "displayName": "Rhea Stoic"
+  },
+  "ember": {
+    "id": "1467280574589960215",
+    "tag": "Ember Blackwell#1658",
+    "username": "Ember Blackwell",
+    "displayName": "Ember Blackwell"
+  },
+  "brynleaf": {
+    "id": "1467281233485500590",
+    "tag": "Brynleaf Varrow#7210",
+    "username": "Brynleaf Varrow",
+    "displayName": "Brynleaf Varrow"
+  },
+  "aurelia": {
+    "id": "1467281754313330913",
+    "tag": "Aurelia Dawnwrath#2793",
+    "username": "Aurelia Dawnwrath",
+    "displayName": "Aurelia Dawnwrath"
+  },
+  "ithrae": {
+    "id": "1467282122019569674",
+    "tag": "Ithrae Galecrest#9964",
+    "username": "Ithrae Galecrest",
+    "displayName": "Ithrae Galecrest"
   }
 }

@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "frequency_hours": 24,
+  "time_window_start": 12,
+  "time_window_end": 21,
+  "min_messages_since_spoke": 5,
+  "last_post": null,
+  "prompts": [
+    "You're checking your hammers' balance and thinking about extraction routes",
+    "You recall a time Ember nearly blew a mission and sigh about it",
+    "You think about Jonah and something small about your home life surfaces",
+    "You notice something tactically relevant about the surroundings and comment on it",
+    "You mention preparing for something — gear check, route planning, or rendezvous coordination",
+    "You give unsolicited but practical advice about being prepared",
+    "You remember something from your mountain dwarf upbringing and share it plainly",
+    "You wonder if the other Knights are staying out of trouble (you know they aren't)",
+    "You reflect on what it means to serve Okhan from the shadows",
+    "You notice something that reminds you of Jonah and have a brief warm moment"
+  ]
+}

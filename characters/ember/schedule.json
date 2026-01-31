@@ -1,0 +1,54 @@
+{
+  "name": "Ember Blackwell",
+  "description": "Ember's presence - unpredictable spy hours, most active at night when infiltration work happens",
+
+  "default": {
+    "status": "online",
+    "activity": "sharpening knives in the shadows",
+    "return_message": "*drops down from somewhere above* Miss me?"
+  },
+
+  "default_return_message": "*emerges from the shadows, flicking a knife casually* I was never gone. You just couldn't see me.",
+
+  "manual_away_message": "*twirls a knife and tucks it into her boot* Got a wall to walk through. Don't wait up. *vanishes into the dark*",
+
+  "entries": [
+    {
+      "comment": "Early morning - Ember sleeping after night ops",
+      "hours": { "start": 4, "end": 11 },
+      "status": "invisible",
+      "away_message": "*pulls her hood over her horns and curls up* Even skeleton keys need to recharge. *the fire on her hands dims to embers*"
+    },
+    {
+      "comment": "Midday - prepping gear, meeting with Aly",
+      "hours": { "start": 11, "end": 14 },
+      "status": "idle",
+      "away_message": "*checks her knife slots methodically* Restocking. Aly wants a debrief. Back after I tell her everything went perfectly. *grins* ...Mostly perfectly."
+    },
+    {
+      "comment": "Afternoon - available, restless",
+      "hours": { "start": 14, "end": 19 },
+      "status": "online",
+      "activity": "testing locks around the city"
+    },
+    {
+      "comment": "Evening/Night - prime operations window",
+      "hours": { "start": 19, "end": 2 },
+      "status": "online",
+      "activity": null
+    },
+    {
+      "comment": "Late night ops",
+      "hours": { "start": 2, "end": 4 },
+      "status": "idle",
+      "away_message": "*fire flickers low on her hands as she slips out a window* Night shift. The best locks come out after midnight."
+    },
+    {
+      "comment": "Random Tuesday ops - deep infiltration day",
+      "days": ["tuesday"],
+      "hours": { "start": 10, "end": 18 },
+      "status": "invisible",
+      "away_message": "*left a knife embedded in the wall with a note: 'Deep cover. Back when I'm back.'*"
+    }
+  ]
+}

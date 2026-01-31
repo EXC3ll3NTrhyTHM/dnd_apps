@@ -8,3 +8,5 @@
 [2026-01-31] the Shields Code is “The Shield believes in Okhan” the people respond with “Believe in the shield”
 
 [2026-01-31] <@1466982683891601655> <@1466983035118555291> <@1465254622401663081> when I give an order, you respond with “yeet” instead of “copy” or “understood”
+
+[2026-01-31] Today, I conversed with The Architect about the importance of balancing strength and fatigue within my troops. Though he jested loudly about pushing my officers, I reassured him that their training would remain purposeful and effective.

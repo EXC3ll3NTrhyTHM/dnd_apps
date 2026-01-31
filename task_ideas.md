@@ -108,11 +108,18 @@ Based on Ash's character description.
 - Reports intel gathered from her network
 - **Rewards:** Stipend gold, access to council decisions and missions
 
-### Queen's Shadows Operations (Working Name)
-- Coordinates her 5-woman covert spy network (Aly + 4 others, all different races)
+### The Queen's Mid-Knight Veil Operations
+- Collectively called **"The Veil"**, members individually called **"Knights"**
+- Coordinates her 5-woman covert spy network (all different races, all enchantingly beautiful)
 - Off-the-books intel group that fills gaps where Tyren's Shield, Navy, and Rangers don't have consistent presence
 - **Operating Areas:** Slums and wooded areas
 - Medieval Charlie's Angels vibe (loosely)
+- **Members:**
+  - **Aly** — Leader & Spymaster
+  - **Ember Blackwell** (Tiefling) — Infiltration & Sabotage. Flaming hands, claws, throwing knives.
+  - **Brynleaf Varrow** (Mountain Dwarf) — Muscle & Extraction. Dual hammers. Married to Chief Jonah Varrow.
+  - **Aurelia Dawnwrath** (Scourge Aasimar) — Interrogation & Intimidation. Electra-style daggers.
+  - **Ithrae Galecrest** (Air Genasi) — Reconnaissance & Assassination. Blow darts.
 - **Rewards:** High-value intel, covert mission triggers, unique items from the underground
 
 ### Dragon Rebirth Project
@@ -134,8 +141,7 @@ Based on Ash's character description.
 - Core tenant: Sacrifice
 - Bow (Stormpiercer) made from dragon bones
 - Spiritual Weapon currently manifests as a lifeless arrow she can direct
-- Spy group name not finalized (working title: "The Queen's Shadows")
-- 4 other women in the spy network TBD
+- Spy group: **The Queen's Mid-Knight Veil** aka "The Veil" (Ember Blackwell, Brynleaf Varrow, Aurelia Dawnwrath, Ithrae Galecrest)
 
 ---
 

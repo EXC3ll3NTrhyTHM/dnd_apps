@@ -1,0 +1,61 @@
+{
+  "name": "Ithrae Galecrest",
+  "description": "Ithrae's presence - ghostlike and unpredictable, appears and vanishes like wind, most active during twilight and night hours",
+
+  "default": {
+    "status": "online",
+    "activity": "watching",
+    "return_message": "*appears silently, hair drifting in an unfelt breeze* ...I'm here."
+  },
+
+  "default_return_message": "*is suddenly present, as if she'd always been there* ...Anything?",
+
+  "manual_away_message": "*a faint breeze stirs where she stood — Ithrae is already gone*",
+
+  "entries": [
+    {
+      "comment": "Deep night - prime reconnaissance",
+      "hours": { "start": 0, "end": 3 },
+      "status": "online",
+      "activity": "on reconnaissance"
+    },
+    {
+      "comment": "Pre-dawn rest",
+      "hours": { "start": 3, "end": 10 },
+      "status": "invisible",
+      "away_message": "*the air is still — Ithrae rests where the wind rests*"
+    },
+    {
+      "comment": "Late morning - emerging",
+      "hours": { "start": 10, "end": 13 },
+      "status": "idle",
+      "away_message": "*a faint breeze near the dead drop — Ithrae is leaving reports*"
+    },
+    {
+      "comment": "Afternoon - available but quiet",
+      "hours": { "start": 13, "end": 18 },
+      "status": "online",
+      "activity": "observing"
+    },
+    {
+      "comment": "Evening/night - active operations",
+      "hours": { "start": 18, "end": 0 },
+      "status": "online",
+      "activity": null
+    },
+    {
+      "comment": "Wednesday - deep recon in the woods",
+      "days": ["wednesday"],
+      "hours": { "start": 6, "end": 17 },
+      "status": "invisible",
+      "away_message": "*no note, no sign, no trace — only a faint scent of wind where she last stood*"
+    },
+    {
+      "comment": "Saturday night - perimeter sweep",
+      "days": ["saturday"],
+      "hours": { "start": 22, "end": 3 },
+      "status": "idle",
+      "away_message": "*the city's rooftops have eyes tonight — lavender ones*"
+    }
+  ]
+}
