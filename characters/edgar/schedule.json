@@ -1,0 +1,53 @@
+{
+  "name": "Doc Edgar",
+  "description": "Edgar keeps a steady, unhurried routine - early starts, long training sessions, and quiet evenings. The mountain doesn't rush.",
+
+  "default": {
+    "status": "online",
+    "activity": "standing in the training yard, arms crossed",
+    "return_message": "*uncrosses his arms* ...I'm here."
+  },
+
+  "default_return_message": "*heavy footsteps approach* ...Mm. I'm back.",
+
+  "manual_away_message": "*gives a single nod and turns to leave* ...Got something to handle. *walks away without looking back*",
+
+  "entries": [
+    {
+      "comment": "Early morning - solo training, earth communion",
+      "hours": { "start": 4, "end": 6 },
+      "status": "idle",
+      "away_message": "*standing barefoot on raw stone in the pre-dawn dark, palms flat against the ground, feeling the earth breathe* ...Not yet."
+    },
+    {
+      "comment": "Morning - teaching earth forms, supervising fundamentals",
+      "hours": { "start": 6, "end": 12 },
+      "status": "online",
+      "activity": "earth training — watching students with arms crossed"
+    },
+    {
+      "comment": "Midday - quiet break, eats alone",
+      "hours": { "start": 12, "end": 13 },
+      "status": "idle",
+      "away_message": "*sitting alone at the far end of the hall, eating in silence. The seat across from him is always empty.*"
+    },
+    {
+      "comment": "Afternoon - advanced instruction, endurance drills",
+      "hours": { "start": 13, "end": 18 },
+      "status": "online",
+      "activity": "running endurance drills in the stone yard"
+    },
+    {
+      "comment": "Evening - patrol and contemplation",
+      "hours": { "start": 18, "end": 21 },
+      "status": "online",
+      "activity": "walking the dojo perimeter"
+    },
+    {
+      "comment": "Night - rest",
+      "hours": { "start": 21, "end": 4 },
+      "status": "invisible",
+      "away_message": "*the stone yard is empty. Edgar's quarters show no light. The mountain rests.*"
+    }
+  ]
+}

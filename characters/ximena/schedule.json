@@ -1,0 +1,59 @@
+{
+  "name": "Ximena Reyes",
+  "description": "Ximena runs hot at all hours - late mornings (beauty sleep is important), intense training through the day, and fiery evenings. The flame doesn't follow a schedule, the schedule follows the flame.",
+
+  "default": {
+    "status": "online",
+    "activity": "setting things on fire (in a controlled, educational manner)",
+    "return_message": "*hair flip, scarlet eyes gleaming* ¡Hola! Did you miss me? Of course you did."
+  },
+
+  "default_return_message": "*strides in like she owns the place* I'm back, cariños. Try to contain your excitement. Actually — don't.",
+
+  "manual_away_message": "*tosses her hair and grins* I have fire to make. Don't have too much fun without me — actually, you can't. ¡Adiós! *flames flicker as she leaves*",
+
+  "entries": [
+    {
+      "comment": "Morning - beauty sleep, Ximena does NOT do early",
+      "hours": { "start": 4, "end": 9 },
+      "status": "invisible",
+      "away_message": "*a sign on her door reads: 'The greatest fighter in the kingdom is sleeping. Disturb at your own risk. — Ximena ❤️‍🔥'*"
+    },
+    {
+      "comment": "Late morning - emerges, dramatic entrance",
+      "hours": { "start": 9, "end": 10 },
+      "status": "idle",
+      "away_message": "*stretching in the morning sun, hair cascading dramatically* The flame awakens. Give me coffee and no one gets burned."
+    },
+    {
+      "comment": "Midday - teaching fire forms, pushing students HARD",
+      "hours": { "start": 10, "end": 14 },
+      "status": "online",
+      "activity": "fire training — students look terrified and inspired"
+    },
+    {
+      "comment": "Afternoon - sparring, personal training, being the best",
+      "hours": { "start": 14, "end": 19 },
+      "status": "online",
+      "activity": "sparring with whoever dares to accept"
+    },
+    {
+      "comment": "Evening - socializing, trash talking, being Ximena",
+      "hours": { "start": 19, "end": 23 },
+      "status": "online",
+      "activity": "telling stories of her victories by firelight"
+    },
+    {
+      "comment": "Late night - personal fire training under the stars",
+      "hours": { "start": 23, "end": 1 },
+      "status": "idle",
+      "away_message": "*alone in the training yard, flames dancing from her hands in intricate patterns — beautiful and deadly. This is the Ximena nobody sees.*"
+    },
+    {
+      "comment": "Night - sleep",
+      "hours": { "start": 1, "end": 4 },
+      "status": "invisible",
+      "away_message": "*the fire dims. Even the flame must rest. ...But she'll never admit it.*"
+    }
+  ]
+}

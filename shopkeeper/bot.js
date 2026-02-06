@@ -483,9 +483,46 @@ async function processCurrencySignal(filePath) {
       }
     }
 
+    // ---- Tavern Purchase Signal ----
+    if (signal.type === 'tavern_purchase' && signal.user_id && signal.amount) {
+      const catalog = loadCatalog();
+      const currencySymbol = catalog.currency_symbol || 'G';
+      const resultPath = path.join(CURRENCY_SIGNALS_DIR, `${signal.signal_id}_result.json`);
+      
+      const wallet = getWallet(signal.user_id, signal.username);
+      
+      if (wallet.balance < signal.amount) {
+        // Not enough gold
+        const result = {
+          success: false,
+          message: `Not enough ${currencySymbol}. Need ${signal.amount}${currencySymbol}, have ${wallet.balance}${currencySymbol}.`,
+          balance_after: wallet.balance
+        };
+        atomicWrite(resultPath, result);
+        console.log(`[Shopkeeper] Tavern purchase DENIED: ${signal.username} can't afford ${signal.item_name} (${signal.amount}${currencySymbol})`);
+      } else {
+        // Deduct gold
+        const updated = spendGold(
+          signal.user_id,
+          signal.username,
+          signal.amount,
+          'tavern_purchase',
+          { item_id: signal.item_id, item_name: signal.item_name, npc: signal.npc }
+        );
+        
+        const result = {
+          success: true,
+          balance_after: updated.balance,
+          item_name: signal.item_name
+        };
+        atomicWrite(resultPath, result);
+        console.log(`[Shopkeeper] Tavern purchase OK: ${signal.username} bought ${signal.item_name} for ${signal.amount}${currencySymbol} (balance: ${updated.balance}${currencySymbol})`);
+      }
+    }
+
     // Delete signal file
     try { fs.unlinkSync(filePath); } catch (e) {}
-    console.log(`[Shopkeeper] Signal processed: ${signal.type} / ${signal.quest_id}`);
+    console.log(`[Shopkeeper] Signal processed: ${signal.type} / ${signal.quest_id || signal.signal_id}`);
   } catch (err) {
     console.error('[Shopkeeper] Error processing currency signal:', err.message);
     try { fs.unlinkSync(filePath); } catch (e) {}
@@ -570,7 +607,9 @@ async function fulfillPurchase(userId, username, item, member) {
     }
   }
 
-  addItemToInventory(userId, item);
+  if (!item.no_inventory) {
+    addItemToInventory(userId, item);
+  }
   return { success: true, wallet };
 }
 
@@ -829,10 +868,94 @@ function buildConfirmEmbed(item, userId, username) {
 // DISCORD EVENTS
 // ============================================
 
-discord.once('ready', () => {
+// ============================================
+// HUB PANEL (Persistent shop panel)
+// ============================================
+
+const HUB_PANEL_PATH = path.join(CHARACTER_DIR, 'hub_panel.json');
+
+function loadHubPanel() {
+  if (!fs.existsSync(HUB_PANEL_PATH)) return null;
+  try { return JSON.parse(fs.readFileSync(HUB_PANEL_PATH, 'utf-8')); } catch { return null; }
+}
+
+function saveHubPanel(data) {
+  fs.writeFileSync(HUB_PANEL_PATH, JSON.stringify(data, null, 2));
+}
+
+function buildShopHubPanel() {
+  const catalog = loadCatalog();
+  const sym = catalog.currency_symbol || 'G';
+  
+  const embed = new EmbedBuilder()
+    .setColor(0xE67E22)
+    .setTitle(`🏪 Grumm's Shop`)
+    .setDescription(
+      `*...The shop is open. What do you need.*\n\n` +
+      `Browse the wares, check your balance, or view your inventory.`
+    )
+    .setFooter({ text: 'grumm | The shop has hours and he keeps them' });
+  
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId('hub_shop_browse')
+      .setLabel('Browse Shop')
+      .setStyle(ButtonStyle.Primary)
+      .setEmoji('🛒'),
+    new ButtonBuilder()
+      .setCustomId('hub_shop_balance')
+      .setLabel('Check Gold')
+      .setStyle(ButtonStyle.Secondary)
+      .setEmoji('💰'),
+    new ButtonBuilder()
+      .setCustomId('hub_shop_inventory')
+      .setLabel('Inventory')
+      .setStyle(ButtonStyle.Secondary)
+      .setEmoji('🎒'),
+    new ButtonBuilder()
+      .setCustomId('hub_shop_profile')
+      .setLabel('Profile')
+      .setStyle(ButtonStyle.Secondary)
+      .setEmoji('📋'),
+  );
+  
+  return { embeds: [embed], components: [row] };
+}
+
+async function ensureShopHubPanel() {
+  const config = loadConfig();
+  const channelId = config.shop_channel_id;
+  if (!channelId) return;
+  
+  const hub = loadHubPanel();
+  const channel = await discord.channels.fetch(channelId).catch(() => null);
+  if (!channel) return;
+  
+  const panelContent = buildShopHubPanel();
+  
+  if (hub && hub.message_id) {
+    try {
+      const existingMsg = await channel.messages.fetch(hub.message_id);
+      await existingMsg.edit(panelContent);
+      console.log(`[Shopkeeper] Hub panel updated (message ${hub.message_id})`);
+      return;
+    } catch {
+      console.log('[Shopkeeper] Hub panel message not found, posting new one');
+    }
+  }
+  
+  const msg = await channel.send(panelContent);
+  saveHubPanel({ message_id: msg.id, channel_id: channel.id, posted_at: new Date().toISOString() });
+  console.log(`[Shopkeeper] Hub panel posted (message ${msg.id})`);
+}
+
+discord.once('ready', async () => {
   console.log('[Shopkeeper] Logged in as', discord.user.tag);
 
   startCurrencySignalWatcher();
+  
+  // Post/update persistent shop hub panel
+  await ensureShopHubPanel();
 
   console.log('[Shopkeeper] Shop is open for business!');
 });
@@ -843,6 +966,38 @@ discord.once('ready', () => {
 
 discord.on('interactionCreate', async (interaction) => {
   try {
+    // ---- HUB PANEL BUTTONS ----
+    
+    if (interaction.isButton() && interaction.customId === 'hub_shop_browse') {
+      const { embed, row } = buildCategorySelectMenu();
+      const username = interaction.member?.displayName || interaction.user.username;
+      const flavor = await grummSpeak(`A customer named ${username} just walked into the shop and is browsing. Greet them briefly in character.`);
+      if (flavor) embed.setDescription(flavor);
+      await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+      return;
+    }
+    
+    if (interaction.isButton() && interaction.customId === 'hub_shop_balance') {
+      const username = interaction.member?.displayName || interaction.user.username;
+      const embed = buildBalanceEmbed(interaction.user.id, username);
+      await interaction.reply({ embeds: [embed], ephemeral: true });
+      return;
+    }
+    
+    if (interaction.isButton() && interaction.customId === 'hub_shop_inventory') {
+      const username = interaction.member?.displayName || interaction.user.username;
+      const embed = buildInventoryEmbed(interaction.user.id, username);
+      await interaction.reply({ embeds: [embed], ephemeral: true });
+      return;
+    }
+    
+    if (interaction.isButton() && interaction.customId === 'hub_shop_profile') {
+      const username = interaction.member?.displayName || interaction.user.username;
+      const embed = buildProfileEmbed(interaction.user.id, username);
+      await interaction.reply({ embeds: [embed], ephemeral: true });
+      return;
+    }
+    
     // Category select menu
     if (interaction.isStringSelectMenu() && interaction.customId === 'shop_category') {
       const categoryKey = interaction.values[0];
@@ -952,11 +1107,83 @@ discord.on('interactionCreate', async (interaction) => {
 });
 
 // ============================================
+// ITEM SHORTCUT COMMANDS
+// ============================================
+
+/**
+ * Find a catalog item whose shortcuts match the incoming message.
+ * Shortcuts are defined per-item in shop_catalog.json, e.g. ["!smoke", "!spark", "!hit blunt"]
+ * Returns the catalog item if matched, null otherwise.
+ */
+function matchItemShortcut(content) {
+  const lower = content.toLowerCase().trim();
+  const catalog = loadCatalog();
+  for (const [catKey, category] of Object.entries(catalog.categories)) {
+    for (const item of category.items) {
+      if (!item.shortcuts || !item.consumable) continue;
+      for (const sc of item.shortcuts) {
+        // Match exact shortcut or shortcut as prefix (e.g. "!smoke" matches "!smoke something")
+        if (lower === sc.toLowerCase() || lower.startsWith(sc.toLowerCase() + ' ')) {
+          return item;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+discord.on('messageCreate', async (message) => {
+  if (message.author.bot) return;
+  const content = message.content.toLowerCase().trim();
+  if (!content.startsWith('!')) return;
+
+  const matched = matchItemShortcut(content);
+  if (!matched) return; // Not a shortcut, ignore (the !shop handler below will catch !shop commands)
+
+  const userId = message.author.id;
+  const username = message.member?.displayName || message.author.username;
+
+  const inv = getInventory(userId);
+  const invItem = inv.items.find(i => i.item_id === matched.id);
+
+  if (!invItem || invItem.quantity <= 0) {
+    const flavor = await grummSpeak(`${username} tried to use a "${matched.name}" but doesn't have any. React in character — maybe suggest they buy one.`);
+    await message.reply(flavor || `You don't have any **${matched.name}**. Check \`!shop browse\` to buy some.`);
+    return;
+  }
+
+  const result = useConsumable(userId, matched.id);
+  if (result.success) {
+    const flavor = await grummSpeak(`${username} just used a "${matched.name}" (consumable). React in character — keep it brief and fun.`);
+    const useMsg = matched.use_message || `You use the ${matched.name}.`;
+    const embed = new EmbedBuilder()
+      .setColor(0x2ECC71)
+      .setDescription(`${useMsg}\n\n*${matched.name} remaining: ${result.item.quantity || 0}*` + (flavor ? `\n\n${flavor}` : ''));
+    await message.reply({ embeds: [embed] });
+  } else {
+    await message.reply(result.message);
+  }
+});
+
+// ============================================
 // MESSAGE COMMANDS
 // ============================================
 
 discord.on('messageCreate', async (message) => {
   if (message.author.bot) return;
+  
+  // Hub panel command
+  if (message.content.toLowerCase().trim() === '!hub' || message.content.toLowerCase().trim() === '!hub post') {
+    if (!isAdmin(message.member)) {
+      await message.reply("You don't have permission to do that.");
+      return;
+    }
+    saveHubPanel({});
+    await ensureShopHubPanel();
+    await message.reply('(Shop hub panel posted/refreshed)');
+    return;
+  }
+  
   if (!message.content.toLowerCase().startsWith('!shop')) return;
 
   const args = message.content.slice(5).trim().split(/\s+/);
@@ -1150,6 +1377,20 @@ discord.on('messageCreate', async (message) => {
 
   // ---- !shop help ----
   if (command === 'help') {
+    // Build shortcut list dynamically from catalog
+    const catalog = loadCatalog();
+    const shortcutLines = [];
+    for (const category of Object.values(catalog.categories)) {
+      for (const item of category.items) {
+        if (item.shortcuts && item.shortcuts.length > 0) {
+          shortcutLines.push(`${item.name}: ${item.shortcuts.map(s => `\`${s}\``).join(', ')}`);
+        }
+      }
+    }
+    const shortcutSection = shortcutLines.length > 0
+      ? `\n\n**Quick Use (shortcuts):**\n${shortcutLines.join('\n')}`
+      : '';
+
     const help = `**Shop Commands**
 
 **Player:**
@@ -1158,7 +1399,7 @@ discord.on('messageCreate', async (message) => {
 \`!shop inventory\` — View your items
 \`!shop use <item>\` — Use a consumable
 \`!shop profile\` — View your full profile
-\`!shop leaderboard\` — Top 10 richest
+\`!shop leaderboard\` — Top 10 richest${shortcutSection}
 
 **Admin:**
 \`!shop give @user <amount>\` — Grant gold

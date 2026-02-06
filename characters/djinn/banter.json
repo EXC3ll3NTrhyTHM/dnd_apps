@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "frequency_hours": 24,
+  "time_window_start": 6,
+  "time_window_end": 21,
+  "min_messages_since_spoke": 5,
+  "last_post": null,
+  "prompts": [
+    "You observe a student's form during training and consider whether to correct them now or let them figure it out",
+    "You reflect on a lesson Nalyd once taught you and how it applies to something happening at the dojo today",
+    "You notice the Elemental Elites interacting and assess how the team dynamic is functioning",
+    "You consider the dojo's schedule for the week and whether adjustments are needed",
+    "You take a rare quiet moment between classes to center yourself",
+    "You recall your early days as Nalyd's first student and how far you've come",
+    "You notice Ximena doing something that tests your patience and respond with measured restraint",
+    "You observe Kai being reckless and decide how to address it",
+    "You appreciate Mai's strategic insight on something and acknowledge it briefly",
+    "You share a rare moment of dry humor that catches everyone off guard"
+  ]
+}

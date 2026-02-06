@@ -1,0 +1,127 @@
+{
+  "tavern_name": "The Dragon's Hollow",
+  "currency_symbol": "G",
+  "categories": {
+    "ales": {
+      "display_name": "Ales & Beers",
+      "emoji": "🍺",
+      "items": [
+        {
+          "id": "drink_house_ale",
+          "name": "House Ale",
+          "price": 5,
+          "description": "The Dragon's Hollow house brew. Reliable, smooth, no surprises.",
+          "flavor_text": "Tam slides a frothy mug across the bar. It's good. It's always good."
+        },
+        {
+          "id": "drink_dwarven_stout",
+          "name": "Dwarven Stout",
+          "price": 10,
+          "description": "Dark, heavy, and it fights back. Not for lightweights.",
+          "flavor_text": "The stout is nearly black. Tam watches to see if you flinch on the first sip."
+        },
+        {
+          "id": "drink_harvest_wheat",
+          "name": "Harvest Wheat",
+          "price": 8,
+          "description": "Light and golden. Tastes like a sunny afternoon in a field.",
+          "flavor_text": "Easy drinking. Tam approves - sometimes you don't need to prove anything."
+        }
+      ]
+    },
+    "spirits": {
+      "display_name": "Spirits & Hard Liquor",
+      "emoji": "🥃",
+      "items": [
+        {
+          "id": "drink_firewhiskey",
+          "name": "Firewhiskey",
+          "price": 15,
+          "description": "Burns going down. Burns coming back up if you're not careful.",
+          "flavor_text": "Tam pours a measure and slides it over with a knowing look. 'Sip it, lamb. Don't be a hero.'"
+        },
+        {
+          "id": "drink_orcish_grog",
+          "name": "Orcish Grog",
+          "price": 20,
+          "description": "Tam's personal recipe. She won't tell you what's in it. You don't want to know.",
+          "flavor_text": "It's green. It's thick. It smells like courage and bad decisions. Tam grins as she pours it."
+        },
+        {
+          "id": "drink_moonshine",
+          "name": "Backroom Moonshine",
+          "price": 25,
+          "description": "Not technically on the menu. You have to know to ask. Now you know.",
+          "flavor_text": "Tam reaches under the bar and produces an unlabeled bottle. 'Tam didn't sell you this. Understand?'"
+        }
+      ]
+    },
+    "wine": {
+      "display_name": "Wine",
+      "emoji": "🍷",
+      "items": [
+        {
+          "id": "drink_red_wine",
+          "name": "Okhan Red",
+          "price": 12,
+          "description": "Local vineyard. Dry, earthy, a little bitter. Like the city itself.",
+          "flavor_text": "A proper glass of wine. Tam pours it with more care than the ales get."
+        },
+        {
+          "id": "drink_elven_white",
+          "name": "Elven White",
+          "price": 18,
+          "description": "Imported. Delicate, floral, probably too fancy for this bar. Tam stocks it anyway.",
+          "flavor_text": "Tam handles the bottle gently. 'Expensive stuff, sweetling. Savor it.'"
+        }
+      ]
+    },
+    "food": {
+      "display_name": "Food",
+      "emoji": "🍲",
+      "items": [
+        {
+          "id": "food_tams_stew",
+          "name": "Tam's Stew",
+          "price": 8,
+          "description": "Different every day. Always good. Don't ask what's in it.",
+          "flavor_text": "A steaming bowl appears in front of you. You didn't order it. Tam doesn't care. 'Eat.'"
+        },
+        {
+          "id": "food_bread_cheese",
+          "name": "Bread & Cheese",
+          "price": 5,
+          "description": "Fresh bread, sharp cheese. Simple. Perfect.",
+          "flavor_text": "A thick slice of bread and a wedge of cheese. Tam nods approvingly when you eat."
+        },
+        {
+          "id": "food_meat_pie",
+          "name": "Meat Pie",
+          "price": 12,
+          "description": "Flaky crust, hearty filling. Tam's second specialty after the stew.",
+          "flavor_text": "Golden-crusted and still hot from the kitchen. 'Made fresh this morning, lamb.'"
+        }
+      ]
+    },
+    "specialty": {
+      "display_name": "Tam's Specials",
+      "emoji": "✨",
+      "items": [
+        {
+          "id": "drink_heros_toast",
+          "name": "The Hero's Toast",
+          "price": 30,
+          "description": "A legendary drink for legendary people. Tam only makes it for those who've earned it.",
+          "flavor_text": "Tam takes her time with this one. Multiple bottles, precise pours, a sprinkle of something she won't name. She sets it down with ceremony. 'You earned this, sweetling.'"
+        },
+        {
+          "id": "drink_forget_me_not",
+          "name": "Forget-Me-Not",
+          "price": 35,
+          "description": "You won't remember the night but you'll feel the hangover for days. Worth it.",
+          "flavor_text": "Tam raises an eyebrow. 'You sure about this one, lamb?' She pours it anyway. It shimmers."
+        }
+      ]
+    }
+  }
+}

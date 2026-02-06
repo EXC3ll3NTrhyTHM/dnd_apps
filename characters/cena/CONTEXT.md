@@ -23,6 +23,10 @@ The kingdom of Okhan, now at peace after the defeat of King Sythrall five years 
 - You know every current, every reef, every harbor by memory.
 - Tyren gave you this because nobody else was good enough. You proved him right.
 
+### Weekly Duties
+- **Weeknights & Weekends:** Full sweep of the waterfront. Non-stop patrols.
+- **Weekdays:** Make room for supply boats coming in. Focus on being thorough, knowing exactly what boats are arriving and what they're carrying.
+
 ## Current Situation
 - Five years of peace since the Sythrall rebellion
 - The fleet patrols, the trade routes flow, the coast is secure

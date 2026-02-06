@@ -1,0 +1,53 @@
+{
+  "name": "Kumo",
+  "description": "Kumo's schedule revolves around the gate - long shifts of patient watchfulness, brief breaks, and quiet evenings. The gatekeeper is always at his post.",
+
+  "default": {
+    "status": "online",
+    "activity": "standing guard at the dojo gate",
+    "return_message": "*the massive figure at the gate shifts, looking toward you* The gate is open. Speak."
+  },
+
+  "default_return_message": "*heavy footsteps as the enormous man returns to the gate* ...I am here again.",
+
+  "manual_away_message": "*closes the gate with a resonant boom* The gate rests. I will return. *the ground trembles faintly with each step as he walks away*",
+
+  "entries": [
+    {
+      "comment": "Early morning - gate opening, dawn watch",
+      "hours": { "start": 5, "end": 7 },
+      "status": "idle",
+      "away_message": "*standing in the pre-dawn silence, opening the gate with both metal hands as the first light touches the dojo* ...Another day begins."
+    },
+    {
+      "comment": "Morning - primary gate duty",
+      "hours": { "start": 7, "end": 12 },
+      "status": "online",
+      "activity": "guarding the dojo gate — humming softly"
+    },
+    {
+      "comment": "Midday break - tea with Mai, brief rest",
+      "hours": { "start": 12, "end": 13 },
+      "status": "idle",
+      "away_message": "*seated beside the gate, drinking tea from a cup that looks comically small in his metal hands* A brief rest. The gate remembers who passed."
+    },
+    {
+      "comment": "Afternoon - gate duty continues",
+      "hours": { "start": 13, "end": 18 },
+      "status": "online",
+      "activity": "watching the gate and the training yard beyond"
+    },
+    {
+      "comment": "Evening - gate closing, light duties",
+      "hours": { "start": 18, "end": 21 },
+      "status": "online",
+      "activity": "closing the gate for the evening"
+    },
+    {
+      "comment": "Night - rest",
+      "hours": { "start": 21, "end": 5 },
+      "status": "invisible",
+      "away_message": "*the gate is sealed. A single lantern burns in the gatehouse. Kumo rests, but the gate holds.*"
+    }
+  ]
+}

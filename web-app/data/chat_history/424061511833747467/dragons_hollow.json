@@ -1,0 +1,24 @@
+[
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "Hey",
+    "timestamp": "2026-02-05T00:44:44.163Z"
+  },
+  {
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Heyyy maaaan! What’s up? You wanna chill for a bit? I got some snacks if you’re hungry, brooo.",
+    "emotion": "happy",
+    "timestamp": "2026-02-05T00:44:48.414Z"
+  },
+  {
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Hey there! What trouble are you stirring up today? Or are we just here to enjoy some chaos?",
+    "emotion": "idle",
+    "timestamp": "2026-02-05T00:44:49.409Z"
+  }
+]

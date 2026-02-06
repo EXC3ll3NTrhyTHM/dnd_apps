@@ -57,12 +57,83 @@ Based on Dylan's character description.
 
 ---
 
+## Nalyd's Power Levels
+- **Aspect of Will: Ignition** — A higher transformation form. First achieved during the Sythrall campaign in the Ashen Maw dungeon when demons nearly killed Tyren. Nalyd broke through, revived Tyren, and defeated the demons.
+- Pattern: Ignition breakthroughs are triggered by people Nalyd loves being on the edge of death.
+- Used Ignition again in the woods encounter against shadow cats and a Stalker when Ximena was near death. Punched clean through the Stalker's chest.
+- **"Something Beyond"** — Nalyd is secretly training to reach the NEXT level past Ignition. Nobody at the dojo knows. He wants to achieve it on his own terms rather than waiting for another near-death crisis to force it.
+- Ximena fought Nalyd to a standstill but he didn't use Ignition. If he had, it would've been over.
+
 ## Character Notes
 - Eats alone, spends a lot of time training solo
 - Close friends: Tyren and Bonesy. Tolerates Nibby when he tags along.
 - Earns money through council job and dojo
 - Rests on weekends but still trains
 - Djinn taking over the dojo full-time
+
+---
+
+## Dojo Key Figures
+
+### Leadership
+- **Nalyd** — Grand Master of Four Elements
+- **Master Djinn Zenatsu** — New Head of Dojo, Master of Four Elements
+  - Nalyd's first student, 5 years ago after Sythrall's defeat
+  - 28-year-old Japanese man, 6'5", peak physical condition
+  - Black hair, bald head with genie-style ponytail
+  - Man of few words, deeply honored to lead the dojo
+
+### The Elemental Elites (Main Teachers, directly under Master Djinn)
+- **Kai Xi Yang** — Master of Water
+  - Twin brother of Mai, Chinese descent
+  - Orphaned, wandered into Okhan at age 14, now 19
+  - 5'10", lean and fast build, gifted martial artist
+  - Short hair, almost bald
+  - Famous combo with Mai: Twin Hurricane Attack
+- **Doc Edgar** — Master of Earth
+  - 6'6", African American man, 44 years old
+  - Toughest no-BS person in the kingdom
+  - Lived just outside Sythrall's reign for years, honing earth elemental abilities
+  - Loner, silent protector, kindred spirit of Nalyd's
+  - Lost a wife and kids to disease
+  - Unbreakable soul, found new purpose in the dojo
+  - Bald, lots of scars on back and chest
+  - Weathered tank of a man
+- **Mai Xi Yang** — Master of Wind
+  - Twin sister of Kai, Chinese descent
+  - Orphaned, wandered into Okhan at age 14, now 19
+  - 5'10", lean and fast build, gifted martial artist
+  - Long flowing hair, always worn in a bun
+  - Famous combo with Kai: Twin Hurricane Attack
+- **Ximena Reyes** — Master of Fire
+  - Spanish woman, mastered her own martial arts school before traveling to train under Nalyd
+  - Arrived at the dojo 2 years after Sythrall's defeat
+  - Effortless master of fire and martial arts, a fighting prodigy
+  - Fought Nalyd to a standstill, beat Master Djinn AND Rhea Stoic in a handicap match
+  - Some say she's the best fighter in the kingdom (Nalyd disagrees)
+  - Good friends and fierce rivals with Nalyd
+  - 5'3", fast, agile, complete control over fire
+  - Beautiful, alluring, deadly
+  - Long black hair, scarlett eyes
+  - 25 years old
+  - Very cocky, confident, fiery personality
+  - Not everyone's cup of tea, couldn't care less
+
+### Gatekeeper
+- **Kumo** — The Sumo Master, Gatekeeper of the Dojo
+  - 9 feet tall, sumo build
+  - Lost his hands as a child, replaced with ancient metal
+  - Nalyd gave him a job, been friends ever since
+  - Doesn't talk much about his past, Nalyd doesn't pry
+  - Strong, loyal, a force when needed
+  - Japanese, 50 years old
+  - Short black hair with fu manchu goatee
+  - Metal hands look like regular hands until you get close
+
+### Dojo Uniform
+- Midnight blue gi's with gold dragons
+- Individual gi styles can vary per character, but must follow the midnight blue + gold dragon color scheme
+- The four Elemental Elites wear samurai hats with their respective elements represented on the hats
 
 ---
 

@@ -1,1 +1,265 @@
-{ "transactions": [] }
+{
+  "transactions": [
+    {
+      "id": "tx_1769918768709_d46p41",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 150,
+      "metadata": {
+        "quest_id": "the_missing_watch",
+        "quest_name": "The Missing Watch"
+      },
+      "timestamp": "2026-02-01T04:06:08.709Z"
+    },
+    {
+      "id": "tx_1769918768727_raki8r",
+      "user_id": "1374906408046166036",
+      "username": "Tyren",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 150,
+      "metadata": {
+        "quest_id": "the_missing_watch",
+        "quest_name": "The Missing Watch"
+      },
+      "timestamp": "2026-02-01T04:06:08.727Z"
+    },
+    {
+      "id": "tx_1769918881530_ugj8w3",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 125,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt"
+      },
+      "timestamp": "2026-02-01T04:08:01.530Z"
+    },
+    {
+      "id": "tx_1769919972709_iymhqf",
+      "user_id": "1374906408046166036",
+      "username": "Tyren",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 125,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt"
+      },
+      "timestamp": "2026-02-01T04:26:12.709Z"
+    },
+    {
+      "id": "tx_1769920296747_qguhkd",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 100,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt"
+      },
+      "timestamp": "2026-02-01T04:31:36.747Z"
+    },
+    {
+      "id": "tx_1769921717529_69nd4c",
+      "user_id": "1374906408046166036",
+      "username": "Tyren",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 100,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt"
+      },
+      "timestamp": "2026-02-01T04:55:17.529Z"
+    },
+    {
+      "id": "tx_1769921894398_24j1zm",
+      "user_id": "1374906408046166036",
+      "username": "Tyren",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 75,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt"
+      },
+      "timestamp": "2026-02-01T04:58:14.398Z"
+    },
+    {
+      "id": "tx_1770098192323_j13fpu",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "quest_reward",
+      "amount": 100,
+      "balance_after": 200,
+      "metadata": {
+        "quest_id": "the_rooftop_kingdom",
+        "quest_name": "The Rooftop Kingdom"
+      },
+      "timestamp": "2026-02-03T05:56:32.323Z"
+    },
+    {
+      "id": "tx_1770141062163_1v6b0q",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 175,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt"
+      },
+      "timestamp": "2026-02-03T17:51:02.163Z"
+    },
+    {
+      "id": "tx_1770146449532_p1c31j",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "quest_reward",
+      "amount": 100,
+      "balance_after": 275,
+      "metadata": {
+        "quest_id": "the_rooftop_kingdom",
+        "quest_name": "The Rooftop Kingdom"
+      },
+      "timestamp": "2026-02-03T19:20:49.532Z"
+    },
+    {
+      "id": "tx_1770146449556_jd7bcp",
+      "user_id": "1374906408046166036",
+      "username": "Tyren",
+      "type": "quest_reward",
+      "amount": 100,
+      "balance_after": 175,
+      "metadata": {
+        "quest_id": "the_rooftop_kingdom",
+        "quest_name": "The Rooftop Kingdom"
+      },
+      "timestamp": "2026-02-03T19:20:49.556Z"
+    },
+    {
+      "id": "tx_1770146449583_gdvahn",
+      "user_id": "765978025937469481",
+      "username": "Aly",
+      "type": "quest_reward",
+      "amount": 100,
+      "balance_after": 100,
+      "metadata": {
+        "quest_id": "the_rooftop_kingdom",
+        "quest_name": "The Rooftop Kingdom"
+      },
+      "timestamp": "2026-02-03T19:20:49.583Z"
+    },
+    {
+      "id": "tx_1770174963885_07tdru",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "quest_reward",
+      "amount": 100,
+      "balance_after": 375,
+      "metadata": {
+        "quest_id": "the_man_at_the_gate",
+        "quest_name": "The Man at the Gate"
+      },
+      "timestamp": "2026-02-04T03:16:03.885Z"
+    },
+    {
+      "id": "tx_1770225815068_dt2btr",
+      "user_id": "1374906408046166036",
+      "username": "Tyren",
+      "type": "quest_reward",
+      "amount": 100,
+      "balance_after": 275,
+      "metadata": {
+        "quest_id": "the_man_at_the_gate",
+        "quest_name": "The Man at the Gate"
+      },
+      "timestamp": "2026-02-04T17:23:35.068Z"
+    },
+    {
+      "id": "tx_1770225815083_ke2ud6",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "quest_reward",
+      "amount": 100,
+      "balance_after": 100,
+      "metadata": {
+        "quest_id": "the_man_at_the_gate",
+        "quest_name": "The Man at the Gate"
+      },
+      "timestamp": "2026-02-04T17:23:35.083Z"
+    },
+    {
+      "id": "tx_1770252491304_i4fp7p",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "tavern_purchase",
+      "amount": -30,
+      "balance_after": 345,
+      "metadata": {
+        "item_id": "drink_heros_toast",
+        "item_name": "The Hero's Toast",
+        "npc": "bigtam"
+      },
+      "timestamp": "2026-02-05T00:48:11.304Z"
+    },
+    {
+      "id": "tx_1770345319996_4ced7c",
+      "user_id": "1374906408046166036",
+      "username": "Tyren",
+      "type": "quest_reward",
+      "amount": 100,
+      "balance_after": 375,
+      "metadata": {
+        "quest_id": "the_uncontrolled_flame",
+        "quest_name": "The Uncontrolled Flame"
+      },
+      "timestamp": "2026-02-06T02:35:19.996Z"
+    },
+    {
+      "id": "tx_1770345320015_ip7bqf",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "quest_reward",
+      "amount": 100,
+      "balance_after": 445,
+      "metadata": {
+        "quest_id": "the_uncontrolled_flame",
+        "quest_name": "The Uncontrolled Flame"
+      },
+      "timestamp": "2026-02-06T02:35:20.015Z"
+    },
+    {
+      "id": "tx_1770345320044_swfe39",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "quest_reward",
+      "amount": 100,
+      "balance_after": 200,
+      "metadata": {
+        "quest_id": "the_uncontrolled_flame",
+        "quest_name": "The Uncontrolled Flame"
+      },
+      "timestamp": "2026-02-06T02:35:20.044Z"
+    },
+    {
+      "id": "tx_1770345320079_qlzipg",
+      "user_id": "765978025937469481",
+      "username": "Aly",
+      "type": "quest_reward",
+      "amount": 100,
+      "balance_after": 200,
+      "metadata": {
+        "quest_id": "the_uncontrolled_flame",
+        "quest_name": "The Uncontrolled Flame"
+      },
+      "timestamp": "2026-02-06T02:35:20.079Z"
+    }
+  ]
+}

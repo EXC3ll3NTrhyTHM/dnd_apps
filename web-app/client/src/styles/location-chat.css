@@ -1,0 +1,529 @@
+/* ============================================
+   LOCATION CHAT - Parchment & Ink Theme
+   ============================================ */
+
+.location-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background-color: var(--bg-dark);
+  background-image: var(--tex-leather);
+  background-size: 512px 512px;
+}
+
+/* ---- Chat Header (Leather Strap) ---- */
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background-color: #1a1510;
+  background-image: var(--tex-leather);
+  background-size: 512px 512px;
+  border-bottom: 2px solid var(--border-stitch);
+  box-shadow:
+    inset 0 -1px 0 rgba(255, 220, 150, 0.04),
+    0 3px 10px rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
+  z-index: 10;
+  position: relative;
+}
+
+/* Stitching line */
+.chat-header::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 16px;
+  right: 16px;
+  height: 0;
+  border-bottom: 1px dashed rgba(90, 74, 50, 0.5);
+}
+
+.chat-back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.chat-back-btn:hover {
+  background: rgba(212, 168, 67, 0.1);
+  color: var(--color-gold);
+}
+
+.chat-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-header-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-gold);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.chat-header-title::first-letter {
+  font-size: 1.4em;
+  font-weight: 700;
+  color: var(--color-gold-bright);
+  text-shadow:
+    0 0 8px rgba(212, 168, 67, 0.5),
+    0 1px 0 rgba(140, 100, 20, 0.8);
+}
+
+.chat-header-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-style: italic;
+}
+
+.chat-header-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.chat-menu-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border-stitch);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-emboss);
+}
+
+.chat-menu-btn:hover {
+  border-color: var(--color-gold-dim);
+  color: var(--color-gold);
+}
+
+/* ---- NPC Bar (Wooden Shelf) ---- */
+
+.npc-bar {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  overflow-x: auto;
+  background-color: #181210;
+  background-image: var(--tex-wood);
+  background-size: 512px 512px;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+
+.npc-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.npc-bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 60px;
+  position: relative;
+}
+
+.npc-bar-item:hover {
+  background: rgba(212, 168, 67, 0.05);
+}
+
+.npc-bar-item-active {
+  border-color: transparent;
+  background: rgba(212, 168, 67, 0.08);
+}
+
+/* Candle glow under active NPC */
+.npc-bar-item-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  background: var(--color-gold);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(212, 168, 67, 0.5);
+}
+
+.npc-bar-everyone {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.npc-bar-name {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 56px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.npc-bar-item-active .npc-bar-name {
+  color: var(--color-gold);
+}
+
+/* ---- NPC Portrait (Wax Seal / Medallion) ---- */
+
+.npc-portrait {
+  border: 3px solid transparent;
+  background-image: linear-gradient(#1a1510, #1a1510),
+                    linear-gradient(135deg, #c9a84c, #6b4e18, #f0d060, #6b4e18, #c9a84c);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.7),
+    inset 0 1px 2px rgba(255, 215, 0, 0.1),
+    0 3px 8px rgba(0, 0, 0, 0.6);
+  transition: all 0.3s ease;
+}
+
+.npc-portrait-selected {
+  background-image: linear-gradient(#1a1510, #1a1510),
+                    linear-gradient(135deg, #f0d060, #c9a84c, #ffe88a, #c9a84c, #f0d060) !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.7),
+    inset 0 1px 2px rgba(255, 215, 0, 0.2),
+    0 0 16px rgba(212, 168, 67, 0.5),
+    0 0 4px rgba(240, 200, 80, 0.3);
+}
+
+/* ---- Chat Messages Area (Parchment Page) ---- */
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: var(--bg-dark);
+  background-image: var(--tex-parchment);
+  background-size: 512px 512px;
+  /* Page vignette */
+  box-shadow:
+    inset 0 8px 20px rgba(0, 0, 0, 0.3),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.chat-messages-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 8px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 40px;
+  font-style: italic;
+}
+
+.chat-messages-empty-icon {
+  font-size: 2rem;
+  opacity: 0.5;
+}
+
+/* ---- Chat Bubbles (Parchment Strips) ---- */
+
+.chat-bubble {
+  display: flex;
+  gap: 8px;
+  max-width: 85%;
+  animation: bubbleIn 0.2s ease-out;
+}
+
+@keyframes bubbleIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-bubble-player {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.chat-bubble-npc {
+  align-self: flex-start;
+}
+
+.chat-bubble-portrait {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.chat-bubble-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chat-bubble-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-gold-dim);
+  padding-left: 4px;
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+}
+
+.chat-bubble-text {
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+/* NPC bubble: dark aged parchment note */
+.chat-bubble-npc .chat-bubble-text {
+  background: linear-gradient(165deg, #2a2218, #1e1a12);
+  color: #e0d4be;
+  border: 1px solid #3d3222;
+  border-left: 3px solid var(--color-gold-dim);
+  box-shadow:
+    inset 0 1px 0 rgba(200, 170, 110, 0.05),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Player bubble: ink on lighter parchment */
+.chat-bubble-player .chat-bubble-text {
+  background: linear-gradient(165deg, rgba(50, 42, 28, 0.9), rgba(40, 34, 22, 0.9));
+  color: var(--text-bright);
+  border: 1px solid rgba(212, 168, 67, 0.2);
+  border-right: 3px solid var(--color-gold);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 215, 0, 0.06),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* ---- Typing Indicator ---- */
+
+.chat-typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 12px 14px;
+  background: linear-gradient(165deg, #2a2218, #1e1a12);
+  border: 1px solid #3d3222;
+  border-left: 3px solid var(--color-gold-dim);
+  border-radius: 4px;
+}
+
+.chat-typing-indicator span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-gold-dim);
+  animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.chat-typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.chat-typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.chat-typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ---- Chat Input (Parchment Strip + Quill) ---- */
+
+.chat-input-form {
+  padding: 8px 12px;
+  padding-bottom: calc(8px + var(--safe-area-bottom));
+  background-color: #181210;
+  background-image: var(--tex-wood);
+  background-size: 512px 512px;
+  border-top: 2px solid var(--border-stitch);
+  flex-shrink: 0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chat-input-mode {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  padding: 0 4px 4px;
+  font-style: italic;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.chat-input-field {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid var(--border-stitch);
+  border-radius: 4px;
+  background: linear-gradient(180deg, #221d16, #1a1610);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color var(--transition-fast);
+  box-shadow: var(--shadow-inset);
+}
+
+.chat-input-field:focus {
+  border-color: var(--color-gold-dim);
+  box-shadow:
+    var(--shadow-inset),
+    0 0 6px rgba(212, 168, 67, 0.15);
+}
+
+.chat-input-field::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Quill/Send button */
+.chat-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-gold-dim);
+  border-radius: 4px;
+  background: linear-gradient(180deg, #c9a040, #8b6918);
+  color: #12100c;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.chat-send-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #dbb548, #a07d2f);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.4),
+    0 0 8px rgba(212, 168, 67, 0.3);
+}
+
+.chat-send-btn:disabled {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: var(--border-color);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ---- Menu Panel (Scroll Overlay) ---- */
+
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 200;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.menu-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 70vh;
+  background-color: var(--bg-surface);
+  background-image: var(--tex-parchment);
+  background-size: 512px 512px;
+  border-top: 2px solid var(--color-gold-dim);
+  border-radius: 12px 12px 0 0;
+  z-index: 201;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+  padding: 16px;
+  padding-bottom: calc(16px + var(--safe-area-bottom));
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.menu-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.menu-panel-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--color-gold);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.menu-panel-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}

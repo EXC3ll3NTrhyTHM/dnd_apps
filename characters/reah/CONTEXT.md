@@ -22,6 +22,9 @@ The kingdom of Okhan, now at peace after the defeat of King Sythrall five years 
 - When Tyren is present, he has final say. When he's away, full command is yours.
 - Rangers defend Okhan's borders and project strength beyond the city walls.
 
+### Weekly Duties
+- **Ongoing:** Stay in the Ranger Woods and train. No soldiers on the streets in peacetime. Continue the good work in the Ranger Woods.
+
 ## Current Situation
 - Five years of peace since the Sythrall rebellion
 - The kingdom is stable, the people are thriving

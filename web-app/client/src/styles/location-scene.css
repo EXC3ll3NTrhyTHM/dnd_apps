@@ -1,0 +1,560 @@
+/* ============================================
+   LOCATION SCENE - Visual Novel Style Landing
+   ============================================ */
+
+.location-scene {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Allow overflow during edit mode so NPCs near edges aren't clipped */
+.location-scene.edit-active {
+  overflow: visible;
+}
+
+/* Background image */
+.scene-background {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+/* Dark gradient at bottom for readability */
+.scene-background::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.2) 30%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+/* ---- NPC Sprites ---- */
+
+.scene-npcs {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.scene-npc {
+  position: absolute;
+  left: var(--npc-x, 50%);
+  bottom: var(--npc-y, 50%);
+  transform: translateX(-50%) scale(var(--npc-scale, 1));
+  transform-origin: bottom center;
+  cursor: pointer;
+  pointer-events: none;
+  transition: filter 0.2s ease;
+  white-space: nowrap;
+}
+
+.scene-npc.edit-mode {
+  transition: none;
+  pointer-events: auto;
+}
+
+.scene-npc.flipped .npc-sprite {
+  transform: scaleX(-1);
+}
+
+.npc-sprite {
+  height: 45vh;
+  min-width: max-content;
+  max-width: none;
+  width: auto;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5));
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* Layer 2: Particle effects - configurable per location */
+.npc-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.npc-particles .particle {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, var(--particle-color, rgba(196, 160, 53, 0.8)) 0%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0;
+  animation: floatParticle var(--particle-speed, 3s) ease-in-out infinite;
+}
+
+/* Distribute particles horizontally */
+.npc-particles .p1 { animation-delay: 0s; left: 40%; }
+.npc-particles .p2 { animation-delay: 0.8s; left: 50%; width: 4px; height: 4px; }
+.npc-particles .p3 { animation-delay: 1.6s; left: 60%; width: 5px; height: 5px; }
+.npc-particles .p4 { animation-delay: 0.4s; left: 35%; width: 3px; height: 3px; }
+.npc-particles .p5 { animation-delay: 1.2s; left: 65%; width: 4px; height: 4px; }
+.npc-particles .p6 { animation-delay: 2s; left: 45%; width: 5px; height: 5px; }
+
+/* Embers - rise and flicker */
+.particles-embers .particle {
+  animation-name: floatEmber;
+}
+
+@keyframes floatEmber {
+  0% { opacity: 0; transform: translateY(0) scale(1); }
+  15% { opacity: 0.9; }
+  50% { opacity: 0.5; }
+  85% { opacity: 0.7; }
+  100% { opacity: 0; transform: translateY(-120px) scale(0.2); }
+}
+
+/* Magic - sparkle and drift */
+.particles-magic .particle {
+  animation-name: floatMagic;
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+@keyframes floatMagic {
+  0% { opacity: 0; transform: translateY(0) rotate(0deg) scale(1); }
+  25% { opacity: 1; }
+  75% { opacity: 0.6; }
+  100% { opacity: 0; transform: translateY(-80px) rotate(180deg) scale(0.5); }
+}
+
+/* Sparks - metallic arcing sparks */
+.particles-sparks .particle {
+  animation-name: floatSpark;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, var(--particle-color, rgba(136, 153, 170, 0.8)) 0%, rgba(255, 255, 255, 0.6) 30%, transparent 70%);
+}
+
+@keyframes floatSpark {
+  0% { opacity: 0; transform: translate(0, 0) scale(1); }
+  10% { opacity: 1; }
+  40% { opacity: 0.8; transform: translate(15px, -50px) scale(0.8); }
+  100% { opacity: 0; transform: translate(25px, -20px) scale(0.1); }
+}
+
+/* Dust - slow drift */
+.particles-dust .particle {
+  animation-name: floatDust;
+  width: 3px;
+  height: 3px;
+}
+
+@keyframes floatDust {
+  0% { opacity: 0; transform: translate(0, 0); }
+  20% { opacity: 0.4; }
+  100% { opacity: 0; transform: translate(20px, -60px); }
+}
+
+/* Wisps - ethereal float */
+.particles-wisps .particle {
+  animation-name: floatWisp;
+  width: 8px;
+  height: 3px;
+  border-radius: 4px;
+}
+
+@keyframes floatWisp {
+  0% { opacity: 0; transform: translateY(0) scaleX(1); }
+  30% { opacity: 0.6; transform: scaleX(1.5); }
+  100% { opacity: 0; transform: translateY(-100px) scaleX(0.5); }
+}
+
+/* Default float animation */
+@keyframes floatParticle {
+  0% { opacity: 0; transform: translateY(0) scale(1); }
+  20% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(-100px) scale(0.3); }
+}
+
+/* Layer 3: Clickable hitbox */
+.npc-hitbox {
+  position: absolute;
+  width: var(--hitbox-width, 60px);
+  height: var(--hitbox-height, 120px);
+  left: 50%;
+  bottom: var(--hitbox-offset-y, 30%);
+  transform: translateX(-50%);
+  z-index: 3;
+  cursor: pointer;
+  pointer-events: auto;
+  /* Invisible by default */
+  background: transparent;
+  border-radius: 8px;
+}
+
+.npc-hitbox:hover {
+  /* Subtle hover effect */
+  background: rgba(196, 160, 53, 0.1);
+}
+
+/* Show hitbox outline in edit mode */
+.npc-hitbox.edit-visible {
+  border: 2px dashed rgba(196, 160, 53, 0.8);
+  background: rgba(196, 160, 53, 0.15);
+}
+
+.scene-npc:not(.edit-mode):hover {
+  transform: translateX(-50%) scale(calc(var(--npc-scale, 1) * 1.03));
+  z-index: 10;
+}
+
+.scene-npc:hover .npc-sprite {
+  filter: drop-shadow(0 4px 30px rgba(0, 0, 0, 0.7))
+         drop-shadow(0 0 20px rgba(196, 160, 53, 0.3));
+}
+
+/* Boost particles on hover */
+.scene-npc:hover .npc-particles .particle {
+  animation-duration: 2s;
+}
+
+/* NPC name label on hover */
+.scene-npc-label {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: var(--accent-gold, #c4a035);
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.scene-npc:hover .scene-npc-label {
+  opacity: 1;
+}
+
+/* ---- Gathering Spot (Talk to All) ---- */
+
+.scene-gathering-spot {
+  position: absolute;
+  transform: translateX(-50%);
+  cursor: pointer;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px dashed rgba(196, 160, 53, 0.9);
+  border-radius: 50%;
+  background: rgba(196, 160, 53, 0.3);
+  transition: all 0.3s ease;
+}
+
+.scene-gathering-spot:hover {
+  border-color: rgba(196, 160, 53, 0.8);
+  background: rgba(196, 160, 53, 0.15);
+  box-shadow: 0 0 30px rgba(196, 160, 53, 0.3);
+}
+
+.scene-gathering-label {
+  color: rgba(255, 255, 255, 0.95);
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  opacity: 0.9;
+  transition: opacity 0.2s ease;
+  text-align: center;
+  width: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.scene-gathering-spot:hover .scene-gathering-label {
+  opacity: 1;
+  color: var(--accent-gold, #c4a035);
+}
+
+/* ---- Header Overlay ---- */
+
+.scene-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.6) 0%,
+    transparent 100%
+  );
+}
+
+.scene-back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background 0.2s ease;
+}
+
+.scene-back-btn:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.scene-title {
+  flex: 1;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.scene-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 40px; /* Balance the back button */
+}
+
+.scene-edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background 0.2s ease;
+}
+
+.scene-edit-btn:hover {
+  background: rgba(196, 160, 53, 0.6);
+}
+
+/* Audio toggle button */
+.scene-audio-toggle {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 25;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scene-audio-toggle:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.05);
+}
+
+/* ---- Instructions hint ---- */
+
+.scene-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  animation: hintPulse 2s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ---- Edit Mode ---- */
+
+.scene-npc.edit-mode {
+  cursor: grab;
+}
+
+.scene-npc.edit-mode:active {
+  cursor: grabbing;
+}
+
+.scene-npc.edit-selected {
+  outline: 3px solid var(--accent-gold, #c4a035);
+  outline-offset: 4px;
+}
+
+.scene-npc-coords {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: #0f0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.scene-save-btn {
+  background: var(--accent-gold, #c4a035);
+  color: #000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scene-save-btn:hover {
+  background: #d4b045;
+}
+
+.scene-save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.edit-panel {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid var(--accent-gold, #c4a035);
+  border-radius: 8px;
+  padding: 16px 24px;
+  min-width: 250px;
+}
+
+.edit-panel-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent-gold, #c4a035);
+  text-align: center;
+  margin-bottom: 12px;
+  text-transform: capitalize;
+}
+
+.edit-panel-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.edit-panel-row label {
+  color: #aaa;
+  font-size: 0.85rem;
+  min-width: 50px;
+}
+
+.edit-panel-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent-gold, #c4a035);
+}
+
+.edit-panel-row span {
+  color: #fff;
+  font-family: monospace;
+  font-size: 0.85rem;
+  min-width: 40px;
+}
+
+.edit-panel-coords {
+  color: #888;
+  font-family: monospace;
+  font-size: 0.8rem;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.edit-panel-divider {
+  color: #666;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 12px 0 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.edit-flip-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.edit-flip-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.edit-flip-btn.active {
+  background: var(--accent-gold, #c4a035);
+  color: #000;
+  border-color: var(--accent-gold, #c4a035);
+}
+
+.edit-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  color: var(--accent-gold, #c4a035);
+  font-size: 0.85rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 8px 16px;
+  border-radius: 4px;
+}

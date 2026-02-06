@@ -29,7 +29,11 @@ const {
   ActionRowBuilder, 
   ButtonBuilder, 
   ButtonStyle,
-  EmbedBuilder
+  EmbedBuilder,
+  AttachmentBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle
 } = require('discord.js');
 const OpenAI = require('openai');
 
@@ -90,15 +94,27 @@ function createAvailableQuestButtons(quests) {
   
   const rows = [];
   
-  for (let i = 0; i < Math.min(quests.length, 5); i++) {
+  // Discord allows max 5 action rows, each can hold up to 5 buttons
+  // Pack multiple quest buttons per row to fit more quests
+  let currentRow = new ActionRowBuilder();
+  let buttonsInRow = 0;
+  
+  for (let i = 0; i < quests.length; i++) {
     const quest = quests[i];
-    const row = new ActionRowBuilder().addComponents(
+    currentRow.addComponents(
       new ButtonBuilder()
         .setCustomId(`quest_track_${quest.id}`)
-        .setLabel(`📜 Track: ${quest.name.substring(0, 30)}`)
+        .setLabel(`📜 ${quest.name.substring(0, 25)}`)
         .setStyle(ButtonStyle.Primary)
     );
-    rows.push(row);
+    buttonsInRow++;
+    
+    if (buttonsInRow === 5 || i === quests.length - 1) {
+      rows.push(currentRow);
+      if (rows.length >= 5) break; // Discord max 5 rows
+      currentRow = new ActionRowBuilder();
+      buttonsInRow = 0;
+    }
   }
   
   return rows;
@@ -178,6 +194,17 @@ function createStageButtons(questDefinition, stageName) {
     rows.push(new ActionRowBuilder().addComponents(currentRow));
   }
   
+  // Add "Say Something" button if there are NPCs present to talk to
+  const dialogueNpcs = getStageDialogueNpcs(questDefinition, stageName);
+  if (dialogueNpcs.length > 0 && rows.length < 5) {
+    rows.push(new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId('quest_speak')
+        .setLabel('💬 Say Something')
+        .setStyle(ButtonStyle.Primary)
+    ));
+  }
+  
   return rows;
 }
 
@@ -195,6 +222,41 @@ function getStageInfo(questDefinition, stageName) {
     return null;
   }
   return questDefinition.stages[stageName];
+}
+
+/**
+ * Get NPCs present in a stage (for free-text dialogue).
+ * Returns array of NPC names in priority order (stage-level cues first, then action cues).
+ */
+function getStageDialogueNpcs(questDefinition, stageName) {
+  const npcs = [];
+  const seen = new Set();
+  const stage = questDefinition.stages?.[stageName];
+  if (!stage) return npcs;
+  
+  // Stage-level cue NPCs are the "primary" NPCs for the scene
+  if (stage.stage_cue_npc) {
+    const name = stage.stage_cue_npc.toLowerCase();
+    if (!seen.has(name)) { seen.add(name); npcs.push(name); }
+  }
+  if (stage.stage_cue_npcs && Array.isArray(stage.stage_cue_npcs)) {
+    for (const cue of stage.stage_cue_npcs) {
+      const name = cue.npc.toLowerCase();
+      if (!seen.has(name)) { seen.add(name); npcs.push(name); }
+    }
+  }
+  
+  // Then action-level cue NPCs
+  if (stage.actions) {
+    for (const action of stage.actions) {
+      if (action.cue_npc) {
+        const name = action.cue_npc.toLowerCase();
+        if (!seen.has(name)) { seen.add(name); npcs.push(name); }
+      }
+    }
+  }
+  
+  return npcs;
 }
 
 
@@ -455,6 +517,316 @@ function resolveQuestImage(sourceNpc, imageName) {
   return null;
 }
 
+// ============================================
+// WEBHOOK MANAGEMENT (for quest NPC dialogue)
+// ============================================
+
+// Per-NPC webhook cache: "channelId:npcName" -> webhook
+const npcWebhookCache = new Map();
+
+/**
+ * Get or create a dedicated webhook for an NPC in a channel.
+ * Each quest NPC gets its own webhook with their name and avatar baked in.
+ * This avoids CDN URL expiration issues with per-message avatarURL overrides.
+ */
+async function getOrCreateNpcWebhook(channel, npcName, questDef) {
+  const cacheKey = `${channel.id}:${npcName}`;
+  if (npcWebhookCache.has(cacheKey)) {
+    return npcWebhookCache.get(cacheKey);
+  }
+  
+  const npcInfo = questDef.key_npcs?.[npcName];
+  const displayName = npcInfo?.name || npcName.charAt(0).toUpperCase() + npcName.slice(1);
+  const webhookName = `Quest NPC: ${displayName}`;
+  
+  try {
+    // Check for existing webhook for this NPC
+    const webhooks = await channel.fetchWebhooks();
+    let webhook = webhooks.find(w => w.name === webhookName && w.owner?.id === discord.user.id);
+    
+    // Load avatar as base64 data URI if available
+    let avatarData = null;
+    const sourceNpc = questDef._source_npc;
+    if (sourceNpc) {
+      const imagesDir = path.join(NPC_CHARACTERS_PATH, sourceNpc, 'quests', 'images');
+      const candidates = [`${npcName}_avatar.png`, `${npcName}.png`];
+      
+      for (const filename of candidates) {
+        const avatarPath = path.join(imagesDir, filename);
+        if (fs.existsSync(avatarPath)) {
+          const buffer = fs.readFileSync(avatarPath);
+          const ext = filename.endsWith('.png') ? 'png' : 'jpeg';
+          avatarData = `data:image/${ext};base64,${buffer.toString('base64')}`;
+          break;
+        }
+      }
+    }
+    
+    if (!webhook) {
+      // Create new webhook with name and avatar baked in
+      const createOptions = { name: webhookName, reason: `Quest NPC dialogue: ${displayName}` };
+      if (avatarData) createOptions.avatar = avatarData;
+      
+      webhook = await channel.createWebhook(createOptions);
+      console.log(`[QuestMaster] Created webhook for ${displayName} in channel ${channel.id}`);
+    } else if (avatarData && !webhook.avatar) {
+      // Webhook exists but has no avatar — update it
+      webhook = await webhook.edit({ avatar: avatarData });
+      console.log(`[QuestMaster] Updated avatar for ${displayName} webhook`);
+    }
+    
+    npcWebhookCache.set(cacheKey, webhook);
+    return webhook;
+  } catch (err) {
+    console.error(`[QuestMaster] Failed to get/create NPC webhook for ${npcName}:`, err.message);
+    return null;
+  }
+}
+
+/**
+ * Legacy shared webhook getter (for non-NPC webhook uses if any)
+ */
+async function getOrCreateWebhook(channel) {
+  return getOrCreateNpcWebhook(channel, '_shared', { key_npcs: {} });
+}
+
+/**
+ * Check if cue_npc refers to a quest NPC (defined in key_npcs) rather than a bot character.
+ */
+function isQuestNpc(npcName, questDef) {
+  // If there's a character folder with a bot, it's a bot NPC
+  const npcCharDir = path.join(NPC_CHARACTERS_PATH, npcName);
+  if (fs.existsSync(npcCharDir)) {
+    return false; // Bot NPC — use the cue file system
+  }
+  // If defined in key_npcs, it's a quest NPC — QM handles dialogue
+  return !!(questDef.key_npcs?.[npcName]);
+}
+
+/**
+ * Wait for an NPC bot to finish processing a cue by watching for the cue file to be deleted.
+ * The NPC bot deletes quest_cue.json after it sends its response, so we poll for that.
+ * Returns true if NPC responded (file deleted), false if timed out.
+ */
+function waitForNpcResponse(npcName, maxWaitMs = 30000) {
+  const cueFilePath = path.join(NPC_CHARACTERS_PATH, npcName, 'quest_cue.json');
+  const pollInterval = 500; // Check every 500ms
+  
+  return new Promise((resolve) => {
+    const startTime = Date.now();
+    
+    const check = () => {
+      // File gone = NPC processed and responded
+      if (!fs.existsSync(cueFilePath)) {
+        // Small buffer to let Discord deliver the message
+        setTimeout(() => resolve(true), 800);
+        return;
+      }
+      
+      // Timed out
+      if (Date.now() - startTime >= maxWaitMs) {
+        console.log(`[QuestMaster] Timed out waiting for ${npcName} to respond (${maxWaitMs}ms)`);
+        resolve(false);
+        return;
+      }
+      
+      setTimeout(check, pollInterval);
+    };
+    
+    // Start polling after a brief initial delay (give NPC bot time to detect the file)
+    setTimeout(check, 300);
+  });
+}
+
+/**
+ * Generate dialogue as a quest NPC using their voice profile from key_npcs.
+ */
+async function generateQuestNpcDialogue(npcName, questDef, instruction, context) {
+  const npcInfo = questDef.key_npcs[npcName];
+  if (!npcInfo) return null;
+  
+  const config = loadConfig();
+  
+  try {
+    const response = await openai.chat.completions.create({
+      model: process.env.MODEL || 'gpt-4o-mini',
+      max_completion_tokens: 400,
+      messages: [
+        {
+          role: 'system',
+          content: `You are ${npcInfo.name}, a character in a D&D quest.
+
+**About you:**
+- Race: ${npcInfo.race || 'Unknown'}
+- Age: ${npcInfo.age || 'Unknown'}
+- Description: ${npcInfo.description || ''}
+- Personality: ${npcInfo.personality || ''}
+
+**Rules:**
+- Speak in first person AS this character
+- Stay in character at all times
+- Use *asterisks* for actions and body language
+- Keep it SHORT. 2-3 sentences max. This is Discord.
+- Don't narrate what other characters do — only speak and act as yourself
+- Don't break character or reference game mechanics
+- NEVER use @mentions or tag other characters/NPCs — just use their name naturally in dialogue`
+        },
+        {
+          role: 'user',
+          content: `Scene context: ${context}\n\nDirection: ${instruction}`
+        }
+      ]
+    });
+    
+    const content = response.choices[0]?.message?.content;
+    return content?.trim() || null;
+  } catch (err) {
+    console.error(`[QuestMaster] Quest NPC dialogue error for ${npcName}:`, err.message);
+    return null;
+  }
+}
+
+/**
+ * Send a message via webhook as a quest NPC.
+ * Uses a dedicated per-NPC webhook with name and avatar baked in.
+ */
+async function sendAsQuestNpc(channel, npcName, questDef, content) {
+  const webhook = await getOrCreateNpcWebhook(channel, npcName, questDef);
+  if (!webhook) {
+    // Fallback: send as QM with name tag
+    const npcInfo = questDef.key_npcs?.[npcName];
+    await channel.send(`**${npcInfo?.name || npcName}:** ${content}`);
+    return;
+  }
+  
+  try {
+    // Name and avatar are baked into the webhook itself — just send content
+    await webhook.send({ content });
+  } catch (err) {
+    console.error(`[QuestMaster] Webhook send failed for ${npcName}:`, err.message);
+    const npcInfo = questDef.key_npcs?.[npcName];
+    await channel.send(`**${npcInfo?.name || npcName}:** ${content}`);
+  }
+}
+
+/**
+ * Collect all NPC names that will be cued for a stage (for dialog exclusion from narration).
+ */
+function getStageCueNpcNames(stageInfo) {
+  const names = [];
+  if (!stageInfo) return names;
+  if (stageInfo.stage_cue_npc) names.push(stageInfo.stage_cue_npc.toLowerCase());
+  if (stageInfo.stage_cue_npcs && Array.isArray(stageInfo.stage_cue_npcs)) {
+    for (const cue of stageInfo.stage_cue_npcs) {
+      const name = cue.npc.toLowerCase();
+      if (!names.includes(name)) names.push(name);
+    }
+  }
+  return names;
+}
+
+/**
+ * Collect all NPC names that will be cued for an action (for dialog exclusion from narration).
+ */
+function getActionCueNpcNames(actionDef) {
+  const names = [];
+  if (!actionDef) return names;
+  if (actionDef.cue_npc) names.push(actionDef.cue_npc.toLowerCase());
+  if (actionDef.cue_npcs && Array.isArray(actionDef.cue_npcs)) {
+    for (const cue of actionDef.cue_npcs) {
+      const name = (typeof cue === 'string' ? cue : cue.npc).toLowerCase();
+      if (!names.includes(name)) names.push(name);
+    }
+  }
+  // Also support stage_cue_npcs at action level (multi-NPC cues)
+  if (actionDef.stage_cue_npcs && Array.isArray(actionDef.stage_cue_npcs)) {
+    for (const cue of actionDef.stage_cue_npcs) {
+      const name = cue.npc.toLowerCase();
+      if (!names.includes(name)) names.push(name);
+    }
+  }
+  return names;
+}
+
+/**
+ * Check if a stage has any NPC cues defined.
+ */
+function stageHasCues(stageInfo) {
+  if (!stageInfo) return false;
+  if (stageInfo.stage_cue_npc) return true;
+  if (stageInfo.stage_cue_npcs && Array.isArray(stageInfo.stage_cue_npcs) && stageInfo.stage_cue_npcs.length > 0) return true;
+  return false;
+}
+
+/**
+ * Handle stage-level NPC cues (stage_cue_npc / stage_cue_npcs).
+ * Called after a stage narration is sent. Fires NPC dialogue via webhook or cue file.
+ * If postComponents is provided, sends buttons AFTER all NPC cues finish.
+ */
+async function handleStageCues(channel, stageInfo, questDef, stageName, postComponents) {
+  if (!stageInfo) {
+    // No stage info but we still need to send buttons if provided
+    if (postComponents && postComponents.length > 0) {
+      await channel.send({ content: '*What do you do next?*', components: postComponents });
+    }
+    return;
+  }
+  
+  const cues = [];
+  
+  // Single NPC cue
+  if (stageInfo.stage_cue_npc) {
+    cues.push({
+      npc: stageInfo.stage_cue_npc.toLowerCase(),
+      instruction: stageInfo.stage_npc_instruction || 'Respond in character.'
+    });
+  }
+  
+  // Multiple NPC cues (in order)
+  if (stageInfo.stage_cue_npcs && Array.isArray(stageInfo.stage_cue_npcs)) {
+    for (const cue of stageInfo.stage_cue_npcs) {
+      cues.push({
+        npc: cue.npc.toLowerCase(),
+        instruction: cue.instruction || 'Respond in character.'
+      });
+    }
+  }
+  
+  for (const cue of cues) {
+    const context = `Quest: ${questDef.name}. Stage: ${stageInfo.description || stageName}. ${questDef.description}`;
+    
+    if (isQuestNpc(cue.npc, questDef)) {
+      // Quest NPC — generate dialogue and send via webhook
+      const dialogue = await generateQuestNpcDialogue(cue.npc, questDef, cue.instruction, context);
+      if (dialogue) {
+        await sendAsQuestNpc(channel, cue.npc, questDef, dialogue);
+      }
+    } else {
+      // Bot NPC — write cue file for the bot to pick up, then wait for response
+      const cueFilePath = path.join(NPC_CHARACTERS_PATH, cue.npc, 'quest_cue.json');
+      try {
+        const cueData = {
+          channel_id: channel.id,
+          quest_id: questDef.id,
+          instruction: cue.instruction,
+          timestamp: Date.now()
+        };
+        fs.writeFileSync(cueFilePath, JSON.stringify(cueData, null, 2));
+        console.log(`[QuestMaster] Wrote stage cue file for ${cue.npc}`);
+        // Wait for bot NPC to respond before continuing
+        await waitForNpcResponse(cue.npc);
+      } catch (err) {
+        console.error(`[QuestMaster] Failed to write stage cue for ${cue.npc}:`, err.message);
+      }
+    }
+  }
+  
+  // Send buttons AFTER all NPC cues have been processed
+  if (postComponents && postComponents.length > 0) {
+    await channel.send({ content: '*What do you do next?*', components: postComponents });
+  }
+}
+
 function findQuestDefinition(questId) {
   // Search all NPC character folders for this quest
   const characters = fs.readdirSync(NPC_CHARACTERS_PATH);
@@ -504,15 +876,22 @@ function listAvailableQuests() {
 // NARRATION
 // ============================================
 
-async function generateNarration(context, instruction) {
+async function generateNarration(context, instruction, npcNames = []) {
   const config = loadConfig();
   
   console.log('[QuestMaster] Generating scene narration...');
   
+  // Build NPC dialog exclusion rule if NPCs are present
+  let npcDialogRule = '';
+  if (npcNames.length > 0) {
+    const names = npcNames.map(n => n.charAt(0).toUpperCase() + n.slice(1)).join(', ');
+    npcDialogRule = `\n- DO NOT include any dialog from NPCs (${names}). They will speak for themselves after your narration. Only describe the scene, atmosphere, and what the player character sees and does. You may describe an NPC's body language or presence but NEVER write their spoken words.`;
+  }
+  
   try {
     const response = await openai.chat.completions.create({
       model: process.env.MODEL || 'gpt-4o-mini',
-      max_completion_tokens: 4000,  // High to account for reasoning models
+      max_completion_tokens: 800,
       messages: [
         {
           role: 'system',
@@ -520,20 +899,24 @@ async function generateNarration(context, instruction) {
 
 Style: ${config.narration_style}
 
+You will receive a narration prompt — this is the CORE CONTENT of the scene. Your job is to bring it to life.
+
 Rules:
 - Narrate in second person ("You walk into the forest...")
 - Set atmosphere and describe surroundings
 - Don't make decisions for the players
 - End with what the players see/hear/can do next
 - Use *asterisks* for emphasis on key details
-- Don't use quotation marks around your narration
+- Don't use quotation marks around your narration (except for the player character's own words)
 - NEVER ask players to roll dice or make skill checks - there is no dice rolling in this game
+- NEVER reference meta-game terms like "path A", "path B", "branch point", or any behind-the-scenes quest structure. Narrate purely in-world.
+- If the prompt is already rich and detailed, deliver it nearly verbatim with light atmospheric polish${npcDialogRule}
 
-IMPORTANT: Keep it SHORT — 2-4 sentences most of the time. This is Discord, not a novel. Only go longer for big dramatic moments (entering a new location, a major reveal, etc.).`
+THIS IS DISCORD. Keep it short. 3-5 sentences max for scene narration. No flowery padding.`
         },
         {
           role: 'user',
-          content: `Context: ${context}\n\nNarrate: ${instruction}`
+          content: `Context: ${context}\n\nNarration prompt:\n${instruction}\n\nBring this scene to life:`
         }
       ]
     });
@@ -556,33 +939,41 @@ IMPORTANT: Keep it SHORT — 2-4 sentences most of the time. This is Discord, no
   }
 }
 
-async function narrateAction(questContext, playerAction) {
+async function narrateAction(questContext, playerAction, npcNames = []) {
   const config = loadConfig();
   
   console.log('[QuestMaster] Generating narration for action:', playerAction?.substring(0, 50));
   
+  // Build NPC dialog exclusion rule if NPCs are present
+  let npcDialogRule = '';
+  if (npcNames.length > 0) {
+    const names = npcNames.map(n => n.charAt(0).toUpperCase() + n.slice(1)).join(', ');
+    npcDialogRule = `\n- DO NOT include any dialog from NPCs (${names}). They will speak for themselves after your narration. Only describe the scene, atmosphere, and what the player character sees and does. You may describe an NPC's body language or presence but NEVER write their spoken words.`;
+  }
+  
   try {
     const response = await openai.chat.completions.create({
       model: process.env.MODEL || 'gpt-4o-mini',
-      max_completion_tokens: 4000,  // High to account for reasoning models
+      max_completion_tokens: 600,
       messages: [
         {
           role: 'system',
-          content: `You are a Quest Master responding to player actions in a D&D adventure.
+          content: `You are a Quest Master narrating a D&D adventure.
 
 Style: ${config.narration_style}
 
-Rules:
-- Describe the outcome of their action briefly
-- Be fair - don't make it too easy or too hard
-- Add a few sensory details
-- NEVER ask players to roll dice or make skill checks - there is no dice rolling in this game
+You will receive a narration prompt — this is the CORE CONTENT of the scene. Your job is to bring it to life.
 
-IMPORTANT: Keep it SHORT — 1-2 sentences. Be punchy, not verbose. Only go to 3-4 sentences if the outcome is truly dramatic.`
+Rules:
+- You may add sensory details, atmosphere, and brief descriptive touches
+- NEVER ask players to roll dice or make skill checks
+- NEVER reference meta-game terms like "path A", "path B", or behind-the-scenes quest structure${npcDialogRule}
+
+THIS IS DISCORD. Keep it punchy. 2-3 sentences of atmosphere max. No walls of text.`
         },
         {
           role: 'user',
-          content: `Quest context: ${questContext}\n\nPlayer action: "${playerAction}"\n\nNarrate the result:`
+          content: `Quest context: ${questContext}\n\nNarration prompt:\n${playerAction}\n\nBring this scene to life:`
         }
       ]
     });
@@ -1013,6 +1404,97 @@ discord.on('interactionCreate', async (interaction) => {
   console.log('[QuestMaster] Interaction received:', interaction.type, interaction.isButton() ? interaction.customId : '(not a button)');
   
   try {
+    // Handle modal submissions (free-text NPC dialogue)
+    if (interaction.isModalSubmit()) {
+      if (interaction.customId === 'quest_speak_modal') {
+        const playerText = interaction.fields.getTextInputValue('quest_speak_text');
+        
+        await interaction.deferReply();
+        
+        let currentQuest = activeQuest;
+        if (!currentQuest || currentQuest.channelId !== interaction.channelId) {
+          currentQuest = getActiveQuestForChannel(interaction.channelId);
+          if (currentQuest) activeQuest = currentQuest;
+        }
+        
+        if (!currentQuest) {
+          await interaction.editReply({ content: '*No quest is active.*' });
+          return;
+        }
+        
+        // Refresh definition from disk
+        const freshDef = findQuestDefinition(currentQuest.id);
+        if (freshDef) currentQuest.definition = freshDef;
+        
+        const stageName = currentQuest.quest.current_stage;
+        const stageInfo = getStageInfo(currentQuest.definition, stageName);
+        const npcs = getStageDialogueNpcs(currentQuest.definition, stageName);
+        
+        if (npcs.length === 0) {
+          await interaction.editReply({ content: '*No one is around to hear you...*' });
+          return;
+        }
+        
+        // Show what the player said
+        await interaction.editReply({ content: `🗣️ *You say:* "${playerText}"` });
+        
+        // Show typing indicator
+        await interaction.channel.sendTyping();
+        
+        const primaryNpc = npcs[0];
+        const context = `Quest: ${currentQuest.definition.name}. Stage: ${stageInfo?.description || stageName}. ${currentQuest.definition.description}`;
+        const instruction = `The player (Grand Master Nalyd) just said to you: "${playerText}". Respond naturally in character to what they said. Stay true to the current scene and your emotional state.`;
+        
+        if (isQuestNpc(primaryNpc, currentQuest.definition)) {
+          // Quest NPC (key_npcs) — generate dialogue via OpenAI + webhook
+          const dialogue = await generateQuestNpcDialogue(primaryNpc, currentQuest.definition, instruction, context);
+          if (dialogue) {
+            await sendAsQuestNpc(interaction.channel, primaryNpc, currentQuest.definition, dialogue);
+          } else {
+            await interaction.channel.send(`*${primaryNpc} remains silent...*`);
+          }
+          
+          // Re-send stage buttons
+          const components = createStageButtons(currentQuest.definition, stageName);
+          if (components.length > 0) {
+            await interaction.channel.send({ content: '*What do you do next?*', components });
+          }
+        } else {
+          // Bot NPC — write cue file with player's dialogue
+          const npcCharDir = path.join(NPC_CHARACTERS_PATH, primaryNpc);
+          if (fs.existsSync(npcCharDir)) {
+            const cueData = {
+              channel_id: interaction.channel.id,
+              instruction: instruction,
+              context: stageInfo?.description || stageName,
+              timestamp: Date.now()
+            };
+            const cueFilePath = path.join(npcCharDir, 'quest_cue.json');
+            const tempFilePath = path.join(npcCharDir, 'quest_cue.tmp');
+            fs.writeFileSync(tempFilePath, JSON.stringify(cueData, null, 2));
+            fs.renameSync(tempFilePath, cueFilePath);
+            console.log(`[QuestMaster] Wrote free-text cue for bot NPC ${primaryNpc}`);
+            
+            // Wait for bot to respond, then re-send buttons
+            waitForNpcResponse(primaryNpc).then(async () => {
+              try {
+                const components = createStageButtons(currentQuest.definition, stageName);
+                if (components.length > 0) {
+                  await interaction.channel.send({ content: '*What do you do next?*', components });
+                }
+              } catch (e) {
+                console.error(`[QuestMaster] Failed to re-send buttons after free-text cue:`, e.message);
+              }
+            });
+          } else {
+            await interaction.channel.send(`*(NPC '${primaryNpc}' not available)*`);
+          }
+        }
+        
+        return;
+      }
+    }
+    
     // Handle button clicks
     if (interaction.isButton()) {
       const parts = interaction.customId.split('_');
@@ -1092,15 +1574,18 @@ discord.on('interactionCreate', async (interaction) => {
           
           let narration;
           const stageInfo = getStageInfo(result.definition, initialStage);
+          const stageNpcNames = getStageCueNpcNames(stageInfo);
           if (stageInfo?.narration_prompt) {
             narration = await generateNarration(
               `Quest: ${result.definition.name}. ${result.definition.description}. Given by: ${result.definition._source_npc}.`,
-              stageInfo.narration_prompt
+              stageInfo.narration_prompt,
+              stageNpcNames
             );
           } else {
             narration = await generateNarration(
               `Quest: ${result.definition.name}. ${result.definition.description}. Given by: ${result.definition._source_npc}.`,
-              'Set the scene for the beginning of this quest. The adventurers are about to embark.'
+              'Set the scene for the beginning of this quest. The adventurers are about to embark.',
+              stageNpcNames
             );
           }
           
@@ -1113,13 +1598,20 @@ discord.on('interactionCreate', async (interaction) => {
           }
           
           // Post narration in the new quest channel
+          // If stage has NPC cues, send narration WITHOUT buttons, then buttons come after NPC dialogue
+          const hasCues = stageHasCues(stageInfo);
           const startMsg = {
             content: `📖 **${result.definition.name}** begins...\n\n📍 **${initialStage.charAt(0).toUpperCase() + initialStage.slice(1)}**\n\n${narration}`,
-            components
+            components: hasCues ? [] : components
           };
           const startImage = resolveQuestImage(result.definition._source_npc, stageInfo?.image);
           if (startImage) startMsg.files = [startImage];
           await questChannel.send(startMsg);
+          
+          // Handle stage-level NPC cues for the initial stage, send buttons after
+          if (stageInfo) {
+            await handleStageCues(questChannel, stageInfo, result.definition, initialStage, hasCues ? components : null);
+          }
           
           // Reply to interaction with link to the new channel, with replay button
           const replayRow = new ActionRowBuilder().addComponents(
@@ -1179,7 +1671,7 @@ discord.on('interactionCreate', async (interaction) => {
         }
         
         if (type === 'replay') {
-          // Reset quest back to available state
+          // Reset quest back to tracked/available so it reappears on the board
           const data = loadPartyQuests();
           const quest = data.quests.find(q => q.id === questId);
           
@@ -1188,15 +1680,16 @@ discord.on('interactionCreate', async (interaction) => {
             return;
           }
           
-          // Reset quest to tracked state
+          // Reset quest state
           quest.status = 'available';
           quest.current_stage = null;
           quest.stages_completed = [];
           quest.started_at = null;
           quest.channel_id = null;
+          if (quest.flags) quest.flags = [];
           savePartyQuests(data);
           
-          // Update board to show available status
+          // Update board to show available status with Start button
           if (quest.board_message_id) {
             await updateQuestOnBoard(quest);
           }
@@ -1206,12 +1699,69 @@ discord.on('interactionCreate', async (interaction) => {
             activeQuest = null;
           }
           
+          // Delete the message the replay button was on
+          try {
+            await interaction.message.delete();
+          } catch (delErr) {
+            console.log('[QuestMaster] Could not delete replay message:', delErr.message);
+          }
+          
+          // Ephemeral notification
+          const config = loadConfig();
+          const boardRef = config.board_channel_id ? ` Check <#${config.board_channel_id}> to start it again!` : '';
           await interaction.reply({
-            content: `🔄 **Quest Reset:** ${quest.name}\n\nThe quest is now available to play again! Check the quest board to start.`,
-            ephemeral: false
+            content: `🔄 **${quest.name}** has been reset.${boardRef}`,
+            ephemeral: true
           });
           return;
         }
+      }
+      
+      // "Say Something" button — opens a modal for free-text NPC dialogue
+      if (interaction.customId === 'quest_speak') {
+        let currentQuest = activeQuest;
+        if (!currentQuest || currentQuest.channelId !== interaction.channelId) {
+          currentQuest = getActiveQuestForChannel(interaction.channelId);
+          if (currentQuest) activeQuest = currentQuest;
+        }
+        
+        if (!currentQuest) {
+          await interaction.reply({ content: 'No quest is active in this channel.', ephemeral: true });
+          return;
+        }
+        
+        // Refresh definition from disk
+        const freshDef = findQuestDefinition(currentQuest.id);
+        if (freshDef) currentQuest.definition = freshDef;
+        
+        const stageName = currentQuest.quest.current_stage;
+        const npcs = getStageDialogueNpcs(currentQuest.definition, stageName);
+        
+        if (npcs.length === 0) {
+          await interaction.reply({ content: '*No one is around to hear you...*', ephemeral: true });
+          return;
+        }
+        
+        // Build NPC display name for modal title
+        const primaryNpc = npcs[0];
+        const npcInfo = currentQuest.definition.key_npcs?.[primaryNpc];
+        const npcDisplayName = npcInfo?.name || primaryNpc.charAt(0).toUpperCase() + primaryNpc.slice(1);
+        
+        const modal = new ModalBuilder()
+          .setCustomId('quest_speak_modal')
+          .setTitle(`Speak to ${npcDisplayName}`);
+        
+        const textInput = new TextInputBuilder()
+          .setCustomId('quest_speak_text')
+          .setLabel('What do you say?')
+          .setStyle(TextInputStyle.Paragraph)
+          .setPlaceholder('Type what you want to say...')
+          .setRequired(true)
+          .setMaxLength(500);
+        
+        modal.addComponents(new ActionRowBuilder().addComponents(textInput));
+        await interaction.showModal(modal);
+        return;
       }
       
       // Stage action buttons (new stage-based system)
@@ -1219,12 +1769,18 @@ discord.on('interactionCreate', async (interaction) => {
         const actionId = parts.slice(2).join('_'); // Rejoin in case action ID has underscores
         console.log('[QuestMaster] Stage action button clicked:', actionId, 'in channel:', interaction.channelId);
         
-        // Try to get active quest from channel if not in memory
+        // Try to get active quest from channel - always refresh definition from disk
         let currentQuest = activeQuest;
         if (!currentQuest || currentQuest.channelId !== interaction.channelId) {
           currentQuest = getActiveQuestForChannel(interaction.channelId);
           if (currentQuest) {
             activeQuest = currentQuest;
+          }
+        } else {
+          // Refresh definition from disk in case quest files were edited
+          const freshDef = findQuestDefinition(currentQuest.id);
+          if (freshDef) {
+            currentQuest.definition = freshDef;
           }
         }
         
@@ -1262,11 +1818,114 @@ discord.on('interactionCreate', async (interaction) => {
           const npcName = actionDef.cue_npc.toLowerCase();
           console.log('[QuestMaster] Cueing NPC:', npcName);
           
+          // Check if this is a quest NPC (defined in key_npcs) or a bot NPC (has character folder)
+          if (isQuestNpc(npcName, currentQuest.definition)) {
+            // --- QUEST NPC: QM generates dialogue via webhook ---
+            console.log(`[QuestMaster] Quest NPC detected: ${npcName}, generating dialogue...`);
+            
+            // Post the narration first (as QM)
+            const narration = actionDef.narration_prompt || `The party looks to ${npcName}...`;
+            const cueReply = { content: `📖 *${narration}*` };
+            const cueImage = resolveQuestImage(currentQuest.definition._source_npc, actionDef.image);
+            if (cueImage) cueReply.files = [cueImage];
+            await interaction.editReply(cueReply);
+            
+            // Generate NPC dialogue
+            const stageInfo = getStageInfo(currentQuest.definition, stageName);
+            const dialogueContext = `Quest: ${currentQuest.definition.name}. Stage: ${stageInfo?.description || stageName}. ${narration}`;
+            const dialogue = await generateQuestNpcDialogue(
+              npcName, 
+              currentQuest.definition,
+              actionDef.npc_instruction || 'Respond in character.',
+              dialogueContext
+            );
+            
+            if (dialogue) {
+              // Send dialogue via webhook with NPC's name and avatar
+              await sendAsQuestNpc(interaction.channel, npcName, currentQuest.definition, dialogue);
+            } else {
+              await interaction.followUp({ content: `*(${npcName} remains silent...)*` });
+            }
+            
+            // Re-send stage buttons if action doesn't advance (so player can keep exploring)
+            if (!actionDef.advances) {
+              const components = createStageButtons(currentQuest.definition, stageName);
+              if (components.length > 0) {
+                await interaction.channel.send({ content: '*What do you do next?*', components });
+              }
+            }
+            
+            // Handle stage advancement for quest NPC actions
+            if (actionDef.advances) {
+              if (actionDef.sets_flag) {
+                const data = loadPartyQuests();
+                const quest = data.quests.find(q => q.id === currentQuest.id);
+                if (quest) {
+                  if (!quest.flags) quest.flags = [];
+                  quest.flags.push(actionDef.sets_flag);
+                  savePartyQuests(data);
+                  console.log(`[QuestMaster] Set flag: ${actionDef.sets_flag}`);
+                }
+              }
+              
+              if (actionDef.completes_quest) {
+                await completeQuest(currentQuest.id);
+                await interaction.channel.send({
+                  content: `✅ **Quest Complete!** *${currentQuest.definition.name}* has been resolved.`,
+                  components: [new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                      .setCustomId(`quest_replay_${currentQuest.id}`)
+                      .setLabel('🔄 Replay Quest')
+                      .setStyle(ButtonStyle.Secondary)
+                  )]
+                });
+                activeQuest = null;
+              } else if (actionDef.next_stage) {
+                const newStageName = actionDef.next_stage;
+                const result = advanceQuest(currentQuest.id, newStageName);
+                currentQuest.quest = result.quest;
+                activeQuest = currentQuest;
+                
+                // Generate and send new stage narration
+                const newStageInfo = getStageInfo(currentQuest.definition, newStageName);
+                if (newStageInfo?.narration_prompt) {
+                  const newStageNpcNames = getStageCueNpcNames(newStageInfo);
+                  const stageNarration = await generateNarration(
+                    `Quest: ${currentQuest.definition.name}. ${currentQuest.definition.description}`,
+                    newStageInfo.narration_prompt,
+                    newStageNpcNames
+                  );
+                  const components = createStageButtons(currentQuest.definition, newStageName);
+                  const newStageHasCues = stageHasCues(newStageInfo);
+                  const transitionMsg = {
+                    content: `📍 **${newStageName.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}**\n\n${stageNarration}`,
+                    components: newStageHasCues ? [] : components
+                  };
+                  const transitionImage = resolveQuestImage(currentQuest.definition._source_npc, newStageInfo?.image);
+                  if (transitionImage) transitionMsg.files = [transitionImage];
+                  await interaction.channel.send(transitionMsg);
+                  
+                  // Handle stage-level NPC cues, send buttons after
+                  await handleStageCues(interaction.channel, newStageInfo, currentQuest.definition, newStageName, newStageHasCues ? components : null);
+                } else {
+                  const components = createStageButtons(currentQuest.definition, newStageName);
+                  await interaction.channel.send({
+                    content: `📍 *Moving to: **${newStageName.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}**...*`,
+                    components
+                  });
+                }
+              }
+            }
+            
+            return;
+          }
+          
+          // --- BOT NPC: Use cue file system ---
           // Check if NPC character folder exists
           const npcCharDir = path.join(NPC_CHARACTERS_PATH, npcName);
           if (!fs.existsSync(npcCharDir)) {
             await interaction.editReply({
-              content: `*(NPC '${npcName}' not found - no character folder at characters/${npcName}/)*`
+              content: `*(NPC '${npcName}' not found - no character folder at characters/${npcName}/ and not defined in quest key_npcs)*`
             });
             return;
           }
@@ -1294,6 +1953,93 @@ discord.on('interactionCreate', async (interaction) => {
             fs.writeFileSync(tempFilePath, JSON.stringify(cueData, null, 2));
             fs.renameSync(tempFilePath, cueFilePath);
             console.log(`[QuestMaster] Wrote cue file for ${npcName}:`, cueFilePath);
+            
+            // Handle quest flags for bot NPC cue actions
+            if (actionDef.advances && actionDef.sets_flag) {
+              const data = loadPartyQuests();
+              const quest = data.quests.find(q => q.id === currentQuest.id);
+              if (quest) {
+                if (!quest.flags) quest.flags = [];
+                quest.flags.push(actionDef.sets_flag);
+                savePartyQuests(data);
+                console.log(`[QuestMaster] Set flag: ${actionDef.sets_flag}`);
+              }
+            }
+            
+            if (actionDef.advances) {
+              if (actionDef.completes_quest) {
+                // Wait for NPC to respond, then complete
+                waitForNpcResponse(npcName).then(async () => {
+                  try {
+                    await completeQuest(currentQuest.id);
+                    await interaction.channel.send({
+                      content: `✅ **Quest Complete!** *${currentQuest.definition.name}* has been resolved.`,
+                      components: [new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                          .setCustomId(`quest_replay_${currentQuest.id}`)
+                          .setLabel('🔄 Replay Quest')
+                          .setStyle(ButtonStyle.Secondary)
+                      )]
+                    });
+                    activeQuest = null;
+                  } catch (e) {
+                    console.error(`[QuestMaster] Failed to complete quest after cue:`, e.message);
+                  }
+                });
+              } else if (actionDef.next_stage) {
+                const newStageName = actionDef.next_stage;
+                // Wait for NPC to respond, then advance stage
+                waitForNpcResponse(npcName).then(async () => {
+                  try {
+                    const result = advanceQuest(currentQuest.id, newStageName);
+                    currentQuest.quest = result.quest;
+                    activeQuest = currentQuest;
+                    
+                    const newStageInfo = getStageInfo(currentQuest.definition, newStageName);
+                    if (newStageInfo?.narration_prompt) {
+                      const newStageNpcNames = getStageCueNpcNames(newStageInfo);
+                      const stageNarration = await generateNarration(
+                        `Quest: ${currentQuest.definition.name}. ${currentQuest.definition.description}`,
+                        newStageInfo.narration_prompt,
+                        newStageNpcNames
+                      );
+                      const components = createStageButtons(currentQuest.definition, newStageName);
+                      const newStageHasCues = stageHasCues(newStageInfo);
+                      const transitionMsg = {
+                        content: `📍 **${newStageName.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}**\n\n${stageNarration}`,
+                        components: newStageHasCues ? [] : components
+                      };
+                      const transitionImage = resolveQuestImage(currentQuest.definition._source_npc, newStageInfo?.image);
+                      if (transitionImage) transitionMsg.files = [transitionImage];
+                      await interaction.channel.send(transitionMsg);
+                      
+                      // Handle stage-level NPC cues, send buttons after
+                      await handleStageCues(interaction.channel, newStageInfo, currentQuest.definition, newStageName, newStageHasCues ? components : null);
+                    } else {
+                      const components = createStageButtons(currentQuest.definition, newStageName);
+                      await interaction.channel.send({
+                        content: `📍 *Moving to: **${newStageName.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}**...*`,
+                        components
+                      });
+                    }
+                  } catch (e) {
+                    console.error(`[QuestMaster] Failed to advance stage after cue:`, e.message);
+                  }
+                });
+              }
+            } else {
+              // Re-send stage buttons after NPC responds (non-advancing action)
+              waitForNpcResponse(npcName).then(async () => {
+                try {
+                  const components = createStageButtons(currentQuest.definition, stageName);
+                  if (components.length > 0) {
+                    await interaction.channel.send({ content: '*What do you do next?*', components });
+                  }
+                } catch (e) {
+                  console.error(`[QuestMaster] Failed to re-send buttons after cue:`, e.message);
+                }
+              });
+            }
           } catch (err) {
             console.error(`[QuestMaster] Failed to write cue file:`, err.message);
             await interaction.followUp({ content: `*(Failed to cue ${npcName})*`, ephemeral: true });
@@ -1302,12 +2048,16 @@ discord.on('interactionCreate', async (interaction) => {
           return;
         }
         
+        // Check for action-level multi-NPC cues (stage_cue_npcs / cue_npcs on the action)
+        const actionCueNpcs = getActionCueNpcNames(actionDef);
+        const hasActionMultiCues = actionCueNpcs.length > 0;
+        
         // Generate narration based on action's prompt
         const stageInfo = getStageInfo(currentQuest.definition, stageName);
         const context = `Quest: ${currentQuest.definition.name}. Location: ${stageInfo?.description || stageName}. ${currentQuest.definition.description}`;
         
         console.log('[QuestMaster] Calling narrateAction with prompt:', actionDef.narration_prompt?.substring(0, 80));
-        const narration = await narrateAction(context, actionDef.narration_prompt);
+        const narration = await narrateAction(context, actionDef.narration_prompt, actionCueNpcs);
         console.log('[QuestMaster] Narration result:', narration?.substring(0, 100));
         
         // Ensure we never send just a book emoji
@@ -1323,6 +2073,18 @@ discord.on('interactionCreate', async (interaction) => {
         let shouldComplete = false;
         let stageTransitionContent = null; // Store stage transition for separate message
         
+        // Handle quest flags
+        if (actionDef.advances && actionDef.sets_flag) {
+          const data = loadPartyQuests();
+          const quest = data.quests.find(q => q.id === currentQuest.id);
+          if (quest) {
+            if (!quest.flags) quest.flags = [];
+            quest.flags.push(actionDef.sets_flag);
+            savePartyQuests(data);
+            console.log(`[QuestMaster] Set flag: ${actionDef.sets_flag}`);
+          }
+        }
+        
         // Check if action advances the quest - but DON'T save yet!
         if (actionDef.advances) {
           if (actionDef.completes_quest) {
@@ -1336,9 +2098,11 @@ discord.on('interactionCreate', async (interaction) => {
             // Store separately to avoid Discord's 2000 char limit
             const newStageInfo = getStageInfo(currentQuest.definition, newStageName);
             if (newStageInfo?.narration_prompt) {
+              const newStageNpcNames = getStageCueNpcNames(newStageInfo);
               const stageNarration = await generateNarration(
                 `Quest: ${currentQuest.definition.name}. ${currentQuest.definition.description}`,
-                newStageInfo.narration_prompt
+                newStageInfo.narration_prompt,
+                newStageNpcNames
               );
               stageTransitionContent = `📍 **${newStageName.charAt(0).toUpperCase() + newStageName.slice(1)}**\n\n${stageNarration}`;
             }
@@ -1356,21 +2120,85 @@ discord.on('interactionCreate', async (interaction) => {
         }
         
         // Send the reply FIRST - if this fails, we haven't changed any state
+        // If action has multi-NPC cues, don't attach buttons to narration (buttons come after NPC dialog)
         const actionReply = {
           content: responseContent,
-          components: stageTransitionContent ? [] : components // No buttons on transition message
+          components: (stageTransitionContent || hasActionMultiCues) ? [] : components
         };
         const actionImage = resolveQuestImage(currentQuest.definition._source_npc, actionDef.image);
         if (actionImage) actionReply.files = [actionImage];
         await interaction.editReply(actionReply);
 
-        // If advancing stages, send stage narration as a follow-up message with the new buttons
+        // Fire action-level multi-NPC cues (stage_cue_npcs / cue_npcs on the action itself)
+        if (hasActionMultiCues) {
+          // Build cue list from action definition (same format as handleStageCues)
+          const actionCues = [];
+          if (actionDef.cue_npcs && Array.isArray(actionDef.cue_npcs)) {
+            for (const cue of actionDef.cue_npcs) {
+              if (typeof cue === 'string') {
+                actionCues.push({ npc: cue.toLowerCase(), instruction: 'Respond in character.' });
+              } else {
+                actionCues.push({ npc: cue.npc.toLowerCase(), instruction: cue.instruction || 'Respond in character.' });
+              }
+            }
+          }
+          if (actionDef.stage_cue_npcs && Array.isArray(actionDef.stage_cue_npcs)) {
+            for (const cue of actionDef.stage_cue_npcs) {
+              actionCues.push({ npc: cue.npc.toLowerCase(), instruction: cue.instruction || 'Respond in character.' });
+            }
+          }
+          
+          // Fire cues sequentially
+          for (const cue of actionCues) {
+            const cueContext = `Quest: ${currentQuest.definition.name}. Stage: ${stageInfo?.description || stageName}. ${actionDef.narration_prompt || currentQuest.definition.description}`;
+            
+            if (isQuestNpc(cue.npc, currentQuest.definition)) {
+              // Quest NPC (key_npcs) — generate dialogue via webhook
+              const dialogue = await generateQuestNpcDialogue(cue.npc, currentQuest.definition, cue.instruction, cueContext);
+              if (dialogue) {
+                await sendAsQuestNpc(interaction.channel, cue.npc, currentQuest.definition, dialogue);
+              }
+            } else {
+              // Bot NPC — write cue file and wait for response
+              const npcCharDir = path.join(NPC_CHARACTERS_PATH, cue.npc);
+              if (fs.existsSync(npcCharDir)) {
+                const cueData = {
+                  channel_id: interaction.channel.id,
+                  instruction: cue.instruction,
+                  context: stageInfo?.description || stageName,
+                  timestamp: Date.now()
+                };
+                const cueFilePath = path.join(npcCharDir, 'quest_cue.json');
+                const tempFilePath = path.join(npcCharDir, 'quest_cue.tmp');
+                fs.writeFileSync(tempFilePath, JSON.stringify(cueData, null, 2));
+                fs.renameSync(tempFilePath, cueFilePath);
+                console.log(`[QuestMaster] Wrote action multi-cue for ${cue.npc}`);
+                await waitForNpcResponse(cue.npc);
+              }
+            }
+          }
+          
+          // Send buttons AFTER all NPC cues have fired
+          if (!shouldAdvance && !shouldComplete && components.length > 0) {
+            await interaction.channel.send({ content: '*What do you do next?*', components });
+          }
+        }
+
+        // If advancing stages, send stage narration as a follow-up message
         if (stageTransitionContent) {
-          const transitionMsg = { content: stageTransitionContent, components };
           const newStageDef = getStageInfo(currentQuest.definition, newStageName);
+          const newStageHasCues = stageHasCues(newStageDef);
+          
+          // If stage has NPC cues, send narration WITHOUT buttons; buttons come after NPC dialogue
+          const transitionMsg = { content: stageTransitionContent, components: newStageHasCues ? [] : components };
           const transitionImage = resolveQuestImage(currentQuest.definition._source_npc, newStageDef?.image);
           if (transitionImage) transitionMsg.files = [transitionImage];
           await interaction.channel.send(transitionMsg);
+          
+          // Handle stage-level NPC cues, send buttons after
+          if (newStageDef) {
+            await handleStageCues(interaction.channel, newStageDef, currentQuest.definition, newStageName, newStageHasCues ? components : null);
+          }
         }
         
         // ONLY NOW save the state change (after successful reply)

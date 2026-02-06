@@ -1,0 +1,28 @@
+{
+  "name": "dragons-hollow-webapp",
+  "version": "1.0.0",
+  "description": "Dragon's Hollow - D&D Web App for the Discord server",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "nodemon server/server.js",
+    "dev:client": "cd client && npx vite",
+    "build": "cd client && npx vite build",
+    "start": "node server/server.js",
+    "start:prod": "cross-env NODE_ENV=production node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.0",
+    "openai": "^4.20.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3"
+  }
+}

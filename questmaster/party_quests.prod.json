@@ -39,6 +39,104 @@
       "board_message_id": "1466665882099912878",
       "channel_id": "1466666382690091073",
       "completed_at": "2026-01-30T06:42:52.658Z"
+    },
+    {
+      "id": "the_missing_watch",
+      "name": "The Missing Watch",
+      "description": "One of Jonah's best Shield officers hasn't reported in for two days. Something's wrong.",
+      "location": "Lower residential district, old storage cellars near the docks",
+      "given_by": "jonah",
+      "status": "completed",
+      "current_stage": "the_decision",
+      "stages_completed": [
+        "harlens_route",
+        "off_the_path",
+        "the_cellar"
+      ],
+      "started_at": "2026-02-01T03:50:13.222Z",
+      "added_at": "2026-02-01T03:49:26.833Z",
+      "notes": [],
+      "board_message_id": "1467366214585159798",
+      "channel_id": "1467366409599455285",
+      "completed_at": "2026-02-01T04:06:08.085Z"
+    },
+    {
+      "id": "the_rooftop_kingdom",
+      "name": "The Rooftop Kingdom",
+      "description": "Ithrae discovered a hidden community of orphans living on the market district rooftops. She needs Aly to see it before someone else finds them first.",
+      "location": "Market district rooftops, Okhan",
+      "given_by": "ithrae",
+      "status": "completed",
+      "current_stage": "aftermath",
+      "stages_completed": [
+        "the_view_from_above",
+        "the_little_architect",
+        "first_contact",
+        "common_ground",
+        "the_decision"
+      ],
+      "started_at": "2026-02-03T18:25:26.571Z",
+      "added_at": "2026-02-03T18:23:38.940Z",
+      "notes": [],
+      "board_message_id": "1468310989689848064",
+      "channel_id": "1468311442892787906",
+      "flags": [
+        "path_a",
+        "decision_recruit"
+      ],
+      "completed_at": "2026-02-03T19:20:48.967Z"
+    },
+    {
+      "id": "the_man_at_the_gate",
+      "name": "The Man at the Gate",
+      "description": "A stranger arrives at the dojo claiming to be Djinn's father. The past Djinn buried comes knocking.",
+      "location": "Dojo of the Four Elements / Okhan",
+      "given_by": "djinn",
+      "status": "completed",
+      "current_stage": "the_open_gate",
+      "stages_completed": [
+        "the_arrival",
+        "djinn_confrontation",
+        "the_vigil",
+        "the_choice"
+      ],
+      "started_at": "2026-02-04T17:14:29.698Z",
+      "added_at": "2026-02-04T15:42:18.264Z",
+      "notes": [],
+      "board_message_id": "1468632775300223058",
+      "channel_id": "1468655973689462937",
+      "flags": [
+        "full_truth"
+      ],
+      "completed_at": "2026-02-04T17:23:34.378Z"
+    },
+    {
+      "id": "the_uncontrolled_flame",
+      "name": "The Uncontrolled Flame",
+      "description": "Ximena touched Ignition without the spiritual foundation to sustain it. The fire is consuming her from the inside. Nalyd must guide her through a crisis that can't be solved with fists.",
+      "location": "Dojo of the Four Elements / The Crucible",
+      "given_by": "djinn",
+      "status": "completed",
+      "current_stage": "the_return",
+      "stages_completed": [
+        "the_report",
+        "the_truth",
+        "the_breaking_point",
+        "the_plan",
+        "the_road",
+        "the_crucible"
+      ],
+      "started_at": "2026-02-06T01:53:39.078Z",
+      "added_at": "2026-02-06T01:52:20.632Z",
+      "notes": [],
+      "board_message_id": "1469148683781144847",
+      "channel_id": "1469149013629599797",
+      "flags": [
+        "observed_first",
+        "sent_message",
+        "pushed_through"
+      ],
+      "completed_at": "2026-02-06T02:35:19.225Z"
     }
   ],
   "completed": [],

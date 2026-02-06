@@ -1,0 +1,16 @@
+[
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "Hello",
+    "timestamp": "2026-02-05T00:47:17.939Z"
+  },
+  {
+    "role": "npc",
+    "npc": "cena",
+    "npcDisplayName": "Cena Marella",
+    "text": "Ahoy there! Ready to set sail into some good conversation?",
+    "emotion": "happy",
+    "timestamp": "2026-02-05T00:47:19.905Z"
+  }
+]

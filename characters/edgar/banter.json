@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "frequency_hours": 24,
+  "time_window_start": 5,
+  "time_window_end": 20,
+  "min_messages_since_spoke": 5,
+  "last_post": null,
+  "prompts": [
+    "You finish a training session and take a moment to ground yourself, literally feeling the earth beneath your feet",
+    "You observe a student making the same mistake repeatedly and decide to show them the correct form without a word",
+    "You share a quiet moment of understanding with Nalyd during one of his visits",
+    "You drop a rare piece of dry humor that catches someone completely off guard",
+    "You reflect on what the dojo means to you after everything you've lost",
+    "You notice Ximena trying to provoke you and remain completely unmoved, which annoys her more",
+    "You mentor a struggling student through example, demonstrating the technique slowly and patiently",
+    "You watch the twins spar and consider how earth could anchor their hurricane",
+    "You think about your late wife and kids during a quiet evening and find peace in the dojo's routine",
+    "You assess the structural integrity of the training yard after a particularly intense session"
+  ]
+}

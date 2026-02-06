@@ -1,39 +1,21 @@
 {
-  "nibby": {
-    "id": "1465254622401663081",
-    "tag": "Nibby#3214",
-    "username": "Nibby",
-    "displayName": "Nibby"
+  "kumo": {
+    "id": "1468093500653568174",
+    "tag": "Kumo#1489",
+    "username": "Kumo",
+    "displayName": "Kumo"
   },
-  "bonesy": {
-    "id": "1465510974336270532",
-    "tag": "Bonesy#9705",
-    "username": "Bonesy",
-    "displayName": "Bonesy"
+  "ximena": {
+    "id": "1468093295266631901",
+    "tag": "Ximena Reyes#6113",
+    "username": "Ximena Reyes",
+    "displayName": "Ximena Reyes"
   },
-  "mira": {
-    "id": "1466894788090527931",
-    "tag": "Mira#6026",
-    "username": "Mira",
-    "displayName": "Mira"
-  },
-  "jonah": {
-    "id": "1466969619670634653",
-    "tag": "Jonah Varrow#0628",
-    "username": "Jonah Varrow",
-    "displayName": "Jonah Varrow"
-  },
-  "cena": {
-    "id": "1466983035118555291",
-    "tag": "Cena Marella#0178",
-    "username": "Cena Marella",
-    "displayName": "Cena Marella"
-  },
-  "reah": {
-    "id": "1466982683891601655",
-    "tag": "Rhea Stoic#7463",
-    "username": "Rhea Stoic",
-    "displayName": "Rhea Stoic"
+  "mai": {
+    "id": "1468092752750182658",
+    "tag": "Mai Xi Yang#6865",
+    "username": "Mai Xi Yang",
+    "displayName": "Mai Xi Yang"
   },
   "ember": {
     "id": "1467280574589960215",
@@ -47,6 +29,54 @@
     "username": "Brynleaf Varrow",
     "displayName": "Brynleaf Varrow"
   },
+  "mira": {
+    "id": "1466894788090527931",
+    "tag": "Mira#6026",
+    "username": "Mira",
+    "displayName": "Mira"
+  },
+  "reah": {
+    "id": "1466982683891601655",
+    "tag": "Rhea Stoic#7463",
+    "username": "Rhea Stoic",
+    "displayName": "Rhea Stoic"
+  },
+  "bonesy": {
+    "id": "1465510974336270532",
+    "tag": "Bonesy#9705",
+    "username": "Bonesy",
+    "displayName": "Bonesy"
+  },
+  "nibby": {
+    "id": "1465254622401663081",
+    "tag": "Nibby#3214",
+    "username": "Nibby",
+    "displayName": "Nibby"
+  },
+  "jonah": {
+    "id": "1466969619670634653",
+    "tag": "Jonah Varrow#0628",
+    "username": "Jonah Varrow",
+    "displayName": "Jonah Varrow"
+  },
+  "cena": {
+    "id": "1466983035118555291",
+    "tag": "Cena Marella#0178",
+    "username": "Cena Marella",
+    "displayName": "Cena Marella"
+  },
+  "kai": {
+    "id": "1468092451683303597",
+    "tag": "Kai Xi Yang#5649",
+    "username": "Kai Xi Yang",
+    "displayName": "Kai Xi Yang"
+  },
+  "edgar": {
+    "id": "1468093022838460481",
+    "tag": "Doc Edgar#0772",
+    "username": "Doc Edgar",
+    "displayName": "Doc Edgar"
+  },
   "aurelia": {
     "id": "1467281754313330913",
     "tag": "Aurelia Dawnwrath#2793",
@@ -58,5 +88,11 @@
     "tag": "Ithrae Galecrest#9964",
     "username": "Ithrae Galecrest",
     "displayName": "Ithrae Galecrest"
+  },
+  "djinn": {
+    "id": "1468091797191397540",
+    "tag": "Djinn Zenatsu#8147",
+    "username": "Djinn Zenatsu",
+    "displayName": "Djinn Zenatsu"
   }
 }

@@ -1,0 +1,76 @@
+/* ============================================
+   LEADERBOARD PAGE
+   ============================================ */
+
+.leaderboard-page .page-header {
+  text-align: center;
+  padding-top: 8px;
+}
+
+.leaderboard-page .page-title {
+  font-size: 1.6rem;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  transition: all var(--transition-fast);
+}
+
+.leaderboard-row-top {
+  border-color: rgba(212, 168, 67, 0.2);
+}
+
+.leaderboard-row-me {
+  border-color: var(--color-gold-dim);
+  background: rgba(212, 168, 67, 0.05);
+  box-shadow: var(--shadow-glow);
+}
+
+.lb-rank {
+  width: 36px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.leaderboard-row-top .lb-rank {
+  font-size: 1.2rem;
+}
+
+.lb-name {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.leaderboard-row-me .lb-name {
+  color: var(--color-gold-bright);
+}
+
+.lb-gold {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-gold);
+}
+
+.lb-gold .gold-icon {
+  font-size: 0.9rem;
+}

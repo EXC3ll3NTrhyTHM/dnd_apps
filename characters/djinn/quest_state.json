@@ -1,0 +1,22 @@
+{
+  "active_quest": null,
+  "current_node": null,
+  "history": [
+    {
+      "node": "approach",
+      "timestamp": "2026-02-06T01:44:05.396Z"
+    },
+    {
+      "node": "insist",
+      "branch": "busy",
+      "timestamp": "2026-02-06T01:46:07.792Z"
+    },
+    {
+      "node": "accepted",
+      "branch": "relents",
+      "timestamp": "2026-02-06T01:52:20.498Z"
+    }
+  ],
+  "status": null,
+  "target_players": []
+}

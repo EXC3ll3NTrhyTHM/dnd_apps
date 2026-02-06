@@ -1,0 +1,231 @@
+{
+  "the_collective": {
+    "name": "The Collective",
+    "description": "The castle hub where adventurers gather",
+    "npcs": [
+      "marcel"
+    ],
+    "features": [],
+    "mapCoords": {
+      "x": 50,
+      "y": 28
+    },
+    "mapIcon": "🏰"
+  },
+  "dragons_hollow": {
+    "name": "Dragon's Hollow",
+    "description": "The tavern at the heart of Okhan",
+    "npcs": [
+      "bonesy",
+      "mira",
+      "nibby",
+      "kumo",
+      "bigtam",
+      "grumm"
+    ],
+    "features": [
+      "tavern_menu",
+      "shop"
+    ],
+    "mapCoords": {
+      "x": 75,
+      "y": 85
+    },
+    "mapIcon": "🐉"
+  },
+  "the_barracks": {
+    "name": "The Barracks",
+    "description": "Where the generals plan and strategize",
+    "npcs": [
+      "cena",
+      "jonah",
+      "reah"
+    ],
+    "features": [],
+    "mapCoords": {
+      "x": 28,
+      "y": 45
+    },
+    "mapIcon": "🛡️",
+    "scene": {
+      "background": "/images/scenes/barrack_interior.png",
+      "gatheringSpot": {
+        "label": "Strategize With Everyone",
+        "position": {
+          "x": 50,
+          "y": 20
+        },
+        "size": {
+          "width": 40,
+          "height": 10
+        }
+      },
+      "particles": {
+        "enabled": true,
+        "type": "sparks",
+        "color": "rgba(136, 153, 170, 0.8)",
+        "count": 3,
+        "speed": 2
+      },
+      "audio": {
+        "music": null,
+        "ambient": []
+      },
+      "npcPlacements": {
+        "cena": {
+          "x": 25,
+          "y": 90,
+          "scale": 1.1,
+          "flipX": false,
+          "zIndex": 5,
+          "hitboxOffsetY": 45,
+          "hitboxWidth": 85,
+          "hitboxHeight": 165
+        },
+        "jonah": {
+          "x": 50,
+          "y": 92,
+          "scale": 1.05,
+          "flipX": false,
+          "zIndex": 10,
+          "hitboxOffsetY": 50,
+          "hitboxWidth": 80,
+          "hitboxHeight": 155
+        },
+        "reah": {
+          "x": 75,
+          "y": 91,
+          "scale": 1.1,
+          "flipX": true,
+          "zIndex": 5,
+          "hitboxOffsetY": 45,
+          "hitboxWidth": 80,
+          "hitboxHeight": 160
+        }
+      }
+    }
+  },
+  "the_veil": {
+    "name": "The Veil",
+    "description": "Aly's spy network, cloaked in shadow",
+    "npcs": [
+      "aurelia",
+      "brynleaf",
+      "ember",
+      "ithrae"
+    ],
+    "features": [],
+    "mapCoords": {
+      "x": 59,
+      "y": 35
+    },
+    "mapIcon": "🌙"
+  },
+  "the_dojo": {
+    "name": "The Dojo",
+    "description": "Training grounds where warriors hone their craft",
+    "npcs": [
+      "djinn",
+      "kai",
+      "mai",
+      "edgar",
+      "ximena",
+      "kumo"
+    ],
+    "features": [],
+    "mapCoords": {
+      "x": 23,
+      "y": 26
+    },
+    "mapIcon": "⛩️",
+    "scene": {
+      "background": "/images/scenes/dojo_courtyard.png",
+      "gatheringSpot": {
+        "label": "Train With Everyone",
+        "position": {
+          "x": 50,
+          "y": 20
+        },
+        "size": {
+          "width": 40,
+          "height": 10
+        }
+      },
+      "particles": {
+        "enabled": true,
+        "type": "embers",
+        "color": "rgba(196, 160, 53, 0.8)",
+        "count": 3,
+        "speed": 3
+      },
+      "audio": {
+        "music": {
+          "src": "/sounds/dojo/shakuhachi.mp3",
+          "volume": 0.6
+        },
+        "ambient": [
+          {
+            "src": "/sounds/dojo/wind-chimes.mp3",
+            "volume": 0.3
+          }
+        ]
+      },
+      "npcPlacements": {
+        "djinn": {
+          "x": 67,
+          "y": 74,
+          "scale": 0.85,
+          "flipX": false,
+          "zIndex": 4,
+          "hitboxOffsetY": 60,
+          "hitboxWidth": 85,
+          "hitboxHeight": 135
+        },
+        "edgar": {
+          "x": 16,
+          "y": 90,
+          "scale": 1.15,
+          "zIndex": 1,
+          "hitboxOffsetY": 45,
+          "hitboxWidth": 85,
+          "hitboxHeight": 165
+        },
+        "mai": {
+          "x": 56,
+          "y": 93,
+          "scale": 1.05,
+          "hitboxWidth": 55,
+          "hitboxHeight": 120,
+          "hitboxOffsetY": 65
+        },
+        "kai": {
+          "x": 36,
+          "y": 94,
+          "scale": 1.05,
+          "flipX": true,
+          "zIndex": 17,
+          "hitboxWidth": 80,
+          "hitboxHeight": 205,
+          "hitboxOffsetY": 40
+        },
+        "ximena": {
+          "x": 83,
+          "y": 96,
+          "scale": 1.15,
+          "hitboxWidth": 90,
+          "hitboxHeight": 190,
+          "hitboxOffsetY": 45
+        },
+        "kumo": {
+          "x": 44,
+          "y": 59,
+          "scale": 0.45,
+          "zIndex": 1,
+          "hitboxOffsetY": 40,
+          "hitboxWidth": 105,
+          "hitboxHeight": 220
+        }
+      }
+    }
+  }
+}

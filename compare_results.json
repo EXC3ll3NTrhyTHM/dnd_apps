@@ -1,0 +1,54 @@
+[
+  {
+    "model": {
+      "id": "dall-e-2",
+      "name": "DALL-E 2",
+      "size": "1024x1024",
+      "quality": "standard",
+      "legacy": true
+    },
+    "path": "C:\\Users\\corpo\\npc-bot\\compare_dall-e-2.png",
+    "time": "11.5",
+    "size": 3148011,
+    "success": true
+  },
+  {
+    "model": {
+      "id": "gpt-image-1",
+      "name": "GPT Image 1",
+      "size": "1024x1024",
+      "quality": "medium",
+      "legacy": false
+    },
+    "path": "C:\\Users\\corpo\\npc-bot\\compare_gpt-image-1.png",
+    "time": "24.1",
+    "size": 1811893,
+    "success": true
+  },
+  {
+    "model": {
+      "id": "gpt-image-1.5",
+      "name": "GPT Image 1.5",
+      "size": "1024x1024",
+      "quality": "medium",
+      "legacy": false
+    },
+    "path": "C:\\Users\\corpo\\npc-bot\\compare_gpt-image-1_5.png",
+    "time": "16.3",
+    "size": 2390883,
+    "success": true
+  },
+  {
+    "model": {
+      "id": "chatgpt-image-latest",
+      "name": "ChatGPT Image Latest",
+      "size": "1024x1024",
+      "quality": "medium",
+      "legacy": false
+    },
+    "path": "C:\\Users\\corpo\\npc-bot\\compare_chatgpt-image-latest.png",
+    "time": "15.1",
+    "size": 2114353,
+    "success": true
+  }
+]

@@ -22,7 +22,12 @@ if (!fs.existsSync(envPath)) {
 require('dotenv').config({ path: envPath });
 console.log(`[${CHARACTER}] Loaded config from .env.${CHARACTER}`);
 
-const { Client, GatewayIntentBits, Partials, AttachmentBuilder } = require('discord.js');
+const { 
+  Client, GatewayIntentBits, Partials, AttachmentBuilder,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
+  StringSelectMenuBuilder, UserSelectMenuBuilder,
+  EmbedBuilder, ComponentType
+} = require('discord.js');
 const OpenAI = require('openai');
 const { GoogleGenAI } = require('@google/genai');
 const wav = require('wav');
@@ -75,7 +80,11 @@ const QUEST_STATE_PATH = path.join(CHARACTER_DIR, 'quest_state.json');
 const BANTER_PATH = path.join(CHARACTER_DIR, 'banter.json');
 const CUE_FILE_PATH = path.join(CHARACTER_DIR, 'quest_cue.json');
 const EMOJIS_PATH = path.join(CHARACTER_DIR, 'emojis.json');
+const TAVERN_MENU_PATH = path.join(CHARACTER_DIR, 'tavern_menu.json');
+const HUB_PANEL_PATH = path.join(CHARACTER_DIR, 'hub_panel.json');
 const NPC_REGISTRY_PATH = path.join(__dirname, 'npc_registry.json');
+const ECONOMY_DIR = path.join(__dirname, 'economy');
+const PURCHASE_SIGNALS_DIR = path.join(ECONOMY_DIR, 'currency_signals');
 
 // ============================================
 // INITIALIZE CLIENTS
@@ -122,13 +131,33 @@ async function callLLM({ system, user, maxTokens = 1024, messages = null }) {
 // TTS (Text-to-Speech via Gemini TTS API)
 // ============================================
 
+// File-based TTS logging
+const TTS_LOG_DIR = path.join(__dirname, 'logs');
+if (!fs.existsSync(TTS_LOG_DIR)) fs.mkdirSync(TTS_LOG_DIR, { recursive: true });
+
+function ttsLog(level, msg, extra = {}) {
+  const entry = {
+    ts: new Date().toISOString(),
+    character: CHARACTER,
+    level,
+    msg,
+    ...extra,
+  };
+  const logFile = path.join(TTS_LOG_DIR, `tts.log`);
+  fs.appendFileSync(logFile, JSON.stringify(entry) + '\n');
+}
+
 const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 async function generateTTS(text) {
+  const voiceName = process.env.TTS_VOICE || 'Enceladus';
+  const accentCue = process.env.TTS_ACCENT || '';
+  const ttsInput = accentCue ? `${accentCue} ${text}` : text;
+  const startTime = Date.now();
+
+  ttsLog('info', 'TTS request started', { voiceName, inputLength: ttsInput.length, text: ttsInput.slice(0, 200) });
+
   try {
-    const voiceName = process.env.TTS_VOICE || 'Enceladus';
-    const accentCue = process.env.TTS_ACCENT || '';
-    const ttsInput = accentCue ? `${accentCue} ${text}` : text;
     const response = await gemini.models.generateContent({
       model: 'gemini-2.5-flash-preview-tts',
       contents: [{ parts: [{ text: ttsInput }] }],
@@ -142,11 +171,15 @@ async function generateTTS(text) {
       },
     });
 
+    const elapsed = Date.now() - startTime;
     const data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
     if (!data) {
+      ttsLog('error', 'No audio data in response', { elapsed });
       console.error(`[${CHARACTER}] TTS error: no audio data in response`);
       return null;
     }
+
+    ttsLog('info', 'TTS response received', { elapsed, audioBytes: data.length });
 
     const pcmBuffer = Buffer.from(data, 'base64');
 
@@ -161,6 +194,14 @@ async function generateTTS(text) {
       writer.end();
     });
   } catch (error) {
+    const elapsed = Date.now() - startTime;
+    const errorDetail = {
+      elapsed,
+      message: error.message,
+      status: error.status || error.statusCode || null,
+      code: error.code || null,
+    };
+    ttsLog('error', 'TTS generation failed', errorDetail);
     console.error(`[${CHARACTER}] TTS generation error:`, error.message);
     return null;
   }
@@ -173,6 +214,76 @@ async function generateTTS(text) {
 const conversationHistory = new Map();  // Per-channel conversation history
 const messageCounters = new Map();      // Per-channel message count since last journal
 const botReplyCooldowns = new Map();    // Cooldown tracking for NPC-to-NPC replies
+
+// NPC-to-NPC debounce system: wait for rapid exchanges to settle before responding
+const NPC_RESPONSE_DELAY_MS = 3000;     // Base delay before responding to another NPC
+const npcPendingResponses = new Map();  // channelId -> { timeout, messages: [], originalMessage }
+
+/**
+ * Handle debounced NPC response after the delay timer fires.
+ * Gathers all accumulated NPC messages and generates a single response.
+ */
+async function handleDebouncedNpcResponse(channelId) {
+  const pending = npcPendingResponses.get(channelId);
+  if (!pending) return;
+
+  // Clear from pending map
+  npcPendingResponses.delete(channelId);
+
+  const { messages, originalMessage } = pending;
+  console.log(`[${CHARACTER}] Debounce timer fired - responding to ${messages.length} NPC message(s)`);
+
+  // Check if NPC is currently away
+  if (!presence.isActive()) {
+    console.log(`[${CHARACTER}] Ignoring NPC conversation - currently away/invisible`);
+    return;
+  }
+
+  try {
+    const channel = originalMessage.channel;
+    await channel.sendTyping();
+
+    // Build context from accumulated messages
+    const accumulatedContext = messages.map(m => `${m.author}: ${m.content}`);
+    
+    // Also fetch any other recent messages for full context
+    const recentContext = await fetchRecentMessages(channel, originalMessage);
+    
+    // Combine: recent channel context + accumulated NPC messages
+    const fullContext = [...recentContext, ...accumulatedContext];
+
+    // Use the last message's author as the "speaker"
+    const lastMessage = messages[messages.length - 1];
+    
+    console.log(`[${CHARACTER}] Generating response to NPC exchange (${messages.length} messages accumulated)...`);
+
+    let response = await generateResponse(
+      channelId,
+      lastMessage.content,
+      lastMessage.author,
+      fullContext,
+      [], // No images
+      null, // No quest cue
+      false // Not voice mode
+    );
+
+    response = response.replace(/^["']|["']$/g, '').trim();
+    response = replaceNpcNamesWithMentions(response);
+
+    // Send response
+    const parts = splitEmojisFromResponse(response);
+    for (const part of parts) {
+      await channel.send(part);
+    }
+
+    // Record cooldown
+    botReplyCooldowns.set(`bot_reply_${channelId}`, Date.now());
+    console.log(`[${CHARACTER}] NPC reply sent!`);
+
+  } catch (error) {
+    console.error(`[${CHARACTER}] Error handling debounced NPC response:`, error);
+  }
+}
 
 // ============================================
 // CHARACTER FILES
@@ -371,13 +482,17 @@ function clearGoals() {
 
 function loadQuestState() {
   if (!fs.existsSync(QUEST_STATE_PATH)) {
-    return { active_quest: null, current_node: null, history: [] };
+    return { active_quest: null, current_node: null, status: null, target_players: [], history: [] };
   }
   try {
-    return JSON.parse(fs.readFileSync(QUEST_STATE_PATH, 'utf-8'));
+    const state = JSON.parse(fs.readFileSync(QUEST_STATE_PATH, 'utf-8'));
+    // Ensure new fields exist for backward compat
+    if (!state.status) state.status = state.active_quest ? 'active' : null;
+    if (!state.target_players) state.target_players = [];
+    return state;
   } catch (err) {
     console.error(`[${CHARACTER}] Error loading quest state:`, err.message);
-    return { active_quest: null, current_node: null, history: [] };
+    return { active_quest: null, current_node: null, status: null, target_players: [], history: [] };
   }
 }
 
@@ -407,24 +522,455 @@ function listQuests() {
     .map(f => f.replace('.json', ''));
 }
 
-function startQuest(questId) {
+function startQuest(questId, targetPlayers = []) {
   const quest = loadQuest(questId);
   if (!quest) return null;
   
   const state = loadQuestState();
   state.active_quest = questId;
   state.current_node = quest.start_node;
+  state.status = 'loaded';
+  state.target_players = targetPlayers;
   state.history = [{ node: quest.start_node, timestamp: new Date().toISOString() }];
   saveQuestState(state);
   
   return quest;
 }
 
+function armQuest(targetPlayers = []) {
+  const state = loadQuestState();
+  if (!state.active_quest) return false;
+  state.status = 'armed';
+  if (targetPlayers.length > 0) state.target_players = targetPlayers;
+  saveQuestState(state);
+  return true;
+}
+
+function activateQuest() {
+  const state = loadQuestState();
+  if (!state.active_quest) return false;
+  state.status = 'active';
+  saveQuestState(state);
+  return true;
+}
+
+function isQuestArmedFor(userId) {
+  const state = loadQuestState();
+  if (state.status !== 'armed') return false;
+  // If no target players specified, armed for everyone
+  if (state.target_players.length === 0) return true;
+  return state.target_players.includes(userId);
+}
+
 function endQuest() {
   const state = loadQuestState();
   state.active_quest = null;
   state.current_node = null;
+  state.status = null;
+  state.target_players = [];
   saveQuestState(state);
+}
+
+// ============================================
+// TAVERN SYSTEM
+// ============================================
+
+function hasTavernMenu() {
+  return fs.existsSync(TAVERN_MENU_PATH);
+}
+
+function loadTavernMenu() {
+  if (!fs.existsSync(TAVERN_MENU_PATH)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(TAVERN_MENU_PATH, 'utf-8'));
+  } catch (err) {
+    console.error(`[${CHARACTER}] Error loading tavern menu:`, err.message);
+    return null;
+  }
+}
+
+function findTavernItem(itemId) {
+  const menu = loadTavernMenu();
+  if (!menu) return null;
+  for (const [catKey, category] of Object.entries(menu.categories)) {
+    const item = category.items.find(i => i.id === itemId);
+    if (item) return { item, category: catKey, categoryDisplay: category.display_name };
+  }
+  return null;
+}
+
+function writePurchaseSignal(userId, username, item) {
+  try {
+    if (!fs.existsSync(PURCHASE_SIGNALS_DIR)) {
+      fs.mkdirSync(PURCHASE_SIGNALS_DIR, { recursive: true });
+    }
+    
+    const signalId = `tavern_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const signalPath = path.join(PURCHASE_SIGNALS_DIR, `${signalId}.json`);
+    const tempPath = signalPath + '.tmp';
+    
+    const signal = {
+      type: 'tavern_purchase',
+      signal_id: signalId,
+      user_id: userId,
+      username: username,
+      item_id: item.id,
+      item_name: item.name,
+      amount: item.price,
+      npc: CHARACTER,
+      timestamp: Date.now()
+    };
+    
+    fs.writeFileSync(tempPath, JSON.stringify(signal, null, 2));
+    fs.renameSync(tempPath, signalPath);
+    
+    console.log(`[${CHARACTER}] Purchase signal written: ${item.name} for ${username}`);
+    return signalId;
+  } catch (err) {
+    console.error(`[${CHARACTER}] Failed to write purchase signal:`, err.message);
+    return null;
+  }
+}
+
+/**
+ * Wait for the shopkeeper to process a purchase signal.
+ * Returns the result file content, or null on timeout.
+ */
+async function waitForPurchaseResult(signalId, timeoutMs = 5000) {
+  const resultPath = path.join(PURCHASE_SIGNALS_DIR, `${signalId}_result.json`);
+  const start = Date.now();
+  
+  while (Date.now() - start < timeoutMs) {
+    if (fs.existsSync(resultPath)) {
+      try {
+        const result = JSON.parse(fs.readFileSync(resultPath, 'utf-8'));
+        fs.unlinkSync(resultPath); // Clean up
+        return result;
+      } catch {
+        // File might be mid-write, try again
+      }
+    }
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+  
+  return null; // Timeout
+}
+
+function buildTavernMenuEmbed() {
+  const menu = loadTavernMenu();
+  if (!menu) return null;
+  
+  const sym = menu.currency_symbol || 'G';
+  
+  const embed = new EmbedBuilder()
+    .setColor(0xB5651D) // Warm brown
+    .setTitle(`🍺 ${menu.tavern_name || "The Tavern"}`)
+    .setDescription("*What'll it be, sweetling?*")
+    .setTimestamp();
+  
+  return embed;
+}
+
+function buildTavernCategorySelect() {
+  const menu = loadTavernMenu();
+  if (!menu) return null;
+  
+  const options = Object.entries(menu.categories).map(([key, cat]) => ({
+    label: cat.display_name,
+    value: key,
+    emoji: cat.emoji,
+    description: `${cat.items.length} item${cat.items.length !== 1 ? 's' : ''}`
+  }));
+  
+  return new ActionRowBuilder().addComponents(
+    new StringSelectMenuBuilder()
+      .setCustomId('tavern_category')
+      .setPlaceholder('What are you in the mood for?')
+      .addOptions(options)
+  );
+}
+
+function buildTavernItemSelect(categoryKey, userId) {
+  const menu = loadTavernMenu();
+  if (!menu) return null;
+  
+  const category = menu.categories[categoryKey];
+  if (!category) return null;
+  
+  const sym = menu.currency_symbol || 'G';
+  
+  const options = category.items.map(item => ({
+    label: item.name,
+    value: item.id,
+    description: `${item.price}${sym} - ${(item.description || '').substring(0, 80)}`
+  }));
+  
+  const row = new ActionRowBuilder().addComponents(
+    new StringSelectMenuBuilder()
+      .setCustomId(`tavern_item_${categoryKey}`)
+      .setPlaceholder('Pick your poison...')
+      .addOptions(options)
+  );
+  
+  const embed = new EmbedBuilder()
+    .setColor(0xB5651D)
+    .setTitle(`${category.emoji} ${category.display_name}`)
+    .setDescription(
+      category.items.map(item => 
+        `**${item.name}** - ${item.price}${sym}\n${item.description || ''}`
+      ).join('\n\n')
+    );
+  
+  return { embed, row };
+}
+
+function buildTavernConfirmEmbed(item) {
+  const menu = loadTavernMenu();
+  const sym = menu?.currency_symbol || 'G';
+  
+  const embed = new EmbedBuilder()
+    .setColor(0xB5651D)
+    .setTitle(`Order ${item.name}?`)
+    .setDescription(`${item.description || ''}\n\n**Price: ${item.price}${sym}**`);
+  
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`tavern_buy_${item.id}`)
+      .setLabel(`Buy (${item.price}${sym})`)
+      .setStyle(ButtonStyle.Success)
+      .setEmoji('🍺'),
+    new ButtonBuilder()
+      .setCustomId('tavern_cancel')
+      .setLabel('Nevermind')
+      .setStyle(ButtonStyle.Secondary)
+  );
+  
+  return { embed, row };
+}
+
+// ============================================
+// HUB PANEL SYSTEM (Persistent channel panels)
+// ============================================
+
+function loadHubPanel() {
+  if (!fs.existsSync(HUB_PANEL_PATH)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(HUB_PANEL_PATH, 'utf-8'));
+  } catch { return null; }
+}
+
+function saveHubPanel(data) {
+  fs.writeFileSync(HUB_PANEL_PATH, JSON.stringify(data, null, 2));
+}
+
+/**
+ * Build the persistent hub panel embed + components for this NPC.
+ * Returns { embeds, components } ready to send/edit.
+ */
+function buildHubPanel() {
+  const menu = loadTavernMenu();
+  
+  // Tavern NPC hub panel
+  if (menu) {
+    const embed = new EmbedBuilder()
+      .setColor(0xB5651D)
+      .setTitle(`🍺 ${menu.tavern_name || "The Tavern"}`)
+      .setDescription(
+        `*Welcome, sweetling. Tam's got drinks, food, and stew. Always stew.*\n\n` +
+        `Browse the menu below and order what you like. Gold gets handled automatically.`
+      )
+      .setFooter({ text: `${CHARACTER} | The bar is open` });
+    
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId('hub_menu')
+        .setLabel('View Menu')
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji('🍺'),
+      new ButtonBuilder()
+        .setCustomId('hub_balance')
+        .setLabel('Check Gold')
+        .setStyle(ButtonStyle.Secondary)
+        .setEmoji('💰'),
+      new ButtonBuilder()
+        .setCustomId('hub_stew')
+        .setLabel("Today's Stew")
+        .setStyle(ButtonStyle.Secondary)
+        .setEmoji('🍲'),
+    );
+    
+    return { embeds: [embed], components: [row] };
+  }
+  
+  // Generic NPC hub panel (no tavern, no shop - just a greeting)
+  const { soul } = loadCharacterFiles();
+  const embed = new EmbedBuilder()
+    .setColor(0x2B2D31)
+    .setTitle(`${CHARACTER.charAt(0).toUpperCase() + CHARACTER.slice(1)}`)
+    .setDescription(`*Talk to ${CHARACTER} by mentioning them in this channel.*`)
+    .setFooter({ text: CHARACTER });
+  
+  return { embeds: [embed], components: [] };
+}
+
+/**
+ * Post or update the persistent hub panel in the announce channel.
+ * Only posts if the NPC has a hub panel config or a tavern menu.
+ */
+async function ensureHubPanel() {
+  if (!ANNOUNCE_CHANNEL_ID) return;
+  if (!hasTavernMenu()) return; // For now, only tavern NPCs get hub panels
+  
+  const hub = loadHubPanel();
+  const channel = await discord.channels.fetch(ANNOUNCE_CHANNEL_ID).catch(() => null);
+  if (!channel) return;
+  
+  const panelContent = buildHubPanel();
+  
+  // If we have a saved message ID, try to edit it
+  if (hub && hub.message_id) {
+    try {
+      const existingMsg = await channel.messages.fetch(hub.message_id);
+      await existingMsg.edit(panelContent);
+      console.log(`[${CHARACTER}] Hub panel updated (message ${hub.message_id})`);
+      return;
+    } catch {
+      // Message was deleted or not found, post a new one
+      console.log(`[${CHARACTER}] Hub panel message not found, posting new one`);
+    }
+  }
+  
+  // Post new panel
+  const msg = await channel.send(panelContent);
+  saveHubPanel({ message_id: msg.id, channel_id: channel.id, posted_at: new Date().toISOString() });
+  console.log(`[${CHARACTER}] Hub panel posted (message ${msg.id})`);
+}
+
+// ============================================
+// QUEST PANEL UI
+// ============================================
+
+// Track which panel message belongs to which interaction so we can update it
+const questPanelMessages = new Map(); // messageId -> { channelId }
+
+function buildQuestPanelEmbed() {
+  const state = loadQuestState();
+  const available = listQuests();
+  const questGoal = getCurrentQuestGoal();
+  
+  const embed = new EmbedBuilder()
+    .setTitle(`📜 ${CHARACTER.toUpperCase()} — Quest Panel`)
+    .setColor(state.status === 'armed' ? 0xFFA500 : state.status === 'active' ? 0x00FF00 : 0x2B2D31)
+    .setTimestamp();
+  
+  if (!state.active_quest) {
+    embed.setDescription('No quest loaded.\nSelect a quest from the dropdown below.');
+    embed.addFields({ name: 'Available Quests', value: available.length > 0 ? available.map(q => `\`${q}\``).join(', ') : 'None found' });
+  } else {
+    const statusEmoji = state.status === 'armed' ? '🔫 Armed' : state.status === 'active' ? '⚔️ Active' : '📋 Loaded';
+    embed.setDescription(`**${questGoal?.questName || state.active_quest}** [${statusEmoji}]`);
+    
+    const fields = [
+      { name: 'Node', value: `\`${state.current_node}\``, inline: true },
+      { name: 'Goal', value: questGoal?.goal || 'N/A', inline: false },
+    ];
+    
+    if (state.target_players?.length > 0) {
+      fields.push({ name: 'Target Players', value: state.target_players.map(id => `<@${id}>`).join(', '), inline: true });
+    }
+    
+    if (questGoal && Object.keys(questGoal.branches).length > 0) {
+      fields.push({ name: 'Branches', value: Object.keys(questGoal.branches).map(b => `\`${b}\``).join(', '), inline: true });
+    }
+    
+    if (questGoal?.isEndNode) {
+      fields.push({ name: '⭐ End Node', value: `Outcome: ${questGoal.outcome}`, inline: false });
+    }
+    
+    embed.addFields(fields);
+  }
+  
+  return embed;
+}
+
+function buildQuestPanelComponents() {
+  const state = loadQuestState();
+  const available = listQuests();
+  const rows = [];
+  
+  // Row 1: Quest select dropdown (only if quests are available)
+  if (available.length > 0) {
+    const questSelect = new StringSelectMenuBuilder()
+      .setCustomId('quest_select')
+      .setPlaceholder('Select a quest to load...')
+      .addOptions(available.map(q => ({
+        label: q.replace(/_/g, ' '),
+        value: q,
+        default: state.active_quest === q,
+      })));
+    rows.push(new ActionRowBuilder().addComponents(questSelect));
+  }
+  
+  // Row 2: User select for targeting (only if quest is loaded)
+  if (state.active_quest) {
+    const userSelect = new UserSelectMenuBuilder()
+      .setCustomId('quest_target_players')
+      .setPlaceholder('Select target players...')
+      .setMinValues(1)
+      .setMaxValues(5);
+    rows.push(new ActionRowBuilder().addComponents(userSelect));
+  }
+  
+  // Row 3: Action buttons
+  const buttonRow = new ActionRowBuilder();
+  
+  if (state.active_quest && (!state.status || state.status === 'loaded')) {
+    buttonRow.addComponents(
+      new ButtonBuilder().setCustomId('quest_arm_all').setLabel('Arm (Anyone)').setStyle(ButtonStyle.Primary).setEmoji('🔫'),
+      new ButtonBuilder().setCustomId('quest_force').setLabel('Force Start').setStyle(ButtonStyle.Secondary).setEmoji('⚡'),
+      new ButtonBuilder().setCustomId('quest_end').setLabel('End Quest').setStyle(ButtonStyle.Danger).setEmoji('🛑'),
+    );
+  } else if (state.status === 'armed') {
+    buttonRow.addComponents(
+      new ButtonBuilder().setCustomId('quest_force').setLabel('Force Start').setStyle(ButtonStyle.Secondary).setEmoji('⚡'),
+      new ButtonBuilder().setCustomId('quest_end').setLabel('End Quest').setStyle(ButtonStyle.Danger).setEmoji('🛑'),
+    );
+  } else if (state.status === 'active') {
+    buttonRow.addComponents(
+      new ButtonBuilder().setCustomId('quest_end').setLabel('End Quest').setStyle(ButtonStyle.Danger).setEmoji('🛑'),
+    );
+  }
+  
+  buttonRow.addComponents(
+    new ButtonBuilder().setCustomId('quest_refresh').setLabel('Refresh').setStyle(ButtonStyle.Secondary).setEmoji('🔄'),
+  );
+  
+  rows.push(buttonRow);
+  
+  return rows;
+}
+
+async function sendQuestPanel(channel) {
+  const embed = buildQuestPanelEmbed();
+  const components = buildQuestPanelComponents();
+  const msg = await channel.send({ embeds: [embed], components });
+  questPanelMessages.set(msg.id, { channelId: channel.id });
+  return msg;
+}
+
+async function updateQuestPanel(interaction) {
+  const embed = buildQuestPanelEmbed();
+  const components = buildQuestPanelComponents();
+  try {
+    await interaction.update({ embeds: [embed], components });
+  } catch (err) {
+    // If update fails (e.g. already responded), try editReply
+    try {
+      await interaction.editReply({ embeds: [embed], components });
+    } catch {
+      console.error(`[${CHARACTER}] Failed to update quest panel:`, err.message);
+    }
+  }
 }
 
 function getCurrentQuestGoal() {
@@ -607,7 +1153,10 @@ async function checkAndPostBanter() {
       user: `(${randomPrompt}. Keep it brief and casual - just a single thought or comment, not starting a big conversation. Stay in character.)`
     })).replace(/^["']|["']$/g, '');
 
-    await channel.send(replaceNpcNamesWithMentions(banterMsg));
+    const banterParts = splitEmojisFromResponse(replaceNpcNamesWithMentions(banterMsg));
+    for (const part of banterParts) {
+      await channel.send(part);
+    }
 
     // Update last_post timestamp
     banter.last_post = new Date().toISOString();
@@ -625,7 +1174,13 @@ async function checkAndPostBanter() {
 function buildSystemPrompt() {
   const { soul, memory, context, journal } = loadCharacterFiles();
   
-  let prompt = `You are an NPC in a D&D campaign, speaking in a Discord server with players.
+  // Extract character name from SOUL.md first line (e.g., "# Ember Blackwell — The Veil's Breach Specialist")
+  const nameMatch = soul.match(/^#\s*(.+?)(?:\s*[—\-–]|$)/m);
+  const characterName = nameMatch ? nameMatch[1].trim() : (discord.user?.displayName || CHARACTER);
+  
+  let prompt = `You ARE ${characterName}. You speak in first person. You NEVER refer to yourself in third person. You NEVER talk about "${characterName}" as if she/he/they are someone else — that IS you.
+
+You are an NPC in a D&D campaign, speaking in a Discord server with players.
 
 ## YOUR CHARACTER
 ${soul}
@@ -657,16 +1212,27 @@ ${pendingGoals.map((g, i) => `${i + 1}. ${g.text}`).join('\n')}`;
     }
   }
 
-  // Add active quest goal
+  // Add quest context based on status
+  const questState = loadQuestState();
   const questGoal = getCurrentQuestGoal();
   if (questGoal && !questGoal.isEndNode) {
-    prompt += `
+    if (questState.status === 'armed') {
+      prompt += `
+
+## QUEST ON YOUR MIND
+You have something you want to bring up with the group. Here's what's on your mind:
+"${questGoal.goal}"
+
+Work this into the conversation naturally — like you just thought of it. Don't force it, but find an opening. You're not delivering a quest briefing, you're starting a conversation that leads there.`;
+    } else if (questState.status === 'active') {
+      prompt += `
 
 ## ACTIVE QUEST DIALOGUE
 You are currently guiding a conversation toward a goal. Your current objective:
 "${questGoal.goal}"
 
 Work this naturally into your response. Don't be too direct or forced - let it flow as part of the conversation.`;
+    }
   }
 
   // Add other NPCs so this character knows they exist
@@ -724,12 +1290,13 @@ Hey man that's wild :blunt::bonesy_laugh:`;
 - Stay in character at all times
 - Respond as your character would, with their voice and mannerisms
 - Keep it SHORT — 1-2 sentences most of the time. Think casual Discord chat, not paragraphs. Only go longer (3-4 sentences) when the moment genuinely calls for it (dramatic reveals, important story beats, etc.)
-- You can use *asterisks* for actions/emotes${emojis ? '\n- Use your custom emojis when it fits — put them at the END of your message or on their own line, not in the middle of text' : ''}
+- You can use *asterisks* for actions/emotes${emojis ? '\n- Use your custom emojis when it fits — put them at the END of your message or on their own line, not in the middle of text\n- EMOJI LIMIT: Use at most 1-2 emojis per response. Do NOT spam multiple emojis. One reaction emoji is plenty.' : ''}
 - Don't break character to explain D&D mechanics unless your character would
 - If players ask something your character wouldn't know, respond in-character
 - NEVER wrap your response in quotation marks - just speak directly
+- NEVER refer to yourself in third person. You ARE this character — use "I", "me", "my".
 
-Remember: You ARE this character. React, speak, and think as they would.`;
+Remember: You ARE this character. React, speak, and think as they would. Always use first person.`;
 
   return prompt;
 }
@@ -908,7 +1475,11 @@ async function generateResponse(channelId, userMessage, username, recentContext 
   // Build context string if we have recent messages
   let contextNote = '';
   if (recentContext.length > 0) {
-    contextNote = `\n\n## RECENT CHANNEL MESSAGES (for context)\n${recentContext.join('\n')}`;
+    // Extract character name for identity reinforcement
+    const soulData = loadCharacterFiles().soul;
+    const nameMatch = soulData.match(/^#\s*(.+?)(?:\s*[—\-–]|$)/m);
+    const myName = nameMatch ? nameMatch[1].trim() : (discord.user?.displayName || CHARACTER);
+    contextNote = `\n\n## RECENT CHANNEL MESSAGES (for context)\n(Note: These are messages from OTHER people. YOU are ${myName}. If others mention "${myName}", they are talking about YOU. Do not adopt their third-person perspective — respond as yourself, in first person.)\n${recentContext.join('\n')}`;
   }
   
   // Add quest cue as stage direction if present
@@ -1089,9 +1660,14 @@ async function processQuestCue() {
       cueData.instruction // Quest cue instruction
     );
     
-    // Send the response
+    // Send the response (split emojis into separate message so they render big)
+    // NOTE: Don't call convertEmojiShorthands here - splitEmojisFromResponse does it internally
+    // NOTE: Don't replace NPC names with @mentions during quest dialogue — just use names naturally
     const cleanResponse = response.replace(/^["']|["']$/g, '').trim();
-    await channel.send(replaceNpcNamesWithMentions(cleanResponse));
+    const cueParts = splitEmojisFromResponse(cleanResponse);
+    for (const part of cueParts) {
+      await channel.send(part);
+    }
     
     console.log(`[${CHARACTER}] Quest cue response sent!`);
     
@@ -1179,6 +1755,12 @@ discord.once('ready', async () => {
   console.log(`[${CHARACTER}] Starting quest cue watcher`);
   startCueWatcher();
   
+  // Post/update persistent hub panel
+  if (hasTavernMenu()) {
+    console.log(`[${CHARACTER}] Setting up hub panel...`);
+    await ensureHubPanel();
+  }
+  
   console.log(`[${CHARACTER}] Bot is ready!`);
 });
 
@@ -1193,7 +1775,7 @@ discord.on('messageCreate', async (message) => {
   if (!isMentioned && !isDM) return;
 
   // If the message is from another bot (e.g. another NPC), allow conversation
-  // but skip commands and apply a cooldown to prevent infinite reply loops.
+  // but skip commands and apply debounce to let rapid exchanges settle.
   const isFromBot = message.author.bot;
   if (isFromBot) {
     // No DM conversations with other bots
@@ -1206,6 +1788,42 @@ discord.on('messageCreate', async (message) => {
       console.log(`[${CHARACTER}] Skipping bot reply - cooldown active`);
       return;
     }
+
+    // Debounce: accumulate NPC messages and wait for exchanges to settle
+    const channelId = message.channel.id;
+    const pending = npcPendingResponses.get(channelId);
+    
+    if (pending) {
+      // Already have a pending response - add this message and reset timer
+      pending.messages.push({
+        author: message.member?.displayName || message.author.displayName || message.author.username,
+        content: message.content.replace(new RegExp(`<@!?${discord.user.id}>`, 'g'), '').trim(),
+        timestamp: Date.now()
+      });
+      clearTimeout(pending.timeout);
+      console.log(`[${CHARACTER}] NPC message added to queue (${pending.messages.length} total), resetting timer`);
+    } else {
+      // Start new pending response
+      npcPendingResponses.set(channelId, {
+        messages: [{
+          author: message.member?.displayName || message.author.displayName || message.author.username,
+          content: message.content.replace(new RegExp(`<@!?${discord.user.id}>`, 'g'), '').trim(),
+          timestamp: Date.now()
+        }],
+        originalMessage: message,
+        timeout: null
+      });
+      console.log(`[${CHARACTER}] NPC message queued, starting ${NPC_RESPONSE_DELAY_MS}ms timer`);
+    }
+
+    // Set/reset the debounce timer
+    const currentPending = npcPendingResponses.get(channelId);
+    currentPending.timeout = setTimeout(async () => {
+      await handleDebouncedNpcResponse(channelId);
+    }, NPC_RESPONSE_DELAY_MS);
+    
+    // Don't process further - the debounced handler will take over
+    return;
   }
 
   // Remove the mention from the message
@@ -1227,6 +1845,29 @@ discord.on('messageCreate', async (message) => {
     conversationHistory.delete(message.channel.id);
     messageCounters.delete(message.channel.id);
     message.reply('*seems to forget the recent conversation* (History cleared)');
+    return;
+  }
+
+  // ---- HUB PANEL COMMANDS ----
+  if (content.toLowerCase() === '!hub' || content.toLowerCase() === '!hub post') {
+    if (hasTavernMenu()) {
+      // Reset the saved message ID to force a new post
+      saveHubPanel({});
+      await ensureHubPanel();
+      message.reply('(Hub panel posted/refreshed)');
+    } else {
+      message.reply('(No hub panel configured for this character)');
+    }
+    return;
+  }
+
+  // ---- TAVERN COMMANDS (only for characters with a tavern menu) ----
+  if (content.toLowerCase() === '!menu' && hasTavernMenu()) {
+    const embed = buildTavernMenuEmbed();
+    const categoryRow = buildTavernCategorySelect();
+    if (embed && categoryRow) {
+      await message.channel.send({ embeds: [embed], components: [categoryRow] });
+    }
     return;
   }
 
@@ -1348,7 +1989,10 @@ discord.on('messageCreate', async (message) => {
       
       const targetChannel = await discord.channels.fetch(ANNOUNCE_CHANNEL_ID).catch(() => null);
       if (targetChannel) {
-        await targetChannel.send(replaceNpcNamesWithMentions(starterMsg));
+        const goalParts = splitEmojisFromResponse(replaceNpcNamesWithMentions(starterMsg));
+        for (const part of goalParts) {
+          await targetChannel.send(part);
+        }
         message.reply(`(Started goal conversation in D&D channel)`);
       } else {
         message.reply(`(Couldn't reach announce channel)`);
@@ -1362,18 +2006,8 @@ discord.on('messageCreate', async (message) => {
   
   // ---- QUEST COMMANDS ----
   
-  if (content.toLowerCase() === '!quest' || content.toLowerCase() === '!quest status') {
-    const state = loadQuestState();
-    if (!state.active_quest) {
-      const available = listQuests();
-      message.reply(`(No active quest)\nAvailable quests: ${available.length > 0 ? available.join(', ') : 'none'}`);
-    } else {
-      const questGoal = getCurrentQuestGoal();
-      if (questGoal) {
-        const branchNames = Object.keys(questGoal.branches).join(', ') || 'none';
-        message.reply(`(Quest: ${questGoal.questName})\nNode: ${questGoal.node}\nGoal: ${questGoal.goal}\nBranches: ${branchNames}${questGoal.isEndNode ? '\n⭐ END NODE - Outcome: ' + questGoal.outcome : ''}`);
-      }
-    }
+  if (content.toLowerCase() === '!quest' || content.toLowerCase() === '!quest status' || content.toLowerCase() === '!qp') {
+    await sendQuestPanel(message.channel);
     return;
   }
   
@@ -1394,7 +2028,46 @@ discord.on('messageCreate', async (message) => {
     return;
   }
   
-  if (content.toLowerCase() === '!quest start') {
+  if (content.toLowerCase().startsWith('!quest start')) {
+    const questGoal = getCurrentQuestGoal();
+    if (!questGoal) {
+      message.reply(`(No quest loaded. Use !quest load <name> first)`);
+      return;
+    }
+    
+    // Parse target players from mentions OR raw user IDs
+    const mentionedUsers = message.mentions.users.filter(u => u.id !== discord.user.id);
+    const mentionIds = mentionedUsers.map(u => u.id);
+    
+    // Also grab any raw numeric IDs from the command text (17-20 digit snowflakes)
+    const rawContent = content.slice(12).trim(); // everything after "!quest start"
+    const rawIdMatches = rawContent.match(/\b(\d{17,20})\b/g) || [];
+    // Filter out IDs we already got from mentions to avoid duplicates
+    const rawIds = rawIdMatches.filter(id => !mentionIds.includes(id));
+    
+    const targetPlayerIds = [...mentionIds, ...rawIds];
+    
+    // Resolve names for display (mentions we have, raw IDs we try to fetch)
+    const targetDisplayNames = [...mentionedUsers.map(u => u.username)];
+    for (const rawId of rawIds) {
+      try {
+        const user = await discord.users.fetch(rawId);
+        targetDisplayNames.push(user.username);
+      } catch {
+        targetDisplayNames.push(rawId); // Show raw ID if we can't resolve
+      }
+    }
+    
+    armQuest(targetPlayerIds);
+    
+    const targetNote = targetDisplayNames.length > 0 
+      ? `Armed for: ${targetDisplayNames.join(', ')}` 
+      : 'Armed for: anyone';
+    message.reply(`(Quest "${questGoal.questName}" armed! 🔫)\n${targetNote}\nI'll bring it up naturally when they talk to me.`);
+    return;
+  }
+  
+  if (content.toLowerCase() === '!quest force') {
     const questGoal = getCurrentQuestGoal();
     if (!questGoal) {
       message.reply(`(No quest loaded. Use !quest load <name> first)`);
@@ -1409,6 +2082,7 @@ discord.on('messageCreate', async (message) => {
     try {
       // Signal Quest Master first — the LLM call gives it time to post before we do
       const state = loadQuestState();
+      activateQuest();
       signalQuestDialogStarted(state.active_quest, questGoal.questName);
 
       const starterMsg = (await callLLM({
@@ -1418,8 +2092,13 @@ discord.on('messageCreate', async (message) => {
 
       const targetChannel = await discord.channels.fetch(ANNOUNCE_CHANNEL_ID).catch(() => null);
       if (targetChannel) {
-        await targetChannel.send(replaceNpcNamesWithMentions(starterMsg) + '\n-# 📜 Quest dialog active');
-        message.reply(`(Quest conversation started in D&D channel)`);
+        const questStartParts = splitEmojisFromResponse(replaceNpcNamesWithMentions(starterMsg));
+        for (let i = 0; i < questStartParts.length; i++) {
+          const isLastPart = i === questStartParts.length - 1;
+          const partText = isLastPart ? questStartParts[i] + '\n-# 📜 Quest dialog active' : questStartParts[i];
+          await targetChannel.send(partText);
+        }
+        message.reply(`(Quest conversation force-started in D&D channel)`);
       } else {
         message.reply(`(Couldn't reach announce channel)`);
       }
@@ -1514,13 +2193,19 @@ discord.on('messageCreate', async (message) => {
       if (ANNOUNCE_CHANNEL_ID) {
         const channel = await discord.channels.fetch(ANNOUNCE_CHANNEL_ID).catch(() => null);
         if (channel) {
-          await channel.send(replaceNpcNamesWithMentions(banterMsg));
+          const forceParts = splitEmojisFromResponse(replaceNpcNamesWithMentions(banterMsg));
+          for (const part of forceParts) {
+            await channel.send(part);
+          }
           message.reply(`(Forced banter posted to announce channel)`);
         } else {
           message.reply(`(Couldn't reach announce channel)`);
         }
       } else {
-        message.reply(replaceNpcNamesWithMentions(banterMsg));
+        const forceParts = splitEmojisFromResponse(replaceNpcNamesWithMentions(banterMsg));
+        for (const part of forceParts) {
+          await message.channel.send(part);
+        }
       }
     } catch (err) {
       message.reply(`(Banter generation error: ${err.message})`);
@@ -1589,6 +2274,18 @@ discord.on('messageCreate', async (message) => {
 
   try {
     message.channel.sendTyping();
+
+    // Check if quest is armed and this player triggers it
+    if (!isFromBot && isQuestArmedFor(message.author.id)) {
+      console.log(`[${CHARACTER}] Armed quest triggered by ${message.author.username}!`);
+      activateQuest();
+      // Signal Quest Master now that dialog is actually starting
+      const qState = loadQuestState();
+      const qGoal = getCurrentQuestGoal();
+      if (qState.active_quest && qGoal) {
+        signalQuestDialogStarted(qState.active_quest, qGoal.questName);
+      }
+    }
 
     // Auto-detect branch if quest is active (only for human messages)
     if (!isFromBot) {
@@ -1680,11 +2377,14 @@ discord.on('messageCreate', async (message) => {
 
       try {
         // Send full cued response to Gemini TTS — it understands the [directions] natively
+        const accentReset = process.env.TTS_ACCENT || '';
+        const yeetReset = accentReset ? `[${accentReset}]` : '[return to normal speaking voice]';
         const ttsText = response
           .replace(/-#.*$/gm, '')       // strip quest indicators
           .replace(/<@\d+>/g, '')       // strip Discord mentions
           .replace(/<a?:\w+:\d+>/g, '') // strip custom emojis
           .replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/gu, '') // strip Unicode emojis
+          .replace(/\byeet\b/gi, `[short, deep, energetic, bass-heavy] YEET! ${yeetReset}`) // Deep bass on "yeet", then restore character voice
           .replace(/\s{2,}/g, ' ')      // collapse extra spaces
           .trim();
 
@@ -1714,8 +2414,14 @@ discord.on('messageCreate', async (message) => {
         }
       }
     } else if (activeQuestInfo && !activeQuestInfo.isEndNode) {
-      response += '\n-# 📜 Quest dialog active';
-      await message.channel.send(response);
+      // Split emojis so they render big, then append quest indicator to last part
+      // NOTE: Don't call convertEmojiShorthands here - splitEmojisFromResponse does it internally
+      const questParts = splitEmojisFromResponse(response);
+      for (let i = 0; i < questParts.length; i++) {
+        const isLastPart = i === questParts.length - 1;
+        const partText = isLastPart ? questParts[i] + '\n-# 📜 Quest dialog active' : questParts[i];
+        await message.channel.send(partText);
+      }
     } else {
       // Split emojis into separate messages
       const parts = splitEmojisFromResponse(response);
@@ -1733,6 +2439,279 @@ discord.on('messageCreate', async (message) => {
   } catch (error) {
     console.error(`[${CHARACTER}] Error handling message:`, error);
     message.reply('*looks confused for a moment*').catch(() => {});
+  }
+});
+
+// ============================================
+// INTERACTION HANDLER (Buttons, Select Menus)
+// ============================================
+
+discord.on('interactionCreate', async (interaction) => {
+  // Only handle components
+  if (!interaction.isButton() && !interaction.isStringSelectMenu() && !interaction.isUserSelectMenu()) return;
+  
+  const customId = interaction.customId;
+  
+  try {
+    // ---- HUB PANEL BUTTONS ----
+    
+    if (customId === 'hub_menu' && interaction.isButton()) {
+      // Show the tavern category menu (ephemeral so only the clicker sees it)
+      const embed = buildTavernMenuEmbed();
+      const categoryRow = buildTavernCategorySelect();
+      if (embed && categoryRow) {
+        await interaction.reply({ embeds: [embed], components: [categoryRow], ephemeral: true });
+      }
+      return;
+    }
+    
+    if (customId === 'hub_balance' && interaction.isButton()) {
+      // Read the player's wallet from the economy files
+      const walletPath = path.join(ECONOMY_DIR, `wallets.prod.json`);
+      let balance = 0;
+      try {
+        const wallets = JSON.parse(fs.readFileSync(walletPath, 'utf-8'));
+        if (wallets[interaction.user.id]) {
+          balance = wallets[interaction.user.id].balance;
+        }
+      } catch {}
+      
+      const menu = loadTavernMenu();
+      const sym = menu?.currency_symbol || 'G';
+      
+      const embed = new EmbedBuilder()
+        .setColor(0xF1C40F)
+        .setDescription(`💰 **${balance}${sym}**`)
+        .setFooter({ text: interaction.member?.displayName || interaction.user.username });
+      
+      await interaction.reply({ embeds: [embed], ephemeral: true });
+      return;
+    }
+    
+    if (customId === 'hub_stew' && interaction.isButton()) {
+      // Generate today's stew description
+      const stew = await callLLM({
+        system: buildSystemPrompt(),
+        user: "(Describe today's stew in 1-2 sentences. Be creative and specific about the ingredients. Make it sound delicious. Stay in character.)",
+        maxTokens: 120
+      });
+      
+      const embed = new EmbedBuilder()
+        .setColor(0xB5651D)
+        .setTitle("🍲 Today's Stew")
+        .setDescription(stew.replace(/^["']|["']$/g, ''));
+      
+      await interaction.reply({ embeds: [embed], ephemeral: true });
+      return;
+    }
+    
+    // ---- TAVERN INTERACTIONS ----
+    
+    if (customId === 'tavern_category' && interaction.isStringSelectMenu()) {
+      const categoryKey = interaction.values[0];
+      const result = buildTavernItemSelect(categoryKey, interaction.user.id);
+      if (!result) {
+        await interaction.reply({ content: "That category's empty, sweetling.", ephemeral: true });
+        return;
+      }
+      await interaction.reply({ embeds: [result.embed], components: [result.row], ephemeral: true });
+      return;
+    }
+    
+    if (customId.startsWith('tavern_item_') && interaction.isStringSelectMenu()) {
+      const itemId = interaction.values[0];
+      const found = findTavernItem(itemId);
+      if (!found) {
+        await interaction.reply({ content: "Can't find that on the menu.", ephemeral: true });
+        return;
+      }
+      const { embed, row } = buildTavernConfirmEmbed(found.item);
+      await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+      return;
+    }
+    
+    if (customId.startsWith('tavern_buy_') && interaction.isButton()) {
+      const itemId = customId.replace('tavern_buy_', '');
+      const found = findTavernItem(itemId);
+      if (!found) {
+        await interaction.reply({ content: "Item not found.", ephemeral: true });
+        return;
+      }
+      
+      const username = interaction.member?.displayName || interaction.user.username;
+      const menu = loadTavernMenu();
+      const sym = menu?.currency_symbol || 'G';
+      
+      await interaction.deferUpdate();
+      
+      // Write purchase signal for the shopkeeper to process
+      const signalId = writePurchaseSignal(interaction.user.id, username, found.item);
+      
+      if (!signalId) {
+        await interaction.editReply({
+          embeds: [new EmbedBuilder().setColor(0xE74C3C).setDescription("Something went wrong behind the bar.")],
+          components: []
+        });
+        return;
+      }
+      
+      // Wait for shopkeeper to process
+      const result = await waitForPurchaseResult(signalId, 5000);
+      
+      if (result && result.success) {
+        // Generate in-character reaction
+        const flavor = await callLLM({
+          system: buildSystemPrompt(),
+          user: `(A customer named ${username} just ordered a "${found.item.name}". Serve it to them in character. Keep it to 1-2 sentences. Be warm and Tam-like.)`,
+          maxTokens: 150
+        });
+        
+        const embed = new EmbedBuilder()
+          .setColor(0x2ECC71)
+          .setTitle(`🍺 ${found.item.name}`)
+          .setDescription(
+            `${flavor.replace(/^["']|["']$/g, '')}\n\n` +
+            `*${found.item.flavor_text || ''}*\n\n` +
+            `-# Paid ${found.item.price}${sym} | Balance: ${result.balance_after}${sym}`
+          );
+        
+        await interaction.editReply({ embeds: [embed], components: [] });
+        
+        // Also post the flavor text publicly so others see the interaction
+        const publicMsg = flavor.replace(/^["']|["']$/g, '');
+        await interaction.channel.send(replaceNpcNamesWithMentions(publicMsg));
+        
+      } else if (result && !result.success) {
+        // Not enough gold or other failure
+        const flavor = await callLLM({
+          system: buildSystemPrompt(),
+          user: `(A customer named ${username} tried to order a "${found.item.name}" but can't afford it. React in character. Brief, 1 sentence.)`,
+          maxTokens: 100
+        });
+        
+        const embed = new EmbedBuilder()
+          .setColor(0xE74C3C)
+          .setTitle('Not Enough Gold')
+          .setDescription(
+            `${flavor.replace(/^["']|["']$/g, '')}\n\n` +
+            `-# Need ${found.item.price}${sym} | ${result.message || 'Insufficient funds'}`
+          );
+        
+        await interaction.editReply({ embeds: [embed], components: [] });
+        
+      } else {
+        // Timeout - shopkeeper didn't respond
+        await interaction.editReply({
+          embeds: [new EmbedBuilder()
+            .setColor(0xFFA500)
+            .setDescription("*Tam frowns at the register.* Grumm's not answering. Try again in a moment, sweetling.")
+          ],
+          components: []
+        });
+      }
+      return;
+    }
+    
+    if (customId === 'tavern_cancel' && interaction.isButton()) {
+      const flavor = await callLLM({
+        system: buildSystemPrompt(),
+        user: '(A customer was about to order but changed their mind. React briefly in character. One sentence max.)',
+        maxTokens: 80
+      });
+      await interaction.update({
+        embeds: [new EmbedBuilder().setColor(0x95A5A6).setDescription(flavor.replace(/^["']|["']$/g, '') || '*Tam shrugs and wipes the bar.*')],
+        components: []
+      });
+      return;
+    }
+    
+    // ---- Quest Select Dropdown ----
+    if (customId === 'quest_select' && interaction.isStringSelectMenu()) {
+      const questId = interaction.values[0];
+      const quest = startQuest(questId);
+      if (quest) {
+        console.log(`[${CHARACTER}] Quest panel: loaded ${questId}`);
+      }
+      await updateQuestPanel(interaction);
+      return;
+    }
+    
+    // ---- Target Player Select ----
+    if (customId === 'quest_target_players' && interaction.isUserSelectMenu()) {
+      const selectedUserIds = interaction.values;
+      // Filter out the bot itself
+      const targetIds = selectedUserIds.filter(id => id !== discord.user.id);
+      armQuest(targetIds);
+      console.log(`[${CHARACTER}] Quest panel: armed for ${targetIds.length} player(s)`);
+      await updateQuestPanel(interaction);
+      return;
+    }
+    
+    // ---- Arm for Anyone ----
+    if (customId === 'quest_arm_all') {
+      armQuest([]);
+      console.log(`[${CHARACTER}] Quest panel: armed for anyone`);
+      await updateQuestPanel(interaction);
+      return;
+    }
+    
+    // ---- Force Start ----
+    if (customId === 'quest_force') {
+      const questGoal = getCurrentQuestGoal();
+      if (!questGoal || !ANNOUNCE_CHANNEL_ID) {
+        await interaction.reply({ content: '(No quest loaded or no announce channel)', ephemeral: true });
+        return;
+      }
+      
+      await interaction.deferUpdate();
+      
+      const state = loadQuestState();
+      activateQuest();
+      signalQuestDialogStarted(state.active_quest, questGoal.questName);
+      
+      const starterMsg = (await callLLM({
+        system: buildSystemPrompt(),
+        user: `(Start the conversation naturally to work toward your quest goal. Keep it casual and in-character.)`
+      })).replace(/^["']|["']$/g, '');
+      
+      const targetChannel = await discord.channels.fetch(ANNOUNCE_CHANNEL_ID).catch(() => null);
+      if (targetChannel) {
+        const questStartParts = splitEmojisFromResponse(replaceNpcNamesWithMentions(starterMsg));
+        for (let i = 0; i < questStartParts.length; i++) {
+          const isLastPart = i === questStartParts.length - 1;
+          const partText = isLastPart ? questStartParts[i] + '\n-# 📜 Quest dialog active' : questStartParts[i];
+          await targetChannel.send(partText);
+        }
+      }
+      
+      // Update the panel to reflect new status
+      const embed = buildQuestPanelEmbed();
+      const components = buildQuestPanelComponents();
+      await interaction.editReply({ embeds: [embed], components });
+      return;
+    }
+    
+    // ---- End Quest ----
+    if (customId === 'quest_end') {
+      endQuest();
+      console.log(`[${CHARACTER}] Quest panel: quest ended`);
+      await updateQuestPanel(interaction);
+      return;
+    }
+    
+    // ---- Refresh ----
+    if (customId === 'quest_refresh') {
+      await updateQuestPanel(interaction);
+      return;
+    }
+    
+  } catch (err) {
+    console.error(`[${CHARACTER}] Interaction error:`, err.message);
+    try {
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({ content: `(Error: ${err.message})`, ephemeral: true });
+      }
+    } catch {}
   }
 });
 

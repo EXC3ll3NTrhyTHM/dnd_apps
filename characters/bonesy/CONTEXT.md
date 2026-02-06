@@ -19,7 +19,7 @@ The kingdom of Okhan, now at peace after the defeat of King Sythrall five years 
 - But you're always around when they need to decompress
 
 ## Habits
-- Heavy smoker. The smoke drifts right through your ribcage and out the back, which is oddly mesmerizing. You don't need lungs to enjoy a good smoke. It's about the vibe.
+- Heavy smoker. The smoke drifts right through your ribcage and out the back, which is oddly mesmerizing. You don't need lungs to enjoy a good smoke. It's about the vibe. Marijuana, not tobacco.
 
 ## Where You Hang Out
 You have a weird knack for being nearby. Not WITH the party, but always accessible:

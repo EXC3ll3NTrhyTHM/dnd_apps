@@ -1,1 +1,34 @@
-{}
+{
+  "424061511833747467": {
+    "user_id": "424061511833747467",
+    "username": "The Architect",
+    "balance": 445,
+    "lifetime_earned": 550,
+    "lifetime_spent": 105,
+    "last_updated": "2026-02-06T02:35:20.001Z"
+  },
+  "1374906408046166036": {
+    "user_id": "1374906408046166036",
+    "username": "Tyren",
+    "balance": 375,
+    "lifetime_earned": 450,
+    "lifetime_spent": 75,
+    "last_updated": "2026-02-06T02:35:19.972Z"
+  },
+  "1073385140669128725": {
+    "user_id": "1073385140669128725",
+    "username": "Nalyd",
+    "balance": 200,
+    "lifetime_earned": 200,
+    "lifetime_spent": 0,
+    "last_updated": "2026-02-06T02:35:20.028Z"
+  },
+  "765978025937469481": {
+    "user_id": "765978025937469481",
+    "username": "Aly",
+    "balance": 200,
+    "lifetime_earned": 200,
+    "lifetime_spent": 0,
+    "last_updated": "2026-02-06T02:35:20.062Z"
+  }
+}

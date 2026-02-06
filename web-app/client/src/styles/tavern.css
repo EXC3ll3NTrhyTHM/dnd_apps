@@ -1,0 +1,29 @@
+/* ============================================
+   TAVERN PAGE
+   ============================================ */
+
+.tavern-page .page-header {
+  text-align: center;
+  padding-top: 8px;
+}
+
+.tavern-page .page-title {
+  font-size: 1.6rem;
+}
+
+.tavern-page .page-subtitle {
+  margin-top: 4px;
+}
+
+.menu-section {
+  margin-bottom: 8px;
+}
+
+.menu-section .section-title {
+  position: sticky;
+  top: var(--top-bar-height);
+  background: var(--bg-dark);
+  padding: 10px 0;
+  z-index: 5;
+  margin-bottom: 8px;
+}

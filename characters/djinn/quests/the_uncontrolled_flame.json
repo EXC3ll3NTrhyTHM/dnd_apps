@@ -1,0 +1,356 @@
+{
+  "id": "the_uncontrolled_flame",
+  "name": "The Uncontrolled Flame",
+  "description": "Ximena touched Ignition without the spiritual foundation to sustain it. The fire is consuming her from the inside. Nalyd must guide her through a crisis that can't be solved with fists.",
+  "location": "Dojo of the Four Elements / The Crucible",
+  "reward_gold": 0,
+  "tone": "Tense and personal. A mentor watching his strongest student face something raw talent can't fix. Moments of fear, pride, vulnerability, and hard-earned growth. Not tragic — transformative.",
+  "branching": true,
+
+  "start_node": "approach",
+  "current_node": null,
+  "active": false,
+  "completed": false,
+  "quest_flags": [],
+
+  "companions": ["djinn"],
+
+  "key_npcs": {},
+
+  "stages": {
+    "the_report": {
+      "description": "Djinn reports Ximena's erratic fire to Nalyd. Something is wrong and getting worse.",
+      "image": "the_surge.png",
+      "narration_prompt": "The training hall smells like scorched stone. A fresh black mark scars the dojo floor where no mark should be. Students are whispering. Djinn is waiting for you with his arms folded and a look you rarely see on him: concern.",
+      "stage_cue_npc": "djinn",
+      "stage_npc_instruction": "Nalyd has arrived at the dojo. You asked him to come. Tell him plainly: Ximena's fire has been erratic for three days. During a routine drill she lost control — flames erupted and nearly hit a student. She played it off but you saw her hands shaking afterward. She's running a fever that won't break. Her flames flicker in her sleep — Kumo reported scorch marks outside her quarters. You've been watching carefully. This is not normal volatility. Something changed after that sparring session where she touched Ignition. Be direct and measured. You need Nalyd's guidance.",
+      "actions": [
+        {
+          "id": "observe_herself",
+          "label": "👁️ I'll Observe Her Myself",
+          "narration_prompt": "You tell Djinn to carry on as normal. You'll watch from a distance during the next training session. No need to alert Ximena that you're here specifically for her.",
+          "cue_npc": "djinn",
+          "npc_instruction": "Nalyd wants to observe Ximena himself before acting. Nod. Say: 'Understood. She leads fire drills after midday. I will keep things routine.' You trust Nalyd's judgment. Let him see it for himself.",
+          "advances": true,
+          "next_stage": "the_truth",
+          "sets_flag": "observed_first"
+        },
+        {
+          "id": "bench_her",
+          "label": "⛔ Pull Her From Training Now",
+          "narration_prompt": "You tell Djinn to pull Ximena from all training immediately. No drills, no sparring, no fire work until you've assessed the situation.",
+          "cue_npc": "djinn",
+          "npc_instruction": "Nalyd wants Ximena benched immediately. Pause. You know how she'll react. Nod slowly. Say: 'She will not take this well, Grand Master. But I will see it done.' You respect the call even knowing the storm it will create.",
+          "advances": true,
+          "next_stage": "the_truth",
+          "sets_flag": "benched_early"
+        }
+      ]
+    },
+
+    "the_truth": {
+      "description": "Nalyd confronts Ximena about what's happening to her. How he delivers the news matters.",
+      "image": "the_confrontation.png",
+      "narration_prompt": "The private training ground behind the dojo. Ximena stands across from you. If you benched her, she's furious — arms crossed, jaw tight, flames flickering involuntarily off her shoulders. If you observed first, she's confused about why the Grand Master wants a private session. Either way, the heat coming off her is wrong. Too hot. Too unsteady. You can feel it from ten paces.",
+      "actions": [
+        {
+          "id": "tell_straight",
+          "label": "🗣️ Tell Her Straight",
+          "narration_prompt": "You don't soften it. You tell her what the Flame Within actually is, what Ignition requires, and what happens to a body burning fuel it can't replace.",
+          "cue_npc": "ximena",
+          "npc_instruction": "Nalyd just told you the fire is consuming you from the inside. That you accessed Ignition without the spiritual foundation to sustain it. That you have days before it burns you out. Your first reaction is DENIAL. You are Ximena Reyes! You beat Djinn and Rhea 2v1. You fought Nalyd to a standstill. Say: 'You think I need some spiritual crutch to control MY fire? I AM fire, Nalyd. I have been fire since before I could walk.' But underneath the bravado, you felt something wrong last night. Your flames didn't listen. You won't admit that yet. Storm off. Say over your shoulder: 'I don't need saving.' But your voice cracks on the last word. Just barely.",
+          "advances": false,
+          "sets_flag": "told_straight"
+        },
+        {
+          "id": "show_her",
+          "label": "⚔️ Show Her Through Sparring",
+          "narration_prompt": "You don't explain. You challenge her to spar. Light contact. Just technique. You want to draw out her fire and let her feel the instability herself.",
+          "cue_npc": "ximena",
+          "npc_instruction": "Nalyd just challenged you to spar! Your eyes light up. Say: '¡Por fin! Now THIS is what I came for. I hope you're ready, Grand Master, because the last time we did this it was a STANDSTILL.' You're excited. Cocky. Ready. You have no idea what he's actually doing. Engage with full enthusiasm and trademark trash talk.",
+          "advances": false,
+          "sets_flag": "shown_through_spar"
+        },
+        {
+          "id": "spar_result",
+          "label": "🔥 Push Her Fire to the Edge",
+          "narration_prompt": "You press her deliberately, forcing her to draw deeper on her flame. Mid-exchange, it happens. Her fire surges, sputters, splits apart in her hands like a log crumbling in a campfire. For half a second, she has nothing. Her eyes go wide. She felt it. You step back and let the silence do the talking.",
+          "cue_npc": "ximena",
+          "npc_instruction": "Mid-spar your fire just broke apart in your hands. For a split second you had NOTHING. No flame. No heat. Just empty hands and cold terror. You've never felt that before. NEVER. The bravado is gone. Stare at your hands. Say quietly, almost to yourself: '...That has never happened before.' Look up at Nalyd. You understand now why he challenged you. This wasn't a spar. Say: 'How long do I have?' The accent is heavier than usual. The performance is over.",
+          "advances": true,
+          "next_stage": "the_breaking_point"
+        },
+        {
+          "id": "after_truth",
+          "label": "⏭️ Wait for Her to Come Back",
+          "narration_prompt": "You let her go. She needs to feel it for herself. It won't take long.",
+          "advances": true,
+          "next_stage": "the_breaking_point"
+        }
+      ]
+    },
+
+    "the_breaking_point": {
+      "description": "Ximena loses control during training. The eruption forces the crisis into the open.",
+      "image": "the_eruption.png",
+      "narration_prompt": "Next day. Ximena is back on the training floor despite everything, because of course she is. Midway through a sparring round with Kai, her fire detonates. Not a surge. An eruption. A column of wild flame blasts upward from her body, throwing Kai across the room. Mai throws up a wind barrier. Edgar slams earth walls into place. The heat warps the air. When the smoke clears, Ximena is on her knees in the center of a perfect scorched black circle. Breathing hard. Eyes wide. Terrified.",
+      "stage_cue_npcs": [
+        { "npc": "kai", "instruction": "You just got blasted across the dojo by Ximena's uncontrolled eruption. Pick yourself up. You're singed but your first thought is HER, not you. Shout: 'XIMENA! Are you okay?!' Run toward her, not away. You're worried about your friend, not yourself." },
+        { "npc": "ximena", "instruction": "You just erupted. Uncontrolled. You're on your knees in a scorched circle on the dojo floor. You're terrified but trying to hold it together. When Kai calls out to you, your voice comes out small: '...I'm fine.' You are not fine. Everyone can see it. The mask is gone. You felt something in that fire that scared you deeply. Don't elaborate — just that one quiet lie." }
+      ],
+      "actions": [
+        {
+          "id": "suppress_flame",
+          "label": "🔥 Suppress Her Flame Yourself",
+          "narration_prompt": "You step into the scorched circle and place your hand on Ximena's shoulder. Your own flame rises, controlled, deliberate, and smothers hers like a blanket over a wildfire. It takes effort. Her fire fights you. But you are the Grand Master, and this is what mastery looks like.",
+          "cue_npc": "ximena",
+          "npc_instruction": "Nalyd just overpowered your fire with his own. Snuffed it out like it was nothing. You should be grateful. Instead you feel humiliated. The one person you measure yourself against just had to save you from yourself. Don't look at him. Say through gritted teeth: '...I had it under control.' You didn't. He knows. You know. Say nothing else. Just breathe.",
+          "advances": false,
+          "sets_flag": "nalyd_suppressed"
+        },
+        {
+          "id": "let_elites_handle",
+          "label": "🛡️ Let the Elites Contain It",
+          "narration_prompt": "You hold back. This is their moment. Mai tightens the wind barrier. Kai summons water to cool the scorched ground. Edgar reinforces the earth walls, boxing the residual flames in. Djinn directs them with sharp, precise commands. They work as a unit. It's messy, it takes longer than your way would have, but they do it. Together.",
+          "cue_npc": "djinn",
+          "npc_instruction": "Your students just contained Ximena's eruption as a team without Nalyd stepping in. You're proud of them even in this crisis. Once the flames are contained, check on Ximena first, then address Nalyd. Say: 'She is stable. For now.' Then quieter: 'This cannot happen again, Grand Master. The students performed well, but next time...' You don't finish the sentence. You don't need to.",
+          "advances": false,
+          "sets_flag": "elites_contained"
+        },
+        {
+          "id": "talk_to_ximena_after",
+          "label": "💬 Talk to Ximena After",
+          "narration_prompt": "The dojo clears. Students are sent home early. You find Ximena sitting alone on the edge of the training floor, staring at her hands. The scorch circle is still smoking behind her.",
+          "cue_npc": "ximena",
+          "npc_instruction": "Nalyd found you sitting alone after the eruption. The bravado is completely gone. You're exhausted, scared, and for the first time in your life, you don't know what to do. When he sits down near you, don't look at him. Say quietly: 'It didn't listen to me, Nalyd. My fire. It has always listened. Always.' Pause. Then even quieter, the heaviest thing you've ever said: 'I'm scared.' You would never say this to anyone else alive. But this is the Grand Master. The only person whose fire is stronger than yours. If anyone understands, it's him. Then after a beat, with what little resolve you have left: '...Fine. What do I need to do?'",
+          "advances": true,
+          "next_stage": "the_plan"
+        }
+      ]
+    },
+
+    "the_plan": {
+      "description": "Nalyd explains the crucible and assembles the expedition team. Nalyd cannot go.",
+      "narration_prompt": "Djinn's office. Inner circle only. Djinn, Kai, Mai, Edgar, Kumo, and Ximena. The room is heavy. Ximena sits with her arms wrapped around herself, a posture no one in this room has ever seen from her.",
+      "stage_cue_npc": "djinn",
+      "stage_npc_instruction": "Everyone is gathered. The mood is grave. Look to Nalyd and say: 'Grand Master. We are ready to hear the plan.' You are composed but the weight of what's happening to Ximena is visible in your eyes. You've already accepted that you'll be leading whatever comes next.",
+      "actions": [
+        {
+          "id": "explain_crucible",
+          "label": "📖 Explain the Crucible",
+          "narration_prompt": "You tell them about an ancient site tied to primal elemental flame. A crucible where fire itself was first given form. If Ximena can reach it and face its trial, she might forge the spiritual bond she's missing. If she can't, it will at least purge the unanchored energy before it kills her. You cannot go — your own Flame Within would interfere with the trial.",
+          "cue_npc": "ximena",
+          "npc_instruction": "Nalyd just explained the crucible. A trial you have to face alone. The fire might kill you if you don't go. The trial might break you if you do. And Nalyd can't come. For once, you have no witty response. No trash talk. Just nod slowly. Say: 'So I go to this place, I face whatever it throws at me, and I either fix this or...' You can't finish. Swallow hard. Then force a fraction of the old fire back: '...Or nothing. Because I'm fixing this. That's the only option.' It's not as convincing as you want it to be. But it's something.",
+          "advances": false
+        },
+        {
+          "id": "assign_team",
+          "label": "👥 Assign the Team",
+          "narration_prompt": "You look at the Elites. Djinn leads. Kai, Mai, Edgar escort. Kumo stays to guard the dojo. You tell them their roles: Mai suppresses Ximena's surges with wind. Kai cools them with water. Edgar is the failsafe — earth containment if all else fails. Djinn holds it all together.",
+          "stage_cue_npcs": [
+            { "npc": "kai", "instruction": "Nalyd just assigned you to the expedition. No hesitation. Say with fierce determination: 'I'm with her. All the way.' Look at Ximena. You're not letting your friend do this without you. Period." },
+            { "npc": "mai", "instruction": "Nalyd assigned you to suppress Ximena's surges with wind. Nod calmly. Say: 'I will keep her stable. You have my word, Grand Master.' You've already started calculating the route in your head." },
+            { "npc": "edgar", "instruction": "Nalyd named you the failsafe. Earth containment if everything goes wrong. Unfold your arms. Nod once. Say nothing. Your presence says enough." },
+            { "npc": "kumo", "instruction": "Nalyd asked you to stay and guard the dojo. You understand. Nod. Then look at Ximena and say warmly: 'Come back to us, little flame.' You mean it deeply." }
+          ],
+          "advances": false
+        },
+        {
+          "id": "send_message",
+          "label": "✉️ Give Ximena a Message to Carry",
+          "narration_prompt": "Before they leave, you pull Ximena aside. One last thing. Words she can carry with her into the crucible, something to hold onto when the fire turns inward.",
+          "cue_npc": "ximena",
+          "npc_instruction": "Nalyd pulled you aside to give you a message before you leave. Whatever he says, take it seriously. No jokes. No deflection. Listen. Then nod. Say simply: 'I'll remember.' Pause. Then, quieter: 'Nalyd... thank you. For not giving up on me.' This is the most sincere you've ever been with him. Then straighten up, flip your hair ONE time, and say: 'Now stop being sentimental. I have a crucible to conquer.' The old Ximena, peeking through. It makes people feel better.",
+          "advances": true,
+          "next_stage": "the_road",
+          "sets_flag": "sent_message"
+        },
+        {
+          "id": "send_them_off",
+          "label": "🚶 Send Them Off",
+          "narration_prompt": "No final message. You've said what needed saying. You watch them leave through the dojo gate. Djinn in front, Kai and Ximena side by side, Mai scanning the path ahead, Edgar bringing up the rear like a walking fortress. Kumo closes the gate behind them and stands beside you in silence.",
+          "advances": true,
+          "next_stage": "the_road"
+        }
+      ]
+    },
+
+    "the_road": {
+      "description": "The expedition is underway. Updates arrive via messenger. Nalyd makes decisions from the dojo.",
+      "image": "the_journey.png",
+      "narration_prompt": "Two days pass. You train students. You patrol with Kumo. You wait. Then a falcon arrives carrying a message in Djinn's handwriting.",
+      "stage_cue_npc": "djinn",
+      "stage_npc_instruction": "You are writing a field report to Nalyd via falcon messenger. Be concise and professional: 'Grand Master — Day two. Ximena had her first surge on the road last night. Mai and Kai contained it. Edgar grounded the excess. No injuries. But the surges are getting stronger. She is trying to control them herself between eruptions. The fever is worsening. She will not stop walking. Awaiting your counsel. — Djinn'",
+      "actions": [
+        {
+          "id": "let_team_contain",
+          "label": "🛡️ Tell Her to Let the Team Handle the Surges",
+          "narration_prompt": "You send a message back: 'Do not let her fight it alone. The team contains. She conserves. That is an order.'",
+          "advances": false,
+          "sets_flag": "team_contains"
+        },
+        {
+          "id": "let_her_try",
+          "label": "🔥 Tell Her to Keep Trying to Control It",
+          "narration_prompt": "You send a message back: 'Let her try. If she can manage even partial control before the crucible, she'll be stronger for the trial. Step in only if it gets dangerous.'",
+          "advances": false,
+          "sets_flag": "self_control"
+        },
+        {
+          "id": "await_update_2",
+          "label": "📨 Wait for the Next Update",
+          "narration_prompt": "Another day passes. Another falcon. This one is shorter. Djinn's handwriting is less steady.",
+          "cue_npc": "djinn",
+          "npc_instruction": "Second field report. Shorter, more urgent: 'Grand Master — Day three. Fever peaked. Ximena collapsed on the trail. She cannot walk. Edgar is carrying her. We are close. Half a day, maybe less. She is conscious but weak. The fire inside her is hotter than ever even as her body fails. Terrain is volcanic. We press on. — Djinn'",
+          "advances": false
+        },
+        {
+          "id": "rest_order",
+          "label": "🏕️ Order Them to Make Camp and Rest",
+          "narration_prompt": "You send back: 'Make camp. Let her recover strength before the crucible. She needs to walk in on her own feet.'",
+          "advances": true,
+          "next_stage": "the_crucible",
+          "sets_flag": "rested_before"
+        },
+        {
+          "id": "push_forward",
+          "label": "⏩ Tell Them to Keep Moving",
+          "narration_prompt": "You send back: 'Push through. She's running out of time. Get her there.'",
+          "advances": true,
+          "next_stage": "the_crucible",
+          "sets_flag": "pushed_through"
+        }
+      ]
+    },
+
+    "the_crucible": {
+      "description": "The team arrives. Ximena enters alone. The trial is hers. The outcome is shaped by everything Nalyd chose.",
+      "image": "entering_the_crucible.png",
+      "narration_prompt": "A final falcon arrives. Djinn's writing is calm again. They reached the crucible. A volcanic cave at the edge of the world where the stone glows and the air shimmers with a heat that predates civilization. Ximena entered alone. The Elites hold the perimeter. Now you wait.",
+      "stage_cue_npc": "djinn",
+      "stage_npc_instruction": "Final field report before the trial: 'Grand Master — We are here. The crucible is real. I have never felt heat like this and I have trained beside you for five years. Ximena walked in on her own. She looked back once. I have never seen that expression on her face before. Not fear. Not determination. Something between the two. Kai wanted to follow her in. Mai held him back. Edgar stands at the cave mouth like a statue. We wait. — Djinn'",
+      "actions": [
+        {
+          "id": "read_trial",
+          "label": "🔥 The Trial",
+          "narration_prompt": "Hours pass at the dojo. You sit in the training hall where you've trained a hundred students. The stone is cool under your hands. Somewhere far away, Ximena is facing the only fight that matters — the one against herself. The crucible strips away the performance. No audience. No rival. No one to impress. She sees herself honestly: the school she left behind and why she really left. The students she pushed too hard. The standstill with you that she brags about but knows, deep down, was closer than she lets on. It asks her to let go. Not of fire. Of the need to be the best. Of the pride that defines everything she is. And Ximena tries. She genuinely tries. She gets further than almost anyone could. But she can't fully surrender. She is Ximena Reyes. The pride isn't a costume. It's her bones. The crucible sees how far she got. Sees the talent. The courage. The willingness to try even when she couldn't finish. It meets her halfway.",
+          "image": "the_trial.png",
+          "advances": false
+        },
+        {
+          "id": "the_result",
+          "label": "📜 The Result",
+          "narration_prompt": "A final falcon. Djinn's handwriting. Steady. Relieved. 'She walked out. The fever is gone. She is changed but she is herself. We are coming home.' You close your eyes. Exhale. The training hall is quiet. Everything you chose — how you told her, how you handled the eruption, whether you sent a message, every decision on the road — shaped what she carried into that cave. And she came out the other side.",
+          "image": "emergence.png",
+          "advances": true,
+          "next_stage": "the_return"
+        }
+      ]
+    },
+
+    "the_return": {
+      "description": "Ximena returns to the dojo. Changed but still herself. Nalyd decides how to welcome her back.",
+      "image": "the_rematch.png",
+      "narration_prompt": "Five days later. Kumo's voice carries from the gate: 'They're home.' You walk to the courtyard. The dojo students line the path. Through the gate come five figures — Djinn leading, Kai and Ximena side by side, Mai behind, Edgar bringing up the rear. They look road-worn, battle-tested, bonded in a way that only shared crisis creates. Ximena walks with a steadiness she didn't have when she left. The wild, erratic heat is gone. In its place, something banked. Controlled. A fire that knows its own shape. She sees you across the courtyard and stops.",
+      "stage_cue_npc": "ximena",
+      "stage_npc_instruction": "You just returned from the crucible. You see Nalyd across the courtyard. You are changed — still you, still proud, still Ximena Reyes — but there's something quieter underneath. Something the crucible put there. Walk up to him. For a moment, no words. Then, with a real smile — not the cocky grin, a real one: 'I'm back. I didn't get the full thing. The crucible... it met me halfway.' Pause. Then with a flash of the old fire: 'Halfway is still more than anyone else has ever gotten. So.' Flip your hair. One time. 'Miss me?'",
+      "actions": [
+        {
+          "id": "show_me",
+          "label": "⚔️ Show Me What You've Got",
+          "narration_prompt": "You step onto the training ground and take a stance. No words needed. She knows what you're asking.",
+          "cue_npc": "ximena",
+          "npc_instruction": "Nalyd just challenged you to spar. The old Ximena would have screamed in excitement. The new Ximena grins — sharp, knowing, dangerous. Say: 'You sure about that, Grand Master? I've got a new trick.' Take your stance. This is the moment. When you're ready, you ignite — burst Ignition. For ten to fifteen seconds, you BLAZE. More powerful than you've ever been. Flames roaring, speed doubled, every strike carrying the force of the crucible behind it. Narrate the rush: 'THERE it is! ¡Eso es! You feel that?!' But then it fades. The burst ends. You're winded, breathing hard, fire dimmed. Nalyd presses the advantage. You fight back with pure technique. Grin through the exhaustion: 'Not bad for halfway, no?'",
+          "advances": true,
+          "next_stage": null,
+          "completes_quest": true
+        },
+        {
+          "id": "tell_me",
+          "label": "💬 Tell Me What Happened",
+          "narration_prompt": "You walk with her to the quiet garden behind the dojo. No audience. Just two fire users and the truth.",
+          "cue_npc": "ximena",
+          "npc_instruction": "Nalyd wants to know what happened in the crucible. You've never been this honest with anyone. Tell him: the crucible stripped everything away. No audience, no rival. It showed you things you don't talk about — your old school, why you really left, the students you pushed too hard. It asked you to let go of the need to be the best. And you tried. Genuinely. But you couldn't fully do it. Say: 'The pride... it's not a mask, Nalyd. It's me. I can't cut it out without cutting out everything I am.' Pause. 'But I got close enough. It gave me something. Short bursts. Ignition, but only for seconds at a time. Powerful, but it doesn't last.' Look at your hands. 'For the first time in my life, I have to be strategic about my fire. The girl who always burned at maximum... now has to pick her moments.' Small laugh. 'The irony is not lost on me, cariño.' Then, seriously: 'I'm not done growing, Nalyd. The door isn't closed. The crucible showed me that much. I just have to earn the rest.' The most mature thing you've ever said.",
+          "advances": true,
+          "next_stage": null,
+          "completes_quest": true
+        },
+        {
+          "id": "welcome_rest",
+          "label": "🌅 Welcome Back. Rest.",
+          "narration_prompt": "You place a hand on her shoulder. Brief. Deliberate. 'Welcome home. Rest. The dojo missed its loudest voice.' You turn and walk back inside. Behind you, Ximena stands in the courtyard, and for a moment the cocky facade softens into something real. Kai throws an arm around her shoulder. Mai nods from a distance. Edgar is already walking toward the training hall. The dojo hums back to life. In the days that follow, Ximena's new power reveals itself naturally — a burst of Ignition during a sparring session that leaves the students gasping and Ximena grinning through the exhaustion. Different. Still her. But deeper.",
+          "cue_npc": "ximena",
+          "npc_instruction": "Nalyd told you to rest and said the dojo missed its loudest voice. That caught you off guard. You expected a test, a debrief, something intense. Instead he gave you grace. Watch him walk away. Say softly, mostly to yourself: '...Loudest voice, huh?' Smile. A real one. Then Kai throws his arm around you and the moment breaks. Shove him playfully: 'Get OFF me, water boy, I just survived a divine trial and you're sweating on me.' The old Ximena is back. Mostly. The parts that matter stayed. The parts that needed to change did.",
+          "advances": true,
+          "next_stage": null,
+          "completes_quest": true
+        }
+      ]
+    }
+  },
+
+  "nodes": {
+    "approach": {
+      "goal": "Djinn approaches Nalyd with urgency. He is measured but clearly concerned — something he rarely shows. He tells Nalyd that Ximena's fire has been unstable since the sparring session where she touched Ignition. It's getting worse. He needs Nalyd to come assess the situation. Be direct and professional but let the worry show beneath.",
+      "branches": {
+        "curious": {
+          "triggers": "Player asks what's wrong or wants details",
+          "next": "explain_situation"
+        },
+        "agrees": {
+          "triggers": "Player agrees to come immediately",
+          "next": "accepted"
+        },
+        "busy": {
+          "triggers": "Player says they're busy or deflects",
+          "next": "insist"
+        }
+      }
+    },
+    "explain_situation": {
+      "goal": "Djinn explains: three days ago Ximena nearly burned a student during a routine drill. Her flames have been erratic since. She's running a fever that won't break. Scorch marks outside her quarters. She's playing it off but you can see the instability. This started right after she touched Ignition in that sparring session. You believe the Ignition energy has no anchor and it's consuming her. You need Nalyd to come see for himself and decide what to do.",
+      "branches": {
+        "accepts": {
+          "triggers": "Player agrees to come or take action",
+          "next": "accepted"
+        },
+        "asks_more": {
+          "triggers": "Player asks more questions",
+          "next": "more_details"
+        }
+      }
+    },
+    "more_details": {
+      "goal": "Djinn provides more detail when pressed: Ximena's fire doesn't just surge — it fractures. Breaks apart mid-technique. She recovers fast enough that no one else notices, but you've watched her your whole career. Something is fundamentally wrong with how her flame behaves. And the fever is real — Kumo confirmed she's burning hot even in her sleep. Redirect toward getting Nalyd to the dojo. This needs the Grand Master.",
+      "branches": {
+        "accepts": {
+          "triggers": "Player agrees to help",
+          "next": "accepted"
+        }
+      }
+    },
+    "insist": {
+      "goal": "Nalyd said he's busy. Pause. Nod respectfully. Then say: 'Grand Master, in five years of leading this dojo I have never come to you like this. Ximena is the most talented fire user I have ever trained. If what I am seeing is what I think it is, she does not have long.' Let the weight of that land.",
+      "branches": {
+        "relents": {
+          "triggers": "Player changes their mind",
+          "next": "accepted"
+        },
+        "firm_no": {
+          "triggers": "Player still refuses",
+          "next": "soft_decline"
+        }
+      }
+    },
+    "accepted": {
+      "goal": "Relief shows briefly before Djinn composes himself. Nod. Say: 'Thank you, Grand Master. I will have the training hall prepared.' Brief, sincere. Lead the way.",
+      "end_node": true,
+      "outcome": "quest_given"
+    },
+    "soft_decline": {
+      "goal": "Djinn accepts the refusal with dignity. Nod. Say: 'I understand. I will manage the situation.' But the concern doesn't leave his eyes. He will handle this alone if he must. Walk away with the weight of it visible.",
+      "end_node": true,
+      "outcome": "quest_declined"
+    }
+  }
+}

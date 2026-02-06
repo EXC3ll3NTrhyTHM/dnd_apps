@@ -134,7 +134,13 @@ Actions that end the quest successfully.
 ```
 
 #### 4. NPC Cue Actions
-Actions that prompt an NPC companion to speak.
+Actions that prompt an NPC to speak. There are two types:
+
+**Bot NPC** (has a character folder in `characters/`): The Quest Manager writes a cue file and the NPC bot picks it up and responds itself.
+
+**Quest NPC** (defined in `key_npcs`): The Quest Manager generates dialogue via AI and sends it through a webhook with the NPC's name and avatar.
+
+Both use the same action format:
 
 ```json
 {
@@ -143,6 +149,61 @@ Actions that prompt an NPC companion to speak.
   "narration_prompt": "The player turns to Nibby for input.",
   "cue_npc": "nibby",
   "npc_instruction": "The party is asking what you think about the scratch marks. Share your thoughts nervously.",
+  "advances": false
+}
+```
+
+### ⚠️ CRITICAL RULE: All NPC Dialogue Goes Through NPCs, Not Narration
+
+The Quest Manager is a **narrator**, not a voice actor. It describes the scene, the environment, body language, and what the player sees. It should **never** speak dialogue for an NPC. If an NPC has something to say, they say it themselves through their webhook/bot.
+
+**The rule is simple: narration_prompt = what the player sees and does. NPC dialogue = cue_npc.**
+
+Any time you're tempted to write quoted dialogue (`'...'`) inside a `narration_prompt`, stop. That dialogue belongs in a `cue_npc` + `npc_instruction` instead.
+
+**Wrong** — Quest Manager narrates NPC dialogue:
+```json
+{
+  "id": "approach_stranger",
+  "narration_prompt": "You approach. The man says 'I am looking for my son.' He coughs and steadies himself. 'My name is Hiro Zenatsu.'"
+}
+```
+
+**Right** — Quest Manager sets the scene, NPC speaks for themselves:
+```json
+{
+  "id": "approach_stranger",
+  "narration_prompt": "You approach the gate. Up close, the resemblance is unmistakable.",
+  "cue_npc": "hiro",
+  "npc_instruction": "Nalyd has approached you. Introduce yourself with quiet dignity. Say your name, and that you are looking for your son."
+}
+```
+
+This applies everywhere:
+- **Actions** — use `cue_npc` + `npc_instruction`
+- **Stage intros** — use `stage_cue_npc` + `stage_npc_instruction` (single NPC) or `stage_cue_npcs` array (multiple NPCs speaking in sequence)
+
+```json
+"stage_cue_npcs": [
+  { "npc": "hiro", "instruction": "Speak softly: 'You are taller than I imagined.'" },
+  { "npc": "djinn", "instruction": "After a long pause, say: 'You are smaller.'" }
+]
+```
+
+If multiple NPCs speak in one scene, use `stage_cue_npcs` with an array — they fire in order.
+
+### ⚠️ IMPORTANT: First Appearance Gets a Portrait
+
+The **first action** where a quest NPC speaks should include `"image"` set to that NPC's reference image (e.g. `"image": "hiro.png"`). This lets players see who they're talking to. Subsequent cues of the same NPC don't need the image unless the scene calls for it.
+
+```json
+{
+  "id": "approach_stranger",
+  "label": "🗣️ Approach the Stranger",
+  "narration_prompt": "You approach the gate. Up close, the resemblance is unmistakable.",
+  "image": "hiro.png",
+  "cue_npc": "hiro",
+  "npc_instruction": "Introduce yourself with quiet dignity.",
   "advances": false
 }
 ```
@@ -156,6 +217,35 @@ List NPCs that accompany the party on this quest:
 ```
 
 These NPCs will appear in the NPC dropdown menu during the quest.
+
+## Key NPCs (Quest-Only Characters)
+
+Some quests introduce new characters that don't have their own bot. Define them in `key_npcs`:
+
+```json
+"key_npcs": {
+  "hiro": {
+    "name": "Hiro Zenatsu",
+    "race": "Human",
+    "age": "62",
+    "description": "A gaunt, weathered old man...",
+    "visual_prompt": "Description for image generation...",
+    "personality": "Measured and deliberate..."
+  }
+}
+```
+
+The Quest Manager handles these NPCs internally: it generates their dialogue via AI and sends it through a Discord webhook with their name and avatar image.
+
+### Avatar Images for Key NPCs
+
+Place avatar images at:
+```
+characters/<source_npc>/quests/images/<key_npc_name>.png
+```
+For example: `characters/djinn/quests/images/hiro.png`
+
+The webhook system looks for `<npc_name>_avatar.png` or `<npc_name>.png`.
 
 ## Button Styling
 
@@ -258,6 +348,37 @@ The Quest Manager automatically styles buttons based on their properties:
 4. **Use evocative narration prompts** - the AI builds on these
 5. **Make advancing actions clear** with directional labels (Follow Trail, Enter, Continue, etc.)
 6. **End with meaningful resolution** - not just "quest complete"
+
+### ⚠️ Buttons Always Come AFTER NPC Dialogue
+
+If a stage or action cues an NPC to speak, the action buttons must appear **after** the NPC dialogue, never before it. Players should read the NPC's response before deciding what to do next.
+
+The Quest Manager handles this automatically: when a stage has `stage_cue_npc` or `stage_cue_npcs`, narration is sent without buttons, the NPC(s) speak, and then the buttons appear in a follow-up message. Same goes for action-level `cue_npc`. Don't try to work around this by putting dialogue in `narration_prompt` instead of using the cue system.
+
+**Flow should always be:**
+1. 📖 Stage narration (no buttons)
+2. 💬 NPC dialogue (via webhook or cue file)
+3. 🎮 Action buttons ("What do you do next?")
+
+### ⚠️ Keep Narration Prompts Short
+
+This is Discord, not a novel. Players read these on screens between button clicks. Walls of text kill pacing.
+
+- **`narration_prompt` for stages**: 1-3 sentences. Set the scene, establish the vibe, stop.
+- **`narration_prompt` for actions**: 1-2 sentences. What happens, what changes, done.
+- **`npc_instruction`**: Keep it focused. Tell the NPC what to say/do, not a paragraph of backstory.
+
+The AI narrator will expand your prompts with atmosphere. If you write a paragraph, the AI adds *more* on top of that and you end up with a novel. Write tight prompts and let the AI do the embellishing.
+
+**Too long:**
+```json
+"narration_prompt": "The party arrives at the edge of the Greymist Forest. The trees here are ancient, their gnarled roots breaking through the earth like skeletal fingers. A thick fog rolls between the trunks, muffling all sound. Somewhere deep within, a faint blue light pulses rhythmically. The air smells of wet earth and something faintly metallic. Birds have gone silent."
+```
+
+**Just right:**
+```json
+"narration_prompt": "The Greymist Forest looms ahead, fog thick between ancient trees. A faint blue light pulses somewhere deep within."
+```
 
 ## Integration with NPC Conversation Trees
 

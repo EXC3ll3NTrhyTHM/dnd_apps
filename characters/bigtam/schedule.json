@@ -1,0 +1,40 @@
+{
+  "description": "Big Tam's presence schedule - the bar has hours",
+  "timezone": "America/Chicago",
+  "default_status": "online",
+  "default_activity": "tending the bar",
+  "default_return_message": "*wipes down the bar and flips the sign to OPEN* Alright, sweetlings. Tam's here. What'll it be?",
+  "manual_away_message": "*hangs up her apron* Bar's closed for now, lambs. Tam needs rest too.",
+  "schedule": [
+    {
+      "comment": "Late night - bar closed",
+      "start_hour": 0,
+      "end_hour": 9,
+      "status": "invisible",
+      "away_message": "*the lights in The Dragon's Hollow dim* Bar's closed. Come back tomorrow, sweetling.",
+      "return_message": "*the smell of fresh stew wafts from the kitchen* Morning, lambs. Tam's got stew on."
+    },
+    {
+      "comment": "Morning prep",
+      "start_hour": 9,
+      "end_hour": 11,
+      "status": "idle",
+      "activity": "prepping the kitchen"
+    },
+    {
+      "comment": "Open for business - lunch through evening",
+      "start_hour": 11,
+      "end_hour": 23,
+      "status": "online",
+      "activity": "tending the bar"
+    },
+    {
+      "comment": "Last call",
+      "start_hour": 23,
+      "end_hour": 0,
+      "status": "online",
+      "activity": "last call",
+      "away_message": "*LAST CALL! That means you too, sweetling. Tam's not asking twice.*"
+    }
+  ]
+}

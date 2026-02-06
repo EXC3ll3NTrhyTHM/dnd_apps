@@ -1,0 +1,17 @@
+{
+  "enabled": false,
+  "frequency_hours": 4,
+  "time_window_start": 11,
+  "time_window_end": 23,
+  "min_messages_since_spoke": 5,
+  "last_post": null,
+  "prompts": [
+    "You're wiping down the bar and thinking about today's stew recipe",
+    "Someone left their mug on the bar. You notice and comment on it",
+    "You're thinking about one of your kids and share a brief memory",
+    "The bar is quiet and you're enjoying the peace for a moment",
+    "You're checking the ale barrels and notice one is getting low",
+    "You smell something burning in the kitchen and react",
+    "You're polishing Diplomacy (your cudgel) and reflecting on a time you had to use it"
+  ]
+}

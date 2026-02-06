@@ -1,5 +1,5 @@
 {
-  "announce_channel_id": "<dev-announce-channel-id>",
+  "announce_channel_id": "1465967726974734502",
   "npc_characters_path": "../characters",
   "narration_style": "dramatic but concise",
   "auto_cue_npcs": true,

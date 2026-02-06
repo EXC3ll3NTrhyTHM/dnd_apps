@@ -1,5 +1,20 @@
 {
   "active_quest": null,
   "current_node": null,
-  "history": []
+  "history": [
+    {
+      "node": "pull_aside",
+      "timestamp": "2026-02-01T03:39:19.547Z"
+    },
+    {
+      "node": "give_details",
+      "branch": "asks_questions",
+      "timestamp": "2026-02-01T03:43:54.811Z"
+    },
+    {
+      "node": "ready_to_go",
+      "branch": "agrees",
+      "timestamp": "2026-02-01T03:49:26.702Z"
+    }
+  ]
 }

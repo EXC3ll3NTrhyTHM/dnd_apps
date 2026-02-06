@@ -69,6 +69,24 @@ A comprehensive Discord bot system for running D&D campaigns, featuring NPC char
 - [ ] Skill checks for gathering
 - [ ] Cooldowns or availability windows?
 
+### NPC Resource Collection (Per-Player Duties)
+
+Players collect unique resources from their NPCs, tied to their role in Okhan. These resources could feed into crafting, quests, or kingdom-building.
+
+**Aly** - Collects **Intel** from her NPC network (rooftop patrol, cleric contacts)
+  - Intel could unlock quest hints, reveal hidden info, or provide strategic advantages
+
+**Tyren** - Collects **???** (TBD)
+  - Ideas: Arms/Materials from the Iron Forge, Military Reports from Ashen Vow troops, Forge Output
+
+**Nalyd** - Collects **???** (TBD)
+  - Ideas: Spiritual Energy/Ki from dojo training, Discipline from students, Elemental Essence
+
+**Nibby** - Collects **???** (TBD)
+  - Ideas: Scouting Reports from ranger patrols, Rumors from sneaking around, Tracking Data
+
+*TODO: Finalize resource types for each player. Each should feel unique to their role and useful in different systems (crafting, quests, shop, kingdom management).*
+
 ### Achievement System
 
 - [ ] Track player milestones
@@ -151,6 +169,15 @@ For multi-player quests:
 - Pet data: Per-player
 
 ---
+
+### Weather Events
+
+- [ ] **Dynamic weather system** for the server
+  - Random or scheduled weather events (storms, fog, blizzards, heatwaves)
+  - Could affect quests (harder gathering in storms, new quests during events)
+  - Flavor posts in a channel ("A thick fog rolls into Okhan...")
+  - NPC reactions to weather (Bonesy vibing in the rain, Nibby complaining)
+  - Tie into campaign themes (unnatural weather as foreshadowing?)
 
 ## Ideas Backlog
 

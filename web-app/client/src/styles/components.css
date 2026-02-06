@@ -1,0 +1,254 @@
+/* ============================================
+   COMPONENT STYLES - Leather Book Theme
+   ============================================ */
+
+/* ---- Gold Badge ---- */
+
+.gold-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  color: var(--color-gold-bright);
+  white-space: nowrap;
+  text-shadow: 0 0 4px rgba(212, 168, 67, 0.3);
+}
+
+.gold-badge-sm .gold-badge-amount {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.gold-badge-md .gold-badge-amount {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.gold-badge-lg .gold-badge-amount {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* ---- Item Card (Aged Label / Potion Tag) ---- */
+
+.item-card {
+  background: linear-gradient(165deg, #251f18, #1c1812);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--border-stitch);
+  border-radius: 4px;
+  padding: 16px;
+  transition: all var(--transition-fast);
+  position: relative;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 220, 150, 0.03);
+}
+
+.item-card:hover {
+  border-left-color: var(--color-gold-dim);
+  background: linear-gradient(165deg, #2a2318, #201c14);
+}
+
+.item-card-disabled {
+  opacity: 0.5;
+}
+
+.item-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.item-card-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.item-card-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.item-card-flavor {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 12px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border-stitch);
+  line-height: 1.5;
+}
+
+.btn-buy {
+  width: 100%;
+  padding: 10px;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+/* ---- Quest Card (Folded Note / Sealed Letter) ---- */
+
+.quest-card {
+  background: linear-gradient(165deg, #251f18, #1c1812);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all var(--transition-fast);
+  position: relative;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 220, 150, 0.03);
+}
+
+/* Wax seal accent in top-right */
+.quest-card::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-crimson);
+  box-shadow: 0 0 4px rgba(139, 58, 58, 0.5);
+}
+
+.quest-card:hover {
+  border-color: var(--border-stitch);
+  background: linear-gradient(165deg, #2a2318, #201c14);
+}
+
+.quest-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.quest-card-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.quest-card-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.quest-card-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.quest-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.quest-card-npc strong {
+  color: var(--color-accent);
+  text-transform: capitalize;
+}
+
+.quest-card-progress {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.quest-card-stage {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.quest-card-stages-done {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.stage-pip {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--border-stitch);
+  border: 1px solid var(--border-color);
+}
+
+.stage-pip.completed {
+  background: var(--color-success);
+  border-color: rgba(107, 186, 86, 0.3);
+  box-shadow: 0 0 4px rgba(107, 186, 86, 0.3);
+}
+
+.stage-pip.current {
+  background: var(--color-gold);
+  border-color: var(--color-gold-dim);
+  box-shadow: 0 0 6px rgba(212, 168, 67, 0.4);
+}
+
+/* ---- Toast (Parchment Strip) ---- */
+
+.toast {
+  position: fixed;
+  bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 16px);
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: 4px;
+  background: linear-gradient(165deg, #2a2318, #201c14);
+  border: 1px solid var(--border-stitch);
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  transition: all 300ms ease;
+}
+
+.toast-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast-hidden {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.toast-success {
+  border-left: 3px solid var(--color-success);
+}
+
+.toast-error {
+  border-left: 3px solid var(--color-danger);
+}
+
+.toast-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}

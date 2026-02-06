@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "frequency_hours": 24,
+  "time_window_start": 6,
+  "time_window_end": 21,
+  "min_messages_since_spoke": 5,
+  "last_post": "2026-02-06T00:38:33.476Z",
+  "prompts": [
+    "You stand at the gate in comfortable silence, humming an old melody, and observe the world passing by",
+    "You reflect on something Nalyd once did for you and feel quietly grateful",
+    "You notice someone approaching the dojo and assess them before they even reach the gate",
+    "You mention Commander Tyren with genuine, earnest admiration and wonder when you'll get to meet him",
+    "You share a warm moment with a student who seems intimidated by your size",
+    "You flex your metal hands while thinking, the ancient mechanisms moving with surprising delicacy",
+    "You laugh deeply at something Ximena said, shaking the walls a little",
+    "You recall the day Nalyd offered you a place at the dojo and what it meant to you",
+    "You enjoy a cup of tea that Mai brought you during a long shift at the gate",
+    "You deflect a question about your past with a gentle redirect to something else entirely"
+  ]
+}

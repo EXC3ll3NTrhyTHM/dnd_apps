@@ -1,5 +1,27 @@
 {
   "active_quest": null,
   "current_node": null,
-  "history": []
+  "history": [
+    {
+      "node": "ithrae_approach",
+      "timestamp": "2026-02-03T16:59:46.824Z"
+    },
+    {
+      "node": "explain_kids",
+      "branch": "asks_what",
+      "timestamp": "2026-02-03T18:16:05.702Z"
+    },
+    {
+      "node": "push_back_guard",
+      "branch": "suggests_guard",
+      "timestamp": "2026-02-03T18:22:12.713Z"
+    },
+    {
+      "node": "ready_to_go",
+      "branch": "agrees",
+      "timestamp": "2026-02-03T18:23:38.812Z"
+    }
+  ],
+  "status": null,
+  "target_players": []
 }

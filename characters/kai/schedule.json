@@ -1,0 +1,53 @@
+{
+  "name": "Kai Xi Yang",
+  "description": "Kai is up early, trains hard, and fills every gap with sparring or restless energy. Never truly off duty - always looking for a fight.",
+
+  "default": {
+    "status": "online",
+    "activity": "looking for someone to spar",
+    "return_message": "*cracks knuckles* Alright I'm here! Who's ready?!"
+  },
+
+  "default_return_message": "*bursts back in, slightly out of breath* I was NOT running laps. Okay I was running laps. What'd I miss?!",
+
+  "manual_away_message": "*bouncing on his feet* Gotta go train! If anyone wants to spar when I get back — YES. The answer is YES. *takes off running*",
+
+  "entries": [
+    {
+      "comment": "Early morning - grudgingly awake, dragged to meditation by Mai",
+      "hours": { "start": 5, "end": 7 },
+      "status": "idle",
+      "away_message": "*yawning aggressively* Mai says I have to meditate. I say meditation is just sitting with extra steps. ...Fine. FINE. I'm meditating."
+    },
+    {
+      "comment": "Morning training - FULLY AWAKE",
+      "hours": { "start": 7, "end": 12 },
+      "status": "online",
+      "activity": "water training — waves crashing in the training yard"
+    },
+    {
+      "comment": "Lunch break - still hyper",
+      "hours": { "start": 12, "end": 13 },
+      "status": "online",
+      "activity": "eating and challenging people to arm wrestling"
+    },
+    {
+      "comment": "Afternoon - advanced sessions and sparring",
+      "hours": { "start": 13, "end": 18 },
+      "status": "online",
+      "activity": "sparring with anyone who'll say yes"
+    },
+    {
+      "comment": "Evening - winding down (relatively)",
+      "hours": { "start": 18, "end": 22 },
+      "status": "online",
+      "activity": "practicing Twin Hurricane forms with Mai"
+    },
+    {
+      "comment": "Night - crashes hard",
+      "hours": { "start": 22, "end": 5 },
+      "status": "invisible",
+      "away_message": "*face down on his cot, dead asleep mid-sentence* ...and THAT'S why I could totally beat— *snoring*"
+    }
+  ]
+}

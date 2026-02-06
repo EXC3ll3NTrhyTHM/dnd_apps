@@ -1,0 +1,117 @@
+/**
+ * Dragon's Hollow - Express API Server
+ * 
+ * Serves the React frontend and provides API endpoints for
+ * the D&D game economy, tavern, shop, quests, and leaderboard.
+ * 
+ * Reads/writes the same JSON files the Discord bots use.
+ */
+
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+
+const express = require('express');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const path = require('path');
+
+const authRoutes = require('./routes/auth');
+const walletRoutes = require('./routes/wallet');
+const shopRoutes = require('./routes/shop');
+const tavernRoutes = require('./routes/tavern');
+const questRoutes = require('./routes/quests');
+const leaderboardRoutes = require('./routes/leaderboard');
+const chatRoutes = require('./routes/chat');
+const campaignRoutes = require('./routes/campaign');
+const adminRoutes = require('./routes/admin');
+
+const app = express();
+const PORT = process.env.PORT || 3420;
+
+// ============================================
+// MIDDLEWARE
+// ============================================
+
+// CORS - allow the Vite dev server in development
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true
+}));
+
+app.use(express.json());
+app.use(cookieParser());
+
+// Request logging (dev only)
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+    }
+    next();
+  });
+}
+
+// ============================================
+// STATIC ASSETS (images, maps, etc.)
+// ============================================
+
+app.use('/images', express.static(path.join(__dirname, '..', 'images')));
+app.use('/sounds', express.static(path.join(__dirname, '..', 'sounds')));
+
+// ============================================
+// API ROUTES
+// ============================================
+
+app.use('/api/auth', authRoutes);
+app.use('/api', walletRoutes);
+app.use('/api/shop', shopRoutes);
+app.use('/api/tavern', tavernRoutes);
+app.use('/api/quests', questRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/campaign', campaignRoutes);
+app.use('/api/admin', adminRoutes);
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// ============================================
+// STATIC FILES (production)
+// ============================================
+
+// In production, serve the built React app
+if (process.env.NODE_ENV === 'production') {
+  const clientDist = path.join(__dirname, '..', 'client', 'dist');
+  app.use(express.static(clientDist));
+  // Images already served above via /images route
+
+  // SPA fallback - serve index.html for all non-API routes
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(clientDist, 'index.html'));
+    }
+  });
+}
+
+// ============================================
+// ERROR HANDLING
+// ============================================
+
+app.use((err, req, res, next) => {
+  console.error('[Server Error]', err.message);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// ============================================
+// START
+// ============================================
+
+app.listen(PORT, () => {
+  console.log(`\n🐉 Dragon's Hollow API server running on port ${PORT}`);
+  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`   API: http://localhost:${PORT}/api`);
+    console.log(`   Client: ${process.env.CLIENT_URL || 'http://localhost:5173'}\n`);
+  }
+});

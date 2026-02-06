@@ -1,0 +1,53 @@
+{
+  "name": "Master Djinn Zenatsu",
+  "description": "Djinn runs a disciplined schedule - up before dawn, last to leave the training yard. The dojo IS his schedule.",
+
+  "default": {
+    "status": "online",
+    "activity": "overseeing the dojo",
+    "return_message": "*steps forward, hands clasped behind his back* I am here."
+  },
+
+  "default_return_message": "*returns with a brief nod* Continue.",
+
+  "manual_away_message": "*closes his eyes briefly* Dojo matters require my attention. *turns and walks away with purpose*",
+
+  "entries": [
+    {
+      "comment": "Pre-dawn meditation",
+      "hours": { "start": 4, "end": 6 },
+      "status": "idle",
+      "away_message": "*seated in the empty training yard, eyes closed, perfectly still* The day begins with silence. As it should."
+    },
+    {
+      "comment": "Morning training - leading sessions",
+      "hours": { "start": 6, "end": 12 },
+      "status": "online",
+      "activity": "leading morning training sessions"
+    },
+    {
+      "comment": "Midday - administrative duties, meetings with Elites",
+      "hours": { "start": 12, "end": 14 },
+      "status": "idle",
+      "away_message": "*reviewing training reports at his desk* The Elites have submitted their assessments. I will review and return."
+    },
+    {
+      "comment": "Afternoon - personal training and advanced student instruction",
+      "hours": { "start": 14, "end": 19 },
+      "status": "online",
+      "activity": "training in the advanced yard"
+    },
+    {
+      "comment": "Evening - available, winding down operations",
+      "hours": { "start": 19, "end": 22 },
+      "status": "online",
+      "activity": "evening rounds at the dojo"
+    },
+    {
+      "comment": "Night - final meditation and rest",
+      "hours": { "start": 22, "end": 4 },
+      "status": "invisible",
+      "away_message": "*the dojo is quiet. Master Djinn has retired for the evening — the lanterns dim in his quarters*"
+    }
+  ]
+}

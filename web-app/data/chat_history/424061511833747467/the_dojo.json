@@ -1,0 +1,38 @@
+[
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "Hello",
+    "timestamp": "2026-02-05T00:47:31.782Z"
+  },
+  {
+    "role": "npc",
+    "npc": "djinn",
+    "npcDisplayName": "Djinn Zenatsu",
+    "text": "Greetings. What brings you here today?",
+    "emotion": "idle",
+    "timestamp": "2026-02-05T00:47:33.237Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kumo",
+    "npcDisplayName": "Kumo",
+    "text": "I see you again. What is on your mind?",
+    "emotion": "idle",
+    "timestamp": "2026-02-05T00:47:34.316Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "Hey",
+    "timestamp": "2026-02-05T05:44:14.015Z"
+  },
+  {
+    "role": "npc",
+    "npc": "mai",
+    "npcDisplayName": "Mai Xi Yang",
+    "text": "Hello again. How do you fare today?",
+    "emotion": "idle",
+    "timestamp": "2026-02-05T05:44:15.576Z"
+  }
+]

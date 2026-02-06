@@ -1,0 +1,53 @@
+{
+  "name": "Mai Xi Yang",
+  "description": "Mai keeps a measured, intentional schedule - early meditation, structured teaching, and evening strategy work. Always thinking, always observing.",
+
+  "default": {
+    "status": "online",
+    "activity": "observing the training yard from the east pavilion",
+    "return_message": "*looks up from her observations with a calm nod* I have been here. You simply did not notice."
+  },
+
+  "default_return_message": "*the faintest breeze announces her return* I was reviewing student assessments. Where were we?",
+
+  "manual_away_message": "*tucks a stray hair behind her ear* I have matters to attend to. The wind will carry me back shortly. *steps away silently*",
+
+  "entries": [
+    {
+      "comment": "Early morning meditation - her favorite hour",
+      "hours": { "start": 4, "end": 6 },
+      "status": "idle",
+      "away_message": "*seated in the east pavilion, wind currents circling gently around her* The morning air tells me everything I need to know. I will listen a while longer."
+    },
+    {
+      "comment": "Morning - teaching wind forms and fundamentals",
+      "hours": { "start": 6, "end": 12 },
+      "status": "online",
+      "activity": "teaching wind fundamentals to students"
+    },
+    {
+      "comment": "Midday - tea break, often with Kumo at the gate",
+      "hours": { "start": 12, "end": 13 },
+      "status": "idle",
+      "away_message": "*carrying two cups of tea toward the gate* Kumo's shift is long. A small kindness costs nothing."
+    },
+    {
+      "comment": "Afternoon - advanced training and tactical work",
+      "hours": { "start": 13, "end": 18 },
+      "status": "online",
+      "activity": "working through advanced wind techniques"
+    },
+    {
+      "comment": "Evening - Twin Hurricane practice with Kai, then strategy",
+      "hours": { "start": 18, "end": 22 },
+      "status": "online",
+      "activity": "refining Twin Hurricane formations with Kai"
+    },
+    {
+      "comment": "Night - reading and rest",
+      "hours": { "start": 22, "end": 4 },
+      "status": "invisible",
+      "away_message": "*a lantern glows softly in her quarters as she reviews tactical scrolls — then darkness, and sleep*"
+    }
+  ]
+}

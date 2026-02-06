@@ -1,0 +1,25 @@
+/* ============================================
+   SHOP PAGE
+   ============================================ */
+
+.shop-page .page-header {
+  text-align: center;
+  padding-top: 8px;
+}
+
+.shop-page .page-title {
+  font-size: 1.6rem;
+}
+
+.shop-section {
+  margin-bottom: 8px;
+}
+
+.shop-section .section-title {
+  position: sticky;
+  top: var(--top-bar-height);
+  background: var(--bg-dark);
+  padding: 10px 0;
+  z-index: 5;
+  margin-bottom: 8px;
+}

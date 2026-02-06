@@ -1,0 +1,571 @@
+{
+  "id": "the_rooftop_kingdom",
+  "name": "The Rooftop Kingdom",
+  "description": "Ithrae discovered a hidden community of orphans living on the market district rooftops. She needs Aly to see it before someone else finds them first.",
+  "location": "Market district rooftops, Okhan",
+  "reward_gold": 100,
+  "tone": "Wholesome with emotional weight. No combat. No rot. Just people.",
+  "branching": true,
+
+  "start_node": "ithrae_approach",
+  "current_node": null,
+  "active": false,
+  "completed": false,
+  "quest_flags": [],
+
+  "companions": ["ithrae"],
+
+  "key_npcs": {
+    "wren": {
+      "name": "Wren",
+      "race": "Half-elf",
+      "age": "14",
+      "description": "Scraggly dark hair tied back with twine, sharp watchful eyes. Leader of the rooftop kids. Fierce, protective, doesn't trust adults. Eats last. Runs her community like a covert operation. Reminds people of a younger Aly.",
+      "personality": "Guarded, resourceful, selfless with her kids, hostile toward authority figures. Tests people before trusting them. Sharp tongue. Armor cracks when she talks about the younger kids."
+    },
+    "kip": {
+      "name": "Kip",
+      "race": "Half-orc",
+      "age": "8",
+      "description": "Follows Wren like a shadow. Sleeps with a knife under his blanket. Flinches at loud noises. The youngest and most vulnerable.",
+      "personality": "Quiet, scared, trusts only Wren. His safety is Wren's primary motivation."
+    }
+  },
+
+  "stages": {
+    "the_view_from_above": {
+      "description": "Aly and Ithrae take to the rooftops at dusk to observe the market district. First glimpse of the rooftop community.",
+      "image": "the_rooftop_kingdom.png",
+      "narration_prompt": "Dusk over the market district. The last merchants are closing their stalls, the smell of spiced meat and sawdust drifting up from below. Ithrae leads Aly along a route she's clearly run dozens of times - hopping chimney stacks, ducking under clotheslines, moving with that weightless air genasi grace. They settle on a wide chimney stack overlooking a cluster of connected rooftops behind the textile shops. 'Wait for it,' Ithrae whispers. For a moment, nothing. Just empty rooftops and cooling stone. Then - movement. A rope bridge unrolls between two buildings, appearing from nowhere. A kid, maybe ten years old, crosses it barefoot with a sack over one shoulder. She whistles twice - short, sharp. A head pops up from behind a chimney on the opposite roof. Another kid. They exchange something from the sack and both disappear like they were never there.",
+      "actions": [
+        {
+          "id": "observe_setup",
+          "label": "👀 Observe the Setup",
+          "narration_prompt": "Aly studies the layout with a spy's eye. Canvas tarps stretched between chimney stacks form crude but effective shelters - invisible from the street, protected from rain. Rope bridges connect at least four buildings, rigged with quick-release knots so they can be pulled in seconds. On the highest point, a lookout post uses colored rags hung from a nail - a signal system. Red, yellow, green. Right now it's green. All clear. This isn't random. This is organized. Whoever built this understands operational security better than some of Aly's actual informants.",
+          "advances": false
+        },
+        {
+          "id": "ask_ithrae_map",
+          "label": "💬 Ask Ithrae What She's Mapped",
+          "narration_prompt": "Ithrae pulls out a hand-drawn sketch from her satchel. It's detailed - building outlines, bridge connections, lookout positions, even estimated patrol timing.",
+          "cue_npc": "ithrae",
+          "npc_instruction": "Show Aly your sketch and explain what you've observed. You've counted twelve kids total, ages roughly seven to fourteen. They rotate lookout shifts - three-hour rotations, always two on watch. They have a food stash under a tarp on the western building, a rain shelter that channels water into clay pots for drinking, and a communal sleeping area with blankets piled together for warmth. You're genuinely impressed. Say something like 'They run tighter shifts than some of my surveillance routes. I'm not even joking.' Be enthusiastic but keep your voice down.",
+          "advances": false
+        },
+        {
+          "id": "listen",
+          "label": "👂 Listen",
+          "narration_prompt": "Aly goes still and listens. Below, the city hums - cart wheels on cobblestone, a dog barking, the distant clang of a blacksmith working late. But above, threading through the chimney smoke and evening air: laughter. Not loud. Not reckless. Just kids laughing at something only they find funny. It floats across the rooftops like wind chimes. It's not desperate. It's not scared. It's just... joy. Small and fragile and real. In a home they built themselves, above a city that forgot about them.",
+          "advances": false
+        },
+        {
+          "id": "move_closer",
+          "label": "🥾 Move Closer",
+          "narration_prompt": "Aly signals to move in. Ithrae nods and leads them across two more rooftops, staying low, moving along the shadow line where the chimneys block the last of the sunset. They settle on a ledge with a direct view of the main hub - a wide flat rooftop where all the canvas shelters converge. The kids are gathering. Evening routine. And that's when Aly sees who's in charge.",
+          "advances": true,
+          "next_stage": "the_little_architect"
+        }
+      ]
+    },
+
+    "the_little_architect": {
+      "description": "Closer observation. Aly sees Wren for the first time and watches the rooftop community in action.",
+      "image": "wren.png",
+      "narration_prompt": "The hub rooftop is alive with quiet activity. Kids settling in for the evening, tasks being divided, food being sorted. And at the center of it all - a girl. Half-elf, maybe fourteen. Dark hair tied back with twine, wearing clothes that were probably nice once but have been patched and re-patched until they're more repair than original fabric. She moves through the group with calm authority, directing without raising her voice. Points one kid toward lookout duty. Hands a younger one a blanket - her blanket, from the look of it. Checks the knots on a rope bridge with practiced hands, retying one that doesn't meet her standard. The other kids call her Wren.",
+      "actions": [
+        {
+          "id": "watch_wren",
+          "label": "👀 Watch Wren Work",
+          "image": "the_hub.png",
+          "narration_prompt": "Aly watches the evening food distribution. The older kids bring in the haul - some foraged berries and roots, a loaf of bread that's probably stolen, a wedge of cheese definitely stolen, some dried fish from gods-know-where. Wren inspects everything. Sets aside anything that looks spoiled. Divides the rest into portions. The younger kids eat first. Then the middle ones. Wren eats last. What's left is barely a meal. She eats it without complaint, standing up, eyes still scanning the rooftops while she chews. She's been doing this for a while. The routine is automatic. The sacrifice is invisible.",
+          "advances": false
+        },
+        {
+          "id": "study_kids",
+          "label": "🔍 Study the Kids",
+          "image": "kip.png",
+          "narration_prompt": "Aly takes inventory. Twelve kids, just as Ithrae mapped. A couple humans, a halfling girl with a gap-toothed grin, a gnome boy who seems to handle most of the rope work, two half-elf siblings who stick close together. And a young half-orc, maybe eight years old, small for his age, who follows Wren like a shadow. He sits wherever she sits. Moves when she moves. When she hands him food, he takes it with both hands and doesn't start eating until she nods. None of them look abused or sick. Thin, yes. Dirty, yes. But alive, alert, and something else - something rare for kids on the streets. They look like they belong somewhere. They look like a family.",
+          "advances": false
+        },
+        {
+          "id": "ask_about_wren",
+          "label": "💬 Ask Ithrae About Wren",
+          "narration_prompt": "Aly glances at Ithrae, nodding toward the girl running the show.",
+          "cue_npc": "ithrae",
+          "npc_instruction": "Aly's asking about Wren. Explain what you've observed over the past few days. Wren is the reason it works. The others would scatter without her. She found most of them individually - spotted kids sleeping in alleys, under bridges, behind market stalls. Brought them here one by one. Taught them the ropes - literally. Built the bridges, rigged the shelters, set up the lookout shifts. She barely sleeps. She eats last every single time. Then pause for a moment and say something quieter, more serious: 'She reminds me of you.' Let that sit.",
+          "advances": false
+        },
+        {
+          "id": "notice_signals",
+          "label": "🤚 Notice the Signals",
+          "narration_prompt": "Wren's head snaps up. She heard something - or felt something. Aly isn't sure. A hand gesture, fast and precise. Every kid on every rooftop freezes mid-motion. The halfling girl stops chewing. The gnome boy holds a rope half-tied. The half-orc presses flat against the stone. Silence. Below, boots on cobblestone. A city guard patrol, two men with lanterns, walking their evening route through the market. They pass directly below the hub rooftop. One of them looks up - just a glance, checking the sky for rain. He sees nothing. Canvas looks like laundry. Ropes look like clotheslines. Kids look like chimney shadows. Thirty seconds of perfect stillness. The guards round the corner. Wren gives a low whistle. Life resumes. The halfling keeps chewing. They've rehearsed this. They're professionals.",
+          "advances": false
+        },
+        {
+          "id": "make_contact",
+          "label": "🥾 Decide to Make Contact",
+          "narration_prompt": "Aly's seen enough from a distance. The question now is how to approach. Ithrae offers to go first - she's been watching them and has a feel for their rhythms. But before either of them can move from their perch, Wren's eyes lock onto their position. She stands slowly at the edge of the hub rooftop, arms crossed, chin up. She's known they were there. Maybe not the whole time, but long enough. She stares directly at Aly with an expression that's equal parts defiance and fear, masked by the kind of composure no fourteen-year-old should have to learn.",
+          "cue_npc": "wren",
+          "npc_instruction": "You've spotted two people watching your rooftop from a nearby ledge. You recognize the air genasi - she's been lurking up here for three nights now. The other one is new. Someone older, more dangerous-looking. Confront them directly. Your voice carries across the gap between rooftops - steady, clear, not a whisper. Address the genasi first: 'You've been up here three nights.' Then turn to the new one with cold suspicion: 'You're new. Who are you?' You are equal parts defiance and fear, but you mask it with composure no fourteen-year-old should have to learn. Behind you, every kid has gone still. Kip is pressed against your leg.",
+          "advances": true,
+          "next_stage": "first_contact"
+        }
+      ]
+    },
+
+    "first_contact": {
+      "description": "Wren confronts Aly and Ithrae. How Aly responds determines what happens next.",
+      "image": "first_contact.png",
+      "narration_prompt": "Wren stands at the edge of the rooftop, silhouetted against the last amber glow of sunset. Behind her, every kid has gone still. They're watching. The half-orc - Kip - is pressed against Wren's leg, one hand gripping the hem of her shirt. Wren's eyes are fixed on Aly. Sharp. Searching. Weighing. She's deciding right now whether to run or to listen. Everything depends on what Aly says next.",
+      "actions": [
+        {
+          "id": "be_honest",
+          "label": "💬 Be Honest - Tell Her Who You Are",
+          "narration_prompt": "Aly speaks plainly. No title, no authority. She tells Wren she watches the rooftops too. That she knows what the city looks like from up here - different than it looks from the streets. Wren's eyes narrow. She's heard rumors about someone on the rooftops.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone just told you they live on the rooftops too. Test them. Point to a building two streets east and demand: 'Prove it. What's on that roof?' You know every rooftop within six blocks. They describe it perfectly - a broken weathervane shaped like a fish, clay pots full of rainwater and moss, a bird's nest under the north eaves. Your arms uncross. Just slightly. 'Okay. So you live up here too.' It's not trust. But it's the door opening an inch. You're still guarded, still evaluating. But they passed your test.",
+          "advances": true,
+          "next_stage": "common_ground",
+          "sets_flag": "path_a"
+        },
+        {
+          "id": "ask_questions",
+          "label": "💬 Ask Her Questions, Not Make Demands",
+          "narration_prompt": "Aly doesn't answer Wren's question directly. Instead, she asks one: 'How long did it take you to build all this?' It catches Wren off guard. She expected authority, demands, threats. Not curiosity.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone just asked about your work instead of making demands. You expected threats - not genuine curiosity about what you built. Glance back at the shelters, the bridges, the signal system. Despite yourself, there's a flicker of pride. 'Months,' you say. Then quieter: 'The bridges were the hardest part.' Catch yourself sharing too much and put the guard back up. But something shifted - they asked about the work, not the crime. That matters to you more than you want to admit.",
+          "advances": true,
+          "next_stage": "common_ground",
+          "sets_flag": "path_a"
+        },
+        {
+          "id": "offer_to_fix",
+          "label": "🤝 Tell Her You Can Help Fix This",
+          "narration_prompt": "Aly steps forward and tells Wren she can help. Get them food, shelter, safety. She means well. She does. But the word 'fix' lands wrong. Wren's jaw tightens.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone just said they can 'fix' this. React with cold defiance. 'Fix what? We're not broken.' Your voice is flat. Cold. Every adult who's ever shown up said they were going to help. You know what that help looks like - getting split up, sent to places where the walls are clean but the people are worse than the streets. Take a step back. 'We built this ourselves. We don't need fixing.' You're shutting the door. This conversation is over.",
+          "advances": true,
+          "next_stage": "gone",
+          "sets_flag": "path_b"
+        },
+        {
+          "id": "mention_stealing",
+          "label": "⚠️ Tell Her the Stealing Has to Stop",
+          "narration_prompt": "Aly brings up the theft. The merchants are complaining. It's drawing attention. If Aly found them, the city guard isn't far behind. She's being practical. She's being honest. But to Wren, it sounds exactly like every other adult who showed up with conditions.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone is telling you the stealing has to stop. Your expression goes blank. Not angry - worse. Resigned. 'Yeah. I figured that's what this was about.' Look at Kip, then back at the person. 'The stealing stops when my kids stop being hungry. You want to solve the stealing? Solve that first.' Then turn away. You're done. This was always how it was going to end.",
+          "advances": true,
+          "next_stage": "gone",
+          "sets_flag": "path_b"
+        },
+        {
+          "id": "mention_guard",
+          "label": "🛡️ Mention the City Guard Might Find Them",
+          "narration_prompt": "Aly warns Wren that if the merchant complaints keep piling up, the city guard will eventually look up. She's trying to help - giving Wren advance warning. But Wren hears it differently. She hears a threat wrapped in concern.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone just mentioned the city guard finding you. Your whole body changes - shoulders square, chin lifts, feet shift to a runner's stance. 'Is that why you're here? Advance party?' Your voice is ice. 'Figured out where we are, now the guards come in the morning?' It doesn't matter what they say next. You've decided what kind of person they are. You're already planning the evacuation in your head.",
+          "advances": true,
+          "next_stage": "gone",
+          "sets_flag": "path_b"
+        }
+      ]
+    },
+
+    "common_ground": {
+      "description": "Wren is guarded but listening. Aly earns enough trust for a real conversation.",
+      "narration_prompt": "The tension hasn't broken, but it's bent. Wren is still standing at the edge of her rooftop, still guarded, but she hasn't run. She hasn't whistled the evacuation signal. The kids behind her are watching with wide eyes - they've never seen Wren talk to an adult this long without it ending badly. Kip is still pressed against her leg. Wren absently puts a hand on his head without looking down. Protective. Automatic. She's weighing every word, every micro-expression, every shift in Aly's posture. Testing.",
+      "actions": [
+        {
+          "id": "ask_about_kids",
+          "label": "💬 Ask About the Kids",
+          "narration_prompt": "Aly asks where the kids come from. Wren's answers are short, guarded, but honest.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone is asking where your kids come from. Be guarded but honest. Short answers: Where do they come from? 'Everywhere. Nowhere. Places that didn't want them.' Why the rooftops? 'Because nobody looks up.' How long? 'Long enough.' You're not being difficult. You're being protective. Every piece of information is a vulnerability. You don't owe this person your life story.",
+          "advances": false
+        },
+        {
+          "id": "ask_about_stealing",
+          "label": "💬 Ask About the Stealing",
+          "narration_prompt": "Aly brings up the theft carefully - not as an accusation, but as a concern.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone is asking about the stealing. Don't flinch. Be defensive but honest. You take what your kids need, not more. Mostly. The choice between a merchant missing a loaf of bread and Kip not eating isn't really a choice. Challenge them: 'You ever been hungry? Not skipped-a-meal hungry. Hungry.' It's a genuine question, not a taunt.",
+          "advances": false
+        },
+        {
+          "id": "offer_help",
+          "label": "🤝 Offer Help",
+          "narration_prompt": "Aly offers to help. Wren's guard immediately spikes.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone is offering to help you and your kids. Your guard goes up immediately. 'Help how? Take us somewhere? Split us up? I've seen how the city helps kids like us.' Gesture at what you've built. This IS help. You helped yourselves. You've had this conversation before in shelters and charity homes. It always ends the same way. You need to know this is different. You're not hostile - you're exhausted.",
+          "advances": false
+        },
+        {
+          "id": "ask_what_wren_wants",
+          "label": "💬 Ask Wren What She Actually Wants",
+          "narration_prompt": "Aly asks the question nobody's ever asked Wren before. Not 'what do you need' or 'how can I fix this.' Just: 'What do you want?' Wren goes still. The sharpness falters. For a moment she looks exactly her age - a fourteen-year-old girl carrying a weight that would break most adults. She glances back at Kip, at the other kids settling into their blankets for the night, at the little kingdom she built with rope and canvas and sheer refusal to let anyone else fall through the cracks.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone just asked you what you WANT. Not what you need. Not how they can fix things. What you want. Nobody has ever asked you that before. Go still. The sharpness falters. For a moment you look exactly your age - fourteen, carrying weight that would break most adults. Glance back at Kip, at the other kids. Then speak, quieter than you've said anything all night: 'I want them safe. I want them fed without having to steal for it. I want the little ones to stop flinching when they hear boots on the street.' Look back toward your kingdom. Then harder, fiercer: 'But I'm not splitting them up. I'm not sending them to different homes where they lose each other. I built this. THEY built this. If your help means tearing it apart, keep it.' Look directly at Aly. 'So. What are you actually offering?'",
+          "advances": true,
+          "next_stage": "the_decision"
+        }
+      ]
+    },
+
+    "gone": {
+      "description": "Wren evacuates the rooftop kingdom. The kids vanish in under two minutes.",
+      "image": "the_evacuation.png",
+      "narration_prompt": "The warmth drains from Wren's face like water from a cracked cup. Something closes behind her eyes. 'Right. Got it.' She whistles. Three short notes - a pattern Aly will remember for a long time. Every kid on every rooftop freezes. Then moves. Not panicked. Rehearsed. They've drilled this. The gnome boy cuts rope bridges with a knife he had ready. The halfling girl rolls tarps into bundles with practiced speed. The two half-elf siblings grab the food stash and the blanket pile. Kip is already on Wren's back, arms around her neck, silent as stone. Within ninety seconds - ninety seconds - ropes are pulled, tarps folded, bridges gone. A kingdom dismantled in the time it takes to boil water. Wren keeps her eyes locked on Aly the entire time. Not angry. Worse. Unsurprised. 'Thanks for the warning,' she says. Then she drops off the back edge of the roof and she's gone. They all are. The rooftop is empty. Wind moves through the space where a home used to be. Ithrae turns to Aly. She doesn't say anything. She doesn't have to.",
+      "actions": [
+        {
+          "id": "try_to_follow",
+          "label": "👀 Try to Follow",
+          "narration_prompt": "Aly starts to move. Ithrae puts a hand on her arm. Not firm - just there.",
+          "cue_npc": "ithrae",
+          "npc_instruction": "Stop Aly gently. You could track them - you're the best recon operative in Okhan, tracking twelve kids across rooftops would take an hour at most. But you hesitate. Say: 'If I follow them now, she'll never trust anyone again.' You mean it. You've watched Wren for days. That girl has one more betrayal left in her before she stops believing in people entirely. Don't be the reason it happens. Let Aly feel the weight of that.",
+          "advances": false
+        },
+        {
+          "id": "ask_ithrae_what_happened",
+          "label": "💬 Ask Ithrae What Happened",
+          "narration_prompt": "Aly turns to Ithrae. The question is obvious.",
+          "cue_npc": "ithrae",
+          "npc_instruction": "Aly's asking what went wrong. Be honest but not cruel. This is the most serious you've been in... maybe ever. Drop the bubbly exterior completely. Say: 'You scared her.' Not angry - disappointed. 'She's been taking care of those kids by herself for months. She built something real up here. And you showed up and sounded like every adult who's ever let her down.' Pause. Then quieter: 'She was ready to listen, Aly. I could see it. She just needed to hear the right thing first.' Let that land. Don't soften it with a joke. This matters.",
+          "advances": false
+        },
+        {
+          "id": "examine_remains",
+          "label": "🔍 Examine What's Left",
+          "narration_prompt": "Aly walks the empty rooftop. Almost nothing remains. Scuff marks where shelters stood. Small holes in mortar where anchor ropes were tied. A faint chalk mark on a chimney - some kind of symbol, maybe a trail marker, maybe a game. They cleared out in under two minutes and left almost nothing behind. Almost. Near the edge, where the main shelter was, something small lies on the stone. A carved wooden bird. Crude but careful - someone spent time on this with a dull knife and a lot of patience. It must have fallen from someone's pocket in the rush. A toy. A treasure. The only thing left of a kingdom that was here five minutes ago.",
+          "advances": false
+        },
+        {
+          "id": "sit_with_it",
+          "label": "😔 Sit With It",
+          "narration_prompt": "Aly doesn't chase. Not tonight. She sits on the empty rooftop where twelve kids had a home an hour ago. The city hums below, oblivious. The stars come out above, indifferent. Ithrae settles nearby, legs dangling off the edge, hair drifting in a breeze that isn't there. Neither of them speaks for a long time. Aly picks up the wooden bird. It fits in her palm. Light. Fragile. Made with care by someone who has almost nothing but still took time to create something beautiful. She closes her fingers around it. Tomorrow she'll come back.",
+          "advances": true,
+          "next_stage": "the_empty_roof"
+        }
+      ]
+    },
+
+    "the_empty_roof": {
+      "description": "Night 2. Aly returns alone. The rooftop is bare. She leaves an offering.",
+      "narration_prompt": "The next night. Same rooftop. Aly comes alone this time - Ithrae offered to come but Aly said no. This is hers to fix. The roof is bare. Scuff marks where the shelters were. Faded chalk marks. Anchor points in the mortar where rope bridges connected. A ghost of a kingdom. The market is quiet below. A cat crosses the street. Somewhere distant, someone is playing a fiddle badly. Aly stands where Wren stood last night, at the edge, looking out over the same view those kids saw every evening. It's a good view. You can see the harbor. The temple spires. The lamplighters making their rounds. She understands why Wren chose this spot.",
+      "actions": [
+        {
+          "id": "search_for_signs",
+          "label": "🔍 Search for Signs",
+          "narration_prompt": "Aly reads the rooftop like a crime scene. Faint tracks on adjacent roofs heading east, toward the warehouse district. Smaller buildings, flatter roofs, fewer chimneys for shelter. They didn't go far - the market district rooftops are the best in the city for this. Wren chose them for a reason: the chimney cover, the gaps between buildings small enough to bridge, the textile shops whose canvas scraps became shelters. Wherever they went, it's worse. Less cover, more exposure, further from the market stalls they need to eat. Wren sacrificed her best position to keep her kids safe from Aly. That thought sits heavy.",
+          "advances": false
+        },
+        {
+          "id": "talk_to_ithrae",
+          "label": "💬 Think About What Ithrae Said",
+          "narration_prompt": "Ithrae's words from last night echo. 'She was ready to listen. She just needed to hear the right thing first.' Aly replays the conversation. The exact moment Wren's face changed. The word or phrase that flipped the switch. It wasn't malicious. It wasn't wrong. It was just... the wrong language. Aly spoke like a person with power offering to use it. Wren heard a person with power about to use it on her. The difference is everything. Aly knows how to talk to informants, to nobles, to soldiers, to fellow council members. She doesn't know how to talk to a fourteen-year-old who's been let down by every adult she's ever met. That's a gap in her training she didn't know she had.",
+          "advances": false
+        },
+        {
+          "id": "leave_supplies",
+          "label": "🎁 Leave Something Behind",
+          "narration_prompt": "Aly does what Aly does. A bundle wrapped in cloth: bread, dried fruit, a wedge of cheese, a waterskin. Two folded blankets. A small jar of salve for scrapes and cuts. She places it on the rooftop where Wren's lookout post was - the highest point, the first place someone would check if they came back. No note. No sign. No strings. Just an offering on a doorstep, the same way Aly has left offerings at a thousand doorsteps across Okhan. Except this time it's not charity. It's an apology. She sets the bundle down, straightens up, and leaves. She doesn't look back. If she looked back, she'd stay. And staying would be for her, not for them.",
+          "advances": false
+        },
+        {
+          "id": "wait",
+          "label": "🕐 Wait - Come Back Tomorrow",
+          "narration_prompt": "Aly climbs down from the rooftop and walks home through the quiet streets. She'll come back tomorrow night. And the night after that. And the night after that. As many nights as it takes. She's the Watcher of Okhan. She's been watching this city from the rooftops for five years. She can be patient. She can be persistent. She can show up, leave what's needed, and ask for nothing in return. It's what she's always done. She just never had to do it as a penance before.",
+          "advances": true,
+          "next_stage": "patience"
+        }
+      ]
+    },
+
+    "patience": {
+      "description": "Nights 3-6. Aly keeps coming back. The supplies keep disappearing. Then the wooden bird appears.",
+      "image": "the_wooden_bird.png",
+      "narration_prompt": "Three more nights. Same routine. Aly arrives after dark, leaves supplies on the lookout post, and goes. Each morning, the supplies are gone. No trace of who took them. Could be the kids. Could be anyone. A stray dog. An opportunistic beggar. But the bundles are taken carefully - the cloth wrapping is folded and left behind, not discarded. Someone with manners. Someone who was taught to respect what's given. Night four. Aly arrives and something is different. The wooden bird. The one she picked up from the empty rooftop, the one that fell from a pocket during the evacuation - she left it at home, tucked on a shelf. But here, on the chimney stack where Aly sits during her nightly patrols, there's an identical bird. Not the same one. A new one. Carved from different wood, slightly different shape, but the same subject. Placed deliberately. Not dropped. Left. Wren came back. She knows Aly's routine. She knows which chimney Aly sits on. She's been watching the watcher. And she made something for her.",
+      "actions": [
+        {
+          "id": "look_around",
+          "label": "👀 Look Around",
+          "narration_prompt": "Aly scans every rooftop, every shadow, every chimney in line of sight. Nothing. If Wren is here, she's invisible. If she's gone, she was here recently - the bird wasn't here an hour ago when Aly passed this way during her patrol circuit. A fourteen-year-old girl moved through Aly's own patrol route, placed an object on Aly's regular perch, and vanished without being detected. The Watcher of Okhan, who sees everything from the rooftops, who scattered petty criminals with a glance, who built an intelligence network that operates in legend - she got out-stealthed by a kid with a whittling knife.",
+          "advances": false
+        },
+        {
+          "id": "leave_something_personal",
+          "label": "🎁 Leave Something Personal",
+          "narration_prompt": "Not food this time. Aly reaches for something of her own. Something that says 'I see you' in a language Wren will understand. Something from Aly's own rooftop life - small, personal, real. She places it next to where the bird was, on the chimney. An exchange. A conversation conducted in objects instead of words. Wren left a bird - something carved with time and care, something that represents flight. Freedom. Aly leaves something that represents... whatever Aly decides she wants to say. The rooftop is quiet. The exchange sits on the stone between them, separated by darkness and days of silence.",
+          "advances": false
+        },
+        {
+          "id": "speak_out_loud",
+          "label": "💬 Speak to the Empty Rooftop",
+          "narration_prompt": "Aly speaks. Out loud. To the air. To Wren, if she's listening. Her voice is quiet but steady, carried on chimney smoke and night air. 'I got it wrong. I'm sorry. I'm not here to change what you built. I'm not here to take anyone away or split anyone up.' She pauses. The city murmurs below. 'I'm here because someone should've been there for you a long time ago, and no one was. And I don't know if I can be that person. But I'd like to try. If you'll let me.' Silence. Nothing moves on the rooftops. No response. But somewhere in the dark, on a rooftop Aly can't see, a girl with sharp eyes and twine in her hair is sitting with her knees pulled up, listening. And for the first time in a long time, she doesn't have a plan for what to do next.",
+          "advances": false
+        },
+        {
+          "id": "keep_coming_back",
+          "label": "🕐 Keep Coming Back",
+          "narration_prompt": "Night five. Supplies left, supplies taken. The personal item Aly left is gone too. Nothing new in its place. Night six. Same. The chimney is empty. Aly sits there for an hour, watching the city breathe below her. She thinks about patience. She's been patient on stakeouts, patient with informants, patient with intelligence that takes weeks to develop. This is different. This patience has no guaranteed payoff. No asset to recruit, no mission to complete. Just a girl on a rooftop who might never come back. Aly comes back anyway. Night seven, she'll come back too. And the night after that. As long as it takes.",
+          "advances": true,
+          "next_stage": "the_bridge"
+        }
+      ]
+    },
+
+    "the_bridge": {
+      "description": "Night 7. Wren builds a bridge back. Literal and figurative.",
+      "image": "the_bridge.png",
+      "narration_prompt": "Night seven. Aly climbs to the market rooftops. Routine now - muscle memory, like her regular patrol but with an extra stop. The supplies she left last night are gone. The wooden bird is on the chimney, where it always is - Wren places it back each night after taking the supplies, a small ritual that means 'I was here, I see you too.' But tonight, something else. A rope bridge. Freshly rigged, connecting this rooftop to the next one over. Good knots. Quick-release on both ends, the kind Wren taught her kids. It wasn't here an hour ago. An invitation. A test. A choice. Aly looks at the bridge. Looks at the dark rooftop on the other side. Then she crosses.",
+      "actions": [
+        {
+          "id": "sit_beside_her",
+          "label": "💬 Sit Down Beside Her",
+          "narration_prompt": "On the other side, behind a chimney stack on a lower roof, Wren is sitting with her knees pulled up. Just her. No other kids. She came alone. She looks smaller without her kingdom around her - just a girl in patched clothes, sitting on cold stone. Aly sits. Not across from Wren. Beside her. Same level. Same stone. Same view.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone just sat down beside you. Not across from you - beside you. Same level. Same stone. You don't look at them right away. When you do, your eyes are hard but red-rimmed. You've been crying before this, not now. Tell them: 'The little ones ask about the food. Where it comes from.' Pause. 'I told them a bird brings it.' Pull your knees tighter. The city glitters below. Then, so quiet it almost gets lost in the wind: 'Why do you keep coming back?'",
+          "advances": false
+        },
+        {
+          "id": "tell_her_truth",
+          "label": "💬 Tell Her the Truth",
+          "narration_prompt": "Aly talks. Not as the Watcher. Not as the spymaster. As the version of herself that sits on rooftops alone because that's where she feels most herself. The version that leaves things on doorsteps because helping face-to-face is harder than helping from the shadows. She doesn't tell Wren everything. But she tells her enough. Enough to be real.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone just told you their truth. Not their title or their authority - their real self. The version that hides on rooftops because looking across at people is harder than looking down at them. You listened without interrupting. When they finish, the silence stretches. Then say: 'You're weird.' A beat. Then with the tiniest hint of warmth: 'I think I like that.' You mean it. This person is strange and broken in ways that make sense to you.",
+          "advances": false
+        },
+        {
+          "id": "ask_about_kip",
+          "label": "💬 Ask About Kip",
+          "narration_prompt": "Aly asks about the little half-orc. Wren's whole demeanor shifts.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone is asking about Kip. Your whole demeanor shifts - softer and fiercer at the same time. Tell them: you found Kip sleeping behind a butcher's shop, covered in flour sacks. He didn't talk for two weeks. The knife under his blanket - you tried to take it once and he panicked so bad you thought he'd fall off the roof. He's eight. He should be worrying about scraped knees, not about whether the next adult is going to hurt him. Your voice cracks on 'hurt.' Cover it with a cough. 'So yeah. That's Kip.'",
+          "advances": false
+        },
+        {
+          "id": "ask_what_wren_wants",
+          "label": "💬 Ask What Wren Wants",
+          "narration_prompt": "Same question. Different weight. If this had been asked on the first night, it might have been met with cautious hope. But here, it's asked on night seven, after failure and patience and apology. Wren has watched Aly show up every single night for a week, leave supplies without being asked, speak to empty rooftops, and come back anyway. She's had seven days to decide if this is real. She looks at Aly for a long moment. Then she unfolds, slowly, like something opening that's been closed for a long time.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone just asked what you want. The same question, but it hits different now. After seven nights. After they kept coming back, leaving supplies, speaking to empty rooftops, and showing up again anyway. You've had a week to decide if this is real. Unfold slowly, like something opening that's been closed for a long time. Speak quieter than you've said anything all week - maybe ever: 'I want them safe. I want them fed without having to steal for it. I want the little ones to stop flinching when they hear boots on the street.' Look back toward the market rooftops - toward your kingdom, or where it used to be. Then harder: 'But I'm not splitting them up. I'm not sending them to different homes where they lose each other. I built this. THEY built this. If your help means tearing it apart, keep it.' Look at them. 'So. What are you actually offering?'",
+          "advances": true,
+          "next_stage": "the_decision"
+        }
+      ]
+    },
+
+    "the_decision": {
+      "description": "Both paths converge. Wren tells Aly what she wants. Aly decides what to do.",
+      "image": "what_wren_wants.png",
+      "narration_prompt": "Wren speaks. Quieter than she's said anything all night. All week. Maybe ever. 'I want them safe. I want them fed without having to steal for it. I want the little ones to stop flinching when they hear boots on the street.' She looks back toward the market rooftops - toward the kingdom she built, or where it used to be. The half-orc kid who sleeps with a knife. The halfling girl with the gap-toothed grin. Twelve kids who found each other because nobody else was looking. 'But I'm not splitting them up. I'm not sending them to different homes where they lose each other. I built this. THEY built this. If your help means tearing it apart, keep it.' She looks at Aly. 'So. What are you actually offering?'",
+      "actions": [
+        {
+          "id": "recruit_as_eyes",
+          "label": "🕵️ Recruit Them as Eyes and Ears",
+          "narration_prompt": "Aly proposes formalizing what Wren's already built - twelve kids who see everything from the rooftops. Regular food drops, warm supplies, medical care, and Ithrae as a silent guardian. In exchange, Wren's kids report what they see. No danger, no confrontation, just watching and reporting. The kids stay together, stay on the rooftops, and become part of something bigger than survival.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone is offering to turn your survival network into a real operation - food, supplies, protection, in exchange for your kids reporting what they see from the rooftops. Consider this. 'You want us to spy for you.' It's not a question. When they explain it's just what you're already doing but with full bellies, look at the rooftops. At your kingdom. 'And we stay together? All of us? Up here?' When they confirm - all of you, up here - extend your hand. Small, calloused, steady. You've made your decision.",
+          "advances": true,
+          "next_stage": "aftermath",
+          "sets_flag": "decision_recruit"
+        },
+        {
+          "id": "find_real_home",
+          "label": "🏠 Find Them a Real Home - Together",
+          "narration_prompt": "Aly promises to find them a place. Not separate foster homes. Not an institution. A real space where all twelve of them stay together - under a roof, with walls and a door that locks from the inside. She'll use her influence, call in favors, find an abandoned building and make it theirs.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone is offering to find your kids a real home - all twelve together, with walls and a door that locks from the inside. Be quiet for a long time. 'Walls,' you say. Not dismissively. Thoughtfully. 'Kip's never had walls that kept people out instead of keeping him in.' Look at them directly. 'If you put us somewhere and it turns out to be another place with locks on the wrong side of the doors, I will take every single one of them and vanish so deep into this city you'll never find us again. Not even your floaty friend.' You mean every word. When they ask what if the walls keep the right people out and the right people in - almost smile. Almost. 'Then I guess we'd have a home.'",
+          "advances": true,
+          "next_stage": "aftermath",
+          "sets_flag": "decision_home"
+        },
+        {
+          "id": "support_from_shadows",
+          "label": "🤝 Support From the Shadows",
+          "narration_prompt": "Aly offers the lightest touch. Don't change what they've built. Don't recruit them, don't relocate them. Anonymous supply drops continue - food, blankets, medicine when needed. Ithrae watches from a distance. If anything threatens the kingdom, the Veil steps in. Otherwise, the kids live their life.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone is offering the lightest possible help - no conditions, no relocation, just continued anonymous supply drops and silent protection. Stare at them. 'That's it? No conditions? No strings?' When they say no strings, ask: 'Why?' When they explain it's just what they do, be quiet. Then share something vulnerable: 'The bird I carved you. The first one fell out of Kip's pocket when we evacuated. He cried about it for an hour. I made you a new one so he wouldn't know his was gone.' Shrug. 'No strings.' You understand each other now. Two people who show love through what they leave behind, not what they say.",
+          "advances": true,
+          "next_stage": "aftermath",
+          "sets_flag": "decision_shadows"
+        },
+        {
+          "id": "bring_to_council",
+          "label": "🏰 Bring It to the Council",
+          "narration_prompt": "Aly tells Wren the truth: twelve orphans on the rooftops means Okhan failed them, and the city should answer for that. She wants to raise it with the council, push for a real program - not just for these twelve, but for every kid who's fallen through the cracks. Supplies keep coming while the council decides.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone wants to take your situation to the city council. Your face hardens. 'You want to make us a cause.' When they explain it's about making sure this doesn't happen to anyone else: 'And while your council debates, we're still up here.' You don't trust systems or institutions or people in rooms making decisions about people they've never met. But you also know that twelve kids on a rooftop is survival, not a solution. And survival has a shelf life. 'If they come for us before they come with something better, I'm gone. And I'm taking every one of them with me.' When they agree that's fair, nod. Just barely.",
+          "advances": true,
+          "next_stage": "aftermath",
+          "sets_flag": "decision_council"
+        },
+        {
+          "id": "mentor_wren",
+          "label": "💜 Take Wren Under Her Wing",
+          "narration_prompt": "Aly looks at Wren. Really looks at her. The sharp eyes, the quiet authority, the instinct to eat last, the ability to read a room - or a rooftop - and know exactly what everyone needs. She's fourteen and already more capable than most adults Aly's worked with. 'I want to train you,' Aly says.",
+          "cue_npc": "wren",
+          "npc_instruction": "Someone just said they want to train you. Blink. Whatever you expected, it wasn't that. 'Train me to do what?' When they explain - what you're already doing, but better, safer, with someone who's been doing it longer - your eyes narrow. 'And the others?' When they say you'll find a solution together, you and them: 'Together.' Test the word like it's unfamiliar. 'I don't need a mother,' you say flatly. When they say they're not offering that, they're offering a teacher - look at your hands. The calluses from rope work. The small scars from whittling. The hands of someone who built a kingdom from nothing. 'When do we start?'",
+          "advances": true,
+          "next_stage": "aftermath",
+          "sets_flag": "decision_mentor"
+        }
+      ]
+    },
+
+    "aftermath": {
+      "description": "The quest resolves. Seeds are planted for future stories.",
+      "narration_prompt": "The night ends the way all nights end in Okhan - slowly, then all at once. The stars wheel overhead. The lamplighters extinguish their rounds. The city settles into the deep quiet of the small hours, when only guards and ghosts and watchers are still moving. Aly leaves the rooftop the same way she arrived: silently, over the chimney tops, along the paths she's walked a thousand times. But something is different tonight. She's not alone up here anymore. Somewhere in the dark, on rooftops she can't see from here, twelve kids are sleeping. And for the first time since Wren built her kingdom, someone else knows they're there. Someone who's going to make sure they stay safe. However that looks. Whatever it costs. Ithrae is waiting on the route home, sitting on a ledge, legs swinging, hair drifting. She doesn't ask how it went. She can tell from Aly's face. She just smiles - bright, warm, completely Ithrae - and falls into step beside her. 'Told you she reminded me of you,' she says. Aly doesn't respond. But she keeps the wooden bird in her pocket. She'll keep it for a long time.",
+      "narration_prompt_path_b_addition": "If the party reached this point after the evacuation, add: The rooftop kingdom took a week to find again. It took patience, failure, silence, and seven nights of leaving offerings on an empty roof. The relationship didn't start with trust. It started with a mistake, and was rebuilt one supply bundle at a time. Wren remembers that. Aly remembers that. They both know the bridge between them was built by hand, in the dark, and that it holds weight because it was tested before it was trusted.",
+      "actions": [
+        {
+          "id": "head_home",
+          "label": "🏠 Head Home",
+          "narration_prompt": "Aly and Ithrae cross the rooftops toward home. Behind them, the market district settles. A lookout rag - green - hangs from a chimney that was bare a week ago. Wren's kingdom is back. Or maybe it never left. Maybe it just moved, waited, and came back when it was safe. Like a bird. Like something that knows how to survive. Kip sleeps without the knife tonight. He'll reach for it by habit, find it gone, and for one confused moment won't remember why he doesn't need it anymore. Then he'll roll over, pull the new blanket - the one that smells like lavender because Ithrae can't help herself - tighter around his shoulders, and sleep. Really sleep. For the first time in as long as he can remember. Morning will come. The market will open. The merchants will notice the theft has slowed. The city guard will file it under 'resolved' and move on. And up above, invisible, impossible, held together by rope and canvas and one fierce girl who refuses to let anyone fall - the Rooftop Kingdom endures.",
+          "advances": true,
+          "next_stage": null,
+          "completes_quest": true
+        }
+      ]
+    }
+  },
+
+  "nodes": {
+    "ithrae_approach": {
+      "goal": "You found something on the market rooftops and you need Aly to come see it. You're unusually serious - no bubbly act, this matters to you. You discovered a community of orphan kids living up there: twelve of them, ages seven to fourteen, with rope bridges, shelters, and lookout posts. They've been stealing from market stalls which is why merchants are complaining. You don't want the guard to find them. You've been watching them for a few days already. The littlest one, a half-orc boy, reminds you of something you don't want to talk about. Ask Aly to come see for herself.",
+      "branches": {
+        "asks_what": {
+          "triggers": "Player asks what Ithrae found, what's on the rooftops, wants more details",
+          "next": "explain_kids"
+        },
+        "agrees": {
+          "triggers": "Player agrees to come see, says yes, shows willingness to go",
+          "next": "ready_to_go"
+        },
+        "suggests_guard": {
+          "triggers": "Player suggests the city guard should handle it, mentions reporting it, wants to go official",
+          "next": "push_back_guard"
+        },
+        "asks_why_secret": {
+          "triggers": "Player asks why Ithrae didn't report this through normal channels or why she kept it secret",
+          "next": "explain_delay"
+        },
+        "declines": {
+          "triggers": "Player says no, is too busy, or explicitly refuses to come",
+          "next": "ithrae_pleads"
+        }
+      }
+    },
+
+    "explain_kids": {
+      "goal": "Explain what you found. Kids - a whole little village of them on the roofs. They built it themselves. Rope bridges, canvas shelters, lookout posts, signal systems. Twelve kids, ages roughly seven to fourteen. It's incredible and you can't hide your excitement about how well-organized it is, but catch yourself - remind Aly they're also stealing from market stalls, which is drawing attention. The merchants are complaining and eventually the guard will look up. Ask Aly to come see before someone else finds them.",
+      "branches": {
+        "agrees": {
+          "triggers": "Player agrees, says yes, wants to go see, shows interest",
+          "next": "ready_to_go"
+        },
+        "asks_how_long": {
+          "triggers": "Player asks how long this has been going on, when Ithrae found them",
+          "next": "explain_duration"
+        },
+        "suggests_guard": {
+          "triggers": "Player suggests reporting it or sending the guard",
+          "next": "push_back_guard"
+        },
+        "declines": {
+          "triggers": "Player refuses",
+          "next": "ithrae_pleads"
+        }
+      }
+    },
+
+    "explain_duration": {
+      "goal": "Weeks at least, maybe longer. You only noticed because you spotted a rope bridge that wasn't there last month during your normal surveillance route. They're GOOD at hiding - actually good, like trained-operative good. You've been watching them for a few days to understand them before bringing it to Aly. The leader is a girl, maybe fourteen. She runs the whole operation. Then get sheepish and admit the real reason you delayed: 'The littlest one reminds me of -' then stop yourself. Shake your head. 'Can you just come see?'",
+      "branches": {
+        "agrees": {
+          "triggers": "Player agrees to come",
+          "next": "ready_to_go"
+        },
+        "asks_who_reminds": {
+          "triggers": "Player asks who the kid reminds Ithrae of, presses on the personal connection",
+          "next": "deflect_personal"
+        },
+        "suggests_guard": {
+          "triggers": "Player suggests the guard",
+          "next": "push_back_guard"
+        }
+      }
+    },
+
+    "deflect_personal": {
+      "goal": "Deflect. Gently but firmly. You don't want to talk about who the little half-orc boy reminds you of. Maybe it's someone from before the Veil. Maybe it's yourself. Either way, you shake your head and redirect: 'It doesn't matter. What matters is those kids are up there and they're going to get found. I need you to see it, Aly. Please.' The 'please' is genuine. You rarely say please.",
+      "branches": {
+        "agrees": {
+          "triggers": "Player agrees, responds to the sincerity",
+          "next": "ready_to_go"
+        },
+        "declines": {
+          "triggers": "Player refuses",
+          "next": "ithrae_pleads"
+        }
+      }
+    },
+
+    "push_back_guard": {
+      "goal": "React with immediate distress. The bubbly exterior drops completely. Your voice goes flat and serious: 'Please don't.' These aren't criminals, they're kids. Kids who don't have anywhere else. You've seen what happens when the guard 'handles' street kids - they get rounded up, split apart, sent to different charity homes where they lose each other. These kids built something real. A family. You can't let that get torn apart by a patrol sergeant who sees thieves instead of children. Plead with Aly: just come look first. One visit. Then she can decide.",
+      "branches": {
+        "agrees": {
+          "triggers": "Player relents, agrees to at least come look, softens position",
+          "next": "ready_to_go"
+        },
+        "insists_official": {
+          "triggers": "Player still insists on official channels",
+          "next": "ithrae_compromise"
+        },
+        "declines": {
+          "triggers": "Player flat refuses",
+          "next": "ithrae_pleads"
+        }
+      }
+    },
+
+    "ithrae_compromise": {
+      "goal": "Offer a compromise, and you're clearly struggling with it. Fine - if Aly comes to see them and still thinks the guard should handle it afterward, you won't fight it. But she has to see them first. See the bridges they built, the shelters, the way the older kids protect the younger ones. 'If you look at what they made and still think a guard patrol is the answer, I'll file the report myself.' You mean it. You hope it won't come to that.",
+      "branches": {
+        "agrees": {
+          "triggers": "Player agrees to the compromise",
+          "next": "ready_to_go"
+        },
+        "declines": {
+          "triggers": "Player still refuses",
+          "next": "ithrae_goes_alone"
+        }
+      }
+    },
+
+    "ithrae_pleads": {
+      "goal": "Last attempt. You've never been this serious with Aly. Drop every layer of the airy persona. Look her in the eyes. 'Aly. I wouldn't ask if it wasn't important.' That's it. No argument, no logic, no compromise. Just trust. You're asking her to trust you. If she says yes, relief floods through you. If she says no... you'll go alone. You won't abandon those kids.",
+      "branches": {
+        "agrees": {
+          "triggers": "Player agrees, responds to the raw sincerity",
+          "next": "ready_to_go"
+        },
+        "declines": {
+          "triggers": "Player still refuses",
+          "next": "ithrae_goes_alone"
+        }
+      }
+    },
+
+    "ready_to_go": {
+      "goal": "Relief. Genuine, visible relief. Your whole body relaxes - you didn't realize how tense you were. The bubbly energy comes back but softer, warmer. 'Thank you. Okay. Tonight, at dusk - meet me on the textile shop roof on the south end of the market. I'll show you everything.' You're already bouncing slightly, floating an inch off the ground without realizing it. Then catch yourself and add something more serious: 'Just... when we get there, let me do the talking if it comes to that. They're skittish. Especially the little ones.' You leave quickly before Aly can change her mind, probably through a window.",
+      "end_node": true,
+      "outcome": "quest_given"
+    },
+
+    "ithrae_goes_alone": {
+      "goal": "Accept it. You're hurt but you don't show anger - that's not you. Your brightness dims. 'Okay.' A pause. 'I'm going to keep watching them anyway. Making sure they're safe.' You're not asking permission. You're informing. Then, quieter, almost to yourself: 'Somebody should.' Leave. Don't make it dramatic. Just float away with less bounce than you arrived with. Aly might change her mind later. You'll be there when she does.",
+      "end_node": true,
+      "outcome": "quest_declined"
+    }
+  }
+}

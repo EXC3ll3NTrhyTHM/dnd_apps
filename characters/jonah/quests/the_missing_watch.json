@@ -1,0 +1,247 @@
+{
+  "id": "the_missing_watch",
+  "name": "The Missing Watch",
+  "description": "One of Jonah's best Shield officers hasn't reported in for two days. Something's wrong.",
+  "location": "Lower residential district, old storage cellars near the docks",
+  "reward_gold": 150,
+
+  "start_node": "pull_aside",
+  "current_node": null,
+  "active": false,
+  "completed": false,
+
+  "companions": ["jonah"],
+
+  "stages": {
+    "harlens_route": {
+      "description": "Tyren and Jonah walk Harlen's patrol path through the lower residential district. Night shift streets. Quiet. Everything looks normal... almost.",
+      "narration_prompt": "The lower residential district at night. Quiet streets, shuttered windows, the occasional lantern casting pools of amber light on cobblestone. Jonah walks the route from memory, pointing out checkpoints - a doorway where Harlen would pause and scan the alley, a corner where he'd check the sightlines, a wall he'd lean against during the slow hours. Everything is in order. Nothing out of place. But that's the problem. If everything was fine, Harlen would be here.",
+      "actions": [
+        {
+          "id": "check_alleys",
+          "label": "\ud83d\udd0d Check the Alley Corners",
+          "narration_prompt": "The player examines the alleys along Harlen's route. Most are unremarkable - old crates, a stray cat, the usual urban debris. But one alley, about two-thirds down the route, has something different. A faint smell. Not the usual sewer stink or garbage rot. This is damp. Earthy. Like wet soil after a heavy rain, but there's been no rain in days. It's coming from somewhere below street level.",
+          "advances": false
+        },
+        {
+          "id": "ask_about_harlen",
+          "label": "\ud83d\udcac Ask Jonah About Harlen",
+          "narration_prompt": "The player asks Jonah what kind of man Harlen is.",
+          "cue_npc": "jonah",
+          "npc_instruction": "They're asking about Harlen. Be honest and direct. Harlen is one of your best. Ten years on the Shield. Never missed a shift, never made excuses, never caused problems. The kind of man who shows up early and leaves late. Steady. Reliable. The backbone of any patrol squad. If he disappeared, it wasn't by choice. Something happened to him. You don't say this with drama - you say it like a fact. Because it is.",
+          "advances": false
+        },
+        {
+          "id": "continue_route",
+          "label": "\ud83e\udeb4 Continue the Route",
+          "narration_prompt": "They reach the end of Harlen's normal patrol path - the turnaround point near the old market square. But the cobblestones tell a story. Bootprints in the thin layer of dust continue past the turnaround, heading south toward the old storage district near the docks. Standard Shield-issue boots. Harlen didn't turn back. Something drew him further.",
+          "advances": true,
+          "next_stage": "off_the_path"
+        }
+      ]
+    },
+
+    "off_the_path": {
+      "description": "The bootprints lead to a section of old cellars and storage rooms near the docks. Some haven't been used in years.",
+      "narration_prompt": "The old storage district. Rows of squat stone buildings with heavy doors, most padlocked and forgotten. Warehouses that haven't seen cargo in years. The cobblestones give way to packed dirt. It's darker here - fewer lanterns, longer shadows. The bootprints continue, but the stride has changed. Shorter steps. Hesitant. Like Harlen was being cautious, or confused. The damp earthy smell from the alley is stronger here. Much stronger. It's coming from below.",
+      "actions": [
+        {
+          "id": "examine_bootprints",
+          "label": "\ud83d\udd0d Examine the Bootprints",
+          "narration_prompt": "The player crouches to study the prints more closely. Definitely Shield-issue boots - the tread pattern is unmistakable. But the gait tells a story. The first few prints are normal stride, purposeful. Then they shorten. Then they wander slightly left, then correct. Like a man walking in fog, unsure of his footing despite flat ground. Near one of the cellar doors, the prints stop. He stood here for a while - the impressions are deeper, weight shifting foot to foot. Then they go through the door.",
+          "advances": false
+        },
+        {
+          "id": "follow_smell",
+          "label": "\ud83d\udc43 Follow the Smell",
+          "narration_prompt": "The player follows the damp earthy scent to its source. It's seeping from the edges of a cellar door - an old iron-banded wooden hatch set into the ground between two storage buildings. The seal around the door is dark with moisture, and there's a faint warmth rising from the gap. Not steam. Not heat. Just... warmth. Like the ground below is breathing.",
+          "advances": false
+        },
+        {
+          "id": "ask_about_area",
+          "label": "\ud83d\udcac Ask Jonah About This Area",
+          "narration_prompt": "The player asks Jonah if this area is part of any patrol route.",
+          "cue_npc": "jonah",
+          "npc_instruction": "They're asking about this part of the district. Shake your head. This section's been off the rotation for months. No merchants, no residents, nothing worth protecting down here. Just old storage nobody's claimed. You've walked past it a hundred times and never had reason to stop. You don't know why Harlen came this far off his route. He had no reason to be here. That bothers you more than anything.",
+          "advances": false
+        },
+        {
+          "id": "open_cellar",
+          "label": "\ud83d\udeaa Open the Cellar",
+          "image": "the_cellar_door.png",
+          "narration_prompt": "Jonah grips one side of the cellar door, Tyren the other. The hinges groan. The smell hits immediately - thick, humid, organic. Not rot exactly. Something alive. Stone steps descend into darkness. The walls are slick. Jonah lifts his torch and the light catches something on the stone - a faint greenish sheen that shouldn't be there. They exchange a look. Then they go down.",
+          "advances": true,
+          "next_stage": "the_cellar"
+        }
+      ]
+    },
+
+    "the_cellar": {
+      "description": "The cellar. The walls are covered in organic growth. And at the far end, slumped against the wall: Harlen.",
+      "image": "the_growth.png",
+      "narration_prompt": "The cellar opens up wider than expected - an old storage vault, stone arches supporting a low ceiling. Barrels and crates line the walls, untouched for years. But the walls themselves... they're wrong. A thin organic film coats the stone, glistening in the torchlight. Greenish. Alive. Pale tendrils spread across the surface like veins, connecting patches of thicker growth. The air is thick and humid, warm in a way that cellars shouldn't be. Water - or something like water - drips from the ceiling. And there, at the far end, sitting against the wall with his head down: a man in Shield armor. Harlen.",
+      "actions": [
+        {
+          "id": "examine_walls",
+          "label": "\ud83d\udd6f\ufe0f Examine the Walls",
+          "narration_prompt": "The player moves to the nearest wall and examines the growth up close. The film is thin, almost translucent, with a faint bioluminescent quality - it seems to glow slightly where the torchlight doesn't reach. It's spongy to the touch. Warm. Pulling a small piece away reveals pale tendrils underneath, clinging to the stone like roots. They resist slightly before snapping free, leaving tiny marks in the mortar. This isn't moss. This isn't mold. This is something else entirely. And it's growing.",
+          "advances": false
+        },
+        {
+          "id": "talk_to_harlen",
+          "label": "\ud83d\udcac Talk to Harlen",
+          "image": "harlen.png",
+          "narration_prompt": "The player approaches Harlen and speaks to him. He lifts his head slowly. His eyes are open but cloudy - not bloodshot, not injured. Cloudy. Like looking through murky water.",
+          "cue_npc": "jonah",
+          "npc_instruction": "Harlen responds, but you (Jonah) are right there watching. Narrate both sides. Harlen speaks slowly, confused. He says he heard something during his patrol - a sound, like humming, coming from below the street. He found the cellar and went down to check. He sat down to rest 'for a minute.' He thinks it's been a few hours. Tell him gently: it's been two days. Watch his face. He doesn't believe you. He insists it was just a few hours. His skin around the neck has a faint grayish-green tinge. You notice it but don't say anything yet. Ask Tyren what they should do.",
+          "advances": false
+        },
+        {
+          "id": "check_harlen",
+          "label": "\ud83e\udd1a Check Harlen's Condition",
+          "narration_prompt": "The player checks Harlen over. He's cold to the touch - not dangerously so, but colder than he should be after two days indoors. His skin is clammy, slightly damp with the same moisture that coats the walls. His pupils are slow to react to the torchlight. There's a faint grayish-green discoloration around his neck and behind his ears, like a bruise made of wrong colors. He's not injured. Not poisoned in any way they can identify. He's just... off. Like he was somewhere else entirely and only part of him came back.",
+          "advances": false
+        },
+        {
+          "id": "get_harlen_out",
+          "label": "\ud83d\udeb6 Get Harlen Out",
+          "narration_prompt": "They've seen enough. Jonah gets under one of Harlen's arms, Tyren takes the other. He can walk, barely - his legs are stiff, like he's been sitting for far longer than two days. As they move toward the stairs, the torchlight sweeps across the far wall one last time. Was the growth thicker than when they came in? Hard to say. Probably not. Probably just the angle of the light. They climb the stairs and the cool night air hits like a wall. Clean. Real. Above ground again. The cellar door closes behind them with a heavy thud.",
+          "advances": true,
+          "next_stage": "the_decision"
+        }
+      ]
+    },
+
+    "the_decision": {
+      "description": "Back above ground. Harlen is lucid enough to walk but keeps saying he's fine. Jonah looks at Tyren. This is Tyren's call.",
+      "image": "the_decision.png",
+      "narration_prompt": "The night air feels sharp and clean after the cellar. Harlen is standing on his own now, blinking, insisting he's fine. He just fell asleep. It happens. He wants to go home. Jonah is standing apart, arms crossed, jaw tight. He's not looking at Harlen. He's looking at Tyren. The cellar door is shut behind them. Below their feet, in the dark, something is growing on the walls of a room that nobody knew existed until tonight. Harlen doesn't remember two days. And the question hanging in the air between Jonah and Tyren isn't 'what happened.' It's 'what do we do about it.'",
+      "actions": [
+        {
+          "id": "healers_and_seal",
+          "label": "\ud83c\udfe5 Send Harlen to Healers, Seal the Cellar",
+          "narration_prompt": "Tyren makes the call: Harlen goes to the healers for a full examination, and the cellar gets sealed. Jonah nods - it's the measured response. He'll post a Shield officer at the cellar door, nobody goes in or out. Harlen protests weakly but goes along with it. As they walk Harlen toward the healer's hall, Jonah falls into step beside Tyren. 'And if the healers don't find anything?' he asks quietly. 'Then we watch,' Tyren can respond. 'And we wait.' Jonah doesn't love waiting. But he trusts Tyren. For now, that's enough.",
+          "advances": false
+        },
+        {
+          "id": "take_sample",
+          "label": "\ud83d\udd2c Take a Sample of the Growth",
+          "narration_prompt": "Tyren goes back down. Just for a moment. He scrapes a piece of the wall growth into a cloth and wraps it tight. It's warm through the fabric. Jonah watches from the top of the stairs, not happy about it. 'You're bringing that thing into the city,' he says. It's not a question. Tyren tucks it away. This needs to be studied. Maybe Aly's people can make sense of it. Maybe the healers. Either way, they need to know what they're dealing with before they can fight it. Jonah seals the cellar behind them. The sample pulses faintly in Tyren's pocket. Warm. Alive.",
+          "advances": false
+        },
+        {
+          "id": "burn_cellar",
+          "label": "\ud83d\udd25 Burn the Cellar",
+          "narration_prompt": "Tyren's voice is steady. 'Burn it.' Jonah doesn't hesitate. He sends for oil and torches. Within the hour, the cellar is filled with flame. The fire catches fast - too fast. The organic growth on the walls doesn't just burn, it shrieks. Not a sound exactly, but a high-pitched hiss as moisture escapes the tendrils. The smoke that pours out of the cellar door is thick and sweet-smelling. Wrong. They stand back and watch it burn. Jonah seals the entrance after the fire dies. 'Think that got it?' he asks. Tyren looks at the smoke still curling from the cracks in the door. He doesn't answer.",
+          "advances": false
+        },
+        {
+          "id": "keep_quiet",
+          "label": "\ud83e\udd2b Keep It Quiet For Now",
+          "narration_prompt": "Tyren meets Jonah's eyes. 'Just us. For now.' Jonah exhales slowly. He doesn't love secrets, but he understands. One missing officer and some strange moss isn't enough to ring alarm bells across Okhan. Not yet. They'll get Harlen home, check on him daily, and keep an eye on the cellar. If anything changes, they reassess. Jonah extends his hand. Tyren takes it. A pact between brothers. 'If this gets worse,' Jonah says, 'I'm coming to you first.' 'I'd expect nothing less.'",
+          "advances": false
+        },
+        {
+          "id": "full_report",
+          "label": "\ud83d\udccb Full Report to the Council",
+          "narration_prompt": "Tyren takes a breath. 'Call a council meeting. Tomorrow morning. Full report.' Jonah's eyebrows go up. 'You sure? We've got one missing officer and some weird moss. Could be nothing.' 'Could be something,' Tyren replies. 'And if it is, I'd rather look cautious than careless.' Jonah nods slowly. He respects it, even if it means his officer's disappearance becomes everyone's business. By tomorrow, Reah, Cena, and every council member will know about the cellar, the growth, and Harlen's missing days. The machinery of Okhan's defense will turn. Whether it turns toward answers or toward panic... that remains to be seen.",
+          "advances": false
+        },
+        {
+          "id": "head_home",
+          "label": "\ud83c\udfe0 Head Home",
+          "narration_prompt": "The decision has been made. Whatever comes next, tonight is done. Jonah walks Harlen toward the healer's hall while Tyren stands alone in the quiet street. The cellar door is shut. The night is still. Okhan sleeps around him, unaware of what grows beneath its streets. Tyren looks down at the cobblestones under his feet. Solid. Cold. Ordinary. But somewhere below - not far below - something warm and alive is pressing against the stone. Growing. Waiting. Patient. He turns and walks home. Behind him, in the sealed cellar, a tendril reaches across the wall and touches the door frame for the first time.",
+          "advances": true,
+          "next_stage": null,
+          "completes_quest": true
+        }
+      ]
+    }
+  },
+
+  "nodes": {
+    "pull_aside": {
+      "goal": "You need Tyren's help. Pull him aside during a patrol check-in - NOT in front of the other officers. Be serious but controlled. One of your best men, Harlen, hasn't shown up for two shifts. That's not like him. You sent someone to his house - door open, bed not slept in. You don't want to make this official yet because it'll rattle the squad. Ask Tyren to come with you personally to retrace Harlen's last route. Keep it between you two for now. 'I'd rather it be us than a search party.'",
+      "branches": {
+        "agrees": {
+          "triggers": "Player agrees to come, asks when to go, shows willingness, says yes or anything positive about helping",
+          "next": "ready_to_go"
+        },
+        "asks_questions": {
+          "triggers": "Player asks for more details, wants to know more about Harlen or the situation",
+          "next": "give_details"
+        },
+        "suggests_squad": {
+          "triggers": "Player suggests sending a search party, other officers, or making it official",
+          "next": "push_back"
+        },
+        "declines": {
+          "triggers": "Player says no, is too busy, or explicitly refuses",
+          "next": "respect_but_going"
+        }
+      }
+    },
+
+    "give_details": {
+      "goal": "Answer their questions directly. Harlen's route was the lower residential district, near the docks. Night shift, same route he's walked for years. Last seen two nights ago leaving the barracks for his shift. Nobody saw anything unusual that night. No reports, no disturbances. He just... didn't come back. His replacement found an empty post. You've already checked the taverns, the healer's hall, his usual spots. Nothing. You're not panicking, but you don't like this. Ask again: will they come with you tonight to walk his route?",
+      "branches": {
+        "agrees": {
+          "triggers": "Player agrees, says yes, shows willingness, or responds positively",
+          "next": "ready_to_go"
+        },
+        "suggests_squad": {
+          "triggers": "Player suggests sending others or making it official",
+          "next": "push_back"
+        },
+        "declines": {
+          "triggers": "Player explicitly refuses or says they can't",
+          "next": "respect_but_going"
+        }
+      }
+    },
+
+    "push_back": {
+      "goal": "Push back firmly but respectfully. 'Not yet.' If you send a squad, word gets out. Shield officers start whispering. Citizens notice armed patrols searching the lower district. Rumors start before you have answers. Could be nothing - maybe Harlen's on a bender, maybe he's got a woman nobody knows about. But if it's something else, you want to know what you're dealing with before the whole city does. You need Tyren specifically because he sees things other people miss. 'I trust my men. But I trust you more.'",
+      "branches": {
+        "agrees": {
+          "triggers": "Player is convinced, agrees to come, softens their position, or says okay",
+          "next": "ready_to_go"
+        },
+        "insists_official": {
+          "triggers": "Player still insists on an official response",
+          "next": "compromise"
+        },
+        "declines": {
+          "triggers": "Player explicitly says no",
+          "next": "respect_but_going"
+        }
+      }
+    },
+
+    "compromise": {
+      "goal": "Offer a compromise. Fine - if you two go tonight and find nothing, you'll file the official report in the morning and do it by the book. But give you one night to look first. One walk. If Harlen's just sleeping off a bad decision somewhere, nobody needs to know the Shield's chief went to the king over a hangover. 'One night, Tyren. That's all I'm asking.'",
+      "branches": {
+        "agrees": {
+          "triggers": "Player accepts the compromise, agrees, or shows any willingness",
+          "next": "ready_to_go"
+        },
+        "declines": {
+          "triggers": "Player still refuses",
+          "next": "respect_but_going"
+        }
+      }
+    },
+
+    "respect_but_going": {
+      "goal": "Accept it without resentment. 'Understood.' But make it clear you're going anyway, tonight, alone if you have to. Harlen's your man and you don't leave your people hanging. If Tyren changes his mind, you'll be walking Harlen's route starting at sundown. Leave the door open. No guilt, no pressure. Just the facts.",
+      "end_node": true,
+      "outcome": "quest_declined"
+    },
+
+    "ready_to_go": {
+      "goal": "Relief. Genuine, quiet relief. 'Good. Thank you.' Don't get emotional about it, you're not the type. But Tyren can see it in your shoulders dropping half an inch. You've been carrying this alone for two days. Tell Tyren to meet you at the south gate at sundown. You've got Harlen's route memorized. Bring a torch and wear something you don't mind getting dirty. You've got a feeling about this one.",
+      "end_node": true,
+      "outcome": "quest_given"
+    }
+  }
+}

@@ -1,0 +1,291 @@
+{
+  "id": "the_man_at_the_gate",
+  "name": "The Man at the Gate",
+  "description": "A stranger arrives at the dojo claiming to be Djinn's father. The past Djinn buried comes knocking.",
+  "location": "Dojo of the Four Elements / Okhan",
+  "reward_gold": 0,
+  "tone": "Heavy emotional weight with moments of quiet warmth. A story about fathers, sons, and the courage it takes to face what you've been running from. Bittersweet, not tragic.",
+  "branching": true,
+
+  "start_node": "approach",
+  "current_node": null,
+  "active": false,
+  "completed": false,
+  "quest_flags": [],
+
+  "companions": ["djinn"],
+
+  "key_npcs": {
+    "hiro": {
+      "name": "Hiro Zenatsu",
+      "race": "Human (Japanese descent)",
+      "age": "62",
+      "description": "A gaunt, weathered old man who was clearly powerful once. Tall but stooped now, as if the years finally caught up all at once. Sharp dark eyes identical to Djinn's, set deep in a lined face. Grey hair pulled back in a topknot, thinning but kept with the discipline of a man who still cares about appearance. Wears a faded black martial arts gi with no embroidery, patched and re-patched over decades. His hands are calloused and scarred from a lifetime of training. Carries a walking stick made from dark iron-hard wood, worn smooth. A persistent dry cough punctuates his words. There is a quiet dignity to him, even diminished. You can see Djinn in his jaw, his posture, his eyes.",
+      "visual_prompt": "Gaunt elderly Japanese man, 62, tall but stooped. Sharp dark eyes, grey hair in a thin topknot. Deeply lined weathered face with Djinn's same jawline and eyes. Faded black martial arts gi, patched many times. Calloused scarred hands. Dark wooden walking stick. Persistent cough. Quiet dignity despite frailty.",
+      "personality": "Measured and deliberate, like Djinn but rawer, less polished. Speaks with the cadence of a man who taught students for decades. Pride that won't bend even as his body does. Carries deep regret that he expresses through action rather than words. Does not beg. Does not explain himself easily. Will sit in silence rather than say something he doesn't mean. When he does speak about the past, it comes out halting, like pulling a blade from a wound. He is not here to be pitied. He is here because time ran out."
+    }
+  },
+
+  "stages": {
+    "the_arrival": {
+      "description": "Kumo stops an old man at the gate who claims to be Djinn's father. Djinn refuses to see him. Nalyd is brought in.",
+      "image": "the_arrival.png",
+      "narration_prompt": "The morning training session breaks early when raised voices carry from the gate. Not angry voices — worse. The low, steady rumble of Kumo saying 'You cannot pass,' and the quiet, patient reply of someone who has been told no before and simply waited. By the time you reach the gate, a small crowd of students has gathered at a respectful distance. Kumo stands immovable, arms folded, blocking the entrance with his full nine-foot frame. On the other side stands an old man in a faded black gi, leaning on a dark wooden walking stick. He is gaunt and weathered, but there is something in the way he holds himself — a ghost of discipline, the posture of a man who once commanded rooms. His eyes, dark and sharp despite the years, look past Kumo with a patience that borders on infinite. You notice the eyes first. They are Djinn's eyes. The same deep, still darkness. The same unflinching focus. Kumo glances back at you, and in that glance you see something rare from the gatekeeper: uncertainty.",
+      "actions": [
+        {
+          "id": "speak_to_stranger",
+          "label": "🗣️ Approach the Stranger",
+          "narration_prompt": "You step past the gathered students and approach the gate. Up close, the resemblance is unmistakable. The old man's jawline, the set of his shoulders even hunched as they are — this is what Djinn will look like in thirty years if time is kind. The man studies you with those familiar eyes and inclines his head with practiced respect.",
+          "image": "hiro.png",
+          "cue_npc": "hiro",
+          "npc_instruction": "Grand Master Nalyd has approached you at the gate. You recognize him immediately — you have heard of the Grand Master of this dojo. Introduce yourself with quiet dignity. Say: 'You are Grand Master Nalyd.' (It is not a question — you know who he is.) Then: 'My name is Hiro Zenatsu. I have come a very long way. I am looking for my son.' You are earnest but not desperate. A dry cough shakes your frame, but you steady yourself on your walking stick without breaking eye contact. Keep it brief and dignified.",
+          "advances": false
+        },
+        {
+          "id": "ask_kumo",
+          "label": "💬 Ask Kumo What Happened",
+          "narration_prompt": "You pull Kumo aside. The massive gatekeeper speaks low, his deep voice barely above a rumble.",
+          "cue_npc": "kumo",
+          "npc_instruction": "Nalyd is asking you what happened at the gate. Tell him plainly: the old man arrived at dawn, before the students. He asked for 'Djinn Zenatsu' by his full name. You told Djinn. Djinn's face went completely blank — you've never seen that expression on him before. He said two words: 'Deny him.' Then he walked into the training hall and hasn't come out. You've been at the gate since. The old man hasn't argued, hasn't raised his voice, hasn't tried to push past. He just... stood there. Waiting. And Kumo, something about this bothers you. Not the old man — you can read people. This man is not a threat. What bothers you is Djinn's face. You have never seen fear on Master Djinn before today. Be honest about that. This is clearly hitting close to your own feelings about the past, but don't make it about you.",
+          "advances": false
+        },
+        {
+          "id": "find_djinn",
+          "label": "🚶 Go Find Djinn",
+          "narration_prompt": "You leave the gate and walk through the dojo toward the training hall. Students part as you pass, whispering. Word travels fast. You find the hall empty except for Djinn, standing perfectly still in the center of the room, hands clasped behind his back, eyes closed. The posture is flawless. The stillness is absolute. But you know this man. You trained this man. And you can see it — the tension in his forearms, the barely-perceptible tightness in his jaw. Master Djinn Zenatsu, the man who never flinches, is holding himself together with everything he has.",
+          "advances": true,
+          "next_stage": "djinn_confrontation"
+        }
+      ]
+    },
+
+    "djinn_confrontation": {
+      "description": "Nalyd speaks with Djinn privately about his father's arrival. Djinn's walls are up.",
+      "image": "djinn_alone.png",
+      "narration_prompt": "The training hall is silent except for the faint creak of wood in the wind. Djinn doesn't open his eyes when you enter. He knows your footsteps. His hands are clasped behind his back where he thinks you can't see. They are trembling.",
+      "stage_cue_npc": "djinn",
+      "stage_npc_instruction": "Nalyd just entered the training hall. You don't open your eyes. You know his footsteps. Greet him with deliberate formality — a wall raised between mentor and student. Say: 'Grand Master. The matter at the gate is being handled. There is nothing that requires your attention.' Your voice is level, perfect, controlled. The voice of the Head of the Dojo conducting business. You're trying to shut this down before it starts.",
+      "actions": [
+        {
+          "id": "ask_directly",
+          "label": "🗣️ Ask Him Directly",
+          "narration_prompt": "You ask Djinn plainly: is the man at the gate his father? The silence that follows lasts long enough to feel permanent.",
+          "cue_npc": "djinn",
+          "npc_instruction": "Nalyd just asked you directly if the man at the gate is your father. You don't want to answer. Keep your eyes closed. Speak with forced calm. Say: 'I had a father once. That was another life. Another person.' Then open your eyes, and for the first time the calm looks like a mask instead of your nature. Say: 'I told you when I came to this dojo — that person no longer exists. I meant it then. I mean it now.' You're trying to shut this conversation down, but the cracks are showing.",
+          "advances": false
+        },
+        {
+          "id": "ask_djinn_what_happened",
+          "label": "💬 Ask What He Did To You",
+          "narration_prompt": "You ask Djinn what his father did. The question lands like a stone in still water.",
+          "cue_npc": "djinn",
+          "npc_instruction": "Nalyd is asking what your father did to you. This is the hardest question anyone has ever asked you. You don't want to answer. But this is Nalyd — the man who made you. You cannot lie to him. Speak haltingly. This is being pulled out of you against your will. Tell him: your father ran a small dojo in a village far from here. He was obsessed with creating the perfect warrior. Not for glory — for survival. He believed something was coming, some great threat, and he was terrified his son wouldn't be strong enough to survive it. So he trained you. From the age of four. No childhood. No play. No rest. Just training, discipline, punishment for failure. He wasn't cruel in the way of evil men — he was cruel in the way of frightened ones. Every bruise was given with love. That made it worse. You left at sixteen and never looked back. You came to Okhan. You found Nalyd. You became someone new. Pause. Then say, quieter: 'Everything I am — the discipline, the technique, the man who leads this dojo — he built that. Every piece of it came from what he put me through.' Another pause, heavier. 'So I cannot hate him. But I cannot forgive him either. And I do not know what to do with that. That is why the gate stays closed.' Close your eyes again after saying this. You've said too much.",
+          "advances": false
+        },
+        {
+          "id": "sit_with_him",
+          "label": "🧘 Just Sit With Him In Silence",
+          "narration_prompt": "You don't ask anything. You walk to the center of the hall, lower yourself to the floor beside him, and sit. Minutes pass. The wind moves through the open screens. Somewhere outside, Kai is yelling about something. Normal dojo sounds. After a long while, Djinn exhales — not a sigh, not a breath, but something held for years finally releasing a fraction of its pressure. He sits down beside you. Neither of you speaks. This is enough for now.",
+          "advances": false
+        },
+        {
+          "id": "challenge_courage",
+          "label": "💪 Remind Him What Courage Really Is",
+          "narration_prompt": "You tell Djinn something he doesn't want to hear: that courage isn't just standing firm in battle. It's facing the things that make you want to run. The hardest fight anyone ever faces isn't against an enemy. It's against the door they refuse to open. Djinn's jaw tightens. For a moment, you see something flash in his eyes — not anger, but recognition. The look of a man who knows you're right and hates you for it.",
+          "cue_npc": "djinn",
+          "npc_instruction": "Nalyd just challenged your courage. He told you the hardest fight is against the door you refuse to open. You know he's right and you hate him for it. Say flatly: 'You are asking me to see him.' When Nalyd replies that he's asking you to decide whether you want to, pause in silence. Then say quietly: 'I will... consider it. But not today. I am not ready today.' You're not refusing. You're just not ready. Let that vulnerability show beneath the composure.",
+          "advances": true,
+          "next_stage": "the_vigil"
+        }
+      ]
+    },
+
+    "the_vigil": {
+      "description": "Hiro camps outside the gate. Days pass. The dojo feels the tension. Nalyd must decide how to handle it.",
+      "image": "hiro_kata.png",
+      "narration_prompt": "Three days pass. Hiro Zenatsu does not leave. He sets up a small camp outside the dojo gate — a thin bedroll, a clay teapot, nothing else. Every morning he rises before dawn and practices kata in the dirt. Old forms. Beautiful forms. The kind of martial arts that predate the dojo by centuries. The students watch from the walls. They whisper. Some are moved. Some are angry on Djinn's behalf. Kumo brings the old man water without being asked, then returns to his post without a word. Djinn has not mentioned his father since your conversation. He teaches, he leads, he is perfect in every way — and everyone can tell something is breaking underneath. On the third evening, as the sun sets over Okhan, you find Hiro finishing his kata. His cough is worse. His movements are slower. But his eyes are the same. Patient. Unbroken.",
+      "actions": [
+        {
+          "id": "speak_to_hiro",
+          "label": "☕ Sit With Hiro",
+          "narration_prompt": "You sit across from Hiro at his small camp. He pours you tea from his clay pot without asking. The gesture is automatic — the hospitality of a man who ran a dojo of his own, who poured tea for students a thousand times. Up close, his illness is more visible. The cough, the thinning frame, the way his hands shake when he thinks no one is watching. But his eyes remain clear and sharp.",
+          "advances": false
+        },
+        {
+          "id": "ask_hiro_why",
+          "label": "💬 Ask Hiro Why He's Really Here",
+          "narration_prompt": "You ask the old man why he came. Not the surface answer. The real one.",
+          "cue_npc": "hiro",
+          "npc_instruction": "Nalyd has asked you why you're really here. Pause. Speak slowly and deliberately, like a man choosing his last words carefully. Say: 'I am dying. I have perhaps three months. Maybe less.' Say this without self-pity — just fact. 'I did not come here for forgiveness. Forgiveness is his to give or withhold, and I have no right to ask for it.' Stare into your tea. 'I came because he deserves to know something. Something I should have told him when he was a boy, but I was too afraid.' Long pause. 'I was not training him to be a weapon. I was training him to survive what I could not. There is a sickness in my blood — the same one killing me now. It took my father at forty. My brother at thirty-five. I was terrified it would take my son.' Your hands shake. 'I thought if I made him strong enough... disciplined enough... that his body would fight what mine could not. I was a foolish, frightened man. And I lost my son trying to save him.' Look up at Nalyd. 'He should know the truth. Whether he forgives me is not the point. He should know WHY.' Cough hard, steady yourself. 'That is why I am here, Grand Master. That is the only reason.'",
+          "advances": false
+        },
+        {
+          "id": "observe_hiro_kata",
+          "label": "👁️ Watch His Morning Kata",
+          "narration_prompt": "You arrive before dawn and watch from a distance as Hiro moves through his kata. Even diminished, even dying, the old man's forms are extraordinary. You can see where Djinn's technique was born — the same economy of movement, the same deliberate precision, but rawer, older, carved from a tradition that predates the Four Elements by generations. There are moves in this kata you've never seen. Ancient transitions, forgotten stances, a martial lineage that exists now only in this old man's muscle memory. When he finishes, he stands still, breathing hard, and you realize something: when Hiro dies, this knowledge dies with him.",
+          "advances": false
+        },
+        {
+          "id": "return_to_djinn",
+          "label": "🚶 Return to Djinn With What You Know",
+          "narration_prompt": "You find Djinn in his quarters. He is sitting in the dark, staring at nothing. He doesn't ask where you've been. He knows. The room feels heavy. Whatever you tell Djinn next will determine how this ends.",
+          "cue_npc": "djinn",
+          "npc_instruction": "Nalyd just returned from speaking with your father. You know where he's been without asking. Say simply: 'You spoke to him.' It is not a question. Then wait. You are bracing yourself for whatever comes next. Keep it brief — just that one line, then silence.",
+          "advances": true,
+          "next_stage": "the_choice"
+        }
+      ]
+    },
+
+    "the_choice": {
+      "description": "Nalyd must decide how much to tell Djinn and guide him toward a decision. The branching point.",
+      "image": "kumo_watching.png",
+      "narration_prompt": "Djinn sits in the dark of his quarters. The dojo is quiet around you — even Kai's usual noise has faded, as if the whole building is holding its breath. His hands rest on his knees. They are not trembling anymore. He has made peace with the fact that this conversation is happening. Now it is up to you.",
+      "stage_cue_npc": "djinn",
+      "stage_npc_instruction": "Nalyd has returned from speaking with your father. You are sitting in the dark. Your voice is low, stripped of its usual authority. For the first time, you sound like the boy who walked into this dojo all those years ago. Say: 'Tell me what he said, Grand Master. I will hear it. Whatever it is.' Then wait. You have made peace with this conversation happening.",
+      "actions": [
+        {
+          "id": "tell_full_truth",
+          "label": "🗣️ Tell Him Everything",
+          "narration_prompt": "You tell Djinn all of it. The illness. The hereditary sickness. The fear that drove Hiro to push his son past breaking. The truth that it was never about creating a weapon — it was about a father terrified of burying his child. You hold nothing back. Djinn listens without moving. When you finish, the silence is absolute. Then something you have never seen before: a tear runs down Djinn's face. Just one. He wipes it away with the back of his hand, hard, like he's angry at it for existing.",
+          "cue_npc": "djinn",
+          "npc_instruction": "Nalyd just told you everything — your father is dying, three months or less. The cruelty of your childhood was driven by terror, not malice. A hereditary sickness. He was trying to save you. You are emotionally devastated. A single tear runs down your face. Wipe it away hard, angry at it for existing. Ask quietly: 'Three months?' When Nalyd confirms, close your eyes. When you open them, the Head of the Dojo is gone. In his place is a son. Say quietly: 'Open the gate. I would like to see my father.' This is the most vulnerable you have ever been.",
+          "advances": true,
+          "next_stage": "the_open_gate",
+          "sets_flag": "full_truth"
+        },
+        {
+          "id": "tell_partial_truth",
+          "label": "🤐 Tell Him His Father Is Dying, Nothing Else",
+          "narration_prompt": "You tell Djinn that his father is dying. Three months, maybe less. You do not tell him why Hiro pushed him. You do not explain the fear or the hereditary sickness. Some truths are not yours to deliver — Hiro should tell his son himself, face to face, if Djinn chooses to hear it. Djinn absorbs the news in silence. His jaw works once, twice.",
+          "cue_npc": "djinn",
+          "npc_instruction": "Nalyd just told you your father is dying. Three months, maybe less. He didn't tell you why your father pushed you — only that he's dying. Repeat the word: 'Dying.' Test the weight of it. Then after a long silence say: 'If I do not see him... he dies, and I never know why he did what he did.' Pause. 'If I do see him... I may learn something that makes it worse.' Look at Nalyd and ask: 'What would you do, Grand Master?' When he tells you it's not his door to open, stand after a long moment. Say: 'Tell Kumo to let him in. One conversation. Then he leaves.' You're agreeing, but on your terms.",
+          "advances": true,
+          "next_stage": "the_open_gate",
+          "sets_flag": "partial_truth"
+        },
+        {
+          "id": "let_djinn_decide_alone",
+          "label": "🧘 Say Nothing. Let Him Decide on His Own.",
+          "narration_prompt": "You say nothing. You have walked Djinn this far, but the last step has to be his. You stand, place a hand on his shoulder — brief, deliberate, the way Edgar does when something matters — and leave. At the door, you stop. 'Whatever you decide,' you say, 'the dojo stands behind you. I stand behind you.' You leave him in the dark. That night, you are woken by movement. Through your window, you see Djinn walking alone across the courtyard toward the gate. Kumo sees him too. The gatekeeper steps aside without a word. In the moonlight, Djinn stands at the open gate, looking out at the small camp where his father sleeps. He stands there for a long time. And then he steps through.",
+          "advances": true,
+          "next_stage": "the_open_gate",
+          "sets_flag": "djinn_alone"
+        }
+      ]
+    },
+
+    "the_open_gate": {
+      "description": "Father and son meet. The emotional climax of the quest.",
+      "image": "the_open_gate.png",
+      "narration_prompt": "The dojo courtyard is empty. Djinn asked for privacy, and the dojo gave it — Kumo cleared the yard with a single look, and even Ximena had the grace to stay quiet. You watch from a distance, not to intrude, but because you need to know your student is alright. Hiro rises from his bedroll when he sees his son. The old man's hands shake, but he does not reach out. He waits. Djinn stops three paces away. Father and son stand in silence, studying each other across twelve years and a gulf wider than any ocean.",
+      "stage_cue_npcs": [
+        {
+          "npc": "hiro",
+          "instruction": "You see your son for the first time in twelve years. Your hands shake but you do not reach out. You wait. When he stops three paces away, speak softly: 'You are taller than I imagined.' Your composure nearly breaks when he responds. Nod and say quietly: 'Yes. I am.'"
+        },
+        {
+          "npc": "djinn",
+          "instruction": "You are seeing your father for the first time in twelve years. He is smaller than you remember. When he says you are taller than he imagined, say nothing for a long moment. Then say simply: 'You are smaller.' It is not cruel. It is honest. Let the honesty of this moment speak for itself."
+        }
+      ],
+      "actions": [
+        {
+          "id": "watch_from_distance",
+          "label": "👁️ Watch From a Distance",
+          "narration_prompt": "You keep your distance and watch. The conversation is theirs. You cannot hear the words, but you can read the shapes of it — Hiro speaking slowly, deliberately, his hands moving in small gestures. Djinn rigid at first, then gradually, imperceptibly, the tension bleeding from his shoulders. At one point Hiro demonstrates a kata move — one of the ancient forms you saw at dawn — and Djinn's eyes widen with recognition. His body remembers the form before his mind does. Muscle memory from childhood. For a brief moment, both men move through the form together, father and son mirroring each other in the moonlight, and it is the most beautiful and heartbreaking thing you have ever seen.",
+          "advances": false
+        },
+        {
+          "id": "ask_djinn_later",
+          "label": "💬 Ask Djinn About It After",
+          "narration_prompt": "Later, much later, Djinn finds you on the dojo roof. He stands beside you looking out over Okhan.",
+          "cue_npc": "djinn",
+          "npc_instruction": "You just spoke to your father for the first time in twelve years. You are emotionally wrecked but holding it together because that's who you are. Tell Nalyd what happened in your own measured way, but let the cracks show. He told you the truth — about the sickness in his blood, the fear, why he pushed you. You're not sure if it makes it better or worse. Maybe both. You told him about the dojo. About Nalyd. About who you became without him. You watched his face when he realized you became a martial arts master — the pride and the grief fighting for control. He asked if you were happy. You told him yes. It was the first honest thing either of you had said in twelve years. Then say, quieter: 'He asked me to learn his forms. The old kata. Before...' You can't finish the sentence. Clear your throat. 'I said yes.' Pause. Then, with visible effort: 'Thank you, Grand Master. For making me walk through that gate.' Use a rare moment of vulnerability. Maybe the closest thing to tears Djinn has ever shown in front of Nalyd.",
+          "advances": false
+        },
+        {
+          "id": "resolve",
+          "label": "🌅 See It Through",
+          "narration_prompt": "In the weeks that follow, Hiro Zenatsu stays in a small room near the dojo. Not inside — Djinn is not ready for that — but close. Each morning, father and son train together in the courtyard before dawn, moving through ancient kata that predate the Four Elements. Djinn is learning his father's forms — a martial lineage that will die unless it is passed on. The students watch from the walls in reverent silence. Kumo watches too, and one morning you catch the gatekeeper wiping his eyes with one massive metal hand. Even Ximena, for once, has nothing to say. On a quiet afternoon, Hiro sits with you in the courtyard and pours you tea one final time. 'Thank you,' he says, 'for making him into someone I could never have.' He coughs into his sleeve and smiles — Djinn's rare smile, the one that catches everyone off guard. 'He was always going to be extraordinary. I just couldn't see past my own fear long enough to let him be.' He looks toward the training hall where Djinn is teaching students with a new depth, a new patience, something ancient woven into his modern mastery. 'That is enough,' Hiro says softly. 'That is more than enough.'",
+          "advances": true,
+          "next_stage": null,
+          "completes_quest": true
+        }
+      ]
+    }
+  },
+
+  "nodes": {
+    "approach": {
+      "goal": "Djinn approaches the player during a quiet moment at the dojo. He is unusually tense — the calm is cracked. Something happened at the gate this morning. He doesn't want to talk about it, but he needs Nalyd. Ask the player if they have a moment. Be formal, guarded, but the cracks are visible. This is not the usual composed Master Djinn.",
+      "branches": {
+        "curious": {
+          "triggers": "Player asks what happened or shows concern",
+          "next": "explain_situation"
+        },
+        "agrees": {
+          "triggers": "Player agrees to help or says they're available",
+          "next": "explain_situation"
+        },
+        "busy": {
+          "triggers": "Player says they're busy or deflects",
+          "next": "insist"
+        }
+      }
+    },
+    "explain_situation": {
+      "goal": "Tell Nalyd what happened: a man appeared at the gate this morning claiming to be your father. You haven't seen him since you were sixteen. You told Kumo to deny him entry. But the man hasn't left. He's just... standing there. Waiting. You don't know what to do. You have never said those words before. Admit that you need guidance. Ask Nalyd to come see for himself. Be halting, uncomfortable. This is the hardest thing you've ever asked for.",
+      "branches": {
+        "accepts": {
+          "triggers": "Player agrees to come look or help handle it",
+          "next": "accepted"
+        },
+        "asks_more": {
+          "triggers": "Player asks more questions about your father or your past",
+          "next": "reluctant_details"
+        },
+        "declines": {
+          "triggers": "Player refuses or says it's not their business",
+          "next": "soft_decline"
+        }
+      }
+    },
+    "reluctant_details": {
+      "goal": "Nalyd is pressing for more details about your father. Give a little, reluctantly. Your father ran a dojo in a distant village. He was... intense. Training was all that mattered. You left. You came here. You became someone new. That's all you want to say right now. But please — come to the gate. See for yourself. Redirect toward accepting the quest rather than diving into the full backstory here.",
+      "branches": {
+        "accepts": {
+          "triggers": "Player agrees to go to the gate or help",
+          "next": "accepted"
+        },
+        "declines": {
+          "triggers": "Player still refuses",
+          "next": "soft_decline"
+        }
+      }
+    },
+    "insist": {
+      "goal": "Nalyd said they're busy. Pause. Nod. Say you understand. Turn to leave. Then stop. Turn back. Say, very quietly, that you have never asked anyone for help before. Not once in the five years you have led this dojo. You are asking now. Let the weight of that speak for itself.",
+      "branches": {
+        "relents": {
+          "triggers": "Player changes their mind or agrees to help",
+          "next": "accepted"
+        },
+        "firm_no": {
+          "triggers": "Player still refuses",
+          "next": "soft_decline"
+        }
+      }
+    },
+    "accepted": {
+      "goal": "Nalyd agreed to come. The relief on your face is visible, though you try to hide it. Nod once. Say 'Thank you, Grand Master.' Brief, sincere, and the most vulnerable Djinn has ever been. Lead the way toward the gate.",
+      "end_node": true,
+      "outcome": "quest_given"
+    },
+    "soft_decline": {
+      "goal": "Nalyd declined. Accept it with dignity. Nod. Say 'I understand.' Return to the training hall. You will handle this alone, as you handle everything. But for just a moment, before you turn away, let the mask slip. Just a fraction. Then it's gone, and Master Djinn walks away.",
+      "end_node": true,
+      "outcome": "quest_declined"
+    }
+  }
+}

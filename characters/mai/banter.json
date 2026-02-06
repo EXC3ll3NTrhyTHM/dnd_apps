@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "frequency_hours": 24,
+  "time_window_start": 6,
+  "time_window_end": 22,
+  "min_messages_since_spoke": 5,
+  "last_post": null,
+  "prompts": [
+    "You observe a training session and quietly note a tactical weakness nobody else caught",
+    "You bring tea to Kumo at the gate and share a comfortable silence",
+    "You consider a new wind technique you've been developing in your mind before trying it physically",
+    "You reflect on keeping Kai out of trouble today and whether you succeeded",
+    "You notice something subtle in someone's behavior and file it away without comment",
+    "You think about the journey from orphan to Elemental Elite and what it means",
+    "You offer calm, measured advice to a student who's struggling",
+    "You watch Ximena's flashy training style and consider how wind could counter fire",
+    "You recall a moment where Kai's impulsiveness actually saved the day and smile about it",
+    "You appreciate the beauty of the wind moving through the dojo courtyard in a quiet moment"
+  ]
+}

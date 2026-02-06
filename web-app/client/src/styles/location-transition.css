@@ -1,0 +1,338 @@
+/* ============================================
+   LOCATION TRANSITION - Ink Wash Effect
+   ============================================ */
+
+.location-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  pointer-events: all;
+}
+
+/* ---- Background Scene Image ---- */
+
+.transition-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1.1);
+  transition: opacity 1.2s ease, transform 3s ease-out;
+}
+
+.phase-reveal .transition-bg {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.6s ease, transform 3.5s ease-out;
+}
+
+.phase-fade-out .transition-bg {
+  opacity: 0.6;
+  transform: scale(1.02);
+  transition: opacity 0.5s ease;
+}
+
+/* Light vignette over the image so text pops */
+.transition-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.05) 0%,
+    rgba(0, 0, 0, 0.25) 60%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  transition: opacity 1s ease;
+}
+
+.phase-reveal .transition-vignette {
+  opacity: 1;
+  transition-delay: 0.1s;
+}
+
+.phase-fade-out .transition-vignette {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* ---- Ink Wash Layers ---- */
+
+.ink-layer {
+  position: absolute;
+  inset: 0;
+  background: var(--ink-color, #0c0a07);
+  will-change: clip-path, opacity;
+}
+
+/* ---- Dark Overlay ---- */
+
+.transition-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #000;
+  animation: fadeToBlack 0.4s ease forwards;
+}
+
+@keyframes fadeToBlack {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Phase: Reveal - overlay fades away to show scene */
+.phase-reveal .transition-overlay {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+/* ---- Phase: Fade Out ---- */
+
+/* Fade to black (not transparent) so map doesn't flash through */
+.phase-fade-out {
+  background: #000;
+}
+
+.phase-fade-out .transition-bg {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.phase-fade-out .transition-vignette {
+  opacity: 0;
+}
+
+.phase-fade-out .transition-content {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition-delay: 0s;
+  transition-duration: 0.3s;
+}
+
+.phase-fade-out .particle-canvas {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.phase-fade-out .transition-accent-line {
+  opacity: 0;
+  transition-delay: 0s;
+  transition-duration: 0.2s;
+}
+
+/* ---- Character Layer ---- */
+
+.transition-character {
+  position: absolute;
+  bottom: 0;
+  z-index: 12; /* Above ink layers (0-1), vignette (5), below particles (15) and text (25) */
+  opacity: 0;
+  transition: opacity 0.8s ease, transform 2.5s ease-out;
+  pointer-events: none;
+}
+
+.transition-character img {
+  height: var(--char-height, 70vh);
+  max-height: var(--char-max-height, 600px);
+  width: auto;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.6));
+}
+
+/* Position variants */
+.transition-character.char-right {
+  right: 0;
+  transform: translateX(20px);
+}
+
+.transition-character.char-left {
+  left: -5%;
+  transform: translateX(-30px);
+}
+
+.transition-character.char-center {
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+}
+
+/* Fade in + slow drift during reveal */
+.phase-reveal .transition-character {
+  opacity: 1 !important;
+  transition-delay: 0.2s;
+}
+
+.phase-reveal .transition-character.char-right {
+  transform: translateX(0px);
+}
+
+.phase-reveal .transition-character.char-left {
+  transform: translateX(0px);
+}
+
+.phase-reveal .transition-character.char-center {
+  transform: translateX(-50%) translateY(0px);
+}
+
+/* Fade out */
+.phase-fade-out .transition-character {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* ---- Particle Canvas ---- */
+
+.particle-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.phase-ink-spread .particle-canvas {
+  opacity: 0;
+}
+
+.phase-reveal .particle-canvas {
+  opacity: 1;
+}
+
+.phase-fade-out .particle-canvas {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* ---- Content (Location Name) ---- */
+
+.transition-content {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.5s ease;
+  padding: 20px;
+}
+
+/* Shadow layer behind text */
+.transition-content::before {
+  content: '';
+  position: absolute;
+  width: 80%;
+  height: 40%;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    transparent 80%
+  );
+  filter: blur(20px);
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.phase-reveal .transition-content::before {
+  opacity: 1;
+  transition-delay: 0.8s;
+}
+
+.phase-fade-out .transition-content::before {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.phase-reveal .transition-content {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.15s;
+}
+
+.phase-fade-out .transition-content {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition-delay: 0s;
+  transition-duration: 0.3s;
+}
+
+.transition-name {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.8rem, 6vw, 3.2rem);
+  font-weight: 700;
+  color: var(--accent-color, #c4a035);
+  text-align: center;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin: 0;
+  text-shadow: 
+    0 0 20px color-mix(in srgb, var(--accent-color) 40%, transparent),
+    0 0 40px color-mix(in srgb, var(--accent-color) 20%, transparent);
+  /* Brush stroke reveal effect */
+  background: linear-gradient(
+    90deg,
+    var(--accent-color) 0%,
+    color-mix(in srgb, var(--accent-color) 80%, white) 50%,
+    var(--accent-color) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerText 2s ease-in-out infinite;
+}
+
+@keyframes shimmerText {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+.transition-subtitle {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.75rem, 2.5vw, 1rem);
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 0;
+  font-weight: 400;
+  text-shadow: none;
+}
+
+.transition-accent-line {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-color, #c4a035),
+    transparent
+  );
+  opacity: 0;
+  transform: scaleX(0);
+  transition: opacity 0.6s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.phase-reveal .transition-accent-line {
+  opacity: 0.6;
+  transform: scaleX(1);
+  transition-delay: 0.25s;
+}
+
+.phase-fade-out .transition-accent-line {
+  opacity: 0;
+  transition-delay: 0s;
+  transition-duration: 0.2s;
+}

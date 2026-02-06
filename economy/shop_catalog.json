@@ -2,49 +2,18 @@
   "currency_name": "Gold",
   "currency_symbol": "G",
   "categories": {
-    "roles": {
-      "display_name": "Titles & Colors",
-      "emoji": "\ud83c\udfa8",
-      "items": [
-        { "id": "role_crimson", "name": "Crimson Name", "price": 200, "type": "role", "role_id": "1466943167621501053", "one_time": true, "consumable": false, "description": "Turn your name a deep crimson red" },
-        { "id": "role_gold", "name": "Golden Name", "price": 300, "type": "role", "role_id": "", "one_time": true, "consumable": false, "description": "Turn your name a glittering gold" },
-        { "id": "role_shadow", "name": "Shadow Name", "price": 250, "type": "role", "role_id": "", "one_time": true, "consumable": false, "description": "Turn your name a dark shadowy purple" }
-      ]
-    },
     "consumables": {
       "display_name": "Consumables",
       "emoji": "\ud83c\udf3f",
       "items": [
-        { "id": "item_blunt", "name": "Blunt", "price": 25, "type": "consumable", "consumable": true, "one_time": false, "max_stack": 10, "use_message": "You light up and take a long drag... The world feels a little more chill.", "description": "A hand-rolled herbal smoke. Relaxing." },
-        { "id": "item_potion_hp", "name": "Healing Potion", "price": 50, "type": "consumable", "consumable": true, "one_time": false, "max_stack": 5, "use_message": "You drink the potion. A warm glow spreads through your body. You feel restored.", "description": "A bubbling red potion. Tastes like cinnamon." },
-        { "id": "item_scroll_lore", "name": "Scroll of Lore", "price": 75, "type": "consumable", "consumable": true, "one_time": false, "max_stack": 3, "use_message": "You unroll the ancient scroll... Fragments of forgotten knowledge fill your mind.", "description": "A dusty scroll with strange writing." },
-        { "id": "item_ale", "name": "Tavern Ale", "price": 10, "type": "consumable", "consumable": true, "one_time": false, "max_stack": 10, "use_message": "You take a deep swig of ale. It's warm, bitter, and exactly what you needed.", "description": "A frothy mug of the tavern's finest." }
+        { "id": "item_blunt", "name": "Blunt", "price": 25, "type": "consumable", "consumable": true, "one_time": false, "max_stack": 10, "use_message": "You light up and take a long drag... The world feels a little more chill.", "description": "A hand-rolled herbal smoke. Relaxing.", "shortcuts": ["!smoke", "!spark", "!burn", "!hit blunt", "!light up"] }
       ]
     },
-    "tools": {
-      "display_name": "Tools & Equipment",
-      "emoji": "\u26cf\ufe0f",
+    "special": {
+      "display_name": "Special",
+      "emoji": "✨",
       "items": [
-        { "id": "tool_pickaxe", "name": "Pickaxe", "price": 150, "type": "tool", "one_time": true, "consumable": false, "description": "A sturdy pickaxe for mining and gathering" },
-        { "id": "tool_lantern", "name": "Lantern", "price": 100, "type": "tool", "one_time": true, "consumable": false, "description": "An oil lantern to light the dark places" },
-        { "id": "tool_rope", "name": "Climbing Rope", "price": 75, "type": "tool", "one_time": true, "consumable": false, "description": "50 feet of strong hemp rope" }
-      ]
-    },
-    "quest_unlocks": {
-      "display_name": "Quest Unlocks",
-      "emoji": "\ud83d\udd13",
-      "items": [
-        { "id": "unlock_shadow_crypt", "name": "Shadow Crypt Key", "price": 500, "type": "quest_unlock", "quest_id": "shadow_crypt", "one_time": true, "consumable": false, "description": "Unlocks the Shadow Crypt quest line" },
-        { "id": "unlock_ancient_ruins", "name": "Ancient Map", "price": 350, "type": "quest_unlock", "quest_id": "ancient_ruins", "one_time": true, "consumable": false, "description": "Reveals the path to the Ancient Ruins" }
-      ]
-    },
-    "badges": {
-      "display_name": "Badges & Trophies",
-      "emoji": "\ud83c\udfc6",
-      "items": [
-        { "id": "badge_veteran", "name": "Veteran Badge", "price": 1000, "type": "badge", "one_time": true, "consumable": false, "description": "A mark of a seasoned adventurer" },
-        { "id": "badge_collector", "name": "Collector Badge", "price": 750, "type": "badge", "one_time": true, "consumable": false, "description": "For those who acquire many things" },
-        { "id": "badge_explorer", "name": "Explorer Badge", "price": 500, "type": "badge", "one_time": true, "consumable": false, "description": "For those who have seen it all" }
+        { "id": "item_custom_emoji", "name": "Custom Emoji", "price": 100, "type": "cosmetic", "consumable": false, "one_time": false, "max_stack": 1, "no_inventory": true, "description": "A custom server emoji made just for you. DM The Architect to discuss your idea." }
       ]
     }
   }
