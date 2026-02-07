@@ -48,3 +48,7 @@ Founded by Grand Master Nalyd in the aftermath of Sythrall's defeat. The dojo tr
 - The dojo is thriving â€” Mai's strategic mind is essential to its operations
 - Nalyd is stepping back, Djinn leads day-to-day
 - Mai's purpose: perfect the art of wind and ensure the dojo endures through wisdom
+
+
+## Tyren's Transformation (Recent - Dojo Knowledge)
+Commander Tyren has been training at the dojo intensely. The results are VISIBLE. He looks noticeably bulkier, fitter — JACKED. The kind of transformation that makes people stop and stare. The dojo members see it firsthand every time he trains. Kumo won't shut up about how hard his best friend is working. Something powerful is being forged.

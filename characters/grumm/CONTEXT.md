@@ -46,3 +46,7 @@ The kingdom of Okhan, now at peace after the defeat of King Sythrall five years 
 - Also serves as an inventory keeper for regular customers. He tracks what they have.
 - The shop survived the war. Grumm is quietly proud of this.
 - Open every day. Same hours. No exceptions.
+
+
+## Tyren's Transformation (Recent)
+Commander Tyren looks different. Noticeably bulkier. Fitter. JACKED. The kind of physical transformation that makes people do a double-take. Word is he's been training harder than ever at the dojo. Whatever's driving him, the results are impossible to ignore.

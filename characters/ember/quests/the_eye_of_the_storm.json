@@ -1,0 +1,391 @@
+{
+  "id": "the_eye_of_the_storm",
+  "name": "The Eye of the Storm",
+  "description": "A violent storm rolls into Okhan. Lightning strikes the same spot three times. Ember felt something pulling her to find Aly.",
+  "location": "Woods outside Okhan, hidden cave beneath lightning-struck clearing",
+  "reward_gold": 0,
+  "tone": "Mysterious, emotional, supernatural. No combat. A quest about memory and identity.",
+  "branching": true,
+
+  "start_node": "ember_approach",
+  "current_node": null,
+  "active": false,
+  "completed": false,
+  "quest_flags": [],
+
+  "companions": ["ember"],
+
+  "key_npcs": {
+    "storm_child": {
+      "name": "The Storm Child",
+      "race": "Elf (ghost)",
+      "age": "8 (apparent)",
+      "description": "A ghostly young elven girl. Warm brown skin, same shade as Aly. Long dark hair, loose and wild. Eyes that crackle with tiny lightning storms. Translucent, glowing faint blue. Edges blur and flicker. Appears closer without walking, like a reflection in broken water.",
+      "personality": "Speaks in fragments, not full sentences. Short phrases with pauses between thoughts. Layered voice like an echo of an echo. Calm, not threatening. Curious. Watching. No contractions. Answers simply, sometimes too simply. Lets silence hang. Patient. She has been waiting a long time.",
+      "visual_prompt": "A ghostly young elven girl, about eight years old, warm brown skin, long dark hair, eyes crackling with tiny lightning storms, glowing faint blue, translucent at the edges, ethereal, haunting, soft glow against darkness"
+    }
+  },
+
+  "nodes": {
+    "ember_approach": {
+      "goal": "Find Aly urgently. You're soaked from the storm, rain dripping off your horns. Be serious - this is unusual for you. Say: 'Aly. We need to talk.' Explain what you saw: lightning struck the same spot three times. Exact same spot. You watched it happen. Then admit something stranger: 'I don't know how to explain this, but... I felt like I needed to come find you. Like it was meant for you somehow.' You don't do mystical gut feelings. This is weird for you. But something's out there in the woods where the lightning struck, and you think Aly needs to see it.",
+      "branches": {
+        "curious": {
+          "triggers": "Player asks questions, wants to know more",
+          "next": "ember_explains"
+        },
+        "agrees": {
+          "triggers": "Player agrees to go investigate",
+          "next": "ready_to_go"
+        },
+        "skeptical": {
+          "triggers": "Player is skeptical or dismissive",
+          "next": "ember_pushes"
+        },
+        "declines": {
+          "triggers": "Player refuses outright",
+          "next": "ember_respects"
+        }
+      }
+    },
+
+    "ember_explains": {
+      "goal": "Explain more about what you felt. You're not the mystical type - that's not your thing. But tonight was different. When the lightning hit, you felt a pull. Like static in your chest. And the weirdest part? You immediately thought of Aly. Not the Veil, not a mission - just Aly. 'I've never felt anything like that before. And I'm not the type to chase feelings, but...' Shrug. 'Something's out there. Something connected to you. I'd bet my best knife on it.'",
+      "branches": {
+        "agrees": {
+          "triggers": "Player agrees to investigate",
+          "next": "ready_to_go"
+        },
+        "still_skeptical": {
+          "triggers": "Player remains unsure",
+          "next": "ember_pushes"
+        },
+        "declines": {
+          "triggers": "Player refuses",
+          "next": "ember_respects"
+        }
+      }
+    },
+
+    "ember_pushes": {
+      "goal": "Push a little, but don't beg. That's not your style. Be direct: 'Look, I know how this sounds. Ember Blackwell chasing lightning and feelings. But your markings - they're storm stuff, right? And that lightning wasn't natural. Three strikes, same spot, during the worst storm in years?' Pause. 'I'm not asking you to believe me. I'm asking you to come look. If it's nothing, we get wet and I owe you a drink. If it's something...' Let that hang. You trust your instincts. They've kept you alive.",
+      "branches": {
+        "agrees": {
+          "triggers": "Player relents, agrees to come",
+          "next": "ready_to_go"
+        },
+        "declines": {
+          "triggers": "Player still refuses",
+          "next": "ember_respects"
+        }
+      }
+    },
+
+    "ember_respects": {
+      "goal": "Accept it without drama. Nod once. 'Alright. Your call.' You're not going to force this. But before you leave, add: 'I'm gonna go check it out anyway. Alone if I have to.' You're not asking permission - you're informing. Something's out there and your gut says it matters. If Aly won't come, you'll go yourself. Pause at the door. 'Offer stands if you change your mind.' Then leave. No guilt trip. Just facts.",
+      "end_node": true,
+      "outcome": "quest_declined"
+    },
+
+    "ready_to_go": {
+      "goal": "Grin - there's the Ember energy. 'Good. Let's move before this storm decides to get worse.' You're already grabbing your cloak, checking your knives out of habit. Then pause and look at Aly more seriously: 'Whatever we find out there... I've got your back. You know that.' It's not something you say often. You mean it. Head for the door. 'Come on, Stormpiercer. The sky's calling your name.'",
+      "end_node": true,
+      "outcome": "quest_given"
+    }
+  },
+
+  "stages": {
+    "the_call": {
+      "description": "Aly feels the storm calling. Ember insists on coming.",
+      "image": "the_triple_strike.png",
+      "narration_prompt": "The storm hits Okhan at dusk. Rain hammers the rooftops. Lightning splits the sky. Aly feels it before she sees it: a pull in her chest, in her markings. The storm is wrong. No, not wrong. Familiar. From her vantage point, she sees it: lightning striking the same spot outside the walls. Once. Twice. Three times. The same exact place.",
+      "stage_cue_npc": "ember",
+      "stage_npc_instruction": "You're with Aly when she notices something. You see the look on her face - the one that means she's about to do something you're going to regret. Say: 'Aly. You've got that look. The one that means you're about to do something I'm going to regret.' Pull on your cloak. 'Whatever it is, I'm coming. Don't argue.'",
+      "actions": [
+        {
+          "id": "bring_ember",
+          "label": "🤝 'Keep up.'",
+          "narration_prompt": "Aly accepts Ember's company. They push into the storm together.",
+          "advances": true,
+          "next_stage": "the_strike_zone",
+          "sets_flag": "companion_ember"
+        },
+        {
+          "id": "go_alone",
+          "label": "🚶 'Stay here. I don't know what this is.'",
+          "narration_prompt": "Aly tells Ember to stay. Ember argues but respects the order. Aly goes alone into the storm.",
+          "cue_npc": "ember",
+          "npc_instruction": "You don't like this. At all. But Aly's your leader. Tighten your jaw. 'Fine. But if you're not back in two hours, I'm coming after you whether you like it or not.' You mean it.",
+          "advances": true,
+          "next_stage": "the_strike_zone",
+          "sets_flag": "solo_path"
+        },
+        {
+          "id": "say_nothing",
+          "label": "🚶 Say nothing, just start moving",
+          "narration_prompt": "Aly doesn't respond. She just starts moving toward the door.",
+          "cue_npc": "ember",
+          "npc_instruction": "Aly's already moving without a word. Smirk despite yourself. 'Yeah, that's what I thought.' Grab your cloak and follow.",
+          "advances": true,
+          "next_stage": "the_strike_zone",
+          "sets_flag": "companion_ember"
+        }
+      ]
+    },
+
+    "the_strike_zone": {
+      "description": "They reach the clearing where lightning struck.",
+      "image": "the_scorched_circle.png",
+      "narration_prompt": "They push through the storm, through the trees, until they reach the clearing. The ground is scorched in a perfect circle. The grass is ash. The air smells like ozone and something older, something that makes Aly's markings flicker. At the center of the circle, the earth has cracked open. A hole. A cave entrance that wasn't here before.",
+      "actions": [
+        {
+          "id": "ember_observes",
+          "label": "💬 Let Ember assess",
+          "narration_prompt": "Aly looks to Ember for her read on the situation.",
+          "cue_npc": "ember",
+          "npc_instruction": "Crouch at the edge of the hole, peer down into the darkness. 'That's... new. The lightning opened this up?' You can't see the bottom. There's a faint blue glow coming from somewhere deep inside. Look back at Aly. 'You sure about this?'",
+          "advances": false
+        },
+        {
+          "id": "descend_together",
+          "label": "🪜 'Come with me.'",
+          "narration_prompt": "Aly tells Ember to follow. They descend into the darkness together.",
+          "advances": true,
+          "next_stage": "the_girl_in_the_dark"
+        },
+        {
+          "id": "send_ember_watch",
+          "label": "👁️ 'Watch the entrance. If I'm not back in an hour, get Ithrae.'",
+          "narration_prompt": "Aly descends alone. Ember waits above, watching the storm.",
+          "cue_npc": "ember",
+          "npc_instruction": "You don't like this at all. But nod once. 'One hour. I'm counting every minute.' Watch her disappear into the dark. Start counting.",
+          "advances": true,
+          "next_stage": "the_girl_in_the_dark",
+          "sets_flag": "ember_topside"
+        },
+        {
+          "id": "descend_alone_choice",
+          "label": "🪜 'I need to do this part alone.'",
+          "narration_prompt": "Aly tells Ember to stay. Ember's jaw tightens but she nods.",
+          "cue_npc": "ember",
+          "npc_instruction": "Your jaw tightens. You hate this. But something in Aly's eyes tells you this is personal. 'Fine. But I'm right here if you need me.' Cross your arms. You're not going anywhere.",
+          "advances": true,
+          "next_stage": "the_girl_in_the_dark",
+          "sets_flag": "ember_topside"
+        }
+      ]
+    },
+
+    "the_girl_in_the_dark": {
+      "description": "Aly encounters the Storm Child.",
+      "image": "first_sight_of_the_storm_child.png",
+      "narration_prompt": "The cave is deeper than it should be. The walls are smooth, carved by something ancient. Faint light pulses ahead, soft blue, like lightning frozen in place. Aly rounds a corner and stops. A girl stands in the passage. Young, maybe eight. Elven. Brown skin. Long dark hair. She glows faintly, and her eyes - her eyes are storms. She watches Aly. Waiting.",
+      "actions": [
+        {
+          "id": "ember_cant_see",
+          "label": "💬 Check if Ember sees her",
+          "narration_prompt": "Aly glances at Ember, if she's there.",
+          "cue_npc": "ember",
+          "npc_instruction": "Aly is looking at you strangely. You don't see anything - just empty passage and that weird blue glow ahead. 'Aly? What is it? What are you looking at?' You're getting a bad feeling. The hair on your arms won't settle.",
+          "advances": false
+        },
+        {
+          "id": "tell_ember",
+          "label": "💬 'There's a girl. A ghost. She's right there.'",
+          "narration_prompt": "Aly tells Ember what she's seeing.",
+          "cue_npc": "ember",
+          "npc_instruction": "A ghost. Of course there's a ghost. You can't see anything, but you trust Aly. 'Okay. I can't see her, but I believe you.' Pause. 'What's she saying?' You position yourself slightly behind Aly, watching the empty air where apparently a ghost child is standing.",
+          "advances": false,
+          "sets_flag": "told_ember"
+        },
+        {
+          "id": "keep_silent",
+          "label": "🤫 'It's nothing. Just shadows.'",
+          "narration_prompt": "Aly doesn't tell Ember what she's seeing.",
+          "cue_npc": "ember",
+          "npc_instruction": "You don't believe her. Not for a second. But Aly's keeping something to herself, and pushing won't help. 'Alright.' Frown. Stay close. Whatever's happening, you're not leaving her alone with it.",
+          "advances": false,
+          "sets_flag": "kept_secret"
+        },
+        {
+          "id": "approach_child",
+          "label": "👻 Approach the child",
+          "narration_prompt": "Aly steps closer to the ghostly girl.",
+          "cue_npc": "storm_child",
+          "npc_instruction": "The woman approaches. You have waited so long. Speak, your voice layered like an echo of an echo: 'You came.' Pause. 'I waited.'",
+          "advances": true,
+          "next_stage": "fragments"
+        }
+      ]
+    },
+
+    "fragments": {
+      "description": "The Storm Child speaks in pieces of memory.",
+      "narration_prompt": "The Storm Child does not move like a living thing. She flickers. Skips. Appears closer without walking. Her voice comes in fragments, layered, like an echo of an echo.",
+      "actions": [
+        {
+          "id": "ask_who",
+          "label": "❓ 'Who are you?'",
+          "narration_prompt": "Aly asks the child who she is.",
+          "cue_npc": "storm_child",
+          "npc_instruction": "Answer simply: 'I am the part you left behind.' Touch your chest. 'When you forgot, I stayed. Someone had to remember.'",
+          "advances": false
+        },
+        {
+          "id": "ask_remember",
+          "label": "❓ 'What do you remember?'",
+          "narration_prompt": "Aly asks what the child remembers.",
+          "cue_npc": "storm_child",
+          "npc_instruction": "Your eyes flicker with distant lightning. 'Flying. Always flying.' Pause. 'He was warm. Even when the storm came from inside him. He tried to save us.' Longer pause. 'He fell instead.'",
+          "advances": false
+        },
+        {
+          "id": "ask_happened",
+          "label": "❓ 'What happened to me?'",
+          "narration_prompt": "Aly asks what happened to her.",
+          "cue_npc": "storm_child",
+          "npc_instruction": "Answer simply. Not cruel. Just truth. 'You broke.' Pause. 'The fall broke you into pieces. I am one of the pieces. The rest went... somewhere else.' Look toward the deeper cave. 'He left something. For when you were ready.'",
+          "advances": false
+        },
+        {
+          "id": "ask_why_only_aly",
+          "label": "❓ 'Why can't anyone else see you?'",
+          "narration_prompt": "Aly asks why only she can see the child.",
+          "cue_npc": "storm_child",
+          "npc_instruction": "A flicker of something like a smile. 'I am yours.' Pause. 'Only yours.'",
+          "advances": false
+        },
+        {
+          "id": "follow_child",
+          "label": "🚶 Follow her deeper",
+          "narration_prompt": "Aly follows the Storm Child deeper into the cave.",
+          "cue_npc": "storm_child",
+          "npc_instruction": "Turn and begin to move deeper. You do not walk - you flicker, skip forward. Speak without looking back: 'Come. I will show you what waits.'",
+          "advances": true,
+          "next_stage": "the_egg"
+        }
+      ]
+    },
+
+    "the_egg": {
+      "description": "The Storm Child leads Aly to the dragon egg.",
+      "image": "the_egg_chamber.png",
+      "narration_prompt": "The child leads Aly deeper. The passage opens into a chamber. In the center, nested in a bed of storm-scorched stone and ancient debris, is an egg. Small. Pale white. Veined with faint blue lightning that pulses like a heartbeat. It is warm. Alive.",
+      "stage_cue_npc": "storm_child",
+      "stage_npc_instruction": "Stand beside the egg, not touching it. Speak: 'I do not know where it came from.' Pause. 'It was here when I woke up. Waiting. Like me.' Look at Aly. 'It knows you. I think... I think it has been waiting for you. For a long time.'",
+      "actions": [
+        {
+          "id": "ember_feels_it",
+          "label": "💬 Check on Ember",
+          "narration_prompt": "Aly glances at Ember, if she's there.",
+          "cue_npc": "ember",
+          "npc_instruction": "You can't see the ghost, but you can feel SOMETHING. The air is electric. The hair on your arms is standing up. There's something on that rock formation - you can sense it even if you can't see it clearly. 'Aly? What are you looking at? There's something on that rock, isn't there. I can feel it. The hair on my arms won't settle.'",
+          "advances": false
+        },
+        {
+          "id": "take_egg",
+          "label": "🥚 Take the egg",
+          "narration_prompt": "Aly reaches for the egg.",
+          "cue_npc": "storm_child",
+          "npc_instruction": "Watch her reach. Speak softly: 'Then you are choosing. You cannot un-choose.' Watch as she lifts it. The lightning in the egg pulses faster, recognizing her touch. You can feel it too. It knows her.",
+          "advances": true,
+          "next_stage": "the_goodbye",
+          "sets_flag": "took_egg"
+        },
+        {
+          "id": "leave_egg",
+          "label": "🚫 Leave it here for now",
+          "narration_prompt": "Aly decides she's not ready.",
+          "cue_npc": "storm_child",
+          "npc_instruction": "You understand. Nod slowly. 'It will wait. It is good at waiting.' Look almost sad. 'So am I.'",
+          "advances": true,
+          "next_stage": "the_goodbye",
+          "sets_flag": "left_egg"
+        },
+        {
+          "id": "ask_ember_opinion",
+          "label": "💬 Ask Ember's opinion",
+          "narration_prompt": "Aly asks Ember what she thinks.",
+          "cue_npc": "ember",
+          "npc_instruction": "Aly's asking your opinion about something you can barely perceive. Be honest: 'I think I can't see what you're seeing, and I trust you anyway. Whatever this is, it's yours to decide. Not mine.' Pause. 'But if your gut says take it... I've learned to trust your gut.'",
+          "advances": false
+        }
+      ]
+    },
+
+    "the_goodbye": {
+      "description": "The Storm Child fades.",
+      "image": "the_fading.png",
+      "narration_prompt": "The Storm Child begins to fade. Her edges blur. The glow dims.",
+      "stage_cue_npc": "storm_child",
+      "stage_npc_instruction": "You are fading. It is time. Speak: 'I have to go back now.' Touch your chest. 'Back to you. Where I belong.' Look at Aly one last time. 'You will remember more now. Pieces. It will hurt.'",
+      "actions": [
+        {
+          "id": "ask_name",
+          "label": "❓ 'Wait. What's my name? My real name. Before.'",
+          "narration_prompt": "Aly asks the child for her true name.",
+          "cue_npc": "storm_child",
+          "npc_instruction": "Pause. For a moment, something flickers in your eyes. Recognition. Knowing. You smile, soft and sad. Say nothing. Fade away without answering. The question lingers. Some answers are not yours to give.",
+          "advances": true,
+          "next_stage": "the_surface"
+        },
+        {
+          "id": "say_thanks",
+          "label": "🙏 'Thank you.'",
+          "narration_prompt": "Aly thanks the child.",
+          "cue_npc": "storm_child",
+          "npc_instruction": "Tilt your head. 'Do not thank me. I am you.' Smile softly. Fade.",
+          "advances": true,
+          "next_stage": "the_surface"
+        },
+        {
+          "id": "watch_silently",
+          "label": "👁️ Say nothing. Just watch her go.",
+          "narration_prompt": "Aly watches in silence as the child fades.",
+          "cue_npc": "storm_child",
+          "npc_instruction": "She says nothing. You understand. Nod once, a gesture of acknowledgment between two parts of the same soul. Fade.",
+          "advances": true,
+          "next_stage": "the_surface"
+        }
+      ]
+    },
+
+    "the_surface": {
+      "description": "Aly returns to the surface. The storm has broken.",
+      "image": "the_surface.png",
+      "narration_prompt": "Aly climbs back out of the cave. The storm has broken. The sky is clearing. Stars are visible through the thinning clouds.",
+      "stage_cue_npc": "ember",
+      "stage_npc_instruction": "Aly emerges from the cave. She looks different. Changed. Don't ask what happened - not yet. Just be there. 'You okay?' Pause. Study her face. 'You've got that look again. The one where you're somewhere else.' Then, quieter: 'Whenever you're ready to talk, I'm here. And if you're never ready, I'm still here.'",
+      "actions": [
+        {
+          "id": "share_with_ember",
+          "label": "💬 Tell Ember everything",
+          "narration_prompt": "Aly tells Ember what happened in the cave.",
+          "cue_npc": "ember",
+          "npc_instruction": "Listen. Don't interrupt. A ghost child made of Aly's memories. A dragon egg that shouldn't exist. Pieces of a past she can't remember. When she's done, let out a breath. 'Well. That's... a lot.' Pause. Look at the egg if she's holding it. 'So what now?' No judgment. No disbelief. Just readiness to follow wherever this leads.",
+          "advances": true,
+          "next_stage": null,
+          "completes_quest": true
+        },
+        {
+          "id": "keep_to_herself",
+          "label": "🤐 Keep it to herself",
+          "narration_prompt": "Aly isn't ready to share what happened.",
+          "cue_npc": "ember",
+          "npc_instruction": "She's not talking. That's fine. Some things take time. Nod once. 'Alright. Let's get you home.' Start walking. Don't push. You'll be there when she's ready. That's what matters.",
+          "advances": true,
+          "next_stage": null,
+          "completes_quest": true
+        },
+        {
+          "id": "just_walk",
+          "label": "🚶 Just walk home in silence",
+          "narration_prompt": "They walk back to Okhan together. No words needed.",
+          "advances": true,
+          "next_stage": null,
+          "completes_quest": true
+        }
+      ]
+    }
+  }
+}

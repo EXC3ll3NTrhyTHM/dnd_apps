@@ -30,5 +30,21 @@
     "lifetime_earned": 200,
     "lifetime_spent": 0,
     "last_updated": "2026-02-06T02:35:20.062Z"
+  },
+  "765984341595521024": {
+    "user_id": "765984341595521024",
+    "username": "stonecoldmufasa",
+    "balance": 0,
+    "lifetime_earned": 0,
+    "lifetime_spent": 0,
+    "last_updated": "2026-02-07T06:21:46.357Z"
+  },
+  "228241331296665600": {
+    "user_id": "228241331296665600",
+    "username": "badbeachpeach",
+    "balance": 0,
+    "lifetime_earned": 0,
+    "lifetime_spent": 0,
+    "last_updated": "2026-02-07T06:35:29.241Z"
   }
 }

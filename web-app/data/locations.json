@@ -68,37 +68,45 @@
         "speed": 2
       },
       "audio": {
-        "music": null,
-        "ambient": []
+        "music": {
+          "src": "/sounds/barracks/rohan-suite.mp3",
+          "volume": 0.4
+        },
+        "ambient": [
+          {
+            "src": "/sounds/barracks/campfire.mp3",
+            "volume": 0.3
+          }
+        ]
       },
       "npcPlacements": {
         "cena": {
-          "x": 25,
-          "y": 90,
-          "scale": 1.1,
+          "x": 48,
+          "y": 98,
+          "scale": 1.35,
           "flipX": false,
           "zIndex": 5,
-          "hitboxOffsetY": 45,
+          "hitboxOffsetY": 50,
           "hitboxWidth": 85,
           "hitboxHeight": 165
         },
         "jonah": {
-          "x": 50,
-          "y": 92,
-          "scale": 1.05,
+          "x": 82,
+          "y": 100,
+          "scale": 1.35,
           "flipX": false,
           "zIndex": 10,
-          "hitboxOffsetY": 50,
+          "hitboxOffsetY": 55,
           "hitboxWidth": 80,
           "hitboxHeight": 155
         },
         "reah": {
-          "x": 75,
-          "y": 91,
-          "scale": 1.1,
+          "x": 17,
+          "y": 100,
+          "scale": 1.3,
           "flipX": true,
           "zIndex": 5,
-          "hitboxOffsetY": 45,
+          "hitboxOffsetY": 55,
           "hitboxWidth": 80,
           "hitboxHeight": 160
         }

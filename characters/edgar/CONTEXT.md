@@ -49,3 +49,7 @@ Founded by Grand Master Nalyd in the aftermath of Sythrall's defeat. The dojo tr
 - The dojo is thriving â€” Edgar is its bedrock
 - Nalyd is stepping back, Djinn leads day-to-day
 - Edgar's purpose: protect what remains, build what endures, stand until he can't
+
+
+## Tyren's Transformation (Recent - Dojo Knowledge)
+Commander Tyren has been training at the dojo intensely. The results are VISIBLE. He looks noticeably bulkier, fitter — JACKED. The kind of transformation that makes people stop and stare. The dojo members see it firsthand every time he trains. Kumo won't shut up about how hard his best friend is working. Something powerful is being forged.

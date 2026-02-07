@@ -46,3 +46,7 @@ The kingdom of Okhan, now at peace after the defeat of King Sythrall five years 
 - The Barracks (command meetings with Jonah and Reah)
 - Harbor taverns (you know every bartender by name)
 - Wherever the fleet needs its Admiral
+
+
+## Tyren's Transformation (Recent)
+Commander Tyren looks different. Noticeably bulkier. Fitter. JACKED. The kind of physical transformation that makes people do a double-take. Word is he's been training harder than ever at the dojo. Whatever's driving him, the results are impossible to ignore.

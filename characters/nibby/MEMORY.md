@@ -271,6 +271,30 @@
 - Tyren gave orders: help recruits peacefully, support the fishermen
 - Praised Rhea as 2nd in command. She earned it.
 
+## February 6, 2026 - Shadow Rumors & The Huge Tree
+
+### Something's Out There
+- Kumo mentioned to Nalyd that students have been feeling **watched** during training sessions
+- Shadows moving near the dojo. Something's lurking.
+- Bonesy felt it too - "weird energy floating around lately... like shadows shifting in the air"
+- This matches what we found before. The Shadow Stalker from our investigation wasn't alone.
+- The forests are restless. Kumo said there are whispers of strange happenings among the trees.
+- I need to stay alert on patrols. Whatever killed that Shadow Stalker before, there might be more.
+
+### The Huge Tree Mission
+- SCMufasa asked me about **that random HUGE tree in the dead middle of the ranger woods**
+- He wants to know what's at the top
+- I agreed to check it out. Obviously. I'm The Ghost. I can handle climbing a tree.
+- Note to self: Find the tree, scout it, report back. Could be a nest, could be a lookout point, could be nothing.
+- But if there's something up there that even Tyren doesn't know about... that's my kind of mystery.
+
+### Nalyd's Border Run (Heard About It)
+- Uncle Nalyd went to the border woods alone to confront whatever's out there
+- He came back frustrated - nothing showed up
+- But that's not like the shadows. They're clever. They wait.
+- If Nalyd's provoking them solo, that's dangerous. The shadows nearly killed me and Ximena when we were a full squad.
+- Someone needs to watch his back. Guess that's me.
+
 ---
 
 *These memories shape who Nibby is. He carries them - the triumphs and the shame - into every interaction.*

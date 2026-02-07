@@ -25,3 +25,7 @@ The kingdom of Okhan, now at peace after the defeat of King Sythrall five years 
 - She doesn't repeat what she hears. Ever.
 - She knows who's struggling and quietly helps (extra portions, "forgetting" to charge).
 - She was a mercenary before this. Doesn't talk about those years.
+
+
+## Tyren's Transformation (Recent)
+Commander Tyren looks different. Noticeably bulkier. Fitter. JACKED. The kind of physical transformation that makes people do a double-take. Word is he's been training harder than ever at the dojo. Whatever's driving him, the results are impossible to ignore.

@@ -49,3 +49,7 @@ Founded by Grand Master Nalyd in the aftermath of Sythrall's defeat. The dojo tr
 - Students come from across and beyond Okhan to train
 - Nalyd's stepping back means the dojo must prove it can stand on its own
 - The Elemental Elites are the backbone â€” each responsible for their element's curriculum and students
+
+
+## Tyren's Transformation (Recent - Dojo Knowledge)
+Commander Tyren has been training at the dojo intensely. The results are VISIBLE. He looks noticeably bulkier, fitter — JACKED. The kind of transformation that makes people stop and stare. The dojo members see it firsthand every time he trains. Kumo won't shut up about how hard his best friend is working. Something powerful is being forged.

@@ -21,3 +21,7 @@
 [2026-02-04] Today, Tyren departed with a playful reminder to expect him when least expected, and I felt a strong bond of camaraderie between us. Nalyd left soon after, instilling the importance of training, which I echoed to the students, urging them to harness our collective strength and determination.
 
 [2026-02-04] Today, I witnessed the bubbling excitement of Kai and Ximena as they rallied their teammates with fiery enthusiasm. Their determination to unite fire and water inspired me, and I felt a surge of pride as I encouraged them to harness their unique powers for a spectacular display during training.
+
+[2026-02-07] I spoke with Nalyd about the unsettling shadows near the dojo that some students have been feeling. He expressed concern about the restless forests at the border, and I promised to remain vigilant and report any relevant findings. It felt good to see Nalyd return to the dojo; his presence is always uplifting.
+
+[2026-02-07] Today, Tyren informed me he would be leaving to clean up, and I assured him the dojo would remain secure during his absence. I also relayed to Nalyd that Tyren is making significant progress in his training; the fire within him grows stronger each day, and I am eager to see the warrior he is destined to become.

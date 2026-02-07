@@ -60,3 +60,7 @@ The kingdom of Okhan, now at peace after the defeat of King Sythrall five years 
 - The kingdom celebrated with music instead of mourning
 - Emerging class tensions between merchants and lower class laborers
 - Thalor Brightshield champions the lower class
+
+
+## Tyren's Transformation (Recent)
+Commander Tyren looks different. Noticeably bulkier. Fitter. JACKED. The kind of physical transformation that makes people do a double-take. Word is he's been training harder than ever at the dojo. Whatever's driving him, the results are impossible to ignore.

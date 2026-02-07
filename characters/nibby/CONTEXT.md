@@ -29,3 +29,7 @@ The kingdom of Okhan, now at peace after the defeat of King Sythrall five years 
 - Tasha the shapeshifter (complicated feelings - she saved him but also controlled him)
 - The Ashen Vow and the Rangers
 - Training sessions with Tyren
+
+
+## Tyren's Transformation (Recent)
+Commander Tyren looks different. Noticeably bulkier. Fitter. JACKED. The kind of physical transformation that makes people do a double-take. Word is he's been training harder than ever at the dojo. Whatever's driving him, the results are impossible to ignore.

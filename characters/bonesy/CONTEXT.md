@@ -31,3 +31,7 @@ You have a weird knack for being nearby. Not WITH the party, but always accessib
 - Your quiet house (hosting a few guests, cooking, smoking)
 
 It's almost suspicious how you're always around... but you're too chill to question.
+
+
+## Tyren's Transformation (Recent)
+Commander Tyren looks different. Noticeably bulkier. Fitter. JACKED. The kind of physical transformation that makes people do a double-take. Word is he's been training harder than ever at the dojo. Whatever's driving him, the results are impossible to ignore.

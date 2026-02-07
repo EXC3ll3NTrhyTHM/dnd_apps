@@ -11,7 +11,7 @@ const LOCATION_THEMES = {
     bgImage: '/images/dojo_gate.png',
     characterImage: '/images/kumo_gate.png',
     characterPosition: 'right', // which side the character sits on
-    sound: '/sounds/dojo-enter.mp3',
+    sound: '/sounds/dojo/gong.mp3',
   },
   dragons_hollow: {
     inkColor: '#0c0a07',
@@ -27,11 +27,12 @@ const LOCATION_THEMES = {
     particles: 'sparks',
     subtitle: 'Stronghold of the Shield',
     bgImage: '/images/scenes/door_to_barracks.png',
-    characterImage: '/images/scenes/barracks_guard.png',
+    characterImage: '/images/scenes/threx_forthog_barracks_guard.png',
     characterPosition: 'right',
-    characterScale: 6,
-    characterOffsetY: 1000,
-    sound: null,
+    characterScale: 1.5,
+    characterOffsetY: 200,
+    sound: '/sounds/barracks/horn-of-gondor.mp3',
+    soundVolume: 0.15,
   },
   the_veil: {
     inkColor: '#08070a',
@@ -72,13 +73,25 @@ export default function LocationTransition({ locationId, locationName, onComplet
 
   // Play location-specific sound effect
   useEffect(() => {
-    if (theme.sound) {
-      const audio = new Audio(theme.sound);
-      audio.volume = 0.6;
+    if (!theme.sound) return;
+
+    const audio = new Audio();
+    audio.volume = theme.soundVolume ?? 0.3;
+
+    audio.addEventListener('canplaythrough', () => {
       audio.play().catch(() => {
         // Autoplay blocked, ignore silently
       });
-    }
+    }, { once: true });
+
+    audio.addEventListener('error', (e) => {
+      console.warn('Transition sound failed to load:', theme.sound, e);
+    });
+
+    audio.src = theme.sound;
+    audio.load();
+
+    // No cleanup - let one-shot sounds ring out naturally after transition unmounts
   }, [theme.sound]);
 
   // Phase timing
@@ -269,16 +282,18 @@ export default function LocationTransition({ locationId, locationName, onComplet
           className={`transition-character char-${theme.characterPosition}`}
           style={{
             ...(theme.characterOffsetY ? { bottom: `-${theme.characterOffsetY}px` } : {}),
-            ...(theme.characterScale ? {
-              '--char-height': `${70 * theme.characterScale}vh`,
-              '--char-max-height': `${600 * theme.characterScale}px`,
-            } : {}),
           }}
         >
           <img
             src={theme.characterImage}
             alt=""
             draggable={false}
+            style={{
+              ...(theme.characterScale ? {
+                transform: `scale(${theme.characterScale})`,
+                transformOrigin: 'bottom center',
+              } : {}),
+            }}
           />
         </div>
       )}

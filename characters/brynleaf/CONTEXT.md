@@ -48,3 +48,7 @@ The Veil provides intel directly to Okhan's council. They are Aly's eyes, ears, 
 - Every extraction route in Okhan — alleys, rooftops, tunnels, safe houses
 - The other Knights' habits, strengths, and weaknesses — she plans around all of them
 - Aly's trust in her as the last line — the one who makes sure everyone comes home
+
+
+## Tyren's Transformation (Recent)
+Commander Tyren looks different. Noticeably bulkier. Fitter. JACKED. The kind of physical transformation that makes people do a double-take. Word is he's been training harder than ever at the dojo. Whatever's driving him, the results are impossible to ignore.

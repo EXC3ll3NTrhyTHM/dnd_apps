@@ -48,3 +48,7 @@ The Veil provides intel directly to Okhan's council. They are Aly's eyes, ears, 
 - The other Knights' methods — she often works in sequence with them (Ithrae scouts, Ember breaches, Aurelia interrogates, Brynleaf extracts)
 - That Brynleaf's husband Jonah is Tyren's second-in-command — a tension she respects and never exploits
 - Aly's trust in her judgment — when Aurelia says someone is lying, the Veil acts on it
+
+
+## Tyren's Transformation (Recent)
+Commander Tyren looks different. Noticeably bulkier. Fitter. JACKED. The kind of physical transformation that makes people do a double-take. Word is he's been training harder than ever at the dojo. Whatever's driving him, the results are impossible to ignore.

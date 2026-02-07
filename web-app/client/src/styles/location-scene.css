@@ -74,7 +74,8 @@
   min-width: max-content;
   max-width: none;
   width: auto;
-  flex-shrink: 0;
+  object-fit: contain;
+  -webkit-transform: translateZ(0);
   filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5));
   pointer-events: none;
   position: relative;
