@@ -1,6 +1,6 @@
 /**
  * LocationChat - Main location page
- * 
+ *
  * Loads custom scene components for locations that have them,
  * otherwise shows the default chat interface.
  */
@@ -14,7 +14,9 @@ import ChatBubble from '../components/ChatBubble';
 import ChatInput from '../components/ChatInput';
 import ItemCard from '../components/ItemCard';
 import Toast from '../components/Toast';
+import SceneAudio from './scenes/SceneAudio';
 import { getSceneComponent } from './scenes';
+import { useUiSounds } from '../hooks/useUiSounds';
 import '../styles/location-chat.css';
 import '../styles/location-scene.css';
 
@@ -28,7 +30,6 @@ export default function LocationChat() {
 
   const [location, setLocation] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [selectedNpc, setSelectedNpc] = useState(null);
   const [npcEmotions, setNpcEmotions] = useState({});
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -37,12 +38,53 @@ export default function LocationChat() {
   const [buying, setBuying] = useState(false);
   const [toast, setToast] = useState(null);
   const [viewMode, setViewMode] = useState('scene'); // 'scene' | 'chat'
-  const [chatTarget, setChatTarget] = useState(null);
+  const [insertNpc, setInsertNpc] = useState(null);
 
   const messagesEndRef = useRef(null);
   const chatAreaRef = useRef(null);
-  
+  const playSound = useUiSounds();
+
   const isAdmin = ADMIN_IDS.includes(user?.id || '');
+
+  // Keep chat layout above the virtual keyboard on iOS/Android
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    function onResize() {
+      document.documentElement.style.setProperty('--vv-height', `${vv.height}px`);
+    }
+
+    onResize();
+    vv.addEventListener('resize', onResize);
+    return () => vv.removeEventListener('resize', onResize);
+  }, []);
+
+  // Presence: join on mount, heartbeat every 30s, leave on unmount
+  useEffect(() => {
+    api('/api/presence/join', {
+      method: 'POST',
+      body: JSON.stringify({ locationId })
+    }).catch(() => {});
+
+    const interval = setInterval(() => {
+      api('/api/presence/heartbeat', {
+        method: 'POST',
+        body: JSON.stringify({ locationId })
+      }).catch(() => {});
+    }, 30000);
+
+    return () => {
+      clearInterval(interval);
+      // Use sendBeacon so the leave request survives component unmount / navigation
+      const token = localStorage.getItem('dh_token');
+      const blob = new Blob(
+        [JSON.stringify({ token })],
+        { type: 'application/json' }
+      );
+      navigator.sendBeacon('/api/presence/leave', blob);
+    };
+  }, [locationId]);
 
   // Load location data + chat history
   useEffect(() => {
@@ -66,7 +108,7 @@ export default function LocationChat() {
       loc.id = locationId;
       setLocation(loc);
       setMessages(histData.history || []);
-      
+
       // Start in scene mode if location has a custom scene, otherwise chat
       const SceneComponent = getSceneComponent(locationId);
       setViewMode(SceneComponent && loc.scene ? 'scene' : 'chat');
@@ -87,17 +129,19 @@ export default function LocationChat() {
     }
   }
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom when new messages arrive (after initial load)
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (messages.length === 0) return;
+    // column-reverse handles initial position; just smooth-scroll on new messages
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Send message
+  // Send message — always uses room endpoint, server picks responding NPCs
   const handleSend = useCallback(async (text) => {
     if (sending) return;
     setSending(true);
+
+    playSound('messageSent');
 
     const playerMsg = {
       role: 'player',
@@ -106,21 +150,32 @@ export default function LocationChat() {
     };
     setMessages(prev => [...prev, playerMsg]);
 
+    // Show typing indicators for @mentioned NPCs, or a generic one if none mentioned
     const typingId = Date.now();
-    setMessages(prev => [...prev, {
-      role: 'npc',
-      npc: selectedNpc || (location?.npcs[0]?.id || '?'),
-      npcDisplayName: '',
-      typing: true,
-      _typingId: typingId
-    }]);
+    const mentionedNpcs = location?.npcs.filter(npc =>
+      text.toLowerCase().includes(`@${npc.displayName.toLowerCase()}`)
+    ) || [];
+
+    const typingBubbles = mentionedNpcs.length > 0
+      ? mentionedNpcs.map((npc, i) => ({
+          role: 'npc',
+          npc: npc.id,
+          npcDisplayName: npc.displayName,
+          typing: true,
+          _typingId: typingId + i
+        }))
+      : [{
+          role: 'npc',
+          npc: location?.npcs[0]?.id || '?',
+          npcDisplayName: '',
+          typing: true,
+          _typingId: typingId
+        }];
+
+    setMessages(prev => [...prev, ...typingBubbles]);
 
     try {
-      const endpoint = selectedNpc
-        ? `/api/chat/locations/${locationId}/npc/${selectedNpc}/message`
-        : `/api/chat/locations/${locationId}/message`;
-
-      const data = await api(endpoint, {
+      const data = await api(`/api/chat/locations/${locationId}/message`, {
         method: 'POST',
         body: JSON.stringify({ message: text })
       });
@@ -129,6 +184,8 @@ export default function LocationChat() {
         const withoutTyping = prev.filter(m => !m._typingId);
         return [...withoutTyping, ...data.responses];
       });
+
+      playSound('npcResponse');
 
       data.responses.forEach(resp => {
         if (resp.emotion) {
@@ -142,7 +199,7 @@ export default function LocationChat() {
     } finally {
       setSending(false);
     }
-  }, [sending, selectedNpc, locationId, location]);
+  }, [sending, locationId, location]);
 
   // Menu handling
   async function openMenu(type) {
@@ -154,6 +211,7 @@ export default function LocationChat() {
         const data = await api('/api/shop/catalog');
         setMenuData(data);
       }
+      playSound('menuOpen');
       setMenuOpen(type);
     } catch (err) {
       console.error('Failed to load menu:', err);
@@ -187,6 +245,7 @@ export default function LocationChat() {
       };
       setMessages(prev => [...prev, purchaseMsg]);
 
+      playSound('purchase');
       setToast({ type: 'success', message: result.message || `Purchased ${item.name}!` });
     } catch (err) {
       setToast({ type: 'error', message: err.data?.error || 'Purchase failed' });
@@ -195,22 +254,24 @@ export default function LocationChat() {
     }
   }
 
+  // NPC bar click — prefill @mention in chat input
+  const handleNpcBarClick = (npc) => {
+    setInsertNpc(npc);
+  };
+
   // Scene interaction handlers
   const handleNpcClick = (npcId) => {
-    setSelectedNpc(npcId);
-    setChatTarget(npcId);
+    const npc = location.npcs.find(n => n.id === npcId);
     setViewMode('chat');
+    if (npc) setInsertNpc(npc);
   };
 
   const handleGatheringClick = () => {
-    setSelectedNpc(null);
-    setChatTarget(null);
     setViewMode('chat');
   };
 
   const handleBackToScene = () => {
     setViewMode('scene');
-    setChatTarget(null);
   };
 
   const handleLocationUpdate = (updatedLocation) => {
@@ -233,11 +294,16 @@ export default function LocationChat() {
 
   // Try to get custom scene component
   const SceneComponent = getSceneComponent(locationId);
+  const hasScene = SceneComponent && location.scene;
+  const sceneAudioConfig = location.scene?.audio;
 
-  // Render custom scene if available and in scene mode
-  if (viewMode === 'scene' && SceneComponent && location.scene) {
-    return (
-      <>
+  return (
+    <>
+      {/* Scene audio — rendered outside view toggle so it persists across scene↔chat */}
+      {sceneAudioConfig && <SceneAudio config={sceneAudioConfig} />}
+
+      {/* Scene View */}
+      {viewMode === 'scene' && hasScene ? (
         <SceneComponent
           location={location}
           isAdmin={isAdmin}
@@ -246,119 +312,103 @@ export default function LocationChat() {
           onLocationUpdate={handleLocationUpdate}
           setToast={setToast}
         />
-        {toast && (
-          <Toast
-            type={toast.type}
-            message={toast.message}
-            onClose={() => setToast(null)}
-          />
-        )}
-      </>
-    );
-  }
-
-  // Chat View (default)
-  return (
-    <div className="location-chat">
-      {/* Header */}
-      <div className="chat-header">
-        <button className="chat-back-btn" onClick={SceneComponent && location.scene ? handleBackToScene : () => navigate('/map')}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-        <div className="chat-header-info">
-          <div className="chat-header-title">
-            {chatTarget
-              ? (location.npcs.find(n => n.id === chatTarget)?.displayName || chatTarget)
-              : location.name
-            }
-          </div>
-          <div className="chat-header-subtitle">
-            {chatTarget ? 'Private conversation' : location.description}
-          </div>
-        </div>
-        <div className="chat-header-actions">
-          {hasTavern && (
-            <button className="chat-menu-btn" onClick={() => openMenu('tavern')}>
-              Menu
+      ) : (
+        /* Chat View */
+        <div className="location-chat">
+          {/* Header */}
+          <div className="chat-header">
+            <button className="chat-back-btn" onClick={hasScene ? handleBackToScene : () => navigate('/map')}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
             </button>
-          )}
-          {hasShop && (
-            <button className="chat-menu-btn" onClick={() => openMenu('shop')}>
-              Shop
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* NPC Bar */}
-      <NpcBar
-        npcs={location.npcs}
-        selectedNpc={selectedNpc}
-        onSelectNpc={setSelectedNpc}
-        emotions={npcEmotions}
-      />
-
-      {/* Chat Messages */}
-      <div className="chat-messages" ref={chatAreaRef}>
-        {messages.length === 0 ? (
-          <div className="chat-messages-empty">
-            <span className="chat-messages-empty-icon">💬</span>
-            <p>You've entered {location.name}.</p>
-            <p>Say something to start a conversation.</p>
-          </div>
-        ) : (
-          messages.map((msg, i) => (
-            <ChatBubble key={msg.timestamp || i} message={msg} />
-          ))
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Chat Input */}
-      <ChatInput
-        onSend={handleSend}
-        selectedNpc={
-          selectedNpc
-            ? (location.npcs.find(n => n.id === selectedNpc)?.displayName || selectedNpc)
-            : null
-        }
-        disabled={sending}
-      />
-
-      {/* Menu Overlay */}
-      {menuOpen && menuData && (
-        <>
-          <div className="menu-overlay" onClick={() => { setMenuOpen(null); setMenuData(null); }} />
-          <div className="menu-panel">
-            <div className="menu-panel-header">
-              <span className="menu-panel-title">
-                {menuOpen === 'tavern' ? (menuData.tavern_name || 'Tavern Menu') : 'Shop'}
-              </span>
-              <button className="menu-panel-close" onClick={() => { setMenuOpen(null); setMenuData(null); }}>
-                &times;
-              </button>
+            <div className="chat-header-info">
+              <div className="chat-header-title">{location.name}</div>
+              <div className="chat-header-subtitle">{location.description}</div>
             </div>
-            {Object.entries(menuData.categories || {}).map(([catKey, category]) => (
-              <div key={catKey} className="items-grid" style={{ marginBottom: 16 }}>
-                <h3 className="section-title">
-                  <span className="section-emoji">{category.emoji}</span>
-                  {category.display_name}
-                </h3>
-                {category.items.map(item => (
-                  <ItemCard
-                    key={item.id}
-                    item={item}
-                    onBuy={handleBuy}
-                    buying={buying}
-                    disabled={wallet && wallet.balance < item.price}
-                  />
+            <div className="chat-header-actions">
+              {hasTavern && (
+                <button className="chat-menu-btn" onClick={() => openMenu('tavern')}>
+                  Menu
+                </button>
+              )}
+              {hasShop && (
+                <button className="chat-menu-btn" onClick={() => openMenu('shop')}>
+                  Shop
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* NPC Bar */}
+          <NpcBar
+            npcs={location.npcs}
+            onNpcClick={handleNpcBarClick}
+            emotions={npcEmotions}
+          />
+
+          {/* Chat Messages — column-reverse so browser natively anchors to bottom */}
+          <div className="chat-messages" ref={chatAreaRef}>
+            <div className="chat-messages-inner">
+              {messages.length === 0 ? (
+                <div className="chat-messages-empty">
+                  <span className="chat-messages-empty-icon">💬</span>
+                  <p>You've entered {location.name}.</p>
+                  <p>Say something to start a conversation.</p>
+                </div>
+              ) : (
+                messages.map((msg, i) => (
+                  <ChatBubble key={msg.timestamp || i} message={msg} npcs={location.npcs} />
+                ))
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          </div>
+
+          {/* Chat Input */}
+          <ChatInput
+            onSend={handleSend}
+            disabled={sending}
+            npcs={location.npcs}
+            groups={location.groups || {}}
+            insertNpc={insertNpc}
+            onInsertNpcDone={() => setInsertNpc(null)}
+          />
+
+          {/* Menu Overlay */}
+          {menuOpen && menuData && (
+            <>
+              <div className="menu-overlay" onClick={() => { playSound('menuClose'); setMenuOpen(null); setMenuData(null); }} />
+              <div className="menu-panel">
+                <div className="menu-panel-header">
+                  <span className="menu-panel-title">
+                    {menuOpen === 'tavern' ? (menuData.tavern_name || 'Tavern Menu') : 'Shop'}
+                  </span>
+                  <button className="menu-panel-close" onClick={() => { playSound('menuClose'); setMenuOpen(null); setMenuData(null); }}>
+                    &times;
+                  </button>
+                </div>
+                {Object.entries(menuData.categories || {}).map(([catKey, category]) => (
+                  <div key={catKey} className="items-grid" style={{ marginBottom: 16 }}>
+                    <h3 className="section-title">
+                      <span className="section-emoji">{category.emoji}</span>
+                      {category.display_name}
+                    </h3>
+                    {category.items.map(item => (
+                      <ItemCard
+                        key={item.id}
+                        item={item}
+                        onBuy={handleBuy}
+                        buying={buying}
+                        disabled={wallet && wallet.balance < item.price}
+                      />
+                    ))}
+                  </div>
                 ))}
               </div>
-            ))}
-          </div>
-        </>
+            </>
+          )}
+        </div>
       )}
 
       {/* Toast */}
@@ -369,6 +419,6 @@ export default function LocationChat() {
           onClose={() => setToast(null)}
         />
       )}
-    </div>
+    </>
   );
 }

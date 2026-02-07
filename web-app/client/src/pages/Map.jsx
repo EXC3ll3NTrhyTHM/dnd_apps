@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../hooks/useApi';
 import NpcPortrait from '../components/NpcPortrait';
 import LocationTransition from '../components/LocationTransition';
+import { pauseAmbientAudio } from '../components/Layout';
+import { useUiSounds } from '../hooks/useUiSounds';
 import '../styles/map.css';
 
-const MAP_SRC = '/images/okhan_map.svg';
+const MAP_SRC = '/images/okhan_map.webp';
 
 export default function Map() {
   const [locations, setLocations] = useState([]);
@@ -14,13 +16,27 @@ export default function Map() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [popupStyle, setPopupStyle] = useState(null);
   const [transitioning, setTransitioning] = useState(null); // { id, name } or null
+  const [presence, setPresence] = useState({}); // { locationId: [{ id, username, avatar }] }
 
   const containerRef = useRef(null);
   const popupRef = useRef(null);
   const navigate = useNavigate();
+  const playSound = useUiSounds();
 
   useEffect(() => {
     loadLocations();
+  }, []);
+
+  // Fetch presence on mount and poll every 30s
+  useEffect(() => {
+    function fetchPresence() {
+      api('/api/presence').then(data => {
+        setPresence(data.presence || {});
+      }).catch(() => {});
+    }
+    fetchPresence();
+    const interval = setInterval(fetchPresence, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   async function loadLocations() {
@@ -164,15 +180,18 @@ export default function Map() {
 
   const handleMarkerTap = useCallback((e, locId) => {
     e.stopPropagation();
+    playSound('mapMarker');
     setSelectedLocation(prev => prev === locId ? null : locId);
-  }, []);
+  }, [playSound]);
 
   const handleEnterLocation = useCallback((e, locId) => {
     e.stopPropagation();
+    playSound('buttonTap');
     const loc = locations.find(l => l.id === locId);
     setSelectedLocation(null);
     setTransitioning({ id: locId, name: loc?.name || locId });
-  }, [locations]);
+    pauseAmbientAudio();
+  }, [locations, playSound]);
 
   const handleMapTap = useCallback(() => {
     setSelectedLocation(null);
@@ -220,6 +239,8 @@ export default function Map() {
           if (!loc.mapCoords) return null;
           const isSelected = selectedLocation === loc.id;
 
+          const playerCount = (presence[loc.id] || []).length;
+
           return (
             <div
               key={loc.id}
@@ -237,6 +258,9 @@ export default function Map() {
                 <div className="map-marker-spike" />
                 {!isSelected && <div className="map-marker-pulse" />}
               </div>
+              {playerCount > 0 && (
+                <div className="map-marker-player-badge">{playerCount}</div>
+              )}
             </div>
           );
         })}
@@ -266,6 +290,21 @@ export default function Map() {
                 {selectedLoc.npcs.length > 4 && (
                   <span className="map-popup-npc-more">+{selectedLoc.npcs.length - 4}</span>
                 )}
+              </div>
+            )}
+
+            {(presence[selectedLoc.id] || []).length > 0 && (
+              <div className="map-popup-players">
+                {presence[selectedLoc.id].map(player => (
+                  <div key={player.id} className="map-popup-player" title={player.username}>
+                    <img
+                      src={player.avatar}
+                      alt={player.username}
+                      className="map-popup-player-avatar"
+                    />
+                    <span className="map-popup-player-name">{player.username}</span>
+                  </div>
+                ))}
               </div>
             )}
 

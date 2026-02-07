@@ -1,16 +1,17 @@
 /**
  * SceneAudio - Ambient audio player for location scenes
- * 
- * Handles background music and ambient sound loops with crossfading
+ *
+ * Handles background music and ambient sound loops.
+ * Mute is controlled globally via the audio setting in Profile.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { useAudioMuted } from '../../hooks/useAudioSettings';
 
 export function SceneAudio({ config, enabled = true }) {
   const musicRef = useRef(null);
   const ambientRefs = useRef([]);
-  const [muted, setMuted] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+  const muted = useAudioMuted();
 
   useEffect(() => {
     if (!config || !enabled) return;
@@ -47,15 +48,13 @@ export function SceneAudio({ config, enabled = true }) {
       audio.addEventListener('canplaythrough', () => {
         loadedCount++;
         if (loadedCount === totalCount) {
-          setLoaded(true);
-          // Stagger start times slightly for natural feel
-          audioElements.forEach((a, i) => {
-            setTimeout(() => {
-              a.play().catch(() => {
-                // Autoplay blocked - will play on first interaction
-              });
-            }, i * 200);
-          });
+          if (!muted) {
+            audioElements.forEach((a, i) => {
+              setTimeout(() => {
+                a.play().catch(() => {});
+              }, i * 200);
+            });
+          }
         }
       }, { once: true });
 
@@ -66,6 +65,30 @@ export function SceneAudio({ config, enabled = true }) {
       audio.load();
     });
 
+    // Try to resume audio on user interaction (for autoplay policy)
+    const resumeAudio = () => {
+      if (muted || document.hidden) return;
+      if (musicRef.current?.paused) {
+        musicRef.current.play().catch(() => {});
+      }
+      ambientRefs.current.forEach(audio => {
+        if (audio.paused) audio.play().catch(() => {});
+      });
+    };
+
+    // Pause when tab/app is hidden, resume when visible
+    const onVisibility = () => {
+      if (document.hidden) {
+        audioElements.forEach(audio => audio.pause());
+      } else if (!muted) {
+        audioElements.forEach(audio => audio.play().catch(() => {}));
+      }
+    };
+
+    window.addEventListener('click', resumeAudio);
+    window.addEventListener('touchstart', resumeAudio);
+    document.addEventListener('visibilitychange', onVisibility);
+
     // Cleanup
     return () => {
       audioElements.forEach(audio => {
@@ -74,52 +97,13 @@ export function SceneAudio({ config, enabled = true }) {
       });
       musicRef.current = null;
       ambientRefs.current = [];
-    };
-  }, [config, enabled]);
-
-  // Update volumes when muted changes
-  useEffect(() => {
-    if (musicRef.current) {
-      musicRef.current.volume = muted ? 0 : (config?.music?.volume ?? 0.3);
-    }
-    ambientRefs.current.forEach((audio, i) => {
-      audio.volume = muted ? 0 : (config?.ambient?.[i]?.volume ?? 0.5);
-    });
-  }, [muted, config]);
-
-  // Try to resume audio on user interaction (for autoplay policy)
-  useEffect(() => {
-    const resumeAudio = () => {
-      if (musicRef.current?.paused) {
-        musicRef.current.play().catch(() => {});
-      }
-      ambientRefs.current.forEach(audio => {
-        if (audio.paused) {
-          audio.play().catch(() => {});
-        }
-      });
-    };
-
-    window.addEventListener('click', resumeAudio, { once: true });
-    window.addEventListener('touchstart', resumeAudio, { once: true });
-
-    return () => {
       window.removeEventListener('click', resumeAudio);
       window.removeEventListener('touchstart', resumeAudio);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [loaded]);
+  }, [config, enabled, muted]);
 
-  if (!config) return null;
-
-  return (
-    <button 
-      className="scene-audio-toggle"
-      onClick={() => setMuted(!muted)}
-      title={muted ? 'Unmute' : 'Mute'}
-    >
-      {muted ? '🔇' : '🔊'}
-    </button>
-  );
+  return null;
 }
 
 export default SceneAudio;

@@ -31,9 +31,9 @@ export default function NpcPortrait({ npcId, emotion = 'idle', size = 48, onClic
 
     let src;
     if (hasEmotion) {
-      src = `/portraits/${npcId}/${emotion}.png`;
+      src = `/portraits/${npcId}/${emotion}.webp`;
     } else if (hasIdle) {
-      src = `/portraits/${npcId}/idle.png`;
+      src = `/portraits/${npcId}/idle.webp`;
     } else {
       src = FALLBACK_SILHOUETTE;
     }

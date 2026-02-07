@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../hooks/useApi';
 import { useAuth } from '../hooks/useAuth';
+import { useAudioMuted, setAudioMuted } from '../hooks/useAudioSettings';
 import GoldBadge from '../components/GoldBadge';
 import '../styles/profile.css';
 import '../styles/leaderboard.css';
@@ -9,6 +11,7 @@ const RANK_DECORATIONS = ['👑', '🥈', '🥉'];
 
 export default function Profile() {
   const { user, wallet, logout } = useAuth();
+  const audioMuted = useAudioMuted();
   const [inventory, setInventory] = useState(null);
   const [leaderboard, setLeaderboard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -136,10 +139,31 @@ export default function Profile() {
         )}
       </section>
 
-      {/* Logout */}
-      <button className="btn btn-outline btn-logout" onClick={logout}>
-        Log Out
-      </button>
+      {/* Settings */}
+      <section className="profile-section">
+        <h2 className="section-title">Settings</h2>
+        <div className="settings-list">
+          <label className="settings-row">
+            <span className="settings-label">Mute All Audio</span>
+            <input
+              type="checkbox"
+              className="settings-toggle"
+              checked={audioMuted}
+              onChange={(e) => setAudioMuted(e.target.checked)}
+            />
+          </label>
+        </div>
+      </section>
+
+      {/* Admin link + Logout */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <Link to="/admin" className="btn btn-outline" style={{ textAlign: 'center', textDecoration: 'none' }}>
+          DM Controls
+        </Link>
+        <button className="btn btn-outline btn-logout" onClick={logout}>
+          Log Out
+        </button>
+      </div>
     </div>
   );
 }

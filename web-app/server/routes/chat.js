@@ -96,23 +96,43 @@ router.get('/locations', authRequired, (req, res) => {
   const locations = loadLocations();
   const registry = loadNpcRegistry();
 
-  const result = Object.entries(locations).map(([id, loc]) => ({
-    id,
-    name: loc.name,
-    description: loc.description,
-    features: loc.features || [],
-    mapCoords: loc.mapCoords || null,
-    mapIcon: loc.mapIcon || null,
-    scene: loc.scene || null,
-    npcs: (loc.npcs || []).map(npcName => {
+  const result = Object.entries(locations).map(([id, loc]) => {
+    const npcList = (loc.npcs || []).map(npcName => {
       const entry = registry[npcName];
       return {
         id: npcName,
         displayName: entry?.displayName || entry?.username || npcName,
         hasPortrait: true
       };
-    })
-  }));
+    });
+
+    // Map group member IDs to display names
+    const groups = {};
+    if (loc.groups) {
+      for (const [groupId, group] of Object.entries(loc.groups)) {
+        groups[groupId] = {
+          displayName: group.displayName,
+          memberIds: group.members || [],
+          members: (group.members || []).map(npcName => {
+            const entry = registry[npcName];
+            return entry?.displayName || entry?.username || npcName;
+          })
+        };
+      }
+    }
+
+    return {
+      id,
+      name: loc.name,
+      description: loc.description,
+      features: loc.features || [],
+      mapCoords: loc.mapCoords || null,
+      mapIcon: loc.mapIcon || null,
+      scene: loc.scene || null,
+      npcs: npcList,
+      groups
+    };
+  });
 
   res.json({ locations: result });
 });

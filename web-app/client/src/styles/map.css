@@ -280,6 +280,60 @@
   transform: scale(0.97);
 }
 
+/* ---- Player Presence Badge (on marker) ---- */
+
+.map-marker-player-badge {
+  position: absolute;
+  top: 0;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #4a9eff;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ---- Player Presence in Popup ---- */
+
+.map-popup-players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-color);
+}
+
+.map-popup-player {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.map-popup-player-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid #4a9eff;
+  flex-shrink: 0;
+}
+
+.map-popup-player-name {
+  font-size: 0.65rem;
+  color: #8ab4f8;
+  white-space: nowrap;
+}
+
 /* ---- Loading ---- */
 
 .page-loading {
@@ -315,5 +369,6 @@
 .map-page.transitioning {
   background: #000;
 }
+
 
 

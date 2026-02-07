@@ -13,7 +13,6 @@ import {
   EditPanel,
   useSceneEditor
 } from './SceneBase';
-import SceneAudio from './SceneAudio';
 import '../../styles/location-scene.css';
 
 export default function BarracksScene({
@@ -118,9 +117,6 @@ export default function BarracksScene({
       {!editor.editMode && (
         <GatheringSpot config={scene.gatheringSpot} onClick={onGatheringClick} />
       )}
-
-      {/* Ambient Audio */}
-      <SceneAudio config={scene.audio} enabled={!editor.editMode} />
 
       {/* Hint */}
       {!editor.editMode && (

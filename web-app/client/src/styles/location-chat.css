@@ -7,9 +7,11 @@
   flex-direction: column;
   height: 100vh;
   height: 100dvh;
+  height: var(--vv-height, 100dvh);
   background-color: var(--bg-dark);
   background-image: var(--tex-leather);
   background-size: 512px 512px;
+  overflow: hidden;
 }
 
 /* ---- Chat Header (Leather Strap) ---- */
@@ -159,39 +161,6 @@
   background: rgba(212, 168, 67, 0.05);
 }
 
-.npc-bar-item-active {
-  border-color: transparent;
-  background: rgba(212, 168, 67, 0.08);
-}
-
-/* Candle glow under active NPC */
-.npc-bar-item-active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 24px;
-  height: 2px;
-  background: var(--color-gold);
-  border-radius: 2px;
-  box-shadow: 0 0 6px rgba(212, 168, 67, 0.5);
-}
-
-.npc-bar-everyone {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.3);
-  border: 2px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
 .npc-bar-name {
   font-size: 0.65rem;
   color: var(--text-muted);
@@ -200,10 +169,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.npc-bar-item-active .npc-bar-name {
-  color: var(--color-gold);
 }
 
 /* ---- NPC Portrait (Wax Seal / Medallion) ---- */
@@ -236,10 +201,8 @@
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: column-reverse;
   background-color: var(--bg-dark);
   background-image: var(--tex-parchment);
   background-size: 512px 512px;
@@ -247,6 +210,14 @@
   box-shadow:
     inset 0 8px 20px rgba(0, 0, 0, 0.3),
     inset 0 -4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Inner wrapper keeps messages in correct top-to-bottom order */
+.chat-messages-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
 }
 
 .chat-messages-empty {
@@ -324,6 +295,11 @@
   word-wrap: break-word;
 }
 
+.chat-bubble-text em {
+  color: var(--color-gold-dim);
+  font-style: italic;
+}
+
 /* NPC bubble: dark aged parchment note */
 .chat-bubble-npc .chat-bubble-text {
   background: linear-gradient(165deg, #2a2218, #1e1a12);
@@ -388,43 +364,199 @@
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.chat-input-mode {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  padding: 0 4px 4px;
-  font-style: italic;
-}
-
 .chat-input-row {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.chat-input-field {
+/* Input wrapper holds border/background */
+.chat-input-wrapper {
   flex: 1;
-  padding: 10px 16px;
+  position: relative;
   border: 1px solid var(--border-stitch);
   border-radius: 4px;
   background: linear-gradient(180deg, #221d16, #1a1610);
-  color: var(--text-primary);
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  outline: none;
-  transition: border-color var(--transition-fast);
   box-shadow: var(--shadow-inset);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.chat-input-field:focus {
+.chat-input-wrapper:focus-within {
   border-color: var(--color-gold-dim);
   box-shadow:
     var(--shadow-inset),
     0 0 6px rgba(212, 168, 67, 0.15);
 }
 
-.chat-input-field::placeholder {
+/* ContentEditable input field */
+.chat-input-field {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  outline: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  min-height: 40px;
+  max-height: 40px;
+  overflow: hidden;
+}
+
+/* Custom placeholder for contentEditable */
+.chat-input-placeholder {
+  position: absolute;
+  inset: 0;
+  padding: 10px 16px;
   color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
   font-style: italic;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+/* ---- Inline Formatting (contentEditable) ---- */
+
+/* @mention pill in the input */
+.mention-highlight-inline {
+  background: rgba(196, 149, 106, 0.25);
+  border-radius: 3px;
+  padding: 1px 2px;
+  color: var(--color-gold);
+  font-weight: 600;
+}
+
+/* Hidden asterisks — still in DOM for plain text, invisible to user */
+.italic-marker {
+  font-size: 0;
+  opacity: 0;
+  display: inline;
+}
+
+/* Italic text in the input */
+.chat-input-field em {
+  color: var(--color-gold-dim);
+  font-style: italic;
+}
+
+/* Chat bubble mention highlight (visible text) */
+.mention-highlight-bubble {
+  background: rgba(196, 149, 106, 0.25);
+  border-radius: 3px;
+  padding: 1px 3px;
+  color: var(--color-gold);
+  font-weight: 600;
+}
+
+/* ---- Mention Popup ---- */
+
+.mention-popup {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: linear-gradient(180deg, #2a2218, #1e1a12);
+  border: 1px solid var(--border-stitch);
+  border-radius: 6px;
+  box-shadow:
+    0 -4px 16px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(200, 170, 110, 0.06);
+  z-index: 50;
+  animation: mentionSlideUp 0.15s ease-out;
+}
+
+@keyframes mentionSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mention-popup-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.1s ease;
+}
+
+.mention-popup-item:first-child {
+  border-radius: 6px 6px 0 0;
+}
+
+.mention-popup-item:last-child {
+  border-radius: 0 0 6px 6px;
+}
+
+.mention-popup-item:hover {
+  background: rgba(212, 168, 67, 0.08);
+}
+
+.mention-popup-item-active {
+  background: rgba(212, 168, 67, 0.12);
+  border-left: 2px solid var(--color-gold);
+  padding-left: 10px;
+}
+
+.mention-popup-name {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+.mention-popup-item-active .mention-popup-name {
+  color: var(--color-gold);
+}
+
+/* Group items in mention popup */
+.mention-popup-group {
+  border-bottom: 1px solid rgba(90, 74, 50, 0.3);
+}
+
+.mention-popup-group-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(212, 168, 67, 0.2), rgba(140, 100, 20, 0.3));
+  border: 1px solid var(--color-gold-dim);
+  color: var(--color-gold);
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.mention-popup-group .mention-popup-name {
+  color: var(--color-gold-dim);
+  font-weight: 600;
+}
+
+.mention-popup-group-count {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 8px;
 }
 
 /* Quill/Send button */

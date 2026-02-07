@@ -57,7 +57,7 @@ export function NpcSprite({
       {/* Layer 1: Sprite image */}
       <img
         className="npc-sprite"
-        src={`/images/sprites/${npcId}.png`}
+        src={`/images/sprites/${npcId}.webp`}
         alt={displayName}
         draggable={false}
       />

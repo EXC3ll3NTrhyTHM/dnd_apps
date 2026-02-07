@@ -13,7 +13,6 @@ import {
   EditPanel,
   useSceneEditor
 } from './SceneBase';
-import SceneAudio from './SceneAudio';
 import '../../styles/location-scene.css';
 
 export default function DojoScene({ 
@@ -118,9 +117,6 @@ export default function DojoScene({
       {!editor.editMode && (
         <GatheringSpot config={scene.gatheringSpot} onClick={onGatheringClick} />
       )}
-
-      {/* Ambient Audio */}
-      <SceneAudio config={scene.audio} enabled={!editor.editMode} />
 
       {/* Hint */}
       {!editor.editMode && (

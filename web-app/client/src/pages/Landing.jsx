@@ -9,7 +9,7 @@ export default function Landing() {
     <div className="landing">
       <div className="landing-backdrop" />
       <div className="landing-content">
-        <div className="landing-emblem">🐉</div>
+        <img className="landing-emblem" src="/app-logo.webp" alt="Dragon's Hollow" draggable={false} />
         <h1 className="landing-title">Dragon's Hollow</h1>
         <p className="landing-subtitle">The tavern awaits, adventurer</p>
         <div className="landing-divider">

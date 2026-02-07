@@ -23,6 +23,7 @@ const leaderboardRoutes = require('./routes/leaderboard');
 const chatRoutes = require('./routes/chat');
 const campaignRoutes = require('./routes/campaign');
 const adminRoutes = require('./routes/admin');
+const presenceRoutes = require('./routes/presence');
 
 const app = express();
 const PORT = process.env.PORT || 3420;
@@ -70,6 +71,7 @@ app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/campaign', campaignRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/presence', presenceRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -32,9 +32,13 @@
 }
 
 .landing-emblem {
-  font-size: 4rem;
-  margin-bottom: 16px;
+  display: block;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin: 0 auto 16px;
   animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(212, 168, 67, 0.3));
 }
 
 @keyframes float {

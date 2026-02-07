@@ -224,7 +224,7 @@ async function pickRespondingNpc(locationNpcs, message, recentHistory = []) {
   });
 
   if (mentioned.length > 0) {
-    return mentioned.slice(0, 2); // Max 2 NPCs respond
+    return mentioned;
   }
 
   // Use LLM to pick who should respond

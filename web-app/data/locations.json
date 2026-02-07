@@ -5,6 +5,7 @@
     "npcs": [
       "marcel"
     ],
+    "groups": {},
     "features": [],
     "mapCoords": {
       "x": 50,
@@ -23,6 +24,24 @@
       "bigtam",
       "grumm"
     ],
+    "groups": {
+      "staff": {
+        "displayName": "Staff",
+        "members": [
+          "bigtam",
+          "grumm"
+        ]
+      },
+      "regulars": {
+        "displayName": "Regulars",
+        "members": [
+          "bonesy",
+          "mira",
+          "nibby",
+          "kumo"
+        ]
+      }
+    },
     "features": [
       "tavern_menu",
       "shop"
@@ -41,6 +60,16 @@
       "jonah",
       "reah"
     ],
+    "groups": {
+      "officers": {
+        "displayName": "Officers",
+        "members": [
+          "cena",
+          "jonah",
+          "reah"
+        ]
+      }
+    },
     "features": [],
     "mapCoords": {
       "x": 28,
@@ -48,7 +77,7 @@
     },
     "mapIcon": "🛡️",
     "scene": {
-      "background": "/images/scenes/barrack_interior.png",
+      "background": "/images/scenes/barrack_interior.webp",
       "gatheringSpot": {
         "label": "Strategize With Everyone",
         "position": {
@@ -122,6 +151,17 @@
       "ember",
       "ithrae"
     ],
+    "groups": {
+      "agents": {
+        "displayName": "Agents",
+        "members": [
+          "aurelia",
+          "brynleaf",
+          "ember",
+          "ithrae"
+        ]
+      }
+    },
     "features": [],
     "mapCoords": {
       "x": 59,
@@ -140,6 +180,19 @@
       "ximena",
       "kumo"
     ],
+    "groups": {
+      "warriors": {
+        "displayName": "Warriors",
+        "members": [
+          "djinn",
+          "kai",
+          "mai",
+          "edgar",
+          "ximena",
+          "kumo"
+        ]
+      }
+    },
     "features": [],
     "mapCoords": {
       "x": 23,
@@ -147,7 +200,7 @@
     },
     "mapIcon": "⛩️",
     "scene": {
-      "background": "/images/scenes/dojo_courtyard.png",
+      "background": "/images/scenes/dojo_courtyard.webp",
       "gatheringSpot": {
         "label": "Train With Everyone",
         "position": {

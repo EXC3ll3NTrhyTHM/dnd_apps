@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { getAudioMuted } from '../hooks/useAudioSettings';
 import '../styles/location-transition.css';
 
 // Location-specific themes for the ink wash
@@ -8,8 +9,8 @@ const LOCATION_THEMES = {
     accentColor: '#c4a035',
     particles: 'embers',
     subtitle: 'Training Grounds of the Four Elements',
-    bgImage: '/images/dojo_gate.png',
-    characterImage: '/images/kumo_gate.png',
+    bgImage: '/images/dojo_gate.webp',
+    characterImage: '/images/kumo_gate.webp',
     characterPosition: 'right', // which side the character sits on
     sound: '/sounds/dojo/gong.mp3',
   },
@@ -26,8 +27,8 @@ const LOCATION_THEMES = {
     accentColor: '#8899aa',
     particles: 'sparks',
     subtitle: 'Stronghold of the Shield',
-    bgImage: '/images/scenes/door_to_barracks.png',
-    characterImage: '/images/scenes/threx_forthog_barracks_guard.png',
+    bgImage: '/images/scenes/door_to_barracks.webp',
+    characterImage: '/images/scenes/threx_forthog_barracks_guard.webp',
     characterPosition: 'right',
     characterScale: 1.5,
     characterOffsetY: 200,
@@ -73,7 +74,7 @@ export default function LocationTransition({ locationId, locationName, onComplet
 
   // Play location-specific sound effect
   useEffect(() => {
-    if (!theme.sound) return;
+    if (!theme.sound || getAudioMuted()) return;
 
     const audio = new Audio();
     audio.volume = theme.soundVolume ?? 0.3;

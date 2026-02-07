@@ -2,37 +2,215 @@
   {
     "role": "player",
     "playerName": "excellentrhythm",
-    "text": "Hello",
-    "timestamp": "2026-02-05T00:47:31.782Z"
+    "text": "@Kai Xi Yang  hey man",
+    "timestamp": "2026-02-07T10:04:41.785Z"
   },
   {
     "role": "npc",
-    "npc": "djinn",
-    "npcDisplayName": "Djinn Zenatsu",
-    "text": "Greetings. What brings you here today?",
-    "emotion": "idle",
-    "timestamp": "2026-02-05T00:47:33.237Z"
-  },
-  {
-    "role": "npc",
-    "npc": "kumo",
-    "npcDisplayName": "Kumo",
-    "text": "I see you again. What is on your mind?",
-    "emotion": "idle",
-    "timestamp": "2026-02-05T00:47:34.316Z"
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "What's up? You got something on your mind or are you just here to say hi? Because I'm ready for anything!",
+    "emotion": "happy",
+    "timestamp": "2026-02-07T10:04:42.581Z"
   },
   {
     "role": "player",
     "playerName": "excellentrhythm",
-    "text": "Hey",
-    "timestamp": "2026-02-05T05:44:14.015Z"
+    "text": "@Kai Xi Yang  hey",
+    "timestamp": "2026-02-07T10:09:56.411Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "Hey! You know I'm always ready to rumble! What’s going on?",
+    "emotion": "happy",
+    "timestamp": "2026-02-07T10:09:58.189Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "@Mai Xi Yang  hey",
+    "timestamp": "2026-02-07T10:10:05.171Z"
   },
   {
     "role": "npc",
     "npc": "mai",
     "npcDisplayName": "Mai Xi Yang",
-    "text": "Hello again. How do you fare today?",
+    "text": "Hello. How can I assist you today?",
     "emotion": "idle",
-    "timestamp": "2026-02-05T05:44:15.576Z"
+    "timestamp": "2026-02-07T10:10:06.044Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "@Kai Xi Yang hey",
+    "timestamp": "2026-02-07T10:11:39.126Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "Hey! You trying to get my attention or just practicing your greetings? Let’s get to it!",
+    "emotion": "happy",
+    "timestamp": "2026-02-07T10:11:39.798Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "@Doc Edgar hey",
+    "timestamp": "2026-02-07T10:11:43.910Z"
+  },
+  {
+    "role": "npc",
+    "npc": "edgar",
+    "npcDisplayName": "Doc Edgar",
+    "text": "Yes? What do you need? Make it quick. We're running out of time.",
+    "emotion": "idle",
+    "timestamp": "2026-02-07T10:11:44.848Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "@Kai Xi Yang @Mai Xi Yang @Doc Edgar @Ximena Reyes @Kumo  hey",
+    "timestamp": "2026-02-07T10:11:51.197Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "Wow, gathering the whole crew! What’s the plan here? Are we sparring or just making rounds? Let's go!",
+    "emotion": "happy",
+    "timestamp": "2026-02-07T10:11:51.975Z"
+  },
+  {
+    "role": "npc",
+    "npc": "mai",
+    "npcDisplayName": "Mai Xi Yang",
+    "text": "It seems like we have everyone's attention. What do you wish to discuss with all of us?",
+    "emotion": "thoughtful",
+    "timestamp": "2026-02-07T10:11:52.637Z"
+  },
+  {
+    "role": "npc",
+    "npc": "edgar",
+    "npcDisplayName": "Doc Edgar",
+    "text": "You’ve called us all, so what’s on your mind? Speak up — don’t waste the moment.",
+    "emotion": "idle",
+    "timestamp": "2026-02-07T10:11:53.918Z"
+  },
+  {
+    "role": "npc",
+    "npc": "ximena",
+    "npcDisplayName": "Ximena Reyes",
+    "text": "Alright, alright! You’ve got my attention! What is it? Let’s make this quick; I’ve got flames to unleash!",
+    "emotion": "happy",
+    "timestamp": "2026-02-07T10:11:55.090Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kumo",
+    "npcDisplayName": "Kumo",
+    "text": "We’re all here. What's the call? Are we training, or is this a social visit?",
+    "emotion": "idle",
+    "timestamp": "2026-02-07T10:11:56.245Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "@Kai Xi Yang  *hits blunt* whats up",
+    "timestamp": "2026-02-07T10:13:47.820Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "Not much! Just ready to train and crush some challenges! What about you? Got any big plans or just enjoying the vibe?",
+    "emotion": "happy",
+    "timestamp": "2026-02-07T10:13:48.713Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "@Kai Xi Yang  *wave* hello",
+    "timestamp": "2026-02-07T10:25:47.071Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "*waves back, grinning* Hey! What’s cooking? Ready to spar or just here to chat?",
+    "emotion": "happy",
+    "timestamp": "2026-02-07T10:25:48.665Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "@Kai Xi Yang *wave* hey how's it going?",
+    "timestamp": "2026-02-07T10:31:35.491Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "*waves back energetically* It's going great! Just charged up and eager to train! You? What’s going on?",
+    "emotion": "happy",
+    "timestamp": "2026-02-07T10:31:36.420Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "@Kai Xi Yang *wave*",
+    "timestamp": "2026-02-07T10:33:17.621Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "*waves enthusiastically* Hey again! Come on, don’t just wave — let’s get into something fun! What’s on your mind?",
+    "emotion": "happy",
+    "timestamp": "2026-02-07T10:33:19.242Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "😄😄 @Kai Xi Yang",
+    "timestamp": "2026-02-07T10:59:55.199Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "*grins back* Those smiles are contagious! You ready to stir up some excitement? Let’s shake things up!",
+    "emotion": "happy",
+    "timestamp": "2026-02-07T10:59:56.319Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "@Kai Xi Yang can you send emojis?",
+    "timestamp": "2026-02-07T11:00:30.107Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "I can send some excitement, but only in words! Let’s use our energy instead! What’s the plan?",
+    "emotion": "happy",
+    "timestamp": "2026-02-07T11:00:30.941Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "@Kai Xi Yang hey",
+    "timestamp": "2026-02-07T11:41:09.411Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "Hey! What’s up? Got something on your mind or are you just here to challenge me?",
+    "emotion": "happy",
+    "timestamp": "2026-02-07T11:41:10.776Z"
   }
 ]

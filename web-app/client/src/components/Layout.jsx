@@ -1,4 +1,7 @@
+import { useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
+import { useAudioMuted } from '../hooks/useAudioSettings';
+import { useUiSounds } from '../hooks/useUiSounds';
 import '../styles/layout.css';
 
 const NAV_ITEMS = [
@@ -7,7 +10,62 @@ const NAV_ITEMS = [
   { path: '/profile', label: 'Profile', icon: '⚔️' },
 ];
 
+// Module-level audio singleton — survives component mount/unmount cycles
+let ambientAudio = null;
+
+function getAmbientAudio() {
+  if (!ambientAudio) {
+    ambientAudio = new Audio('/sounds/bustling-city.mp3');
+    ambientAudio.loop = true;
+    ambientAudio.volume = 0.4;
+  }
+  return ambientAudio;
+}
+
+export function pauseAmbientAudio() {
+  if (ambientAudio) ambientAudio.pause();
+}
+
 export default function Layout() {
+  const audioMuted = useAudioMuted();
+  const playSound = useUiSounds();
+
+  // Ambient city audio — plays across all Layout routes, stops on unmount (e.g. entering a location)
+  useEffect(() => {
+    const audio = getAmbientAudio();
+    audio.currentTime = 0;
+    audio.volume = audioMuted ? 0 : 0.4;
+    if (!audioMuted) {
+      audio.play().catch(() => {});
+    }
+
+    const tryResume = () => {
+      if (!audioMuted && audio.paused && !document.hidden) {
+        audio.play().catch(() => {});
+      }
+    };
+
+    // Pause when tab/app is hidden, resume when visible
+    const onVisibility = () => {
+      if (document.hidden) {
+        audio.pause();
+      } else if (!audioMuted) {
+        audio.play().catch(() => {});
+      }
+    };
+
+    window.addEventListener('click', tryResume);
+    window.addEventListener('touchstart', tryResume);
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      audio.pause();
+      window.removeEventListener('click', tryResume);
+      window.removeEventListener('touchstart', tryResume);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [audioMuted]);
+
   return (
     <div className="app-layout">
       <main className="main-content">
@@ -20,6 +78,7 @@ export default function Layout() {
             key={item.path}
             to={item.path}
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            onClick={() => playSound('navTap')}
           >
             <span className="nav-icon">{item.icon}</span>
             <span className="nav-label">{item.label}</span>

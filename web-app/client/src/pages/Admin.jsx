@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '../hooks/useApi';
 import { useTheme } from '../context/ThemeContext';
 import Toast from '../components/Toast';
@@ -10,6 +10,264 @@ const ALL_NPCS = [
   'nibby', 'reah', 'ximena'
 ];
 
+/* ── Group Management Card (per location) ── */
+function GroupCard({ loc, onSave, onToast }) {
+  // Build local editable groups from the server data
+  // loc.groups has { groupId: { displayName, memberIds, members } }
+  const [groups, setGroups] = useState({});
+  const [expanded, setExpanded] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
+
+  // Sync from server data when location changes
+  useEffect(() => {
+    const g = {};
+    if (loc.groups) {
+      for (const [gid, group] of Object.entries(loc.groups)) {
+        g[gid] = {
+          displayName: group.displayName,
+          members: [...(group.memberIds || [])]
+        };
+      }
+    }
+    setGroups(g);
+    setDirty(false);
+  }, [loc]);
+
+  const locationNpcIds = loc.npcs.map(n => n.id);
+
+  function toggleExpand(gid) {
+    setExpanded(prev => ({ ...prev, [gid]: !prev[gid] }));
+  }
+
+  function toggleMember(gid, npcId) {
+    setGroups(prev => {
+      const group = prev[gid];
+      const has = group.members.includes(npcId);
+      return {
+        ...prev,
+        [gid]: {
+          ...group,
+          members: has
+            ? group.members.filter(m => m !== npcId)
+            : [...group.members, npcId]
+        }
+      };
+    });
+    setDirty(true);
+  }
+
+  function updateDisplayName(gid, name) {
+    setGroups(prev => ({
+      ...prev,
+      [gid]: { ...prev[gid], displayName: name }
+    }));
+    setDirty(true);
+  }
+
+  function deleteGroup(gid) {
+    setGroups(prev => {
+      const next = { ...prev };
+      delete next[gid];
+      return next;
+    });
+    setExpanded(prev => {
+      const next = { ...prev };
+      delete next[gid];
+      return next;
+    });
+    setDirty(true);
+  }
+
+  function addGroup() {
+    // Generate a unique key
+    let idx = 1;
+    let key = 'new_group';
+    while (groups[key]) {
+      key = `new_group_${idx++}`;
+    }
+    setGroups(prev => ({
+      ...prev,
+      [key]: { displayName: 'New Group', members: [] }
+    }));
+    setExpanded(prev => ({ ...prev, [key]: true }));
+    setDirty(true);
+  }
+
+  async function save() {
+    setSaving(true);
+    try {
+      await api(`/api/admin/locations/${loc.id}/groups`, {
+        method: 'PUT',
+        body: JSON.stringify({ groups })
+      });
+      onToast({ type: 'success', message: `Groups saved for ${loc.name}` });
+      setDirty(false);
+      onSave();
+    } catch (err) {
+      onToast({ type: 'error', message: err.data?.error || 'Failed to save groups' });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const groupEntries = Object.entries(groups);
+
+  return (
+    <div style={{
+      marginBottom: 16,
+      padding: 12,
+      background: 'var(--bg-card)',
+      borderRadius: 8,
+      border: '1px solid var(--border-color)'
+    }}>
+      <h3 style={{
+        fontFamily: 'var(--font-display)',
+        fontSize: '0.95rem',
+        color: 'var(--color-gold)',
+        marginBottom: 8
+      }}>
+        {loc.name}
+      </h3>
+
+      {groupEntries.length === 0 && (
+        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 8 }}>
+          No groups defined
+        </div>
+      )}
+
+      {groupEntries.map(([gid, group]) => {
+        const isExpanded = expanded[gid];
+        return (
+          <div key={gid} style={{
+            marginBottom: 8,
+            border: '1px solid var(--border-color)',
+            borderRadius: 6,
+            overflow: 'hidden'
+          }}>
+            {/* Group header */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '6px 10px',
+                cursor: 'pointer',
+                background: 'rgba(255,255,255,0.02)',
+                gap: 8
+              }}
+              onClick={() => toggleExpand(gid)}
+            >
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', width: 12 }}>
+                {isExpanded ? '\u25BC' : '\u25B6'}
+              </span>
+              <input
+                type="text"
+                value={group.displayName}
+                onChange={e => updateDisplayName(gid, e.target.value)}
+                onClick={e => e.stopPropagation()}
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: '1px solid transparent',
+                  borderRadius: 4,
+                  color: 'var(--text-primary)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '0.85rem',
+                  padding: '2px 6px',
+                  outline: 'none',
+                  transition: 'border-color 0.15s',
+                  borderColor: 'transparent'
+                }}
+                onFocus={e => e.target.style.borderColor = 'var(--color-gold-dim)'}
+                onBlur={e => e.target.style.borderColor = 'transparent'}
+              />
+              <span style={{
+                fontSize: '0.7rem',
+                color: 'var(--text-muted)',
+                whiteSpace: 'nowrap'
+              }}>
+                {group.members.length} member{group.members.length !== 1 ? 's' : ''}
+              </span>
+              <button
+                onClick={e => { e.stopPropagation(); deleteGroup(gid); }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  padding: '0 4px',
+                  lineHeight: 1
+                }}
+                title="Delete group"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Expanded: member toggles */}
+            {isExpanded && (
+              <div style={{ padding: '8px 10px', display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                {locationNpcIds.map(npcId => {
+                  const isMember = group.members.includes(npcId);
+                  return (
+                    <button
+                      key={npcId}
+                      onClick={() => toggleMember(gid, npcId)}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: 12,
+                        border: `1px solid ${isMember ? 'var(--color-gold-dim)' : 'var(--border-color)'}`,
+                        background: isMember ? 'rgba(212, 168, 67, 0.15)' : 'transparent',
+                        color: isMember ? 'var(--color-gold)' : 'var(--text-muted)',
+                        fontSize: '0.75rem',
+                        cursor: 'pointer',
+                        fontFamily: 'var(--font-body)',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {npcId}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+        <button
+          onClick={addGroup}
+          style={{
+            padding: '4px 12px',
+            borderRadius: 6,
+            border: '1px dashed var(--border-color)',
+            background: 'transparent',
+            color: 'var(--text-muted)',
+            fontSize: '0.75rem',
+            cursor: 'pointer',
+            fontFamily: 'var(--font-body)'
+          }}
+        >
+          + Add Group
+        </button>
+        {dirty && (
+          <button
+            className="btn btn-primary"
+            onClick={save}
+            disabled={saving}
+            style={{ padding: '4px 16px', fontSize: '0.8rem' }}
+          >
+            {saving ? 'Saving...' : 'Save Groups'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── Main Admin Page ── */
 export default function Admin() {
   const { phase, setPhase } = useTheme();
   const [locations, setLocations] = useState([]);
@@ -26,7 +284,7 @@ export default function Admin() {
     loadLocations();
   }, []);
 
-  async function loadLocations() {
+  const loadLocations = useCallback(async () => {
     try {
       const data = await api('/api/chat/locations');
       setLocations(data.locations);
@@ -36,7 +294,7 @@ export default function Admin() {
         setAuthorized(false);
       }
     }
-  }
+  }, []);
 
   async function savePhase() {
     setSaving(true);
@@ -136,7 +394,7 @@ export default function Admin() {
       </section>
 
       {/* NPC Location Assignment */}
-      <section>
+      <section style={{ marginBottom: 32 }}>
         <h2 className="section-title">NPC Locations</h2>
         {locations.map(loc => (
           <div key={loc.id} style={{
@@ -179,6 +437,19 @@ export default function Admin() {
               })}
             </div>
           </div>
+        ))}
+      </section>
+
+      {/* Group Management */}
+      <section>
+        <h2 className="section-title">Group Management</h2>
+        {locations.map(loc => (
+          <GroupCard
+            key={loc.id}
+            loc={loc}
+            onSave={loadLocations}
+            onToast={setToast}
+          />
         ))}
       </section>
 
