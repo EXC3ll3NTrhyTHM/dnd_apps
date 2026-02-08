@@ -86,6 +86,8 @@ export default function LocationTransition({ locationId, locationName, onComplet
   const particlesRef = useRef([]);
   const skippedRef = useRef(false);
   const timersRef = useRef([]);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   const theme = LOCATION_THEMES[locationId] || DEFAULT_THEME;
 
@@ -133,10 +135,10 @@ export default function LocationTransition({ locationId, locationName, onComplet
     skippedRef.current = true;
     timersRef.current.forEach(clearTimeout);
     setPhase('fade-out');
-    setTimeout(() => onComplete(), 300);
+    setTimeout(() => onCompleteRef.current(), 300);
   };
 
-  // Phase timing
+  // Phase timing — runs once on mount (ref keeps onComplete stable)
   useEffect(() => {
     const timers = [];
 
@@ -146,11 +148,11 @@ export default function LocationTransition({ locationId, locationName, onComplet
     // Phase 3: Fade to black (3100ms - 3500ms)
     timers.push(setTimeout(() => setPhase('fade-out'), 3100));
     // Navigate while still covered by black screen
-    timers.push(setTimeout(() => onComplete(), 3400));
+    timers.push(setTimeout(() => onCompleteRef.current(), 3400));
 
     timersRef.current = timers;
     return () => timers.forEach(clearTimeout);
-  }, [onComplete]);
+  }, []);
 
   // Particle canvas animation
   useEffect(() => {

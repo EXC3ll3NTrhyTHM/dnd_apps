@@ -1,0 +1,20 @@
+[
+  {
+    "id": "10220539-8d24-40c3-9b52-78fb65cc7a77",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Cena Marella hello",
+    "timestamp": "2026-02-08T08:03:59.447Z"
+  },
+  {
+    "id": "07a6cd57-80a7-4690-b4c2-5d15a824c7aa",
+    "role": "npc",
+    "npc": "cena",
+    "npcDisplayName": "Cena Marella",
+    "text": "Ahoy, Architect! What brings you to the barracks today? Ready for a bit of strategy discussion or just stopping by for a chat?",
+    "emotion": "happy",
+    "timestamp": "2026-02-08T08:04:00.835Z"
+  }
+]

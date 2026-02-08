@@ -113,7 +113,7 @@ export default function LocationChat() {
     return () => vv.removeEventListener('resize', onResize);
   }, []);
 
-  // Presence: join on mount, heartbeat every 30s, leave on unmount
+  // Presence: join on mount, heartbeat every 10s, leave on unmount
   useEffect(() => {
     api('/api/presence/join', {
       method: 'POST',
@@ -125,7 +125,7 @@ export default function LocationChat() {
         method: 'POST',
         body: JSON.stringify({ locationId })
       }).catch(() => {});
-    }, 30000);
+    }, 10000);
 
     return () => {
       clearInterval(interval);

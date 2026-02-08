@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const STALE_MS = 2 * 60 * 1000; // 2 minutes
+const STALE_MS = 30 * 1000; // 30 seconds
 const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
 
 function loadPlayers() {

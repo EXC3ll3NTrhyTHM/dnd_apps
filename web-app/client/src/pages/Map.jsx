@@ -27,7 +27,7 @@ export default function Map() {
     loadLocations();
   }, []);
 
-  // Fetch presence on mount and poll every 30s
+  // Fetch presence on mount and poll every 5s for near-live tracking
   useEffect(() => {
     function fetchPresence() {
       api('/api/presence').then(data => {
@@ -35,7 +35,7 @@ export default function Map() {
       }).catch(() => {});
     }
     fetchPresence();
-    const interval = setInterval(fetchPresence, 30000);
+    const interval = setInterval(fetchPresence, 5000);
     return () => clearInterval(interval);
   }, []);
 
