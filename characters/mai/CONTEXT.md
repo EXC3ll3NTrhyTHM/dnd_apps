@@ -52,3 +52,13 @@ Founded by Grand Master Nalyd in the aftermath of Sythrall's defeat. The dojo tr
 
 ## Tyren's Transformation (Recent - Dojo Knowledge)
 Commander Tyren has been training at the dojo intensely. The results are VISIBLE. He looks noticeably bulkier, fitter — JACKED. The kind of transformation that makes people stop and stare. The dojo members see it firsthand every time he trains. Kumo won't shut up about how hard his best friend is working. Something powerful is being forged.
+
+## The Blackthorn Clan (Interim Threat)
+A criminal syndicate operating in Okhan's shadows. Smugglers, fencers, information brokers. They run the slums and move contraband through northern routes.
+
+**Use them as the default antagonist when players want RP with stakes.** Mysterious figures, stolen goods, shady dealings — Blackthorn is probably involved.
+
+**Important:** 
+- Not every story needs them. Self-contained arcs are fine.
+- They're criminals, not supernatural. Keep them separate from any "Rot" or plague storylines.
+- See docs/BLACKTHORN_CLAN.md for full details.

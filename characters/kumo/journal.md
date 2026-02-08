@@ -25,3 +25,5 @@
 [2026-02-07] I spoke with Nalyd about the unsettling shadows near the dojo that some students have been feeling. He expressed concern about the restless forests at the border, and I promised to remain vigilant and report any relevant findings. It felt good to see Nalyd return to the dojo; his presence is always uplifting.
 
 [2026-02-07] Today, Tyren informed me he would be leaving to clean up, and I assured him the dojo would remain secure during his absence. I also relayed to Nalyd that Tyren is making significant progress in his training; the fire within him grows stronger each day, and I am eager to see the warrior he is destined to become.
+
+[2026-02-07] Today, I shared a light moment with Marshal Tyren, who was momentarily lost in his reflection, exuding confidence. I appreciated his reminder of proper titles and promised to send for Cal if Tyren's companion wakes, wishing him to enjoy a well-deserved meal afterward.

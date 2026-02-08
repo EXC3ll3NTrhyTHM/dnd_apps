@@ -8,10 +8,19 @@
  */
 
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const jwt = require('jsonwebtoken');
 const { getAuthorizationUrl, exchangeCode, fetchUser, getAvatarUrl } = require('../lib/discord-auth');
 const { authRequired } = require('../middleware/auth');
 const { getWallet, getInventory } = require('../lib/economy');
+
+const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
+
+function loadPlayers() {
+  try { return JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8')); }
+  catch { return {}; }
+}
 
 const router = express.Router();
 
@@ -70,12 +79,27 @@ router.get('/me', authRequired, (req, res) => {
   const wallet = getWallet(req.user.id, req.user.username);
   const inventory = getInventory(req.user.id);
 
+  const players = loadPlayers();
+  const characterName = players[req.user.id]?.characterName || null;
+
+  // Persist avatar so enrichHistory can backfill old chat messages
+  if (req.user.avatar && (!players[req.user.id] || players[req.user.id].avatar !== req.user.avatar)) {
+    if (!players[req.user.id]) players[req.user.id] = {};
+    players[req.user.id].avatar = req.user.avatar;
+    try {
+      const tmpPath = PLAYERS_PATH + '.tmp';
+      fs.writeFileSync(tmpPath, JSON.stringify(players, null, 2));
+      fs.renameSync(tmpPath, PLAYERS_PATH);
+    } catch {}
+  }
+
   res.json({
     user: {
       id: req.user.id,
       username: req.user.username,
       global_name: req.user.global_name,
-      avatar: req.user.avatar
+      avatar: req.user.avatar,
+      characterName
     },
     wallet: {
       balance: wallet.balance,

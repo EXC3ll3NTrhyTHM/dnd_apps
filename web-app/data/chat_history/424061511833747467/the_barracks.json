@@ -12,5 +12,19 @@
     "text": "Ahoy there! Ready to set sail into some good conversation?",
     "emotion": "happy",
     "timestamp": "2026-02-05T00:47:19.905Z"
+  },
+  {
+    "role": "player",
+    "playerName": "The Architect",
+    "text": "@Rhea Stoic poop",
+    "timestamp": "2026-02-08T05:43:47.144Z"
+  },
+  {
+    "role": "npc",
+    "npc": "reah",
+    "npcDisplayName": "Rhea Stoic",
+    "text": "*raises an eyebrow* Not quite what I expected to hear from you, Architect. Got somethin' more substantial to discuss?",
+    "emotion": "thoughtful",
+    "timestamp": "2026-02-08T05:43:48.449Z"
   }
 ]

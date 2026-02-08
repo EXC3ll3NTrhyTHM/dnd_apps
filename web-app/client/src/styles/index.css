@@ -49,6 +49,7 @@
   /* Spacing */
   --nav-height: 64px;
   --top-bar-height: 52px;
+  --safe-area-top: env(safe-area-inset-top, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 
   /* Shadows */
@@ -83,6 +84,7 @@ html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
 }
 
 body {
@@ -95,6 +97,7 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
+  overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -253,6 +256,7 @@ img {
 
 .page {
   padding: 16px;
+  padding-top: calc(16px + var(--safe-area-top));
   padding-bottom: 20px;
 }
 

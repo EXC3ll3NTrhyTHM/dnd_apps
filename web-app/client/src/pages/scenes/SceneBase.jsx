@@ -2,7 +2,8 @@
  * SceneBase - Shared components and utilities for location scenes
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useUiSounds } from '../../hooks/useUiSounds';
 
 // Particle system component - reusable across scenes
 export function ParticleLayer({ config, className = '' }) {
@@ -83,9 +84,10 @@ export function NpcSprite({
 
 // Scene header component
 export function SceneHeader({ title, onBack, editMode, saving, onSave, onEditToggle, isAdmin }) {
+  const playSound = useUiSounds();
   return (
     <div className="scene-header">
-      <button className="scene-back-btn" onClick={onBack}>
+      <button className="scene-back-btn" onClick={() => { playSound('buttonTap'); onBack(); }}>
         ←
       </button>
       <div className="scene-title">{title}</div>
@@ -129,93 +131,102 @@ export function GatheringSpot({ config, onClick }) {
   );
 }
 
-// Edit panel component
-export function EditPanel({ 
-  npcId, 
-  placement, 
-  onScaleChange, 
-  onZIndexChange, 
+// Edit panel component — collapsible
+export function EditPanel({
+  npcId,
+  placement,
+  onScaleChange,
+  onZIndexChange,
   onFlipToggle,
-  onHitboxChange 
+  onHitboxChange
 }) {
+  const [collapsed, setCollapsed] = useState(false);
+
   if (!npcId || !placement) return null;
-  
+
   return (
-    <div className="edit-panel">
-      <div className="edit-panel-title">{npcId}</div>
-      <div className="edit-panel-row">
-        <label>Scale:</label>
-        <input
-          type="range"
-          min="0.3"
-          max="1.5"
-          step="0.05"
-          value={placement.scale || 1}
-          onChange={(e) => onScaleChange(npcId, e.target.value)}
-        />
-        <span>{(placement.scale || 1).toFixed(2)}</span>
+    <div className={`edit-panel ${collapsed ? 'edit-panel-collapsed' : ''}`}>
+      <div className="edit-panel-header" onClick={() => setCollapsed(c => !c)}>
+        <span className="edit-panel-title">{npcId}</span>
+        <span className="edit-panel-toggle">{collapsed ? '▲' : '▼'}</span>
       </div>
-      <div className="edit-panel-row">
-        <label>Layer:</label>
-        <input
-          type="range"
-          min="1"
-          max="20"
-          step="1"
-          value={placement.zIndex ?? 10}
-          onChange={(e) => onZIndexChange(npcId, e.target.value)}
-        />
-        <span>{placement.zIndex ?? 10}</span>
-      </div>
-      <div className="edit-panel-row">
-        <label>Flip:</label>
-        <button 
-          className={`edit-flip-btn ${placement.flipX ? 'active' : ''}`}
-          onClick={() => onFlipToggle(npcId)}
-        >
-          ↔️ {placement.flipX ? 'ON' : 'OFF'}
-        </button>
-      </div>
-      <div className="edit-panel-divider">Hitbox</div>
-      <div className="edit-panel-row">
-        <label>Width:</label>
-        <input
-          type="range"
-          min="20"
-          max="200"
-          step="5"
-          value={placement.hitboxWidth || 60}
-          onChange={(e) => onHitboxChange(npcId, 'hitboxWidth', e.target.value)}
-        />
-        <span>{placement.hitboxWidth || 60}</span>
-      </div>
-      <div className="edit-panel-row">
-        <label>Height:</label>
-        <input
-          type="range"
-          min="30"
-          max="300"
-          step="5"
-          value={placement.hitboxHeight || 120}
-          onChange={(e) => onHitboxChange(npcId, 'hitboxHeight', e.target.value)}
-        />
-        <span>{placement.hitboxHeight || 120}</span>
-      </div>
-      <div className="edit-panel-row">
-        <label>Y Offset:</label>
-        <input
-          type="range"
-          min="0"
-          max="80"
-          step="5"
-          value={placement.hitboxOffsetY || 30}
-          onChange={(e) => onHitboxChange(npcId, 'hitboxOffsetY', e.target.value)}
-        />
-        <span>{placement.hitboxOffsetY || 30}%</span>
-      </div>
-      <div className="edit-panel-coords">
-        X: {placement.x} | Y: {placement.y}
-      </div>
+      {!collapsed && (
+        <>
+          <div className="edit-panel-row">
+            <label>Scale:</label>
+            <input
+              type="range"
+              min="0.3"
+              max="1.5"
+              step="0.05"
+              value={placement.scale || 1}
+              onChange={(e) => onScaleChange(npcId, e.target.value)}
+            />
+            <span>{(placement.scale || 1).toFixed(2)}</span>
+          </div>
+          <div className="edit-panel-row">
+            <label>Layer:</label>
+            <input
+              type="range"
+              min="1"
+              max="20"
+              step="1"
+              value={placement.zIndex ?? 10}
+              onChange={(e) => onZIndexChange(npcId, e.target.value)}
+            />
+            <span>{placement.zIndex ?? 10}</span>
+          </div>
+          <div className="edit-panel-row">
+            <label>Flip:</label>
+            <button
+              className={`edit-flip-btn ${placement.flipX ? 'active' : ''}`}
+              onClick={() => onFlipToggle(npcId)}
+            >
+              ↔️ {placement.flipX ? 'ON' : 'OFF'}
+            </button>
+          </div>
+          <div className="edit-panel-divider">Hitbox</div>
+          <div className="edit-panel-row">
+            <label>Width:</label>
+            <input
+              type="range"
+              min="20"
+              max="200"
+              step="5"
+              value={placement.hitboxWidth || 60}
+              onChange={(e) => onHitboxChange(npcId, 'hitboxWidth', e.target.value)}
+            />
+            <span>{placement.hitboxWidth || 60}</span>
+          </div>
+          <div className="edit-panel-row">
+            <label>Height:</label>
+            <input
+              type="range"
+              min="30"
+              max="300"
+              step="5"
+              value={placement.hitboxHeight || 120}
+              onChange={(e) => onHitboxChange(npcId, 'hitboxHeight', e.target.value)}
+            />
+            <span>{placement.hitboxHeight || 120}</span>
+          </div>
+          <div className="edit-panel-row">
+            <label>Y Offset:</label>
+            <input
+              type="range"
+              min="0"
+              max="80"
+              step="5"
+              value={placement.hitboxOffsetY || 30}
+              onChange={(e) => onHitboxChange(npcId, 'hitboxOffsetY', e.target.value)}
+            />
+            <span>{placement.hitboxOffsetY || 30}%</span>
+          </div>
+          <div className="edit-panel-coords">
+            X: {placement.x} | Y: {placement.y}
+          </div>
+        </>
+      )}
     </div>
   );
 }

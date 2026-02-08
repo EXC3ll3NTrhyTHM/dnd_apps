@@ -12,6 +12,8 @@ import { useAuth } from '../hooks/useAuth';
 import NpcBar from '../components/NpcBar';
 import ChatBubble from '../components/ChatBubble';
 import ChatInput from '../components/ChatInput';
+import ChatInputCustom from '../components/ChatInputCustom';
+import EffectsOverlay, { useEffects } from '../components/EffectsOverlay';
 import ItemCard from '../components/ItemCard';
 import Toast from '../components/Toast';
 import SceneAudio from './scenes/SceneAudio';
@@ -19,6 +21,10 @@ import { getSceneComponent } from './scenes';
 import { useUiSounds } from '../hooks/useUiSounds';
 import '../styles/location-chat.css';
 import '../styles/location-scene.css';
+import '../styles/custom-keyboard.css';
+
+// Set to true to use the custom on-screen keyboard (allows fullscreen effects over keyboard)
+const USE_CUSTOM_KEYBOARD = true;
 
 // Admin IDs who can use edit mode
 const ADMIN_IDS = ['424061511833747467'];
@@ -43,8 +49,55 @@ export default function LocationChat() {
   const messagesEndRef = useRef(null);
   const chatAreaRef = useRef(null);
   const playSound = useUiSounds();
+  const [effect, triggerEffect, clearEffect] = useEffects();
+  const latestTimestampRef = useRef(null);
+  const sendingRef = useRef(false);
+  const knownIdsRef = useRef(new Set());
 
   const isAdmin = ADMIN_IDS.includes(user?.id || '');
+
+  // ── Back-button: scene↔chat history management ──
+  const hasSceneRef = useRef(false);
+  const viewModeRef = useRef('scene');
+  const viewChangedByPopRef = useRef(false);
+
+  // Keep hasScene ref in sync
+  useEffect(() => {
+    const SceneComp = getSceneComponent(locationId);
+    hasSceneRef.current = !!(SceneComp && location?.scene);
+  }, [locationId, location]);
+
+  // Push/pop history entries when switching between scene and chat views
+  useEffect(() => {
+    const prev = viewModeRef.current;
+    viewModeRef.current = viewMode;
+
+    if (viewMode === 'chat' && prev === 'scene' && hasSceneRef.current) {
+      // Entering chat from scene — push history entry so back button can return
+      window.history.pushState({ chatView: true }, '');
+    } else if (viewMode === 'scene' && prev === 'chat' && !viewChangedByPopRef.current) {
+      // Returned to scene via UI button — clean up the history entry
+      if (window.history.state?.chatView) {
+        window.history.back();
+      }
+    }
+    viewChangedByPopRef.current = false;
+  }, [viewMode]);
+
+  // Listen for OS back button to switch chat → scene
+  useEffect(() => {
+    function onPopState() {
+      // If we landed on our chatView entry, something above (keyboard) was just closed
+      if (window.history.state?.chatView) return;
+      // If in chat and location has a scene, go back to scene view
+      if (viewModeRef.current === 'chat' && hasSceneRef.current) {
+        viewChangedByPopRef.current = true;
+        setViewMode('scene');
+      }
+    }
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   // Keep chat layout above the virtual keyboard on iOS/Android
   useEffect(() => {
@@ -86,6 +139,39 @@ export default function LocationChat() {
     };
   }, [locationId]);
 
+  // Poll for new messages from other players every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (sendingRef.current || !latestTimestampRef.current) return;
+      try {
+        const data = await api(
+          `/api/chat/locations/${locationId}/messages?since=${encodeURIComponent(latestTimestampRef.current)}`
+        );
+        const newMsgs = (data.messages || []).filter(m => m.id && !knownIdsRef.current.has(m.id));
+        if (newMsgs.length > 0) {
+          newMsgs.forEach(m => knownIdsRef.current.add(m.id));
+          // Update latest timestamp
+          const newest = newMsgs[newMsgs.length - 1].timestamp;
+          if (newest > latestTimestampRef.current) {
+            latestTimestampRef.current = newest;
+          }
+          setMessages(prev => [...prev, ...newMsgs]);
+          // Update NPC emotions from polled messages
+          newMsgs.forEach(m => {
+            if (m.role === 'npc' && m.emotion) {
+              setNpcEmotions(prev => ({ ...prev, [m.npc]: m.emotion }));
+            }
+          });
+          playSound('npcResponse');
+        }
+      } catch {
+        // Polling failure is non-fatal
+      }
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [locationId]);
+
   // Load location data + chat history
   useEffect(() => {
     loadLocationAndHistory();
@@ -107,7 +193,20 @@ export default function LocationChat() {
       // Add locationId to the location object for convenience
       loc.id = locationId;
       setLocation(loc);
-      setMessages(histData.history || []);
+      const history = histData.history || [];
+      setMessages(history);
+
+      // Seed known IDs and latest timestamp for polling
+      const ids = new Set();
+      let latest = null;
+      history.forEach(msg => {
+        if (msg.id) ids.add(msg.id);
+        if (msg.timestamp && (!latest || msg.timestamp > latest)) {
+          latest = msg.timestamp;
+        }
+      });
+      knownIdsRef.current = ids;
+      latestTimestampRef.current = latest;
 
       // Start in scene mode if location has a custom scene, otherwise chat
       const SceneComponent = getSceneComponent(locationId);
@@ -115,7 +214,7 @@ export default function LocationChat() {
 
       // Restore last emotion per NPC from history
       const emotions = {};
-      (histData.history || []).forEach(msg => {
+      history.forEach(msg => {
         if (msg.role === 'npc' && msg.emotion) {
           emotions[msg.npc] = msg.emotion;
         }
@@ -140,15 +239,21 @@ export default function LocationChat() {
   const handleSend = useCallback(async (text) => {
     if (sending) return;
     setSending(true);
+    sendingRef.current = true;
 
     playSound('messageSent');
 
-    const playerMsg = {
+    // Optimistic player message (will be replaced by server version with id/userId)
+    const optimisticMsg = {
       role: 'player',
       text,
-      timestamp: new Date().toISOString()
+      userId: user?.id,
+      playerName: user?.characterName || user?.global_name || user?.username || 'You',
+      playerAvatar: user?.avatar,
+      timestamp: new Date().toISOString(),
+      _optimistic: true
     };
-    setMessages(prev => [...prev, playerMsg]);
+    setMessages(prev => [...prev, optimisticMsg]);
 
     // Show typing indicators for @mentioned NPCs, or a generic one if none mentioned
     const typingId = Date.now();
@@ -180,9 +285,20 @@ export default function LocationChat() {
         body: JSON.stringify({ message: text })
       });
 
+      // Track IDs so polling doesn't re-add these
+      const allNew = [data.playerMessage, ...data.responses];
+      allNew.forEach(m => { if (m.id) knownIdsRef.current.add(m.id); });
+
+      // Update latest timestamp
+      const newest = allNew[allNew.length - 1]?.timestamp;
+      if (newest && (!latestTimestampRef.current || newest > latestTimestampRef.current)) {
+        latestTimestampRef.current = newest;
+      }
+
       setMessages(prev => {
-        const withoutTyping = prev.filter(m => !m._typingId);
-        return [...withoutTyping, ...data.responses];
+        // Replace optimistic player msg + typing bubbles with server versions
+        const withoutOptimistic = prev.filter(m => !m._typingId && !m._optimistic);
+        return [...withoutOptimistic, data.playerMessage, ...data.responses];
       });
 
       playSound('npcResponse');
@@ -198,6 +314,7 @@ export default function LocationChat() {
       setToast({ type: 'error', message: err.message || 'Failed to send message' });
     } finally {
       setSending(false);
+      sendingRef.current = false;
     }
   }, [sending, locationId, location]);
 
@@ -317,7 +434,7 @@ export default function LocationChat() {
         <div className="location-chat">
           {/* Header */}
           <div className="chat-header">
-            <button className="chat-back-btn" onClick={hasScene ? handleBackToScene : () => navigate('/map')}>
+            <button className="chat-back-btn" onClick={() => { playSound('buttonTap'); hasScene ? handleBackToScene() : navigate('/map'); }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
@@ -358,7 +475,7 @@ export default function LocationChat() {
                 </div>
               ) : (
                 messages.map((msg, i) => (
-                  <ChatBubble key={msg.timestamp || i} message={msg} npcs={location.npcs} />
+                  <ChatBubble key={msg.id || msg._typingId || i} message={msg} npcs={location.npcs} currentUserId={user?.id} />
                 ))
               )}
               <div ref={messagesEndRef} />
@@ -366,14 +483,27 @@ export default function LocationChat() {
           </div>
 
           {/* Chat Input */}
-          <ChatInput
-            onSend={handleSend}
-            disabled={sending}
-            npcs={location.npcs}
-            groups={location.groups || {}}
-            insertNpc={insertNpc}
-            onInsertNpcDone={() => setInsertNpc(null)}
-          />
+          {USE_CUSTOM_KEYBOARD ? (
+            <ChatInputCustom
+              onSend={handleSend}
+              disabled={sending}
+              npcs={location.npcs}
+              groups={location.groups || {}}
+              insertNpc={insertNpc}
+              onInsertNpcDone={() => setInsertNpc(null)}
+              playSound={playSound}
+              scrollContainerRef={chatAreaRef}
+            />
+          ) : (
+            <ChatInput
+              onSend={handleSend}
+              disabled={sending}
+              npcs={location.npcs}
+              groups={location.groups || {}}
+              insertNpc={insertNpc}
+              onInsertNpcDone={() => setInsertNpc(null)}
+            />
+          )}
 
           {/* Menu Overlay */}
           {menuOpen && menuData && (
@@ -410,6 +540,9 @@ export default function LocationChat() {
           )}
         </div>
       )}
+
+      {/* Effects overlay — renders above custom keyboard */}
+      <EffectsOverlay effect={effect} onDone={clearEffect} />
 
       {/* Toast */}
       {toast && (

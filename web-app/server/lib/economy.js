@@ -9,6 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 
+const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
 const ECONOMY_DIR = path.resolve(__dirname, '..', '..', '..', 'economy');
 const CHARACTERS_DIR = path.resolve(__dirname, '..', '..', '..', 'characters');
 const QUESTMASTER_DIR = path.resolve(__dirname, '..', '..', '..', 'questmaster');
@@ -305,13 +306,17 @@ function waitForSignalResult(signalId, timeoutMs = 5000) {
 
 function getLeaderboard(limit = 10) {
   const wallets = loadWallets();
+  let players = {};
+  try { players = JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8')); }
+  catch { /* ignore */ }
+
   return Object.values(wallets)
     .sort((a, b) => b.balance - a.balance)
     .slice(0, limit)
     .map((w, i) => ({
       rank: i + 1,
       user_id: w.user_id,
-      username: w.username,
+      username: players[w.user_id]?.characterName || w.username,
       balance: w.balance,
       lifetime_earned: w.lifetime_earned
     }));

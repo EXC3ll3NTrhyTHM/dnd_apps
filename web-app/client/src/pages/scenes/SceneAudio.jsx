@@ -14,8 +14,12 @@ export function SceneAudio({ config, enabled = true }) {
   const muted = useAudioMuted();
 
   useEffect(() => {
-    if (!config || !enabled) return;
+    if (!config || !enabled) {
+      console.log('[SceneAudio] Skipped — config:', !!config, 'enabled:', enabled);
+      return;
+    }
 
+    console.log('[SceneAudio] Init with config:', JSON.stringify(config), 'muted:', muted);
     const audioElements = [];
 
     // Create music track
@@ -25,6 +29,7 @@ export function SceneAudio({ config, enabled = true }) {
       music.volume = muted ? 0 : (config.music.volume ?? 0.3);
       musicRef.current = music;
       audioElements.push(music);
+      console.log('[SceneAudio] Created music:', config.music.src, 'vol:', music.volume);
     }
 
     // Create ambient sound layers
@@ -38,41 +43,38 @@ export function SceneAudio({ config, enabled = true }) {
       audioElements.push(...ambientRefs.current);
     }
 
-    // Wait for all to load, then play
-    let loadedCount = 0;
-    const totalCount = audioElements.length;
+    if (audioElements.length === 0) return;
 
-    if (totalCount === 0) return;
-
-    audioElements.forEach(audio => {
+    // Play each track as soon as it's ready
+    audioElements.forEach((audio, i) => {
       audio.addEventListener('canplaythrough', () => {
-        loadedCount++;
-        if (loadedCount === totalCount) {
-          if (!muted) {
-            audioElements.forEach((a, i) => {
-              setTimeout(() => {
-                a.play().catch(() => {});
-              }, i * 200);
+        console.log('[SceneAudio] canplaythrough:', audio.src, 'muted:', muted);
+        if (!muted) {
+          setTimeout(() => {
+            audio.play().then(() => {
+              console.log('[SceneAudio] Playing:', audio.src);
+            }).catch((err) => {
+              console.warn('[SceneAudio] Play blocked:', audio.src, err.message);
             });
-          }
+          }, i * 200);
         }
       }, { once: true });
 
       audio.addEventListener('error', (e) => {
-        console.warn('Audio failed to load:', audio.src, e);
+        console.warn('[SceneAudio] Load error:', audio.src, e);
       });
 
       audio.load();
     });
 
-    // Try to resume audio on user interaction (for autoplay policy)
+    // Try to resume audio on any user interaction (for autoplay policy)
     const resumeAudio = () => {
       if (muted || document.hidden) return;
-      if (musicRef.current?.paused) {
-        musicRef.current.play().catch(() => {});
-      }
-      ambientRefs.current.forEach(audio => {
-        if (audio.paused) audio.play().catch(() => {});
+      audioElements.forEach(audio => {
+        if (audio.paused) {
+          console.log('[SceneAudio] Resuming on interaction:', audio.src);
+          audio.play().then(() => console.log('[SceneAudio] Resumed OK')).catch(e => console.warn('[SceneAudio] Resume failed:', e.message));
+        }
       });
     };
 
@@ -87,6 +89,7 @@ export function SceneAudio({ config, enabled = true }) {
 
     window.addEventListener('click', resumeAudio);
     window.addEventListener('touchstart', resumeAudio);
+    window.addEventListener('pointerdown', resumeAudio);
     document.addEventListener('visibilitychange', onVisibility);
 
     // Cleanup
@@ -99,6 +102,7 @@ export function SceneAudio({ config, enabled = true }) {
       ambientRefs.current = [];
       window.removeEventListener('click', resumeAudio);
       window.removeEventListener('touchstart', resumeAudio);
+      window.removeEventListener('pointerdown', resumeAudio);
       document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [config, enabled, muted]);

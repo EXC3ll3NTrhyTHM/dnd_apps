@@ -1,0 +1,30 @@
+[
+  {
+    "role": "player",
+    "playerName": "The Architect",
+    "text": "@Mira sup girl",
+    "timestamp": "2026-02-08T05:44:39.660Z"
+  },
+  {
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Hey there, Architect! Just keeping an eye on things and waiting for some mischief to stir up. What’s got you in a twist today?",
+    "emotion": "idle",
+    "timestamp": "2026-02-08T05:44:41.070Z"
+  },
+  {
+    "role": "player",
+    "playerName": "The Architect",
+    "text": "@Mira banana",
+    "timestamp": "2026-02-08T05:45:31.340Z"
+  },
+  {
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Banana? Are we throwing fruit now? I knew you were fruity, but this is a whole new level! 🍌 Got a plan or just trying to distract me?",
+    "emotion": "happy",
+    "timestamp": "2026-02-08T05:45:32.312Z"
+  }
+]

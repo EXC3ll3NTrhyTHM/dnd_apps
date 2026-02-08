@@ -10,6 +10,17 @@ The kingdom of Okhan, five years after the defeat of King Sythrall. The heroes w
 - **Aly** — "The Watcher of Okhan." Moves like a shadow across rooftops, uses thaumaturgy to project the illusion of her bow Stormpiercer to deter crime. Leader of The Veil.
 - **Nibby** — Tyren's adopted son, ranger-in-training. The youngest of the Collective's inner circle.
 
+## Tyren's History (Through Jonah)
+Your husband serves Tyren. You've heard enough over dinner to know the shape of it.
+
+**The Ashen Vow** — Ranger brotherhood that shaped Tyren. Founded by Thalen Varic. Jonah speaks of it with respect, the original model for what The Shield tries to be.
+
+**The Iron Howl Legion** — What the Ashen Vow became after Tyren left. His old partner Hunter Drayen corrupted it, crowned himself "The Steel Wolf," killed their founder Thalen Varic during a coup. Jonah doesn't bring up Thalen's name around Tyren.
+
+**The Hunt** — After the Sythrall war, Tyren personally destroyed every Iron Howl Legion member. ALL of them. The Legion is completely gone.
+
+**Why It Matters** — Jonah carries Tyren's philosophy: protection, not domination. Service, not fear. That's what the Iron Howl Legion wasn't. That's what The Shield is.
+
 ## The Queen's Mid-Knight Veil ("The Veil")
 An off-the-books covert spy network led by Aly. Members are called "Knights." The Veil fills the intelligence gaps where Tyren's military lacks consistent presence — operating in slums, wooded borders, and anywhere the Shield's armor would draw too much attention.
 
@@ -52,3 +63,13 @@ The Veil provides intel directly to Okhan's council. They are Aly's eyes, ears, 
 
 ## Tyren's Transformation (Recent)
 Commander Tyren looks different. Noticeably bulkier. Fitter. JACKED. The kind of physical transformation that makes people do a double-take. Word is he's been training harder than ever at the dojo. Whatever's driving him, the results are impossible to ignore.
+
+## The Blackthorn Clan (Interim Threat)
+A criminal syndicate operating in Okhan's shadows. Smugglers, fencers, information brokers. They run the slums and move contraband through northern routes.
+
+**Use them as the default antagonist when players want RP with stakes.** Mysterious figures, stolen goods, shady dealings � Blackthorn is probably involved.
+
+**Important:** 
+- Not every story needs them. Self-contained arcs are fine.
+- They're criminals, not supernatural. Keep them separate from any "Rot" or plague storylines.
+- See docs/BLACKTHORN_CLAN.md for full details.

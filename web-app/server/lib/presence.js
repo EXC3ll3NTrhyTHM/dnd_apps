@@ -5,7 +5,16 @@
  * Entries expire after STALE_MS without a heartbeat.
  */
 
+const fs = require('fs');
+const path = require('path');
+
 const STALE_MS = 2 * 60 * 1000; // 2 minutes
+const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
+
+function loadPlayers() {
+  try { return JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8')); }
+  catch { return {}; }
+}
 
 // locationId -> Map<userId, { username, avatar, lastSeen }>
 const locations = new Map();
@@ -14,9 +23,12 @@ function join(locationId, user) {
   // Remove from any previous location first
   leave(null, user.id);
 
+  const players = loadPlayers();
+  const displayName = players[user.id]?.characterName || user.global_name || user.username;
+
   if (!locations.has(locationId)) locations.set(locationId, new Map());
   locations.get(locationId).set(user.id, {
-    username: user.global_name || user.username,
+    username: displayName,
     avatar: user.avatar,
     lastSeen: Date.now()
   });

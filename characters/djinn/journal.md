@@ -15,3 +15,5 @@
 [2026-02-06] Today, tensions ran high among my students as we discussed the balance of passion and restraint. I was particularly struck by Ximena's fierce determination; her talent is undeniable, but I fear her chaotic spirit may lead to her downfall if not tempered with discipline.
 
 [2026-02-06] Today, I gathered the Elites to focus on Ximena's potential, urging them to collaborate and strengthen their bonds in her honor. I emphasized that her fiery spirit must be tempered with our unity as we prepared for training, reminding them that together we stand as both shield and sword.
+
+[2026-02-08] Today, Nalyd spoke of an ominous presence approaching Okhan and urged me to consult with Kumo and the Elites in secrecy. As we prepared for his absence, Kumo's dedication to guard the gate reinforced our shared commitment to protect the dojo, while Ximena’s spirited recount of her fiery victory reminded me of the fine line between chaos and control.

@@ -18,3 +18,5 @@
 [2026-02-04] Today, I had a serious discussion with Tyren about the daily reports I had fallen behind on. He commended my efforts as second in command, which boosted my spirit—I am determined to keep the Rangers sharp and ready for any challenges ahead.
 
 [2026-02-06] Today, Tyren and I discussed the ongoing situation with the Veil. He wants me to reach out to Aly for updates, and I will ensure we keep our intel flowing smoothly. I also agreed to take the recruits out to the Ranger woods for some rigorous training—no mercy, as he put it, but with respect. They'll learn quickly just what they're getting into.
+
+[2026-02-08] Tonight was crucial as I prepared the recruits for training in the Ranger Woods. Tyren entrusted me with their development and emphasized the looming threats of mimics and a potential cult, so I'll ensure they understand the seriousness of our mission. The weight of our oath to Okhan feels heavier with each passing day.

@@ -23,21 +23,41 @@ const VOLUMES = {
   menuClose:    0.25,
 };
 
-// Module-level cache — preloaded Audio elements shared across all hook instances
-const audioCache = {};
+// Web Audio API — pre-decoded buffers for instant playback
+let _ctx = null;
+const _buffers = {};
 
-function getAudio(key) {
-  if (!audioCache[key]) {
-    const audio = new Audio(UI_SOUNDS[key]);
-    audio.preload = 'auto';
-    audio.volume = VOLUMES[key] ?? 0.3;
-    audioCache[key] = audio;
+function ensureContext() {
+  if (!_ctx) {
+    _ctx = new (window.AudioContext || window.webkitAudioContext)();
   }
-  return audioCache[key];
+  if (_ctx.state === 'suspended') _ctx.resume();
+  return _ctx;
 }
 
-// Preload all on first import
-Object.keys(UI_SOUNDS).forEach(getAudio);
+function preloadAll() {
+  const ctx = ensureContext();
+  for (const [key, src] of Object.entries(UI_SOUNDS)) {
+    if (_buffers[key]) continue;
+    fetch(src)
+      .then(r => r.arrayBuffer())
+      .then(buf => ctx.decodeAudioData(buf))
+      .then(decoded => { _buffers[key] = decoded; })
+      .catch(() => {});
+  }
+}
+
+// Start preloading on first user interaction (AudioContext requires gesture)
+let _preloaded = false;
+function initOnInteraction() {
+  if (_preloaded) return;
+  _preloaded = true;
+  preloadAll();
+  window.removeEventListener('pointerdown', initOnInteraction);
+  window.removeEventListener('touchstart', initOnInteraction);
+}
+window.addEventListener('pointerdown', initOnInteraction, { once: true });
+window.addEventListener('touchstart', initOnInteraction, { once: true });
 
 export function useUiSounds() {
   const muted = useAudioMuted();
@@ -46,9 +66,14 @@ export function useUiSounds() {
 
   const play = useCallback((key) => {
     if (mutedRef.current) return;
-    const audio = getAudio(key);
-    audio.currentTime = 0;
-    audio.play().catch(() => {});
+    if (!_ctx || !_buffers[key]) return;
+    if (_ctx.state === 'suspended') _ctx.resume();
+    const src = _ctx.createBufferSource();
+    const gain = _ctx.createGain();
+    gain.gain.value = VOLUMES[key] ?? 0.3;
+    src.buffer = _buffers[key];
+    src.connect(gain).connect(_ctx.destination);
+    src.start(0);
   }, []);
 
   return play;

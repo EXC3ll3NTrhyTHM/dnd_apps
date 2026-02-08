@@ -40,8 +40,11 @@ const LOCATION_THEMES = {
     accentColor: '#7b68ee',
     particles: 'wisps',
     subtitle: 'Where Shadows Keep Secrets',
-    bgImage: null,
-    sound: null,
+    bgImage: '/images/scenes/veil_exterior.webp',
+    sounds: [
+      { src: '/sounds/veil/transition.mp3', volume: 0.6 },
+      { src: '/sounds/veil/stone-slide-2.mp3', volume: 0.4, delay: 1400 },
+    ],
   },
   the_collective: {
     inkColor: '#0c0a07',
@@ -50,6 +53,18 @@ const LOCATION_THEMES = {
     subtitle: 'Heart of Okhan',
     bgImage: null,
     sound: null,
+  },
+  the_cottage: {
+    inkColor: '#0a0c07',
+    accentColor: '#7aab5e',
+    particles: 'dust',
+    subtitle: 'A Cozy Woodland Retreat',
+    bgImage: '/images/scenes/cottage_exterior.webp',
+    sounds: [
+      { src: '/sounds/cottage/sparkle.mp3', volume: 0.3 },
+      { src: '/sounds/cottage/birds.mp3', volume: 0.35 },
+      { src: '/sounds/cottage/creek.mp3', volume: 0.2 },
+    ],
   },
 };
 
@@ -69,31 +84,57 @@ export default function LocationTransition({ locationId, locationName, onComplet
   const canvasRef = useRef(null);
   const animFrameRef = useRef(null);
   const particlesRef = useRef([]);
+  const skippedRef = useRef(false);
+  const timersRef = useRef([]);
 
   const theme = LOCATION_THEMES[locationId] || DEFAULT_THEME;
 
-  // Play location-specific sound effect
+  // Play location-specific sound effect(s)
   useEffect(() => {
-    if (!theme.sound || getAudioMuted()) return;
+    if (getAudioMuted()) return;
 
-    const audio = new Audio();
-    audio.volume = theme.soundVolume ?? 0.3;
+    // Build list: support both single `sound` and layered `sounds` array
+    const entries = [];
+    if (theme.sounds) {
+      theme.sounds.forEach(s => entries.push({ src: s.src, volume: s.volume ?? 0.3, delay: s.delay ?? 0 }));
+    } else if (theme.sound) {
+      entries.push({ src: theme.sound, volume: theme.soundVolume ?? 0.3 });
+    }
+    if (entries.length === 0) return;
 
-    audio.addEventListener('canplaythrough', () => {
-      audio.play().catch(() => {
-        // Autoplay blocked, ignore silently
+    entries.forEach(({ src, volume, delay }) => {
+      const audio = new Audio();
+      audio.volume = volume;
+
+      audio.addEventListener('canplaythrough', () => {
+        if (delay > 0) {
+          const t = setTimeout(() => audio.play().catch(() => {}), delay);
+          timersRef.current.push(t);
+        } else {
+          audio.play().catch(() => {});
+        }
+      }, { once: true });
+
+      audio.addEventListener('error', (e) => {
+        console.warn('Transition sound failed to load:', src, e);
       });
-    }, { once: true });
 
-    audio.addEventListener('error', (e) => {
-      console.warn('Transition sound failed to load:', theme.sound, e);
+      audio.src = src;
+      audio.load();
     });
 
-    audio.src = theme.sound;
-    audio.load();
-
     // No cleanup - let one-shot sounds ring out naturally after transition unmounts
-  }, [theme.sound]);
+  }, [theme.sound, theme.sounds]);
+
+  // Tap to skip transition
+  const handleSkip = (e) => {
+    e.stopPropagation();
+    if (skippedRef.current) return;
+    skippedRef.current = true;
+    timersRef.current.forEach(clearTimeout);
+    setPhase('fade-out');
+    setTimeout(() => onComplete(), 300);
+  };
 
   // Phase timing
   useEffect(() => {
@@ -107,6 +148,7 @@ export default function LocationTransition({ locationId, locationName, onComplet
     // Navigate while still covered by black screen
     timers.push(setTimeout(() => onComplete(), 3400));
 
+    timersRef.current = timers;
     return () => timers.forEach(clearTimeout);
   }, [onComplete]);
 
@@ -263,6 +305,7 @@ export default function LocationTransition({ locationId, locationName, onComplet
         '--ink-color': theme.inkColor,
         '--accent-color': theme.accentColor,
       }}
+      onClick={handleSkip}
     >
       {/* Background scene image (revealed as ink clears) */}
       {theme.bgImage && (

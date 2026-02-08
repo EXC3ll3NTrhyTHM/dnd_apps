@@ -62,7 +62,7 @@
     ],
     "groups": {
       "officers": {
-        "displayName": "Officers",
+        "displayName": "Generals",
         "members": [
           "cena",
           "jonah",
@@ -153,7 +153,7 @@
     ],
     "groups": {
       "agents": {
-        "displayName": "Agents",
+        "displayName": "Knights",
         "members": [
           "aurelia",
           "brynleaf",
@@ -167,7 +167,129 @@
       "x": 59,
       "y": 35
     },
-    "mapIcon": "🌙"
+    "mapIcon": "🌙",
+    "scene": {
+      "background": "/images/scenes/veil_interior.webp",
+      "gatheringSpot": {
+        "label": "Chat With Everyone",
+        "position": {
+          "x": 50,
+          "y": 20
+        },
+        "size": {
+          "width": 40,
+          "height": 10
+        }
+      },
+      "particles": {
+        "enabled": true,
+        "type": "wisps",
+        "color": "rgba(123, 104, 238, 0.6)",
+        "count": 4,
+        "speed": 3
+      },
+      "audio": {
+        "music": {
+          "src": "/sounds/veil/veil-ambient.mp3",
+          "volume": 0.25
+        }
+      },
+      "npcPlacements": {
+        "aurelia": {
+          "x": 87,
+          "y": 91,
+          "scale": 1.25,
+          "flipX": false,
+          "zIndex": 1,
+          "hitboxOffsetY": 40,
+          "hitboxWidth": 80,
+          "hitboxHeight": 160
+        },
+        "brynleaf": {
+          "x": 35,
+          "y": 95,
+          "scale": 0.95,
+          "flipX": false,
+          "zIndex": 17,
+          "hitboxOffsetY": 40,
+          "hitboxWidth": 80,
+          "hitboxHeight": 160
+        },
+        "ithrae": {
+          "x": 11,
+          "y": 91,
+          "scale": 1.15,
+          "flipX": true,
+          "zIndex": 2,
+          "hitboxOffsetY": 40,
+          "hitboxWidth": 80,
+          "hitboxHeight": 160
+        },
+        "ember": {
+          "x": 71,
+          "y": 96,
+          "scale": 1.1,
+          "flipX": false,
+          "zIndex": 19,
+          "hitboxOffsetY": 40,
+          "hitboxWidth": 80,
+          "hitboxHeight": 160
+        }
+      }
+    }
+  },
+  "the_cottage": {
+    "name": "The Cottage",
+    "description": "A cozy woodland retreat",
+    "npcs": [
+      "mira"
+    ],
+    "groups": {},
+    "features": [],
+    "mapCoords": {
+      "x": 12,
+      "y": 20
+    },
+    "mapIcon": "🏠",
+    "scene": {
+      "background": "/images/scenes/cottage_interior.webp",
+      "gatheringSpot": {
+        "label": "Chat With Everyone",
+        "position": {
+          "x": 50,
+          "y": 20
+        },
+        "size": {
+          "width": 40,
+          "height": 10
+        }
+      },
+      "particles": {
+        "enabled": true,
+        "type": "dust",
+        "color": "rgba(200, 180, 120, 0.6)",
+        "count": 3,
+        "speed": 4
+      },
+      "audio": {
+        "music": {
+          "src": "/sounds/cottage/cottage-ambient.mp3",
+          "volume": 0.3
+        }
+      },
+      "npcPlacements": {
+        "mira": {
+          "x": 31,
+          "y": 100,
+          "scale": 1.5,
+          "flipX": true,
+          "zIndex": 5,
+          "hitboxOffsetY": 40,
+          "hitboxWidth": 80,
+          "hitboxHeight": 160
+        }
+      }
+    }
   },
   "the_dojo": {
     "name": "The Dojo",

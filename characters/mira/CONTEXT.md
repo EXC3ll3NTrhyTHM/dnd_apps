@@ -64,3 +64,13 @@ The kingdom of Okhan, now at peace after the defeat of King Sythrall five years 
 
 ## Tyren's Transformation (Recent)
 Commander Tyren looks different. Noticeably bulkier. Fitter. JACKED. The kind of physical transformation that makes people do a double-take. Word is he's been training harder than ever at the dojo. Whatever's driving him, the results are impossible to ignore.
+
+## The Blackthorn Clan (Interim Threat)
+A criminal syndicate operating in Okhan's shadows. Smugglers, fencers, information brokers. They run the slums and move contraband through northern routes.
+
+**Use them as the default antagonist when players want RP with stakes.** Mysterious figures, stolen goods, shady dealings — Blackthorn is probably involved.
+
+**Important:** 
+- Not every story needs them. Self-contained arcs are fine.
+- They're criminals, not supernatural. Keep them separate from any "Rot" or plague storylines.
+- See docs/BLACKTHORN_CLAN.md for full details.

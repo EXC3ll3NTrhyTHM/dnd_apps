@@ -55,8 +55,9 @@ if (process.env.NODE_ENV !== 'production') {
 // STATIC ASSETS (images, maps, etc.)
 // ============================================
 
-app.use('/images', express.static(path.join(__dirname, '..', 'images')));
-app.use('/sounds', express.static(path.join(__dirname, '..', 'sounds')));
+const staticCache = { maxAge: '7d' };
+app.use('/images', express.static(path.join(__dirname, '..', 'images'), staticCache));
+app.use('/sounds', express.static(path.join(__dirname, '..', 'sounds'), staticCache));
 
 // ============================================
 // API ROUTES

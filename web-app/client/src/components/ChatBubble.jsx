@@ -52,16 +52,31 @@ function HighlightedText({ text, npcs }) {
 /**
  * Chat message bubble.
  * NPC variant shows portrait + name on the left.
- * Player variant is right-aligned.
+ * Own player messages are right-aligned.
+ * Other players' messages are left-aligned with a distinct accent.
  */
-export default function ChatBubble({ message, npcs }) {
+export default function ChatBubble({ message, npcs, currentUserId }) {
   const isPlayer = message.role === 'player';
   const isTyping = message.typing;
 
   if (isPlayer) {
+    const isOtherPlayer = message.userId && message.userId !== currentUserId;
+
     return (
-      <div className="chat-bubble chat-bubble-player">
+      <div className={`chat-bubble ${isOtherPlayer ? 'chat-bubble-other-player' : 'chat-bubble-player'}`}>
+        {message.playerAvatar && (
+          <img
+            src={message.playerAvatar}
+            alt={message.playerName || 'Player'}
+            className="chat-bubble-portrait chat-bubble-player-avatar"
+          />
+        )}
         <div className="chat-bubble-content">
+          {message.playerName && (
+            <span className={`chat-bubble-name ${isOtherPlayer ? 'chat-bubble-name-other' : 'chat-bubble-name-player'}`}>
+              {message.playerName}
+            </span>
+          )}
           <p className="chat-bubble-text">
             <HighlightedText text={message.text} npcs={npcs} />
           </p>

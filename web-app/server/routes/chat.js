@@ -3,12 +3,14 @@
  *
  * Location-based NPC chat system.
  * Supports room chat (auto-picks NPC) and 1-on-1 mode.
+ * Chat history is shared per-location so all players see the same conversation.
  */
 
 const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { authRequired } = require('../middleware/auth');
 const {
   loadLocations,
@@ -20,8 +22,49 @@ const {
 
 const DATA_DIR = path.resolve(__dirname, '..', '..', 'data');
 const HISTORY_DIR = path.join(DATA_DIR, 'chat_history');
+const SHARED_DIR = path.join(HISTORY_DIR, 'shared');
+const PLAYERS_PATH = path.join(DATA_DIR, 'players.json');
 const MAX_HISTORY = 30;
 const JOURNAL_INTERVAL = 8; // Write journal every N messages per NPC
+
+function loadPlayers() {
+  try { return JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8')); }
+  catch { return {}; }
+}
+
+function savePlayers(players) {
+  const tmpPath = PLAYERS_PATH + '.tmp';
+  fs.writeFileSync(tmpPath, JSON.stringify(players, null, 2));
+  fs.renameSync(tmpPath, PLAYERS_PATH);
+}
+
+function getPlayerName(user) {
+  const players = loadPlayers();
+  return players[user.id]?.characterName || user.global_name || user.username;
+}
+
+// Persist avatar URL so enrichHistory can backfill old messages
+function updatePlayerAvatar(user) {
+  const players = loadPlayers();
+  if (!players[user.id]) players[user.id] = {};
+  if (players[user.id].avatar !== user.avatar) {
+    players[user.id].avatar = user.avatar;
+    savePlayers(players);
+  }
+}
+
+// Backfill playerName and playerAvatar in old history messages
+function enrichHistory(history) {
+  const players = loadPlayers();
+  for (const msg of history) {
+    if (msg.role === 'player' && msg.userId && players[msg.userId]) {
+      const p = players[msg.userId];
+      if (p.characterName) msg.playerName = p.characterName;
+      if (p.avatar && !msg.playerAvatar) msg.playerAvatar = p.avatar;
+    }
+  }
+  return history;
+}
 
 // ============================================
 // RATE LIMITING (in-memory, sufficient for 5 players)
@@ -48,19 +91,18 @@ function checkRateLimit(userId) {
 }
 
 // ============================================
-// CHAT HISTORY (file-based, per-player per-location)
+// CHAT HISTORY (file-based, shared per-location)
 // ============================================
 
-function getHistoryPath(userId, locationId) {
-  const userDir = path.join(HISTORY_DIR, userId);
-  if (!fs.existsSync(userDir)) {
-    fs.mkdirSync(userDir, { recursive: true });
+function getHistoryPath(locationId) {
+  if (!fs.existsSync(SHARED_DIR)) {
+    fs.mkdirSync(SHARED_DIR, { recursive: true });
   }
-  return path.join(userDir, `${locationId}.json`);
+  return path.join(SHARED_DIR, `${locationId}.json`);
 }
 
-function loadHistory(userId, locationId) {
-  const histPath = getHistoryPath(userId, locationId);
+function loadHistory(locationId) {
+  const histPath = getHistoryPath(locationId);
   try {
     return JSON.parse(fs.readFileSync(histPath, 'utf-8'));
   } catch {
@@ -68,21 +110,51 @@ function loadHistory(userId, locationId) {
   }
 }
 
-function saveHistory(userId, locationId, history) {
+function saveHistory(locationId, history) {
   // Keep last MAX_HISTORY messages
   const trimmed = history.slice(-MAX_HISTORY);
-  const histPath = getHistoryPath(userId, locationId);
+  const histPath = getHistoryPath(locationId);
   const tmpPath = histPath + '.tmp';
   fs.writeFileSync(tmpPath, JSON.stringify(trimmed, null, 2));
   fs.renameSync(tmpPath, histPath);
 }
 
-// Track message counts for journal writes per NPC
-const messageCounters = new Map();
+// ============================================
+// PER-LOCATION MUTEX (prevents concurrent writes)
+// ============================================
 
-function getNpcMessageKey(npcName, userId) {
-  return `${npcName}:${userId}`;
+const locationLocks = new Map();
+
+function acquireLock(locationId) {
+  if (!locationLocks.has(locationId)) {
+    locationLocks.set(locationId, { locked: false, queue: [] });
+  }
+  const lock = locationLocks.get(locationId);
+
+  return new Promise(resolve => {
+    if (!lock.locked) {
+      lock.locked = true;
+      resolve();
+    } else {
+      lock.queue.push(resolve);
+    }
+  });
 }
+
+function releaseLock(locationId) {
+  const lock = locationLocks.get(locationId);
+  if (!lock) return;
+
+  if (lock.queue.length > 0) {
+    const next = lock.queue.shift();
+    next();
+  } else {
+    lock.locked = false;
+  }
+}
+
+// Track message counts for journal writes per NPC (shared, not per-user)
+const messageCounters = new Map();
 
 // ============================================
 // ROUTES
@@ -139,7 +211,7 @@ router.get('/locations', authRequired, (req, res) => {
 
 /**
  * GET /api/chat/locations/:locationId/history
- * Returns chat history for the authenticated user at a location
+ * Returns shared chat history for a location
  */
 router.get('/locations/:locationId/history', authRequired, (req, res) => {
   const { locationId } = req.params;
@@ -149,8 +221,31 @@ router.get('/locations/:locationId/history', authRequired, (req, res) => {
     return res.status(404).json({ error: 'Location not found' });
   }
 
-  const history = loadHistory(req.user.id, locationId);
+  const history = enrichHistory(loadHistory(locationId));
   res.json({ history, locationId });
+});
+
+/**
+ * GET /api/chat/locations/:locationId/messages?since=<ISO timestamp>
+ * Returns messages newer than the given timestamp (for polling)
+ */
+router.get('/locations/:locationId/messages', authRequired, (req, res) => {
+  const { locationId } = req.params;
+  const { since } = req.query;
+
+  const locations = loadLocations();
+  if (!locations[locationId]) {
+    return res.status(404).json({ error: 'Location not found' });
+  }
+
+  const history = enrichHistory(loadHistory(locationId));
+
+  if (!since) {
+    return res.json({ messages: history });
+  }
+
+  const newMessages = history.filter(msg => msg.timestamp > since);
+  res.json({ messages: newMessages });
 });
 
 /**
@@ -185,14 +280,20 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
     return res.status(400).json({ error: 'No NPCs at this location' });
   }
 
+  updatePlayerAvatar(req.user);
+
+  await acquireLock(locationId);
   try {
-    const history = loadHistory(req.user.id, locationId);
-    const playerName = req.user.global_name || req.user.username;
+    const history = loadHistory(locationId);
+    const playerName = getPlayerName(req.user);
 
     // Add player message to history
     const playerMsg = {
+      id: crypto.randomUUID(),
       role: 'player',
+      userId: req.user.id,
       playerName,
+      playerAvatar: req.user.avatar,
       text: message.trim(),
       timestamp: new Date().toISOString()
     };
@@ -218,6 +319,7 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
       const result = await generateResponse(npcName, playerName, message, history, locationContext);
 
       const npcMsg = {
+        id: crypto.randomUUID(),
         role: 'npc',
         npc: npcName,
         npcDisplayName: registry[npcName]?.displayName || npcName,
@@ -229,20 +331,19 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
       history.push(npcMsg);
       responses.push(npcMsg);
 
-      // Journal tracking
-      const key = getNpcMessageKey(npcName, req.user.id);
-      const count = (messageCounters.get(key) || 0) + 1;
-      messageCounters.set(key, count);
+      // Journal tracking (per-NPC, shared)
+      const count = (messageCounters.get(npcName) || 0) + 1;
+      messageCounters.set(npcName, count);
 
       if (count >= JOURNAL_INTERVAL) {
-        messageCounters.set(key, 0);
+        messageCounters.set(npcName, 0);
         writeWebJournal(npcName, history).catch(err =>
           console.error(`[chat] Journal error for ${npcName}:`, err.message)
         );
       }
     }
 
-    saveHistory(req.user.id, locationId, history);
+    saveHistory(locationId, history);
 
     res.json({
       playerMessage: playerMsg,
@@ -251,6 +352,8 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
   } catch (error) {
     console.error('[chat] Room message error:', error.message);
     res.status(500).json({ error: 'Failed to generate response' });
+  } finally {
+    releaseLock(locationId);
   }
 });
 
@@ -285,15 +388,21 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
     return res.status(400).json({ error: `${npcName} is not at this location` });
   }
 
+  updatePlayerAvatar(req.user);
+
+  await acquireLock(locationId);
   try {
-    const history = loadHistory(req.user.id, locationId);
-    const playerName = req.user.global_name || req.user.username;
+    const history = loadHistory(locationId);
+    const playerName = getPlayerName(req.user);
     const registry = loadNpcRegistry();
 
     // Add player message to history
     const playerMsg = {
+      id: crypto.randomUUID(),
       role: 'player',
+      userId: req.user.id,
       playerName,
+      playerAvatar: req.user.avatar,
       text: message.trim(),
       timestamp: new Date().toISOString()
     };
@@ -312,6 +421,7 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
     const result = await generateResponse(npcName, playerName, message, history, locationContext);
 
     const npcMsg = {
+      id: crypto.randomUUID(),
       role: 'npc',
       npc: npcName,
       npcDisplayName: registry[npcName]?.displayName || npcName,
@@ -321,15 +431,14 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
     };
 
     history.push(npcMsg);
-    saveHistory(req.user.id, locationId, history);
+    saveHistory(locationId, history);
 
-    // Journal tracking
-    const key = getNpcMessageKey(npcName, req.user.id);
-    const count = (messageCounters.get(key) || 0) + 1;
-    messageCounters.set(key, count);
+    // Journal tracking (per-NPC, shared)
+    const count = (messageCounters.get(npcName) || 0) + 1;
+    messageCounters.set(npcName, count);
 
     if (count >= JOURNAL_INTERVAL) {
-      messageCounters.set(key, 0);
+      messageCounters.set(npcName, 0);
       writeWebJournal(npcName, history).catch(err =>
         console.error(`[chat] Journal error for ${npcName}:`, err.message)
       );
@@ -342,6 +451,8 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
   } catch (error) {
     console.error('[chat] 1-on-1 message error:', error.message);
     res.status(500).json({ error: 'Failed to generate response' });
+  } finally {
+    releaseLock(locationId);
   }
 });
 

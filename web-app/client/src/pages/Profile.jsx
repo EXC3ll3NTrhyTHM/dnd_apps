@@ -47,12 +47,14 @@ export default function Profile() {
       <div className="profile-card">
         <img
           src={user.avatar}
-          alt={user.username}
+          alt={user.characterName || user.global_name || user.username}
           className="profile-avatar"
         />
         <div className="profile-info">
-          <h2 className="profile-name">{user.global_name || user.username}</h2>
-          <p className="profile-username">@{user.username}</p>
+          <h2 className="profile-name">{user.characterName || user.global_name || user.username}</h2>
+          {user.characterName && (
+            <p className="profile-username">{user.global_name || user.username}</p>
+          )}
         </div>
       </div>
 

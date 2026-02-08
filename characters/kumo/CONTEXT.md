@@ -69,3 +69,13 @@ As Tyren's closest friend, Kumo knows everything:
 - "My best friend is going to be the most powerful warrior Okhan has ever seen. Mark my words."
 
 Kumo believes Tyren is preparing for something big. He doesn't know what. But he knows his friend â€” and this level of dedication means something serious is on the horizon.
+
+## The Blackthorn Clan (Interim Threat)
+A criminal syndicate operating in Okhan's shadows. Smugglers, fencers, information brokers. They run the slums and move contraband through northern routes.
+
+**Use them as the default antagonist when players want RP with stakes.** Mysterious figures, stolen goods, shady dealings — Blackthorn is probably involved.
+
+**Important:** 
+- Not every story needs them. Self-contained arcs are fine.
+- They're criminals, not supernatural. Keep them separate from any "Rot" or plague storylines.
+- See docs/BLACKTHORN_CLAN.md for full details.

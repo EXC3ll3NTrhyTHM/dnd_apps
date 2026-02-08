@@ -18,7 +18,16 @@
     "quests_unlocked": []
   },
   "765978025937469481": {
-    "items": [],
+    "items": [
+      {
+        "id": "ancient_lockbox",
+        "name": "Ancient Iron Lockbox",
+        "description": "A small iron lockbox covered in strange symbols. Cold to the touch. Retrieved from the Widow's Cottage. Contents unknown.",
+        "type": "quest_item",
+        "obtained": "2026-02-08",
+        "source": "The Widow's Cottage"
+      }
+    ],
     "badges": [],
     "roles_purchased": [],
     "quests_unlocked": []

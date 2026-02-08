@@ -1,0 +1,16 @@
+[
+  {
+    "role": "player",
+    "playerName": "badbeachpeach",
+    "text": "@Mira good evening Mira! how are you?",
+    "timestamp": "2026-02-08T06:14:58.370Z"
+  },
+  {
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Good evening, Trouble! I'm as lively as a bard on a full moon. How about you? Plotting any grand escapades? 🎭",
+    "emotion": "happy",
+    "timestamp": "2026-02-08T06:14:59.100Z"
+  }
+]

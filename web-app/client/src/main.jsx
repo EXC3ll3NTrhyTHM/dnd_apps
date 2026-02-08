@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { AuthProvider } from './hooks/useAuth';
 import { ThemeProvider } from './context/ThemeContext';
+import PwaUpdateBanner from './components/PwaUpdateBanner';
 import './styles/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -12,6 +13,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <AuthProvider>
         <ThemeProvider>
           <App />
+          <PwaUpdateBanner />
         </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>

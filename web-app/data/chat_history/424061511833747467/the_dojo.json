@@ -2,20 +2,6 @@
   {
     "role": "player",
     "playerName": "excellentrhythm",
-    "text": "@Kai Xi Yang  hey man",
-    "timestamp": "2026-02-07T10:04:41.785Z"
-  },
-  {
-    "role": "npc",
-    "npc": "kai",
-    "npcDisplayName": "Kai Xi Yang",
-    "text": "What's up? You got something on your mind or are you just here to say hi? Because I'm ready for anything!",
-    "emotion": "happy",
-    "timestamp": "2026-02-07T10:04:42.581Z"
-  },
-  {
-    "role": "player",
-    "playerName": "excellentrhythm",
     "text": "@Kai Xi Yang  hey",
     "timestamp": "2026-02-07T10:09:56.411Z"
   },
@@ -212,5 +198,19 @@
     "text": "Hey! What’s up? Got something on your mind or are you just here to challenge me?",
     "emotion": "happy",
     "timestamp": "2026-02-07T11:41:10.776Z"
+  },
+  {
+    "role": "player",
+    "playerName": "excellentrhythm",
+    "text": "@Kai Xi Yang hello *waves*",
+    "timestamp": "2026-02-08T00:44:50.055Z"
+  },
+  {
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "*waves back enthusiastically* Hey there! Ready to dive into some action or just hanging out?",
+    "emotion": "happy",
+    "timestamp": "2026-02-08T00:44:51.186Z"
   }
 ]
