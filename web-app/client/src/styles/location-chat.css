@@ -643,6 +643,38 @@
   50% { box-shadow: 0 0 8px 3px rgba(200, 60, 60, 0.4); }
 }
 
+/* Plus button (left of input — opens extras menu) */
+.chat-plus-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border-stitch);
+  border-radius: 4px;
+  background: linear-gradient(180deg, #3a3228, #2a241c);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.chat-plus-btn:active {
+  background: linear-gradient(180deg, #3a3228, #28221a);
+  color: var(--text-primary);
+}
+
+.chat-plus-btn-active {
+  background: rgba(212, 168, 67, 0.12);
+  border-color: var(--color-gold-dim);
+  color: var(--color-gold);
+}
+
 /* Quill/Send button */
 .chat-send-btn {
   display: flex;
@@ -746,14 +778,8 @@
 
 /* ---- Expanded Emoji Picker — hide chat to give near-fullscreen space ---- */
 
-.location-chat:has(.ck-emoji-expanded) .chat-messages,
-.location-chat:has(.ck-emoji-expanding) .chat-messages {
+.location-chat:has(.ck-emoji-expanded) .chat-messages {
   flex: 0 0 0;
   overflow: hidden;
   min-height: 0;
-}
-
-.location-chat:has(.ck-emoji-expanded) .npc-bar,
-.location-chat:has(.ck-emoji-expanding) .npc-bar {
-  display: none;
 }

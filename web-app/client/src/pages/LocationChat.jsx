@@ -9,7 +9,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../hooks/useApi';
 import { useAuth } from '../hooks/useAuth';
-import NpcBar from '../components/NpcBar';
 import ChatBubble from '../components/ChatBubble';
 import ChatInput from '../components/ChatInput';
 import ChatInputCustom from '../components/ChatInputCustom';
@@ -371,11 +370,6 @@ export default function LocationChat() {
     }
   }
 
-  // NPC bar click — prefill @mention in chat input
-  const handleNpcBarClick = (npc) => {
-    setInsertNpc(npc);
-  };
-
   // Scene interaction handlers
   const handleNpcClick = (npcId) => {
     const npc = location.npcs.find(n => n.id === npcId);
@@ -457,13 +451,6 @@ export default function LocationChat() {
             </div>
           </div>
 
-          {/* NPC Bar */}
-          <NpcBar
-            npcs={location.npcs}
-            onNpcClick={handleNpcBarClick}
-            emotions={npcEmotions}
-          />
-
           {/* Chat Messages — column-reverse so browser natively anchors to bottom */}
           <div className="chat-messages" ref={chatAreaRef}>
             <div className="chat-messages-inner">
@@ -488,6 +475,7 @@ export default function LocationChat() {
               onSend={handleSend}
               disabled={sending}
               npcs={location.npcs}
+              npcEmotions={npcEmotions}
               groups={location.groups || {}}
               insertNpc={insertNpc}
               onInsertNpcDone={() => setInsertNpc(null)}

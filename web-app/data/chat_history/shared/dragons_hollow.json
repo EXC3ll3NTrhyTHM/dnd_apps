@@ -43,5 +43,50 @@
     "text": "A drink, yes. It warms the spirit. What do you prefer? I can ask for something strong if you need a boost.",
     "emotion": "idle",
     "timestamp": "2026-02-09T07:04:43.413Z"
+  },
+  {
+    "id": "97b31d1a-848e-4717-bbe8-ac4e55830825",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "mama I hungry",
+    "timestamp": "2026-02-10T05:38:42.146Z"
+  },
+  {
+    "id": "6fcb016d-6589-45f2-aa10-5af42f8e366c",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Oh man, I gotchu, bro! *pulls out a half-eaten sandwich* You want the rest of this? It's still got some good vibes, I swear!",
+    "emotion": "happy",
+    "timestamp": "2026-02-10T05:38:45.684Z"
+  },
+  {
+    "id": "37ef33e0-bc91-4ca6-89e9-3c30c16e43c6",
+    "role": "npc",
+    "npc": "kumo",
+    "npcDisplayName": "Kumo",
+    "text": "Ah, hunger can be a fierce opponent. I can ask around for food. What would you like? Something hearty or something light?",
+    "emotion": "thoughtful",
+    "timestamp": "2026-02-10T05:38:47.521Z"
+  },
+  {
+    "id": "f7fac111-a539-488d-997c-64bc4bee85d7",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Mira Hi friend",
+    "timestamp": "2026-02-10T05:39:19.865Z"
+  },
+  {
+    "id": "f8b9e35c-b3bb-41ca-95b4-ba91a51b2830",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Hey there, friend! *leans casually against the bar* How's life treating you today? Found any trouble worth chasing?",
+    "emotion": "happy",
+    "timestamp": "2026-02-10T05:39:21.298Z"
   }
 ]

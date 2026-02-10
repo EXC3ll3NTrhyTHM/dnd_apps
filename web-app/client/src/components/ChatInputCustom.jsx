@@ -39,6 +39,7 @@ export default function ChatInputCustom({
   onSend,
   disabled,
   npcs = [],
+  npcEmotions = {},
   groups = {},
   insertNpc,
   onInsertNpcDone,
@@ -59,6 +60,7 @@ export default function ChatInputCustom({
 
   const displayRef = useRef(null);
   const contentRef = useRef(null);
+  const bottomBarRef = useRef(null);
   const cursorOverlayRef = useRef(null);
   const handleRef = useRef(null);
   const longPressTimer = useRef(null);
@@ -74,6 +76,8 @@ export default function ChatInputCustom({
 
   // Back button: close keyboard instead of navigating away
   const kbOpenRef = useRef(false);
+  const kbModeRef = useRef('keys');
+  kbModeRef.current = kbMode;
 
   useEffect(() => {
     if (kbOpen && !kbOpenRef.current) {
@@ -102,39 +106,150 @@ export default function ChatInputCustom({
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
-  // Close keyboard when user swipes DOWN on the chat history
-  // Uses touch events (reliable during mobile scroll) with a downward threshold.
-  // Delays arming so layout-triggered scroll from keyboard open doesn't re-trigger.
+  // Drag-to-close keyboard: swipe down on chat messages when at bottom.
+  // Uses TWO GPU-composited transforms for zero-layout-cost per frame:
+  //  1. Bar: position:fixed + translateY (slides keyboard down)
+  //  2. Chat: translateY (slides chat down in sync, revealing older messages)
+  // When bar goes fixed, chat instantly fills the freed space (one reflow).
+  // A counter-transform on the chat keeps content at the same screen position.
+  // During drag, both transforms update together — pure GPU, no layout per frame.
   useEffect(() => {
     const el = scrollContainerRef?.current;
-    if (!el || !kbOpen) return;
+    const bar = bottomBarRef.current;
+    if (!el || !bar || !kbOpen) return;
     let armed = false;
     const timer = setTimeout(() => { armed = true; }, 300);
-    let startY = null;
+
+    const state = { active: false, startY: 0, startH: 0, inputH: 0, activateY: 0, atBottom: false };
+
+    const clearBarStyles = () => {
+      bar.style.position = '';
+      bar.style.top = '';
+      bar.style.left = '';
+      bar.style.width = '';
+      bar.style.height = '';
+      bar.style.zIndex = '';
+      bar.style.willChange = '';
+      bar.style.transform = '';
+      bar.style.transition = '';
+    };
+
+    const clearElStyles = () => {
+      el.style.willChange = '';
+      el.style.transform = '';
+      el.style.transition = '';
+    };
 
     const onTouchStart = (e) => {
-      startY = e.touches[0].clientY;
+      state.atBottom = el.scrollTop <= 1;
+      state.startY = e.touches[0].clientY;
+      state.active = false;
     };
+
     const onTouchMove = (e) => {
-      if (!armed || startY === null) return;
-      const dy = e.touches[0].clientY - startY;
-      if (dy > 30) { // finger moved 30px downward
-        setKbOpen(false);
-        setKbMode('keys');
-        setMentionQuery(null);
-        setShowHandle(false);
-        startY = null;
-        // Scroll chat to bottom so newest messages are visible after keyboard closes
-        requestAnimationFrame(() => { el.scrollTop = 0; }); // column-reverse: 0 = bottom
+      if (!armed || !state.atBottom) return;
+      const dy = e.touches[0].clientY - state.startY;
+
+      if (!state.active && dy > 10) {
+        const rect = bar.getBoundingClientRect();
+        state.startH = rect.height;
+        // Measure input bar so we know where to stop the slide
+        const formEl = bar.querySelector('.cki-form');
+        state.inputH = formEl ? formEl.offsetHeight : 0;
+        state.active = true;
+        state.activateY = e.touches[0].clientY;
+
+        // Pull bar out of flow — chat fills freed space (one reflow).
+        bar.style.position = 'fixed';
+        bar.style.top = `${rect.top}px`;
+        bar.style.left = `${rect.left}px`;
+        bar.style.width = `${rect.width}px`;
+        bar.style.height = `${rect.height}px`;
+        bar.style.zIndex = '100';
+        bar.style.willChange = 'transform';
+
+        // Counter-translate chat so content stays at same screen position.
+        // Chat grew by ~startH, so shift it up by that amount.
+        el.style.willChange = 'transform';
+        el.style.transform = `translateY(${-state.startH}px)`;
+      }
+
+      if (state.active) {
+        e.preventDefault();
+        const offset = Math.max(0, e.touches[0].clientY - state.activateY);
+        // Both GPU-composited: bar slides down, chat slides down in sync
+        bar.style.transform = `translateY(${offset}px)`;
+        el.style.transform = `translateY(${-state.startH + offset}px)`;
+      }
+    };
+
+    const onTouchEnd = () => {
+      if (!state.active) return;
+      state.active = false;
+      const match = bar.style.transform.match(/translateY\(([0-9.]+)px\)/);
+      const currentY = match ? parseFloat(match[1]) : 0;
+      const threshold = state.startH * 0.3;
+      let cleaned = false;
+
+      if (currentY >= threshold) {
+        // Snap closed — slide keyboard off-screen but keep input bar visible.
+        // Animate bar to translateY(startH - inputH): keyboard goes below
+        // viewport, input bar stays at its final resting position.
+        // When useEffect cleanup clears both bar + chat styles in the same
+        // frame, the offsets cancel perfectly — zero visual jump.
+        const slideTarget = state.startH - state.inputH;
+        const remaining = Math.abs(slideTarget - currentY);
+        const duration = Math.max(80, Math.min(300, remaining * 0.8));
+        bar.style.transition = `transform ${duration}ms ease-out`;
+        bar.style.transform = `translateY(${slideTarget}px)`;
+        el.style.transition = `transform ${duration}ms ease-out`;
+        el.style.transform = `translateY(${-state.inputH}px)`;
+
+        const cleanup = () => {
+          if (cleaned) return;
+          cleaned = true;
+          // Don't clear bar or el styles — useEffect cleanup (triggered by
+          // kbOpen change) clears both in the same frame so positions cancel.
+          setKbOpen(false);
+          setKbMode('keys');
+          setMentionQuery(null);
+          setShowHandle(false);
+          requestAnimationFrame(() => { el.scrollTop = 0; });
+          bar.removeEventListener('transitionend', cleanup);
+        };
+        bar.addEventListener('transitionend', cleanup, { once: true });
+        setTimeout(cleanup, duration + 50);
+      } else {
+        // Snap back — animate both transforms
+        const duration = Math.max(80, Math.min(200, currentY * 0.8));
+        bar.style.transition = `transform ${duration}ms ease-out`;
+        bar.style.transform = 'translateY(0)';
+        el.style.transition = `transform ${duration}ms ease-out`;
+        el.style.transform = `translateY(${-state.startH}px)`;
+
+        const cleanup = () => {
+          if (cleaned) return;
+          cleaned = true;
+          // Clear both in same frame — offsets cancel, no visual jump
+          clearBarStyles();
+          clearElStyles();
+          bar.removeEventListener('transitionend', cleanup);
+        };
+        bar.addEventListener('transitionend', cleanup, { once: true });
+        setTimeout(cleanup, duration + 50);
       }
     };
 
     el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchmove', onTouchMove, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
     return () => {
       clearTimeout(timer);
+      clearBarStyles();
+      clearElStyles();
       el.removeEventListener('touchstart', onTouchStart);
       el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
     };
   }, [kbOpen, scrollContainerRef]);
 
@@ -413,6 +528,11 @@ export default function ChatInputCustom({
       return;
     }
 
+    // If in extras or npcs mode, tapping input switches back to keys
+    if (kbModeRef.current === 'extras' || kbModeRef.current === 'npcs') {
+      setKbMode('keys');
+    }
+
     // Detect double-tap — let browser handle native text selection
     const now = Date.now();
     if (now - lastTapRef.current < DOUBLE_TAP_MS) {
@@ -687,6 +807,23 @@ export default function ChatInputCustom({
     setMentionQuery(null);
   }, []);
 
+  // Insert NPC @mention from the npcs panel (stays in npcs mode for multi-tagging)
+  const handleNpcMention = useCallback((npc) => {
+    const mention = `@${npc.displayName} `;
+    const prev = textRef.current;
+    const pos = cursorPosRef.current;
+    const base = pos === prev.length && prev.length && !prev.endsWith(' ')
+      ? prev + ' '
+      : prev;
+    const newPos = pos === prev.length ? base.length + mention.length : pos + mention.length;
+    if (pos === prev.length) {
+      setText(base + mention);
+    } else {
+      setText(prev.slice(0, pos) + mention + prev.slice(pos));
+    }
+    setCursorPos(newPos);
+  }, []);
+
   // ── Display HTML — full text with formatting, NO cursor (cursor is an overlay) ──
   const displayHtml = useMemo(() => {
     if (!text) return '';
@@ -740,20 +877,28 @@ export default function ChatInputCustom({
         </div>
       )}
 
+      {/* Input bar + keyboard wrapper (for drag-to-close transform) */}
+      <div ref={bottomBarRef} className="ck-bottom-bar">
       {/* Input display bar */}
       <div className="cki-form">
         <div className="cki-row">
           <button
             type="button"
-            className={`chat-mic-btn ${listening ? 'chat-mic-active' : ''}`}
-            onPointerDown={(e) => { e.preventDefault(); toggleMic(); }}
-            aria-label={listening ? 'Stop listening' : 'Voice input'}
+            className={`chat-plus-btn${kbMode === 'extras' || kbMode === 'npcs' ? ' chat-plus-btn-active' : ''}`}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              if (!kbOpen) {
+                setKbOpen(true);
+                setKbMode('extras');
+              } else {
+                setKbMode(kbMode === 'extras' || kbMode === 'npcs' ? 'keys' : 'extras');
+              }
+            }}
+            aria-label="Extras menu"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-              <line x1="12" y1="19" x2="12" y2="23" />
-              <line x1="8" y1="23" x2="16" y2="23" />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
           </button>
           <div
@@ -857,7 +1002,13 @@ export default function ChatInputCustom({
         playSound={playSound}
         mode={kbMode}
         onModeChange={setKbMode}
+        npcs={npcs}
+        npcEmotions={npcEmotions}
+        onNpcMention={handleNpcMention}
+        listening={listening}
+        onToggleMic={toggleMic}
       />
+      </div>
     </>
   );
 }
