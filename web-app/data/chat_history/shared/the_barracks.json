@@ -16,5 +16,32 @@
     "text": "Ahoy, Architect! What brings you to the barracks today? Ready for a bit of strategy discussion or just stopping by for a chat?",
     "emotion": "happy",
     "timestamp": "2026-02-08T08:04:00.835Z"
+  },
+  {
+    "id": "e3efbfd5-9282-44df-838c-01941df28c6b",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "something smells fishy",
+    "timestamp": "2026-02-09T07:05:11.434Z"
+  },
+  {
+    "id": "03c54d7d-993e-4298-b188-e6450892eef0",
+    "role": "npc",
+    "npc": "cena",
+    "npcDisplayName": "Cena Marella",
+    "text": "Fishy, you say? I certainly hope it’s not from my last catch! But if it’s something more sinister, we should investigate. What’s on your mind?",
+    "emotion": "suspicious",
+    "timestamp": "2026-02-09T07:05:12.766Z"
+  },
+  {
+    "id": "383b1fb9-0b8f-4319-aed8-3ef60bb2962d",
+    "role": "npc",
+    "npc": "jonah",
+    "npcDisplayName": "Jonah Varrow",
+    "text": "Understood. We can't afford to overlook anything unusual. Have you noticed anything specific?",
+    "emotion": "thoughtful",
+    "timestamp": "2026-02-09T07:05:13.936Z"
   }
 ]

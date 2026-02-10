@@ -1,0 +1,65 @@
+[
+  {
+    "id": "b2247664-487d-4096-adfa-36fdaacec9a4",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Kai Xi Yang hey",
+    "timestamp": "2026-02-08T23:42:10.563Z"
+  },
+  {
+    "id": "beb075f2-0977-46b4-a605-0b3431c2d28d",
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "HEY! What’s up? Ready to throw down or what? Let’s go!",
+    "emotion": "happy",
+    "timestamp": "2026-02-08T23:42:11.612Z"
+  },
+  {
+    "id": "b3eb5f19-4e81-48b5-ac24-d17ede4aef28",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Kai Xi Yang no not right now I want some avocado dip though",
+    "timestamp": "2026-02-09T00:08:50.254Z"
+  },
+  {
+    "id": "80c48518-9815-4bc1-8fae-db95f2b62d19",
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "Avocado dip?! Now THAT sounds amazing! We should totally have a feast after training. I'll bring the fire, you bring the flavor! 🔥",
+    "emotion": "happy",
+    "timestamp": "2026-02-09T00:08:51.265Z"
+  },
+  {
+    "id": "cc86c65c-6f9f-4e8c-95e3-63240e28f6d1",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "whats poppin",
+    "timestamp": "2026-02-09T07:03:45.752Z"
+  },
+  {
+    "id": "e26ea885-9c6a-4aac-ba6b-26b516420ad4",
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "What's poppin?! Just training and waiting for a challenge! You up for a sparring match later, or are you just here for the dip?",
+    "emotion": "happy",
+    "timestamp": "2026-02-09T07:03:47.916Z"
+  },
+  {
+    "id": "58e0a09d-0c4e-44c9-aea1-5eaf479febb9",
+    "role": "npc",
+    "npc": "mai",
+    "npcDisplayName": "Mai Xi Yang",
+    "text": "The usual — wind patterns, training strategies, and a bit of peace. What about you? Looking for a good fight or just a break?",
+    "emotion": "idle",
+    "timestamp": "2026-02-09T07:03:48.936Z"
+  }
+]

@@ -9,6 +9,8 @@ import DojoScene from './DojoScene';
 import BarracksScene from './BarracksScene';
 import CottageScene from './CottageScene';
 import VeilScene from './VeilScene';
+import DragonHollowScene from './DragonHollowScene';
+import CollectiveScene from './CollectiveScene';
 
 // Map of locationId -> Scene Component
 const SCENE_REGISTRY = {
@@ -16,6 +18,8 @@ const SCENE_REGISTRY = {
   'the_barracks': BarracksScene,
   'the_cottage': CottageScene,
   'the_veil': VeilScene,
+  'dragons_hollow': DragonHollowScene,
+  'the_collective': CollectiveScene,
 };
 
 /**
@@ -37,4 +41,4 @@ export function hasCustomScene(locationId) {
 }
 
 // Export individual scenes for direct imports if needed
-export { DojoScene, BarracksScene, CottageScene, VeilScene };
+export { DojoScene, BarracksScene, CottageScene, VeilScene, DragonHollowScene, CollectiveScene };

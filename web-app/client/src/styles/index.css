@@ -412,3 +412,52 @@ img {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-gold-dim);
 }
+
+/* ============================================
+   LANDSCAPE LOCK — force portrait orientation
+   ============================================ */
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .landscape-block {
+    display: flex !important;
+  }
+  #root {
+    display: none !important;
+  }
+}
+
+.landscape-block {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: var(--bg-deepest);
+  background-image: var(--tex-leather);
+  background-size: 512px 512px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  text-align: center;
+  padding: 24px;
+}
+
+.landscape-block-icon {
+  font-size: 2.5rem;
+  animation: rotate-hint 2s ease-in-out infinite;
+}
+
+@keyframes rotate-hint {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-90deg); }
+  50% { transform: rotate(-90deg); }
+  75% { transform: rotate(0deg); }
+}
+
+.landscape-block-text {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--color-gold);
+}

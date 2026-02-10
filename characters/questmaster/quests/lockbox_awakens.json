@@ -1,0 +1,58 @@
+{
+  "id": "lockbox_awakens",
+  "name": "The Lockbox Awakens",
+  "description": "The night after the interrogation, whoever sleeps near the lockbox receives disturbing visions. A soul trapped within reaches out, desperate to communicate.",
+  "chat_mode": true,
+  "reward_gold": 150,
+  
+  "images": {
+    "lockbox_glowing": "lockbox_glowing.png",
+    "aldric_apparition": "aldric_apparition.png",
+    "vision_mill": "vision_mill.png"
+  },
+  
+  "stages": {
+    "nightmare_begins": {
+      "description": "Aly (or whoever has the lockbox) falls into a disturbing dream. Cold seeps into their bones. They're not alone.",
+      "narration_prompt": "The dream comes unbidden. One moment you're drifting in peaceful darkness, the next — cold. Bone-deep cold that doesn't belong. You're standing in a place that isn't quite real. Stone walls flicker like bad memories. And something is watching you from the shadows. Something that desperately wants to be seen.",
+      "image": "lockbox_glowing.png",
+      "advance_conditions": "Player engages with the presence, calls out, or moves toward the figure in the shadows",
+      "next_stage": "aldric_appears"
+    },
+    
+    "aldric_appears": {
+      "description": "Aldric's form materializes — a translucent man, flickering like a dying candle. He speaks in fragments.",
+      "narration_prompt": "The shadows coalesce. A figure emerges — not walking, but simply *becoming*. A man, translucent, his edges blurring and reforming with each heartbeat. His eyes find yours with desperate recognition.\n\nHis voice echoes, layered, as if speaking from very far away:\n\n> **\"You... you can see me. Finally. Please — my name is Aldric. I've been... so long... trapped in the dark...\"**\n\nHis form flickers violently, then stabilizes.\n\n> **\"The box. I'm in the box. Years now. I don't... I lose track. Please, don't leave. I need to warn you.\"**",
+      "image": "aldric_apparition.png",
+      "advance_conditions": "Player asks about The Weaver, the mill, why he's trapped, or what the warning is",
+      "next_stage": "the_warning"
+    },
+    
+    "the_warning": {
+      "description": "Aldric shares what he knows about The Weaver and the danger they face.",
+      "narration_prompt": "Aldric's form stabilizes slightly, as if your attention gives him strength. But fear flickers across his translucent features.\n\n> **\"The Weaver... yes. He's the one who put me here. I was... I was one of his first. Proof that it works.\"**\n\nHis voice drops to a whisper.\n\n> **\"He's collecting souls. The blood oaths — they're not just loyalty. They're chains. When those people die, their souls go to him. He's building something. A congregation of the dead.\"**\n\nAldric's eyes go distant, haunted.\n\n> **\"And there's someone he wants to bring back. I've felt it — echoes of rage, of vengeance. Someone who died angry. The Weaver is trying to resurrect them. I don't know who. But if he succeeds...\"**\n\nHe trails off, shuddering.",
+      "advance_conditions": "Player asks how to stop The Weaver, how to free Aldric, or where to find him",
+      "next_stage": "the_request"
+    },
+    
+    "the_request": {
+      "description": "Aldric makes his request — and gives a warning about his own fate.",
+      "narration_prompt": "Aldric's form flickers violently. The connection is weakening. He reaches toward you with transparent hands, urgent.\n\n> **\"The mill — the old mill past the orchards. There's a ritual chamber beneath it. That's where he works. That's where you have to go.\"**\n\nHis voice cracks with desperation.\n\n> **\"Please. Stop him. Before he finishes. Before—\"**\n\nHe hesitates, something painful crossing his face.\n\n> **\"And if you can't... if it takes too long... you might have to destroy the box. Destroy me.\"**\n\nTears would fall if he could still cry.\n\n> **\"I can feel myself forgetting. Who I was. What kindness felt like. The longer I'm trapped, the more I become... something else. A spirit that forgets its humanity becomes a monster. I don't want to hurt anyone. Please. Promise me you'll—\"**\n\nHis voice cuts out. His form scatters like smoke in wind. The vision fractures.",
+      "advance_conditions": "The vision breaks and the player experiences waking up",
+      "next_stage": "waking"
+    },
+    
+    "waking": {
+      "description": "The dreamer wakes, gasping. The lockbox is ice cold. This was real.",
+      "narration_prompt": "You wake gasping, drenched in cold sweat. Your hand flies to your chest — your heart is racing.\n\nThe lockbox sits where you left it, but when you touch it, the metal is *ice cold*. Frost patterns have formed on its surface, slowly melting in the warm air.\n\nThis was no ordinary dream.\n\nAldric is real. The danger is real. And somewhere beneath an old mill, The Weaver continues his work.\n\nDawn light creeps through the window. The frost on the lockbox has melted, leaving only damp metal and unanswered questions. The clock is ticking — for the city, and for the tortured soul trapped in that box.",
+      "advance_conditions": "Player acknowledges the experience or indicates they're ready to continue",
+      "next_stage": "quest_complete"
+    },
+    
+    "quest_complete": {
+      "description": "The vision ends. The party now knows about Aldric and the stakes.",
+      "narration_prompt": "The weight of what you've learned settles over you. A name: Aldric. A location: the old mill. A threat: resurrection. And a terrible choice that may have to be made.\n\nThe Collective needs to know about this.",
+      "completes_quest": true
+    }
+  }
+}

@@ -11,7 +11,88 @@
       "x": 50,
       "y": 28
     },
-    "mapIcon": "🏰"
+    "mapIcon": "🏰",
+    "scene": {
+      "background": "/images/scenes/collective_interior.webp",
+      "gatheringSpot": {
+        "label": "Gather With Everyone",
+        "position": {
+          "x": 50,
+          "y": 20
+        },
+        "size": {
+          "width": 40,
+          "height": 10
+        }
+      },
+      "particles": {
+        "enabled": true,
+        "type": "dust",
+        "color": "rgba(192, 160, 112, 0.5)",
+        "count": 3,
+        "speed": 4
+      },
+      "audio": {
+        "music": {
+          "src": "/sounds/collective/throne-room-v2.mp3",
+          "volume": 0.4
+        },
+        "ambient": [
+          {
+            "src": "/sounds/collective/quill-writing.mp3",
+            "volume": 0.18,
+            "delay": 15000,
+            "irregular": true,
+            "irregularPause": [
+              8,
+              25
+            ]
+          }
+        ]
+      },
+      "npcPlacements": {
+        "tyren": {
+          "x": 37,
+          "y": 95,
+          "scale": 1.2,
+          "flipX": true,
+          "zIndex": 5,
+          "hitboxOffsetY": 45,
+          "hitboxWidth": 80,
+          "hitboxHeight": 195
+        },
+        "aly": {
+          "x": 86,
+          "y": 97,
+          "scale": 1.2,
+          "flipX": false,
+          "zIndex": 1,
+          "hitboxOffsetY": 45,
+          "hitboxWidth": 80,
+          "hitboxHeight": 190
+        },
+        "nalyd": {
+          "x": 12,
+          "y": 95,
+          "scale": 1.2,
+          "flipX": false,
+          "zIndex": 8,
+          "hitboxOffsetY": 45,
+          "hitboxWidth": 80,
+          "hitboxHeight": 215
+        },
+        "acacia": {
+          "x": 65,
+          "y": 96,
+          "scale": 1.15,
+          "flipX": false,
+          "zIndex": 6,
+          "hitboxOffsetY": 45,
+          "hitboxWidth": 80,
+          "hitboxHeight": 205
+        }
+      }
+    }
   },
   "dragons_hollow": {
     "name": "Dragon's Hollow",
@@ -20,9 +101,7 @@
       "bonesy",
       "mira",
       "nibby",
-      "kumo",
-      "bigtam",
-      "grumm"
+      "kumo"
     ],
     "groups": {
       "staff": {
@@ -50,7 +129,82 @@
       "x": 75,
       "y": 85
     },
-    "mapIcon": "🐉"
+    "mapIcon": "🐉",
+    "scene": {
+      "background": "/images/scenes/dragons_hallow_interior.webp",
+      "gatheringSpot": {
+        "label": "Drink With Everyone",
+        "position": {
+          "x": 50,
+          "y": 20
+        },
+        "size": {
+          "width": 40,
+          "height": 10
+        }
+      },
+      "particles": {
+        "enabled": true,
+        "type": "embers",
+        "color": "rgba(212, 168, 67, 0.7)",
+        "count": 4,
+        "speed": 3
+      },
+      "audio": {
+        "music": {
+          "src": "/sounds/dragons_hollow/tavern-music.mp3",
+          "volume": 0.35
+        },
+        "ambient": [
+          {
+            "src": "/sounds/dragons_hollow/tavern-ambient.mp3",
+            "volume": 0.3
+          }
+        ]
+      },
+      "npcPlacements": {
+        "bonesy": {
+          "x": 20,
+          "y": 98,
+          "scale": 1.2,
+          "flipX": true,
+          "zIndex": 20,
+          "hitboxOffsetY": 55,
+          "hitboxWidth": 80,
+          "hitboxHeight": 160
+        },
+        "mira": {
+          "x": 82,
+          "y": 99,
+          "scale": 1.2,
+          "flipX": false,
+          "zIndex": 10,
+          "hitboxOffsetY": 45,
+          "hitboxWidth": 80,
+          "hitboxHeight": 200
+        },
+        "nibby": {
+          "x": 50,
+          "y": 96,
+          "scale": 1,
+          "flipX": false,
+          "zIndex": 8,
+          "hitboxOffsetY": 45,
+          "hitboxWidth": 80,
+          "hitboxHeight": 160
+        },
+        "kumo": {
+          "x": 51,
+          "y": 81,
+          "scale": 1.05,
+          "flipX": true,
+          "zIndex": 2,
+          "hitboxOffsetY": 55,
+          "hitboxWidth": 100,
+          "hitboxHeight": 155
+        }
+      }
+    }
   },
   "the_barracks": {
     "name": "The Barracks",
@@ -275,7 +429,13 @@
         "music": {
           "src": "/sounds/cottage/cottage-ambient.mp3",
           "volume": 0.3
-        }
+        },
+        "ambient": [
+          {
+            "src": "/sounds/cottage/fireplace.mp3",
+            "volume": 0.35
+          }
+        ]
       },
       "npcPlacements": {
         "mira": {

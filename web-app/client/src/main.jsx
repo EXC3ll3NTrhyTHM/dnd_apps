@@ -7,6 +7,9 @@ import { ThemeProvider } from './context/ThemeContext';
 import PwaUpdateBanner from './components/PwaUpdateBanner';
 import './styles/index.css';
 
+// Lock to portrait orientation
+screen.orientation?.lock?.('portrait').catch(() => {});
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>

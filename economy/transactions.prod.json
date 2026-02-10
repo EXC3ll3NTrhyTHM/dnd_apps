@@ -260,6 +260,19 @@
         "quest_name": "The Uncontrolled Flame"
       },
       "timestamp": "2026-02-06T02:35:20.079Z"
+    },
+    {
+      "id": "tx_1770687630407_1xnz0l",
+      "user_id": "1374906408046166036",
+      "username": "Tyren",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 450,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt"
+      },
+      "timestamp": "2026-02-10T01:40:30.407Z"
     }
   ]
 }

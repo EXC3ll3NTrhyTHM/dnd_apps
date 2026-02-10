@@ -84,5 +84,59 @@
     "text": "Well, hello there, Architect! What brings you to my corner of mischief today? Looking for a bit of intrigue, or are you just here to keep me on my toes?",
     "emotion": "happy",
     "timestamp": "2026-02-08T06:41:41.134Z"
+  },
+  {
+    "id": "568ffaf6-eed3-4226-b3fb-45a88718dad1",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "@Mira 👅",
+    "timestamp": "2026-02-09T06:54:44.559Z"
+  },
+  {
+    "id": "fc7373bf-90e5-4422-94c4-02ed3a0e794d",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Oh, is that your mischievous tongue wagging at me, Songbird? Careful now, or I might just have to steal a kiss or two!",
+    "emotion": "idle",
+    "timestamp": "2026-02-09T06:54:45.988Z"
+  },
+  {
+    "id": "14033b8d-8b7c-4e26-8a99-05e86bc36083",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "@Mira You have so many good nicknames for me. Ace, trouble, Songbird. What should I give you as a nickname?",
+    "timestamp": "2026-02-09T06:57:20.703Z"
+  },
+  {
+    "id": "a5c5ce98-6d5b-42e6-a874-2015b4b3513a",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Hmm, how about 'The Queen's Favorite Shadow'? Or maybe 'Chaos Incarnate'? I feel like those have a nice ring to them!",
+    "emotion": "happy",
+    "timestamp": "2026-02-09T06:57:22.328Z"
+  },
+  {
+    "id": "f484d9a4-169f-4e54-a540-4e756a6da85e",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "You know what shadow and Chaos are cute. good ideas!",
+    "timestamp": "2026-02-09T06:58:11.713Z"
+  },
+  {
+    "id": "e24be07e-6a4e-4603-84b9-981a91fa9e87",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Glad you approve! Just remember, I’m here to keep your royal self safe, even when I’m up to no good. Chaos is just part of the job description!",
+    "emotion": "happy",
+    "timestamp": "2026-02-09T06:58:13.417Z"
   }
 ]

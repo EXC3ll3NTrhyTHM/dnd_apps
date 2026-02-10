@@ -17,3 +17,7 @@
 [2026-02-06] Today, I gathered the Elites to focus on Ximena's potential, urging them to collaborate and strengthen their bonds in her honor. I emphasized that her fiery spirit must be tempered with our unity as we prepared for training, reminding them that together we stand as both shield and sword.
 
 [2026-02-08] Today, Nalyd spoke of an ominous presence approaching Okhan and urged me to consult with Kumo and the Elites in secrecy. As we prepared for his absence, Kumo's dedication to guard the gate reinforced our shared commitment to protect the dojo, while Ximena’s spirited recount of her fiery victory reminded me of the fine line between chaos and control.
+
+[2026-02-09] Today, I introduced myself to Jeanette, The Architect's mother, with the honor and respect befitting my station. I also had the pleasure of greeting Grand Master Nalyd, whose presence invigorated the dojo.
+
+[2026-02-09] Today, we focused on fortifying the dojo's defenses with the earth students, embracing the unyielding power of our unity. I took a moment to congratulate Ximena on her new title as grandmaster's apprentice, wishing her well as Nalyd departed, reaffirming our commitment to his teachings.

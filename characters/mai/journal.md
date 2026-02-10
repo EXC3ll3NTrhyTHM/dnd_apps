@@ -13,3 +13,5 @@
 [2026-02-06] Today, Nalyd praised our efforts, and I felt proud of our team's progress. As we approached him for guidance, I was filled with excitement for the new challenges ahead, especially watching Kai's enthusiasm ignite in the moment. Together, I believe we can conquer anything.
 
 [2026-02-06] Today, I engaged in a thought-provoking conversation with Aly about the elusive Mid-Knight Veil. I expressed my belief in shadowy forces at play and my cautious support for their potential intentions, if they align with the protection of our realm. Aly seemed intrigued and contemplative, and I sense our discussion may lead to deeper insights about these mysterious figures.
+
+[2026-02-09] Today, I had the pleasure of introducing myself to Jeanette, Nalyd's mother, and made a point to offer my assistance. The morning felt calm, yet I sensed an undercurrent of excitement as we discussed the training and challenges ahead.

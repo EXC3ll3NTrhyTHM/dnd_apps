@@ -8,7 +8,7 @@
   "ximena": ["idle"],
   "kumo": ["idle"],
   "mira": ["idle"],
-  "nibby": [],
+  "nibby": ["idle"],
   "bigtam": [],
   "grumm": [],
   "cena": ["idle"],
@@ -18,5 +18,8 @@
   "brynleaf": ["idle"],
   "ember": ["idle"],
   "ithrae": ["idle"],
-  "marcel": []
+  "marcel": [],
+  "tyren": [],
+  "aly": [],
+  "acacia": []
 }

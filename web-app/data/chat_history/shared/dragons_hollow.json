@@ -1,0 +1,47 @@
+[
+  {
+    "id": "c7fdef27-4103-4bb8-bc07-bd95385f586d",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Bonesy hey bones!",
+    "timestamp": "2026-02-08T22:11:44.134Z"
+  },
+  {
+    "id": "21a79a62-cc0f-4b33-8773-8d94017fb2b9",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Heyyy maaaan, what’s up? You want some snacks? I got a half-eaten cookie over here, still good, bro!",
+    "emotion": "happy",
+    "timestamp": "2026-02-08T22:11:45.263Z"
+  },
+  {
+    "id": "07abd99f-434e-425c-a4d6-7d8405070f66",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "i could use a drink",
+    "timestamp": "2026-02-09T07:04:41.146Z"
+  },
+  {
+    "id": "0bbc5f15-012f-43f5-be44-4812aa6c4d2e",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Duuude, let me grab you a round! *waves over the tavern keeper* Nothing like a cold drink to chill the vibes, ya know?",
+    "emotion": "happy",
+    "timestamp": "2026-02-09T07:04:42.694Z"
+  },
+  {
+    "id": "b8584148-75e8-46fe-ba60-c7631b648b98",
+    "role": "npc",
+    "npc": "kumo",
+    "npcDisplayName": "Kumo",
+    "text": "A drink, yes. It warms the spirit. What do you prefer? I can ask for something strong if you need a boost.",
+    "emotion": "idle",
+    "timestamp": "2026-02-09T07:04:43.413Z"
+  }
+]

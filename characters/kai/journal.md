@@ -11,3 +11,5 @@
 [2026-02-04] Today, we faced a crushing defeat at the hands of Nalyd, but rather than succumbing to despair, Mai and Ximena sparked a renewed fire within me. With our spirits united and determination surging, we vowed to rise together and unleash a storm of strength in our next encounter!
 
 [2026-02-04] Today was electrifying as I watched Ximena channel her fiery spirit and prepare to unleash an incredible firestorm. Her determination ignited something within me, and I coordinated my water magic to protect her while we charged into battle together, feeling unstoppable with our combined strengths. Djinn's encouragement about patience resonated deeply, fueling my resolve to master my abilities alongside my friends, and I can't wait to see how far we can push each other in our training!
+
+[2026-02-09] Today was filled with energy and anticipation as I greeted Master Nalyd and Tyren. I couldn't contain my excitement for the training ahead and eagerly awaited Nalyd’s announcements, hoping for thrilling news.

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "2e13b7f3-6bef-4430-88fb-4146e0255408",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@kashe what u doin girl",
+    "timestamp": "2026-02-09T07:02:58.616Z"
+  },
+  {
+    "id": "9c5bc355-b80b-4e0f-99cf-3a239f61a3ee",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "marcel",
+    "text": "Ah, greetings, traveler! I am Marcel, the keeper of forgotten tales and secrets. Speak to me of your quests, and perhaps I may offer my wisdom. What brings you here to converse with Kashe?",
+    "emotion": "idle",
+    "timestamp": "2026-02-09T07:03:00.160Z"
+  },
+  {
+    "id": "a6f44036-842f-4ee8-bfec-c0e55eb81470",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "hi",
+    "timestamp": "2026-02-09T19:56:00.607Z"
+  },
+  {
+    "id": "c4a95721-961a-4495-8d66-1d008290e88f",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "marcel",
+    "text": "Hello, friend! What knowledge or adventure do you seek today? The winds of fate are ever in motion. Speak your mind!",
+    "emotion": "idle",
+    "timestamp": "2026-02-09T19:56:01.745Z"
+  }
+]

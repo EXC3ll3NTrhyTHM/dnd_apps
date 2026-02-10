@@ -4,3 +4,5 @@
 [2026-02-04] Today, I shared exciting news about the younglings of the rooftop kingdom, their energy revitalizing my spirit. I also offered to help Brynleaf by keeping an eye on our routes, while playfully suggesting we use Ember's fiery spirit to send a message to the Blackthorn clan. The camaraderie felt truly strong!
 
 [2026-02-08] Today, I shared updates on the younglings with Aly; they’re mischievous but thriving, though they could use more shelter supplies. I also learned about a mimic in disguise, which unsettles me, and I vowed to be cautious while scouting the woods for any whispers of danger.
+
+[2026-02-10] Today, I promised Aly I would scout ahead of the younglings, ensuring their adventure remained a secret delight. I noticed some suspicious figures in the northern slums; I’ll have to keep a watchful eye on them while the children explore freely.

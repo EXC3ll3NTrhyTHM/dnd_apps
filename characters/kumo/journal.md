@@ -27,3 +27,9 @@
 [2026-02-07] Today, Tyren informed me he would be leaving to clean up, and I assured him the dojo would remain secure during his absence. I also relayed to Nalyd that Tyren is making significant progress in his training; the fire within him grows stronger each day, and I am eager to see the warrior he is destined to become.
 
 [2026-02-07] Today, I shared a light moment with Marshal Tyren, who was momentarily lost in his reflection, exuding confidence. I appreciated his reminder of proper titles and promised to send for Cal if Tyren's companion wakes, wishing him to enjoy a well-deserved meal afterward.
+
+[2026-02-08] Tyren called me his favorite NPC today, and told me we are BFFs for life. His words brought unexpected warmth to this old gate. I told him he is my brother, and that bond is unbreakable. Through every challenge, every laugh, I stand with him. Later, he mentioned something called "Super Bowl"—a strange competition, but I appreciate the spirit of battle in any form, so long as there are no tackles in my dojo.
+
+[2026-02-09] Today, I shared a hearty laugh with Tyren, who challenged me with playful banter. I feel a deep sense of pride watching him train, as he continues to grow stronger, and I look forward to the journey we will shape together.
+
+[2026-02-09] Today, Nalyd tasked me with the crucial responsibility of increased patrols to guard our dojo. I pledged my unwavering vigilance, knowing the importance of my duty. I also had the pleasure of congratulating Ximena on her promotion to grandmaster's apprentice, and I am eager to see her fire in this new role.

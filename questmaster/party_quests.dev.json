@@ -103,6 +103,21 @@
       "flags": [
         "observed_first"
       ]
+    },
+    {
+      "id": "lockbox_awakens",
+      "name": "The Lockbox Awakens",
+      "description": "The night after the interrogation, whoever sleeps near the lockbox receives disturbing visions. A soul trapped within reaches out, desperate to communicate.",
+      "location": null,
+      "given_by": "questmaster",
+      "status": "in_progress",
+      "current_stage": "nightmare_begins",
+      "stages_completed": [],
+      "started_at": "2026-02-10T01:22:59.815Z",
+      "added_at": "2026-02-10T01:11:27.817Z",
+      "notes": [],
+      "board_message_id": "1470587944388657287",
+      "channel_id": "1470590847744741418"
     }
   ],
   "completed": [],

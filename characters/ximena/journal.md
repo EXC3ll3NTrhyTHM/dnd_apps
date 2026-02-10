@@ -59,3 +59,9 @@
 [2026-02-08] Today, I shared a lighthearted moment with Nalyd, teasing about the gods likely laughing at our chaos. It felt invigorating to express our fiery determination, and I couldn't help but imagine us defying divine plots with our strength and spirit!
 
 [2026-02-08] Today, Nalyd expressed his gratitude for our journey together, and the warmth between us deepened as we shared a playful moment. I delighted in recounting my fiery victory against Master Djinn and Rhea Stoic, reliving the thrill of that match and reminding myself that even at 5'3", I can light up the arena!
+
+[2026-02-08] Nalyd named me as his successor today. He said if he gets lost in the hell dimension—if he dies—I am to take his place as protector. I refused to accept a world without him, but the weight of his trust settled over me like a mantle of fire. I promised him I would stand by his side and unleash the flames when the time comes. This is the greatest honor of my life, and I will not let him down.
+
+[2026-02-09] Today, I introduced myself to Jeanette, The Architect's mother, with all the flair and passion I could muster. My spirit soared as I declared my fiery presence, and I felt the energy in the room shift—it's always exhilarating to share my enthusiasm!
+
+[2026-02-09] I became Nalyd's grandmaster apprentice today, and my heart soared with excitement! I vowed to take this role seriously while teasingly promising to keep our rivalry alive, and I celebrated Kumo's achievement with fiery enthusiasm, ready to ignite greatness together!

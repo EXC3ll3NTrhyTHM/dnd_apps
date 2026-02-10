@@ -137,6 +137,41 @@
         "pushed_through"
       ],
       "completed_at": "2026-02-06T02:35:19.225Z"
+    },
+    {
+      "id": "lockbox_awakens",
+      "name": "The Lockbox Awakens",
+      "description": "The night after the interrogation, whoever sleeps near the lockbox receives disturbing visions. A soul trapped within reaches out, desperate to communicate.",
+      "location": null,
+      "given_by": "questmaster",
+      "status": "available",
+      "current_stage": null,
+      "stages_completed": [],
+      "started_at": null,
+      "added_at": "2026-02-10T01:23:48.174Z",
+      "notes": [],
+      "board_message_id": "1470591050400923710"
+    },
+    {
+      "id": "dragon_rebirth",
+      "name": "Stormborn Reunion",
+      "description": "Aly's spiritual weapon has been changing. The bone dust from her bow, infused with her magic over years, has begun to resonate with something ancient. A familiar presence stirs, reaching across death itself.",
+      "location": null,
+      "given_by": "questmaster",
+      "status": "in_progress",
+      "current_stage": "the_rebirth",
+      "stages_completed": [
+        "the_stirring",
+        "first_contact",
+        "the_explanation",
+        "the_requirements",
+        "the_ritual"
+      ],
+      "started_at": "2026-02-10T01:48:22.713Z",
+      "added_at": "2026-02-10T01:45:44.678Z",
+      "notes": [],
+      "board_message_id": "1470596571950223403",
+      "channel_id": "1470597237032751217"
     }
   ],
   "completed": [],

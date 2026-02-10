@@ -290,6 +290,8 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .chat-bubble-name {
@@ -315,6 +317,8 @@
   word-wrap: break-word;
   -webkit-user-select: text;
   user-select: text;
+  -webkit-touch-callout: default;
+  cursor: text;
 }
 
 .chat-bubble-text em {
@@ -601,6 +605,44 @@
   border-radius: 8px;
 }
 
+/* Mic button (left of input) */
+.chat-mic-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border-stitch);
+  border-radius: 4px;
+  background: linear-gradient(180deg, #3a3228, #2a241c);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.chat-mic-btn:active {
+  background: linear-gradient(180deg, #3a3228, #28221a);
+  color: var(--text-primary);
+}
+
+.chat-mic-active {
+  color: var(--color-crimson, #c44) !important;
+  background: rgba(200, 60, 60, 0.15) !important;
+  border-color: rgba(200, 60, 60, 0.4) !important;
+  animation: mic-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 60, 60, 0.3); }
+  50% { box-shadow: 0 0 8px 3px rgba(200, 60, 60, 0.4); }
+}
+
 /* Quill/Send button */
 .chat-send-btn {
   display: flex;
@@ -700,4 +742,18 @@
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
+}
+
+/* ---- Expanded Emoji Picker — hide chat to give near-fullscreen space ---- */
+
+.location-chat:has(.ck-emoji-expanded) .chat-messages,
+.location-chat:has(.ck-emoji-expanding) .chat-messages {
+  flex: 0 0 0;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.location-chat:has(.ck-emoji-expanded) .npc-bar,
+.location-chat:has(.ck-emoji-expanding) .npc-bar {
+  display: none;
 }

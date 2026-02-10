@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo, useCallback, useEffect, useLayoutEffect } from 'react';
 import CustomKeyboard from './CustomKeyboard';
 import MentionPopup from './MentionPopup';
+import { prevGraphemeLength, nextGraphemeLength } from '../utils/grapheme';
 
 /**
  * Walk text nodes inside `container` to find the DOM node + offset
@@ -47,12 +48,14 @@ export default function ChatInputCustom({
   const [text, setText] = useState('');
   const [cursorPos, setCursorPos] = useState(0);
   const [kbOpen, setKbOpen] = useState(false);
+  const [kbMode, setKbMode] = useState('keys');
   const [mentionQuery, setMentionQuery] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [showPasteBtn, setShowPasteBtn] = useState(false);
   const [listening, setListening] = useState(false);
   const [loupeInfo, setLoupeInfo] = useState(null);
   const [showHandle, setShowHandle] = useState(false);
+  const [hasSelection, setHasSelection] = useState(false);
 
   const displayRef = useRef(null);
   const contentRef = useRef(null);
@@ -90,6 +93,7 @@ export default function ChatInputCustom({
     function onPopState() {
       if (kbOpenRef.current) {
         setKbOpen(false);
+        setKbMode('keys');
         setMentionQuery(null);
         kbOpenRef.current = false;
       }
@@ -116,6 +120,7 @@ export default function ChatInputCustom({
       const dy = e.touches[0].clientY - startY;
       if (dy > 30) { // finger moved 30px downward
         setKbOpen(false);
+        setKbMode('keys');
         setMentionQuery(null);
         setShowHandle(false);
         startY = null;
@@ -370,7 +375,9 @@ export default function ChatInputCustom({
   // ── Pointer events: tap to place cursor, drag to scrub, long-press paste ──
   const draggingRef = useRef(false);
   const dragStartRef = useRef(null);
+  const lastTapRef = useRef(0);
   const DRAG_THRESHOLD = 5;
+  const DOUBLE_TAP_MS = 350;
 
   const positionCursorFromPoint = useCallback((x, y) => {
     const content = contentRef.current;
@@ -405,7 +412,19 @@ export default function ChatInputCustom({
       setKbOpen(true);
       return;
     }
-    e.preventDefault();
+
+    // Detect double-tap — let browser handle native text selection
+    const now = Date.now();
+    if (now - lastTapRef.current < DOUBLE_TAP_MS) {
+      lastTapRef.current = 0;
+      setShowHandle(false);
+      // Don't position cursor — browser will select the word natively
+      return;
+    }
+    lastTapRef.current = now;
+
+    // Clear any existing browser selection on single tap
+    window.getSelection()?.removeAllRanges();
 
     // Position cursor immediately at touch point and show grab handle
     positionCursorFromPoint(e.clientX, e.clientY);
@@ -531,6 +550,19 @@ export default function ChatInputCustom({
     } catch {}
   }, []);
 
+  // Track native browser text selection inside display
+  useEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+    const onSelectionChange = () => {
+      const sel = window.getSelection();
+      const selected = sel && !sel.isCollapsed && content.contains(sel.anchorNode);
+      setHasSelection(!!selected);
+    };
+    document.addEventListener('selectionchange', onSelectionChange);
+    return () => document.removeEventListener('selectionchange', onSelectionChange);
+  }, []);
+
   // Listen for paste events (Ctrl+V / system paste) when keyboard is open
   useEffect(() => {
     if (!kbOpen) return;
@@ -599,17 +631,24 @@ export default function ChatInputCustom({
       }
     }
 
-    setText(prev => prev.slice(0, pos - 1) + prev.slice(pos));
-    setCursorPos(pos - 1);
+    const glen = prevGraphemeLength(currentText, pos);
+    setText(prev => prev.slice(0, pos - glen) + prev.slice(pos));
+    setCursorPos(pos - glen);
   }, []);
 
-  // Arrow key handlers
+  // Arrow key handlers — grapheme-aware so emoji are skipped as whole characters
   const handleLeft = useCallback(() => {
-    setCursorPos(prev => Math.max(0, prev - 1));
+    setCursorPos(prev => {
+      const glen = prevGraphemeLength(textRef.current, prev);
+      return Math.max(0, prev - glen);
+    });
   }, []);
 
   const handleRight = useCallback(() => {
-    setCursorPos(prev => Math.min(textRef.current.length, prev + 1));
+    setCursorPos(prev => {
+      const glen = nextGraphemeLength(textRef.current, prev);
+      return Math.min(textRef.current.length, prev + glen);
+    });
   }, []);
 
   const handleSubmit = useCallback(() => {
@@ -620,10 +659,12 @@ export default function ChatInputCustom({
     setCursorPos(0);
     setMentionQuery(null);
     setKbOpen(false);
+    setKbMode('keys');
   }, [disabled, onSend]);
 
   const handleClose = useCallback(() => {
     setKbOpen(false);
+    setKbMode('keys');
     setMentionQuery(null);
   }, []);
 
@@ -702,6 +743,19 @@ export default function ChatInputCustom({
       {/* Input display bar */}
       <div className="cki-form">
         <div className="cki-row">
+          <button
+            type="button"
+            className={`chat-mic-btn ${listening ? 'chat-mic-active' : ''}`}
+            onPointerDown={(e) => { e.preventDefault(); toggleMic(); }}
+            aria-label={listening ? 'Stop listening' : 'Voice input'}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+              <line x1="12" y1="19" x2="12" y2="23" />
+              <line x1="8" y1="23" x2="16" y2="23" />
+            </svg>
+          </button>
           <div
             className="cki-wrapper"
             onPointerDown={handleWrapperPointerDown}
@@ -723,13 +777,13 @@ export default function ChatInputCustom({
             )}
             <div ref={displayRef} className="cki-display">
               <span ref={contentRef} dangerouslySetInnerHTML={{ __html: displayHtml }} />
-              {kbOpen && (
+              {kbOpen && !hasSelection && (
                 <div ref={cursorOverlayRef} className={`cki-cursor-overlay${loupeInfo ? ' cki-cursor-dragging' : ''}`}>
                   <div className="cki-cursor-line" />
                 </div>
               )}
             </div>
-            {kbOpen && showHandle && (
+            {kbOpen && showHandle && !hasSelection && (
               <div
                 ref={handleRef}
                 className="cki-cursor-handle"
@@ -747,6 +801,33 @@ export default function ChatInputCustom({
               />
             )}
           </div>
+          <button
+            type="button"
+            className={`chat-emoji-btn${kbMode === 'emoji' ? ' chat-emoji-btn-active' : ''}`}
+            aria-label={kbMode === 'emoji' ? 'Switch to keyboard' : 'Open emoji picker'}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              if (!kbOpen) {
+                setKbOpen(true);
+                setKbMode('emoji');
+              } else {
+                setKbMode(kbMode === 'emoji' ? 'keys' : 'emoji');
+              }
+            }}
+          >
+            {kbMode === 'emoji' ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <line x1="6" y1="8" x2="6" y2="8" />
+                <line x1="10" y1="8" x2="10" y2="8" />
+                <line x1="14" y1="8" x2="14" y2="8" />
+                <line x1="18" y1="8" x2="18" y2="8" />
+                <line x1="6" y1="12" x2="6" y2="12" />
+                <line x1="18" y1="12" x2="18" y2="12" />
+                <line x1="8" y1="16" x2="16" y2="16" />
+              </svg>
+            ) : '😊'}
+          </button>
           <button
             type="button"
             className="chat-send-btn"
@@ -772,10 +853,10 @@ export default function ChatInputCustom({
         onPaste={handlePaste}
         onLeft={handleLeft}
         onRight={handleRight}
-        onMic={toggleMic}
-        listening={listening}
         disabled={disabled}
         playSound={playSound}
+        mode={kbMode}
+        onModeChange={setKbMode}
       />
     </>
   );

@@ -1,6 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
+// Chat mode module for free-form chat instead of buttons
+const chatMode = require('./chat_mode');
+
 // ============================================
 // ENVIRONMENT SETUP
 // ============================================
@@ -1568,6 +1571,13 @@ discord.on('interactionCreate', async (interaction) => {
             channelId: questChannel.id
           };
           
+          // Check if this quest uses chat mode (no buttons, free-form chat)
+          const isChatMode = result.definition.chat_mode === true;
+          if (isChatMode) {
+            chatMode.startChatMode(questChannel.id, questId, result.definition, result.quest);
+            console.log(`[QuestMaster] Started chat mode for quest ${questId}`);
+          }
+          
           // Generate narration - use stage prompt if available
           // Show typing indicator while generating
           await questChannel.sendTyping();
@@ -1589,28 +1599,30 @@ discord.on('interactionCreate', async (interaction) => {
             );
           }
           
-          // Get stage-specific buttons if available
-          let components;
-          if (result.definition.stages && result.definition.stages[initialStage]) {
-            components = createStageButtons(result.definition, initialStage);
-          } else {
-            components = [...createGameplayButtons()];
+          // Get stage-specific buttons if available (skip if chat mode)
+          let components = [];
+          if (!isChatMode) {
+            if (result.definition.stages && result.definition.stages[initialStage]) {
+              components = createStageButtons(result.definition, initialStage);
+            } else {
+              components = [...createGameplayButtons()];
+            }
           }
           
           // Post narration in the new quest channel
           // If stage has NPC cues, send narration WITHOUT buttons, then buttons come after NPC dialogue
           const hasCues = stageHasCues(stageInfo);
           const startMsg = {
-            content: `📖 **${result.definition.name}** begins...\n\n📍 **${initialStage.charAt(0).toUpperCase() + initialStage.slice(1)}**\n\n${narration}`,
-            components: hasCues ? [] : components
+            content: `📖 **${result.definition.name}** begins...\n\n📍 **${initialStage.charAt(0).toUpperCase() + initialStage.slice(1)}**\n\n${narration}${isChatMode ? '\n\n*Type your actions and dialogue freely.*' : ''}`,
+            components: (hasCues || isChatMode) ? [] : components
           };
           const startImage = resolveQuestImage(result.definition._source_npc, stageInfo?.image);
           if (startImage) startMsg.files = [startImage];
           await questChannel.send(startMsg);
           
-          // Handle stage-level NPC cues for the initial stage, send buttons after
+          // Handle stage-level NPC cues for the initial stage, send buttons after (skip buttons if chat mode)
           if (stageInfo) {
-            await handleStageCues(questChannel, stageInfo, result.definition, initialStage, hasCues ? components : null);
+            await handleStageCues(questChannel, stageInfo, result.definition, initialStage, (hasCues && !isChatMode) ? components : null);
           }
           
           // Reply to interaction with link to the new channel, with replay button
@@ -2317,6 +2329,116 @@ discord.on('interactionCreate', async (interaction) => {
 
 discord.on('messageCreate', async (message) => {
   if (message.author.bot) return;
+  
+  // ============================================
+  // CHAT MODE PROCESSING
+  // ============================================
+  const chatSession = chatMode.getChatSession(message.channel.id);
+  if (chatSession && !message.content.toLowerCase().startsWith('!qm')) {
+    // Process player message in chat mode
+    try {
+      await message.channel.sendTyping();
+      
+      const result = await chatMode.processChatMessage(
+        openai,
+        process.env.MODEL || 'gpt-4o-mini',
+        chatSession.definition,
+        chatSession.quest,
+        message.content,
+        message.member?.displayName || message.author.username
+      );
+      
+      // Send narration if present
+      if (result.narration) {
+        await message.channel.send(`📖 ${result.narration}`);
+      }
+      
+      // Send image if requested
+      if (result.send_image && chatSession.definition.images) {
+        const imagePath = chatSession.definition.images[result.send_image];
+        if (imagePath) {
+          const fullPath = resolveQuestImage(chatSession.definition._source_npc, imagePath);
+          if (fullPath) {
+            await message.channel.send({ files: [fullPath] });
+          }
+        }
+      }
+      
+      // Cue NPC if requested
+      if (result.cue_npc) {
+        const npcName = result.cue_npc.toLowerCase();
+        
+        if (isQuestNpc(npcName, chatSession.definition)) {
+          // Quest NPC - generate dialogue via webhook
+          const stageInfo = getStageInfo(chatSession.definition, chatSession.quest.current_stage);
+          const dialogueContext = `Quest: ${chatSession.definition.name}. Stage: ${stageInfo?.description || chatSession.quest.current_stage}. Player just said: "${message.content}"`;
+          
+          const dialogue = await generateQuestNpcDialogue(
+            npcName,
+            chatSession.definition,
+            result.npc_instruction || 'Respond in character.',
+            dialogueContext
+          );
+          
+          if (dialogue) {
+            await sendAsQuestNpc(message.channel, npcName, chatSession.definition, dialogue);
+          }
+        } else {
+          // Bot NPC - write cue file
+          const npcCharDir = path.join(NPC_CHARACTERS_PATH, npcName);
+          if (fs.existsSync(npcCharDir)) {
+            const cueData = {
+              channel_id: message.channel.id,
+              instruction: result.npc_instruction || 'Respond in character.',
+              context: `Player said: "${message.content}"`,
+              timestamp: Date.now()
+            };
+            const cueFilePath = path.join(npcCharDir, 'quest_cue.json');
+            const tempFilePath = path.join(npcCharDir, 'quest_cue.tmp');
+            fs.writeFileSync(tempFilePath, JSON.stringify(cueData, null, 2));
+            fs.renameSync(tempFilePath, cueFilePath);
+            console.log(`[ChatMode] Wrote cue file for bot NPC ${npcName}`);
+          }
+        }
+      }
+      
+      // Advance stage if requested
+      if (result.advance_stage) {
+        const advanceResult = advanceQuest(chatSession.questId, result.advance_stage);
+        chatSession.quest = advanceResult.quest;
+        chatMode.updateChatSession(message.channel.id, advanceResult.quest);
+        
+        // Get new stage narration
+        const newStageInfo = getStageInfo(chatSession.definition, result.advance_stage);
+        if (newStageInfo?.narration_prompt) {
+          const stageNarration = await generateNarration(
+            `Quest: ${chatSession.definition.name}. ${chatSession.definition.description}`,
+            newStageInfo.narration_prompt,
+            getStageCueNpcNames(newStageInfo)
+          );
+          
+          const stageMsg = { content: `📍 **${result.advance_stage.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}**\n\n${stageNarration}` };
+          const stageImage = resolveQuestImage(chatSession.definition._source_npc, newStageInfo?.image);
+          if (stageImage) stageMsg.files = [stageImage];
+          await message.channel.send(stageMsg);
+          
+          // Handle stage-level NPC cues
+          await handleStageCues(message.channel, newStageInfo, chatSession.definition, result.advance_stage, null);
+        }
+      }
+      
+      // Complete quest if requested
+      if (result.quest_complete) {
+        await completeQuest(chatSession.questId);
+        chatMode.endChatMode(message.channel.id);
+        await message.channel.send(`✅ **Quest Complete!** *${chatSession.definition.name}* has been resolved.`);
+      }
+      
+    } catch (err) {
+      console.error('[ChatMode] Error processing message:', err);
+    }
+    return;
+  }
   
   // Check if message starts with !qm
   if (!message.content.toLowerCase().startsWith('!qm')) return;

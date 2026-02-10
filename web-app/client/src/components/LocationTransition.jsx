@@ -19,8 +19,15 @@ const LOCATION_THEMES = {
     accentColor: '#d4760a',
     particles: 'sparks',
     subtitle: 'Where Tales Are Told Over Ale',
-    bgImage: null,
-    sound: null,
+    bgImage: '/images/scenes/dragons_hallow_exterior.webp',
+    sounds: [
+      { src: '/sounds/dragons_hollow/transition_whistle.mp3', volume: 0.3 },
+      { src: '/sounds/dragons_hollow/transition_roar.mp3', volume: 0.3 },
+    ],
+    preloadAudio: [
+      '/sounds/dragons_hollow/tavern-music.mp3',
+      '/sounds/dragons_hollow/tavern-ambient.mp3',
+    ],
   },
   the_barracks: {
     inkColor: '#0a0c10',
@@ -51,8 +58,14 @@ const LOCATION_THEMES = {
     accentColor: '#c0a070',
     particles: 'dust',
     subtitle: 'Heart of Okhan',
-    bgImage: null,
-    sound: null,
+    bgImage: '/images/scenes/collective_exterior.webp',
+    sounds: [
+      { src: '/sounds/collective/footsteps.mp3', volume: 0.3 },
+      { src: '/sounds/collective/door-opening.mp3', volume: 0.3, delay: 2000 },
+    ],
+    preloadAudio: [
+      '/sounds/collective/throne-room-v2.mp3',
+    ],
   },
   the_cottage: {
     inkColor: '#0a0c07',
@@ -90,6 +103,19 @@ export default function LocationTransition({ locationId, locationName, onComplet
   onCompleteRef.current = onComplete;
 
   const theme = LOCATION_THEMES[locationId] || DEFAULT_THEME;
+
+  // Preload scene audio during transition so it's cached when SceneAudio mounts
+  useEffect(() => {
+    if (!theme.preloadAudio || theme.preloadAudio.length === 0) return;
+    const preloaded = theme.preloadAudio.map(src => {
+      const a = new Audio();
+      a.preload = 'auto';
+      a.src = src;
+      a.load();
+      return a;
+    });
+    return () => preloaded.forEach(a => { a.src = ''; });
+  }, [theme.preloadAudio]);
 
   // Play location-specific sound effect(s)
   useEffect(() => {

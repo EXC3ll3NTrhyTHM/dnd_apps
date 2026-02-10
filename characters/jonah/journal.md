@@ -26,3 +26,5 @@
 [2026-02-06] Today, I received orders from Tyren to take the recruits into the Ranger woods for rigorous training. I felt a surge of determination as I prepared them for the reality of our duties, signaling the difference between mere desire for challenge and the actual endurance required—time to turn their energy into strength.
 
 [2026-02-08] Today, I received orders from Tyren to escort the recruits back to their post, emphasizing the importance of their training. During our debriefing, I noted a looming threat with the Weaver's recruiting and the mimic incident, stressing to Tyren the necessity of keeping our young recruits vigilant against the growing shadows.
+
+[2026-02-09] Today, Tyren emphasized the importance of forgetting the Veil and preparing for an interrogation of our prisoner regarding the cottage robbery and its ties to the Iron Howl Legion. I coordinated with the officers to ensure they would support Tyren and the Dojo in silence, ready to observe and assist as needed.

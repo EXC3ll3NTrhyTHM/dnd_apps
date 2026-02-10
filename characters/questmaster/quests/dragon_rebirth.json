@@ -1,0 +1,78 @@
+{
+  "id": "dragon_rebirth",
+  "name": "Stormborn Reunion",
+  "description": "Aly's spiritual weapon has been changing. The bone dust from her bow, infused with her magic over years, has begun to resonate with something ancient. A familiar presence stirs, reaching across death itself.",
+  "chat_mode": true,
+  "personal_quest": "aly",
+  "reward_gold": 0,
+  
+  "images": {
+    "bow_glowing": "bow_glowing.png",
+    "dragon_spirit": "dragon_spirit.png",
+    "storm_memory": "storm_memory.png",
+    "rebirth_moment": "rebirth_moment.png",
+    "dragon_egg": "dragon_egg.png"
+  },
+  
+  "stages": {
+    "the_stirring": {
+      "description": "Aly notices her bow humming with unfamiliar energy. The bone dust she's been experimenting with glows faintly.",
+      "narration_prompt": "It starts as a hum. Low. Almost imperceptible. Your bow, Stormpiercer, vibrates against your back like a tuning fork struck by an invisible hand.\n\nThe bone dust you've been carefully shaving, experimenting with, mixing with your spiritual magic... it glows. Faint blue-white, like distant lightning trapped in powder.\n\nAnd then you feel it. Not a sound. Not a sight. A *presence*. Something achingly familiar, like a word on the tip of your tongue. Like a face you've seen in dreams but can't quite remember.\n\nThe feeling pulls at your chest. Whoever this is... they're trying to reach you.",
+      "image": "bow_glowing.png",
+      "advance_conditions": "Aly acknowledges the presence, focuses on it, or tries to communicate",
+      "next_stage": "first_contact"
+    },
+    
+    "first_contact": {
+      "description": "The presence resolves into something more coherent. A voice. A feeling. The dragon she lost.",
+      "narration_prompt": "You close your eyes and reach toward the presence with your spirit.\n\nThe world falls away.\n\nYou're falling. Wind screaming past. Lightning splitting the sky. And beside you, wings outstretched, eyes locked on yours with desperate love and absolute trust—\n\n*Him.*\n\nThe memory shatters, but the connection holds. A voice, not in your ears but in your soul, speaks for the first time in over a century:\n\n> **\"...Aly...\"**\n\nIt's weak. Fragmented. Like words spoken through water. But it's *him*. Your dragon. Your friend. The one who fell with you. The one who died so you could live.\n\n> **\"...still here... in the bones... in you... never left...\"**",
+      "image": "dragon_spirit.png",
+      "advance_conditions": "Aly responds emotionally, asks how this is possible, or asks what he needs",
+      "next_stage": "the_explanation"
+    },
+    
+    "the_explanation": {
+      "description": "The dragon's spirit explains what's been happening and what could be possible.",
+      "narration_prompt": "The presence grows stronger, as if your attention feeds it. The voice becomes clearer, though still distant.\n\n> **\"The lightning... divine lightning... it didn't just kill my body. It bound my spirit to the bones. To you. I've been... sleeping. Dreaming. Feeling echoes of your life for so long...\"**\n\nA wave of warmth washes through you. Not heat. Love. Pure, patient, enduring love.\n\n> **\"Your magic woke me. The spiritual weapon... you've been pouring yourself into it for years. And the bone dust... it's me, Aly. Pieces of me. You've been calling me back without knowing it.\"**\n\nThe presence flickers, straining.\n\n> **\"I can't come back as I was. Too much of me is gone. But something smaller... something new... if you're willing to try...\"**",
+      "advance_conditions": "Aly expresses willingness to try, asks what she needs to do, or emotionally commits to the process",
+      "next_stage": "the_requirements"
+    },
+    
+    "the_requirements": {
+      "description": "The dragon explains what's needed for the rebirth ritual.",
+      "narration_prompt": "Hope. After all these years, hope.\n\n> **\"The bone dust holds my essence. Your spiritual weapon holds your faith. We need to merge them... truly merge them. Not as separate things, but as one.\"**\n\nImages flash through your mind, not words but pure understanding:\n\n- The bone dust, carefully collected over months of careful work\n- Your spiritual weapon, the lifeless arrow you've been directing with will alone\n- A moment of perfect connection, where grief becomes gratitude, where loss becomes reunion\n\n> **\"No dark magic. No forbidden prices. Just... us. Choosing each other again. The way we did the first time, when you were young and I was wild and we looked at each other and knew.\"**\n\nThe presence wavers.\n\n> **\"I won't be what I was. Smaller. Fragile. I'll need to grow again, maybe for years. Maybe forever small. But I'll be *here*. With you. If you'll have me.\"**",
+      "advance_conditions": "Aly agrees and is ready to perform the ritual, or asks how to begin",
+      "next_stage": "the_ritual"
+    },
+    
+    "the_ritual": {
+      "description": "Aly performs the rebirth ritual, merging bone dust with spiritual weapon.",
+      "narration_prompt": "You gather what you need. The bone dust, glowing softly in its pouch. Your bow, humming with anticipation. A quiet space where no one will disturb you.\n\nYou sit. You breathe. You call forth your spiritual weapon, the lifeless arrow that has served you faithfully.\n\nIt hovers before you, waiting.\n\nSlowly, reverently, you release the bone dust into the air around it. The particles hang suspended, each one a tiny star, each one a piece of him.\n\n> **\"Remember the fall,\"** his voice whispers. **\"Remember the storm. Remember me.\"**\n\nYou remember. The wind. The lightning. The terror. The love. His eyes finding yours in that final moment, saying *it's okay, it's okay, I've got you, I've always got you—*\n\nTears stream down your face. Your spiritual magic surges.\n\nThe bone dust spirals. The arrow transforms.",
+      "image": "storm_memory.png",
+      "advance_conditions": "Automatic progression after the ritual description",
+      "next_stage": "the_rebirth"
+    },
+    
+    "the_rebirth": {
+      "description": "The dragon is reborn as an egg, waiting to hatch.",
+      "narration_prompt": "Light.\n\nBlinding, beautiful, storm-silver light.\n\nThe arrow is gone. The bone dust is gone. In their place, hovering in the air before you, is a shape. Small. Perfect. Unmistakable.\n\nAn egg. Storm-grey shell shimmering to silver to pale blue, veins of captured lightning pulsing beneath the surface like a heartbeat. It's warm. It's *alive*.\n\nYou reach out, and the egg settles into your palms as if it belongs there. As if it's been waiting for this moment for over a century.\n\nAnd you feel him. Not words anymore, not a voice, but a presence. Curled up inside that shell, dreaming, growing, *becoming*. The bond thrums between you, stronger than it's ever been.\n\nHe's not back yet. Not fully. But he's *here*. Waiting to return to you.\n\nYour spiritual weapon will never be a lifeless arrow again. It holds a promise now. A life waiting to begin again.",
+      "image": "rebirth_moment.png",
+      "advance_conditions": "Aly reacts to the egg or acknowledges what's happened",
+      "next_stage": "new_beginning"
+    },
+    
+    "new_beginning": {
+      "description": "Aly holds the egg, a promise of reunion waiting to hatch.",
+      "narration_prompt": "You cradle the egg against your chest. It pulses with warmth, with life, with *him*.\n\nThe shell shifts colors in the light, storm-grey to silver to pale blue. Lightning veins trace patterns across its surface, a heartbeat made visible. When you hold it close, you swear you can feel him dreaming in there. Peaceful. Safe. Home.\n\nYou don't know how long until he hatches. Days? Weeks? Months? It doesn't matter. You've waited over a century. You can wait a little longer.\n\nBut this time, you'll be waiting *together*.\n\nThe Velzari have a word for this kind of reunion. Roughly translated, it means: *\"the storm that returns.\"*\n\nHe's coming back. And when that shell cracks and those bright white eyes find yours for the first time in this new life...\n\nYou'll be ready.\n\nWelcome back, old friend. Take your time.",
+      "image": "dragon_egg.png",
+      "advance_conditions": "Aly acknowledges the completion or says goodbye to the moment",
+      "next_stage": "quest_complete"
+    },
+    
+    "quest_complete": {
+      "description": "The rebirth is complete. Aly holds a dragon egg, waiting to hatch.",
+      "narration_prompt": "Some bonds transcend death. Some love refuses to end. And sometimes, if you're patient enough and brave enough and willing to pour your heart into magic you don't fully understand...\n\nSometimes, you get them back.\n\n*Quest Complete: Stormborn Reunion*\n\n**Reward:** Aly's Spiritual Weapon is now bound to a storm dragon egg. When it hatches, her old friend will return, reborn and ready to fly at her side once more.",
+      "completes_quest": true
+    }
+  }
+}

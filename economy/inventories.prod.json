@@ -6,7 +6,15 @@
     "quests_unlocked": []
   },
   "1374906408046166036": {
-    "items": [],
+    "items": [
+      {
+        "item_id": "item_blunt",
+        "name": "Blunt",
+        "type": "consumable",
+        "quantity": 1,
+        "acquired_at": "2026-02-10T01:40:30.409Z"
+      }
+    ],
     "badges": [],
     "roles_purchased": [],
     "quests_unlocked": []

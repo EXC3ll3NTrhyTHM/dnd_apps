@@ -1,0 +1,29 @@
+[
+  {
+    "id": "6f6eab71-8f71-4211-a3cd-8e66e290bd9d",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "any secrets I can hear about?",
+    "timestamp": "2026-02-09T07:05:43.894Z"
+  },
+  {
+    "id": "6c502436-e536-4f76-b38e-8ac444f1e310",
+    "role": "npc",
+    "npc": "aurelia",
+    "npcDisplayName": "Aurelia Dawnwrath",
+    "text": "Secrets dwell where shadows linger. The Blackthorn Clan's movements have become increasingly bold. I believe they have plans that could disrupt the fragile peace in Okhan. Keep your ears open; the truth often surfaces in whispers.",
+    "emotion": "thoughtful",
+    "timestamp": "2026-02-09T07:05:46.008Z"
+  },
+  {
+    "id": "8e3c291e-9198-433e-92b7-40bf3676afee",
+    "role": "npc",
+    "npc": "ember",
+    "npcDisplayName": "Ember Blackwell",
+    "text": "You already asking the wrong questions. It's not about what you can hear; it's about what you're willing to act on. The Blackthorn Clan's got their claws in the city — best be ready for trouble. Keep your head on a swivel.",
+    "emotion": "suspicious",
+    "timestamp": "2026-02-09T07:05:48.342Z"
+  }
+]

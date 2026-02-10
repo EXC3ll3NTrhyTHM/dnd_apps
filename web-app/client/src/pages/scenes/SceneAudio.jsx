@@ -9,54 +9,112 @@ import { useEffect, useRef } from 'react';
 import { useAudioMuted } from '../../hooks/useAudioSettings';
 
 export function SceneAudio({ config, enabled = true }) {
-  const musicRef = useRef(null);
-  const ambientRefs = useRef([]);
+  const mutedRef = useRef(false);
   const muted = useAudioMuted();
+  mutedRef.current = muted;
 
+  const audioRef = useRef([]);     // all Audio elements
+  const configKeyRef = useRef(''); // serialized config for comparison
+  const pausedRef = useRef(false); // true when tab hidden OR window not focused
+
+  // Mute/unmute existing audio without recreating elements
   useEffect(() => {
-    if (!config || !enabled) {
-      console.log('[SceneAudio] Skipped — config:', !!config, 'enabled:', enabled);
-      return;
-    }
+    audioRef.current.forEach((entry) => {
+      const { audio, volume, irregular, waiting } = entry;
+      audio.volume = muted ? 0 : volume;
+      if (muted || pausedRef.current) {
+        audio.pause();
+      } else if (!irregular && audio.readyState >= 3) {
+        audio.play().catch(() => {});
+      } else if (irregular && waiting && audio.readyState >= 3) {
+        entry.waiting = false;
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      }
+    });
+  }, [muted]);
 
-    console.log('[SceneAudio] Init with config:', JSON.stringify(config), 'muted:', muted);
-    const audioElements = [];
+  // Create audio elements when config changes
+  useEffect(() => {
+    if (!config || !enabled) return;
 
-    // Create music track
+    // Only recreate if config actually changed
+    const key = JSON.stringify(config);
+    if (key === configKeyRef.current && audioRef.current.length > 0) return;
+    configKeyRef.current = key;
+
+    // Clean up previous
+    audioRef.current.forEach(({ audio }) => {
+      audio.pause();
+      audio.src = '';
+    });
+    audioRef.current = [];
+
+    const entries = [];
+
     if (config.music) {
-      const music = new Audio(config.music.src);
-      music.loop = true;
-      music.volume = muted ? 0 : (config.music.volume ?? 0.3);
-      musicRef.current = music;
-      audioElements.push(music);
-      console.log('[SceneAudio] Created music:', config.music.src, 'vol:', music.volume);
+      entries.push({ src: config.music.src, volume: config.music.volume ?? 0.3 });
     }
-
-    // Create ambient sound layers
     if (config.ambient) {
-      ambientRefs.current = config.ambient.map(amb => {
-        const audio = new Audio(amb.src);
-        audio.loop = true;
-        audio.volume = muted ? 0 : (amb.volume ?? 0.5);
-        return audio;
+      config.ambient.forEach(amb => {
+        entries.push({
+          src: amb.src,
+          volume: amb.volume ?? 0.5,
+          delay: amb.delay ?? 0,
+          irregular: amb.irregular ?? false,
+          irregularPause: amb.irregularPause ?? [8, 20],
+        });
       });
-      audioElements.push(...ambientRefs.current);
     }
 
-    if (audioElements.length === 0) return;
+    if (entries.length === 0) return;
 
-    // Play each track as soon as it's ready
-    audioElements.forEach((audio, i) => {
+    const timers = [];
+
+    const audioElements = entries.map(({ src, volume, delay, irregular, irregularPause }, i) => {
+      const audio = new Audio(src);
+      audio.loop = !irregular;
+      audio.volume = mutedRef.current ? 0 : volume;
+      audio.preload = 'auto';
+      return { audio, volume, delay, irregular, irregularPause, waiting: false };
+    });
+    audioRef.current = audioElements;
+
+    const shouldPlay = () => !mutedRef.current && !pausedRef.current;
+
+    // Schedule irregular playback: play once, pause for random interval, repeat
+    function scheduleIrregular(entry) {
+      const { audio, irregularPause } = entry;
+      const [minPause, maxPause] = irregularPause;
+      entry.waiting = true;
+
+      audio.onended = () => {
+        const pauseSec = minPause + Math.random() * (maxPause - minPause);
+        const t = setTimeout(() => {
+          if (shouldPlay()) {
+            entry.waiting = false;
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+          }
+          // If muted/hidden/blurred, stay in waiting state — resumeAll will pick it up
+        }, pauseSec * 1000);
+        timers.push(t);
+      };
+    }
+
+    // Try to play each track once loaded
+    audioElements.forEach((entry, i) => {
+      const { audio, delay, irregular } = entry;
+
+      if (irregular) scheduleIrregular(entry);
+
       audio.addEventListener('canplaythrough', () => {
-        console.log('[SceneAudio] canplaythrough:', audio.src, 'muted:', muted);
-        if (!muted) {
-          setTimeout(() => {
-            audio.play().then(() => {
-              console.log('[SceneAudio] Playing:', audio.src);
-            }).catch((err) => {
-              console.warn('[SceneAudio] Play blocked:', audio.src, err.message);
-            });
-          }, i * 200);
+        if (shouldPlay()) {
+          const startDelay = delay + i * 200;
+          const t = setTimeout(() => {
+            if (shouldPlay()) audio.play().catch(() => {});
+          }, startDelay);
+          timers.push(t);
         }
       }, { once: true });
 
@@ -67,45 +125,81 @@ export function SceneAudio({ config, enabled = true }) {
       audio.load();
     });
 
-    // Try to resume audio on any user interaction (for autoplay policy)
-    const resumeAudio = () => {
-      if (muted || document.hidden) return;
-      audioElements.forEach(audio => {
-        if (audio.paused) {
-          console.log('[SceneAudio] Resuming on interaction:', audio.src);
-          audio.play().then(() => console.log('[SceneAudio] Resumed OK')).catch(e => console.warn('[SceneAudio] Resume failed:', e.message));
+    // Resume all audio (looping tracks + waiting irregular sounds)
+    const resumeAll = () => {
+      if (!shouldPlay()) return;
+      audioRef.current.forEach((entry) => {
+        const { audio, irregular, waiting } = entry;
+        if (irregular) {
+          // Only resume irregular sounds that are waiting (timer elapsed while paused)
+          if (waiting && audio.paused && audio.readyState >= 3) {
+            entry.waiting = false;
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+          }
+        } else {
+          if (audio.paused && audio.readyState >= 3) {
+            audio.play().catch(() => {});
+          }
         }
       });
     };
 
-    // Pause when tab/app is hidden, resume when visible
+    // Pause all audio
+    const pauseAll = () => {
+      audioRef.current.forEach(({ audio }) => audio.pause());
+    };
+
+    // Handle tab visibility + window focus/blur
     const onVisibility = () => {
       if (document.hidden) {
-        audioElements.forEach(audio => audio.pause());
-      } else if (!muted) {
-        audioElements.forEach(audio => audio.play().catch(() => {}));
+        pausedRef.current = true;
+        pauseAll();
+      } else if (document.hasFocus()) {
+        pausedRef.current = false;
+        resumeAll();
       }
     };
 
-    window.addEventListener('click', resumeAudio);
-    window.addEventListener('touchstart', resumeAudio);
-    window.addEventListener('pointerdown', resumeAudio);
-    document.addEventListener('visibilitychange', onVisibility);
+    const onBlur = () => {
+      pausedRef.current = true;
+      pauseAll();
+    };
 
-    // Cleanup
+    const onFocus = () => {
+      if (!document.hidden) {
+        pausedRef.current = false;
+        resumeAll();
+      }
+    };
+
+    // Resume on user interaction (autoplay policy)
+    const onInteraction = () => resumeAll();
+
+    window.addEventListener('click', onInteraction);
+    window.addEventListener('touchstart', onInteraction);
+    window.addEventListener('pointerdown', onInteraction);
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('blur', onBlur);
+    window.addEventListener('focus', onFocus);
+
     return () => {
-      audioElements.forEach(audio => {
+      timers.forEach(clearTimeout);
+      audioRef.current.forEach(({ audio }) => {
+        audio.onended = null;
         audio.pause();
         audio.src = '';
       });
-      musicRef.current = null;
-      ambientRefs.current = [];
-      window.removeEventListener('click', resumeAudio);
-      window.removeEventListener('touchstart', resumeAudio);
-      window.removeEventListener('pointerdown', resumeAudio);
+      audioRef.current = [];
+      configKeyRef.current = '';
+      window.removeEventListener('click', onInteraction);
+      window.removeEventListener('touchstart', onInteraction);
+      window.removeEventListener('pointerdown', onInteraction);
       document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('focus', onFocus);
     };
-  }, [config, enabled, muted]);
+  }, [config, enabled]);
 
   return null;
 }
