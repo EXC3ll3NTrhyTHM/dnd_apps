@@ -1,160 +1,276 @@
 [
   {
-    "id": "5dedeb97-816f-4033-95c5-5be11f42d325",
-    "role": "player",
-    "userId": "228241331296665600",
-    "playerName": "badbeachpeach",
-    "text": "@Mira Mira Run",
-    "timestamp": "2026-02-08T06:27:28.727Z"
-  },
-  {
-    "id": "dd05ecd2-f4ea-4c45-a93f-78d2b3b053be",
-    "role": "npc",
-    "npc": "mira",
-    "npcDisplayName": "Mira",
-    "text": "Oh, we're running now? Great! I was hoping for a little cardio. What's the rush, Trouble?",
-    "emotion": "idle",
-    "timestamp": "2026-02-08T06:27:29.468Z"
-  },
-  {
-    "id": "8ab29e5f-eabd-4b41-b31c-1ee307c3fbd1",
-    "role": "player",
-    "userId": "228241331296665600",
-    "playerName": "badbeachpeach",
-    "text": "@Mira Just kidding",
-    "timestamp": "2026-02-08T06:27:50.792Z"
-  },
-  {
-    "id": "213346c9-b504-472c-b42c-eccfde1f3e62",
-    "role": "npc",
-    "npc": "mira",
-    "npcDisplayName": "Mira",
-    "text": "You’re lucky I don’t throw daggers for jokes. But you definitely got my heart racing. What's next, a treasure map?",
-    "emotion": "happy",
-    "timestamp": "2026-02-08T06:27:51.517Z"
-  },
-  {
-    "id": "4757bf7e-89d6-409d-a5ef-8f75df2f639f",
-    "role": "player",
-    "userId": "228241331296665600",
-    "playerName": "badbeachpeach",
-    "text": "@Mira Don't mind me know I love trouble",
-    "timestamp": "2026-02-08T06:28:39.932Z"
-  },
-  {
-    "id": "090dec97-0e17-459f-befa-e1eda27dae2b",
-    "role": "npc",
-    "npc": "mira",
-    "npcDisplayName": "Mira",
-    "text": "Ah, a fellow connoisseur of chaos! You and I are going to get along just fine. What kind of trouble are we stirring up today?",
-    "emotion": "happy",
-    "timestamp": "2026-02-08T06:28:40.643Z"
-  },
-  {
-    "id": "b8fae221-971e-4c8c-807e-d1a5a19db162",
-    "role": "player",
-    "userId": "228241331296665600",
-    "playerName": "badbeachpeach",
-    "text": "@Mira you know that about me obviously though",
-    "timestamp": "2026-02-08T06:29:55.252Z"
-  },
-  {
-    "id": "da7e1f0a-07be-4ee2-a04f-c7b1c08fc1a4",
-    "role": "npc",
-    "npc": "mira",
-    "npcDisplayName": "Mira",
-    "text": "Of course I do! It’s practically written on your forehead. I can spot a troublemaker from a mile away. Just make sure you save some fun for me, alright?",
-    "emotion": "idle",
-    "timestamp": "2026-02-08T06:29:55.967Z"
-  },
-  {
-    "id": "250f8e09-b567-48f5-9c0a-70044c7b10aa",
+    "id": "f8729e11-dcb8-43ec-b3f2-f3691b2a825e",
     "role": "player",
     "userId": "424061511833747467",
     "playerName": "The Architect",
     "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Mira hello",
-    "timestamp": "2026-02-08T06:41:40.284Z"
+    "text": "@Marcel test",
+    "timestamp": "2026-02-11T04:14:19.962Z"
   },
   {
-    "id": "a0376aa1-e0f3-45a6-9a76-48ffc6c9b544",
+    "id": "33f4437b-c0d8-4dda-836b-98c4990d9194",
     "role": "npc",
-    "npc": "mira",
-    "npcDisplayName": "Mira",
-    "text": "Well, hello there, Architect! What brings you to my corner of mischief today? Looking for a bit of intrigue, or are you just here to keep me on my toes?",
-    "emotion": "happy",
-    "timestamp": "2026-02-08T06:41:41.134Z"
-  },
-  {
-    "id": "568ffaf6-eed3-4226-b3fb-45a88718dad1",
-    "role": "player",
-    "userId": "228241331296665600",
-    "playerName": "Acacia",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "text": "@Mira 👅",
-    "timestamp": "2026-02-09T06:54:44.559Z"
-  },
-  {
-    "id": "fc7373bf-90e5-4422-94c4-02ed3a0e794d",
-    "role": "npc",
-    "npc": "mira",
-    "npcDisplayName": "Mira",
-    "text": "Oh, is that your mischievous tongue wagging at me, Songbird? Careful now, or I might just have to steal a kiss or two!",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "✓",
     "emotion": "idle",
-    "timestamp": "2026-02-09T06:54:45.988Z"
+    "timestamp": "2026-02-11T04:14:25.521Z"
   },
   {
-    "id": "14033b8d-8b7c-4e26-8a99-05e86bc36083",
+    "id": "a81765ff-fced-4059-ae4d-9b15308c84b9",
     "role": "player",
-    "userId": "228241331296665600",
-    "playerName": "Acacia",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "text": "@Mira You have so many good nicknames for me. Ace, trouble, Songbird. What should I give you as a nickname?",
-    "timestamp": "2026-02-09T06:57:20.703Z"
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Marcel test",
+    "timestamp": "2026-02-11T04:19:54.544Z"
   },
   {
-    "id": "a5c5ce98-6d5b-42e6-a874-2015b4b3513a",
+    "id": "97d24228-56fe-4262-8590-344919289e59",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "✓",
+    "emotion": "idle",
+    "timestamp": "2026-02-11T04:19:59.257Z"
+  },
+  {
+    "id": "6b38c092-1069-433c-bf24-0f2749df6f53",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Marcel test",
+    "timestamp": "2026-02-11T04:26:35.246Z"
+  },
+  {
+    "id": "0e01dbc1-6151-491a-b2e6-9a06a30bac25",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "✓",
+    "emotion": "idle",
+    "timestamp": "2026-02-11T04:26:39.007Z"
+  },
+  {
+    "id": "444f217f-0934-4a3b-9b75-a93502891a5a",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Mira hey",
+    "timestamp": "2026-02-11T04:32:22.606Z"
+  },
+  {
+    "id": "d00e764c-b837-4414-b37d-b6920a36a258",
     "role": "npc",
     "npc": "mira",
     "npcDisplayName": "Mira",
-    "text": "Hmm, how about 'The Queen's Favorite Shadow'? Or maybe 'Chaos Incarnate'? I feel like those have a nice ring to them!",
+    "text": "Hey there, Your Majesty! What's on your mind today? 🎭",
     "emotion": "happy",
-    "timestamp": "2026-02-09T06:57:22.328Z"
+    "timestamp": "2026-02-11T04:32:23.629Z"
   },
   {
-    "id": "f484d9a4-169f-4e54-a540-4e756a6da85e",
+    "id": "c8a82939-fc4f-4ce8-8c23-a882644267d0",
     "role": "player",
-    "userId": "228241331296665600",
-    "playerName": "Acacia",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "text": "You know what shadow and Chaos are cute. good ideas!",
-    "timestamp": "2026-02-09T06:58:11.713Z"
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Mira who am i?",
+    "timestamp": "2026-02-11T04:32:37.857Z"
   },
   {
-    "id": "e24be07e-6a4e-4603-84b9-981a91fa9e87",
+    "id": "4a146d09-6f62-417c-aab1-288db461ce52",
     "role": "npc",
     "npc": "mira",
     "npcDisplayName": "Mira",
-    "text": "Glad you approve! Just remember, I’m here to keep your royal self safe, even when I’m up to no good. Chaos is just part of the job description!",
-    "emotion": "happy",
-    "timestamp": "2026-02-09T06:58:13.417Z"
+    "text": "Well, if I had to guess, I'd say you're the one stirring up trouble and keeping me on my toes. But if you want a title, how about \"Master of Mischief\"? 😉",
+    "emotion": "idle",
+    "timestamp": "2026-02-11T04:32:39.329Z"
   },
   {
-    "id": "d5c2c08d-5ca1-4f57-88ea-87f3c2b2c885",
+    "id": "9d027e52-d448-424a-8c11-7a0ff6ec430b",
     "role": "player",
-    "userId": "228241331296665600",
-    "playerName": "Acacia",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "text": "@Mira @Mira @Mira @Mira",
-    "timestamp": "2026-02-10T07:23:51.057Z"
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Mira hey",
+    "timestamp": "2026-02-11T04:34:59.645Z"
   },
   {
-    "id": "e814dd81-8b72-4dcc-8690-486631f53142",
+    "id": "781daa48-1967-4b55-a8bb-7bdfbdef798c",
     "role": "npc",
     "npc": "mira",
     "npcDisplayName": "Mira",
-    "text": "You’ve got my attention, Your Majesty! What’s on your mind? More nicknames, or are we plotting a little adventure?",
+    "text": "Hey again! Still with you—what's up? 🎭",
     "emotion": "happy",
-    "timestamp": "2026-02-10T07:23:52.460Z"
+    "timestamp": "2026-02-11T04:35:00.608Z"
+  },
+  {
+    "id": "0c331037-8ac4-4e33-89e0-a2b6084eaeca",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Marcel hey",
+    "timestamp": "2026-02-11T04:35:05.043Z"
+  },
+  {
+    "id": "c8860ecb-28e0-4f9e-9a47-a57d997b18ed",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Marcel test",
+    "timestamp": "2026-02-11T04:40:04.393Z"
+  },
+  {
+    "id": "37a2605b-1bcd-4046-96ab-921c80f07995",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "✓",
+    "emotion": "idle",
+    "timestamp": "2026-02-11T04:40:08.660Z"
+  },
+  {
+    "id": "1fa54099-7fba-416e-a92a-77664ac3c65d",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Marcel test",
+    "timestamp": "2026-02-11T05:20:20.225Z"
+  },
+  {
+    "id": "5343aaeb-490e-4e39-84b0-334d3e8965c1",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "✓",
+    "emotion": "idle",
+    "timestamp": "2026-02-11T05:20:27.416Z"
+  },
+  {
+    "id": "12058060-0f20-4373-a0e1-2373c2fcb254",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Mira hi",
+    "timestamp": "2026-02-11T05:20:56.025Z"
+  },
+  {
+    "id": "b7a7595b-9292-4c43-be50-a710035c7d9d",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Well, hello again! You sure know how to make an entrance. What do you need from your favorite shadow? 😏",
+    "emotion": "happy",
+    "timestamp": "2026-02-11T05:20:58.098Z"
+  },
+  {
+    "id": "320f8cab-241b-4b48-a764-eb24590a780e",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Marcel hey",
+    "timestamp": "2026-02-11T05:34:28.926Z"
+  },
+  {
+    "id": "e09a7623-9304-4051-8abb-53856cea7e9b",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Hey Blake. What's up?",
+    "emotion": "idle",
+    "timestamp": "2026-02-11T05:34:32.727Z"
+  },
+  {
+    "id": "a295c1cb-a901-4377-8c1e-f4c7e1c1f8b4",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Mira hey",
+    "timestamp": "2026-02-11T05:34:42.466Z"
+  },
+  {
+    "id": "3a7ab3b2-4166-4894-8e35-b0aaf75f5614",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Hey! You must really like my company. What's on your mind? 🎭",
+    "emotion": "happy",
+    "timestamp": "2026-02-11T05:34:44.873Z"
+  },
+  {
+    "id": "3beca55e-5e0a-4d85-9ced-7d2b8e7354d8",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Marcel hey",
+    "timestamp": "2026-02-11T05:34:50.774Z"
+  },
+  {
+    "id": "d6fcc70e-151d-453b-af88-e13b141fc528",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Still here. You testing something or just lonely? 😏",
+    "emotion": "idle",
+    "timestamp": "2026-02-11T05:34:55.546Z"
+  },
+  {
+    "id": "24e54289-8fbf-4e4f-9d54-6e95189491a4",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Marcel test",
+    "timestamp": "2026-02-11T05:35:06.565Z"
+  },
+  {
+    "id": "e785286a-8566-42ad-be7a-932bc143a87a",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "✓",
+    "emotion": "idle",
+    "timestamp": "2026-02-11T05:35:09.773Z"
+  },
+  {
+    "id": "e65f5dca-51aa-4fac-8b4a-fd6583c6da71",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Marcel say something",
+    "timestamp": "2026-02-11T06:44:50.113Z"
+  },
+  {
+    "id": "36403cc0-96b0-4f48-b131-f7da42efafbf",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Something. \n\n...Okay fine, you want actual conversation? I'm here, I'm functional, the cottage is cozy. Mira's hogging the spotlight over there. What do you actually want to talk about?",
+    "emotion": "idle",
+    "timestamp": "2026-02-11T06:44:54.910Z"
+  },
+  {
+    "id": "5d51790f-9620-4861-b90c-1c9a626d6986",
+    "role": "player",
+    "type": "gif",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "gifUrl": "https://media3.giphy.com/media/J4YVoJEYm5nXCZUbiU/200w.gif?cid=08b926b0bl95ffrqc1l4s56ecceg89pk13gw2l3z4qnx7dox&ep=v1_gifs_search&rid=200w.gif&ct=g",
+    "gifWidth": 200,
+    "gifHeight": 200,
+    "text": "Shane Ilya GIF by Movistar Plus+",
+    "timestamp": "2026-02-11T08:27:42.537Z"
   }
 ]

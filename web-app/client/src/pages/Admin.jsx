@@ -6,7 +6,7 @@ import '../styles/map.css';
 
 const ALL_NPCS = [
   'aurelia', 'bigtam', 'bonesy', 'brynleaf', 'cena', 'djinn', 'edgar',
-  'ember', 'grumm', 'ithrae', 'jonah', 'kai', 'kumo', 'mai', 'mira',
+  'ember', 'grumm', 'ithrae', 'jonah', 'kai', 'kumo', 'mai', 'marcel', 'mira',
   'nibby', 'reah', 'ximena'
 ];
 

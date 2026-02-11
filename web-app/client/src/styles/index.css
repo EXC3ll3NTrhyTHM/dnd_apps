@@ -107,7 +107,7 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: var(--vv-height, 100dvh);
+  bottom: 0;
   overflow: hidden;
 }
 

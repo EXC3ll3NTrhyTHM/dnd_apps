@@ -105,7 +105,8 @@
       "bonesy",
       "mira",
       "nibby",
-      "kumo"
+      "kumo",
+      "marcel"
     ],
     "groups": {
       "staff": {
@@ -220,7 +221,8 @@
     "npcs": [
       "cena",
       "jonah",
-      "reah"
+      "reah",
+      "marcel"
     ],
     "groups": {
       "officers": {
@@ -317,7 +319,8 @@
       "aurelia",
       "brynleaf",
       "ember",
-      "ithrae"
+      "ithrae",
+      "marcel"
     ],
     "groups": {
       "agents": {
@@ -417,7 +420,8 @@
       "765984341595521024"
     ],
     "npcs": [
-      "mira"
+      "mira",
+      "marcel"
     ],
     "groups": {},
     "features": [],
@@ -483,7 +487,8 @@
       "mai",
       "edgar",
       "ximena",
-      "kumo"
+      "kumo",
+      "marcel"
     ],
     "groups": {
       "warriors": {

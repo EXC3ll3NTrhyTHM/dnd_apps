@@ -2,6 +2,41 @@ import { useState, useRef, useMemo, useCallback, useEffect, useLayoutEffect } fr
 import CustomKeyboard from './CustomKeyboard';
 import MentionPopup from './MentionPopup';
 import { prevGraphemeLength, nextGraphemeLength } from '../utils/grapheme';
+import { correctWord } from '../utils/spellcheck';
+
+/**
+ * Apply autocorrect to the word before the cursor, preserving the original
+ * casing pattern (lowercase, Capitalized, or ALL CAPS).
+ */
+function autocorrectAtCursor(text, pos, lastCorrection) {
+  const before = text.slice(0, pos);
+  const m = before.match(/(\S+)$/);
+  if (!m) return null;
+  const token = m[1];
+  // Skip @mentions
+  if (token.startsWith('@')) return null;
+  // Separate leading/trailing punctuation from the alphabetic core
+  const parts = token.match(/^([^a-zA-Z']*?)([a-zA-Z']+)([^a-zA-Z']*)$/);
+  if (!parts) return null;
+  const [, prefix, word, suffix] = parts;
+  if (!word) return null;
+  const tokenStart = pos - token.length;
+  // Skip if the user reverted a correction at this exact position
+  if (lastCorrection && lastCorrection.reverted && tokenStart === lastCorrection.start) return null;
+  const corrected = correctWord(word);
+  if (!corrected) return null;
+  // Preserve case
+  let fixed;
+  if (word === word.toUpperCase() && word.length > 1) {
+    fixed = corrected.toUpperCase();
+  } else if (word[0] === word[0].toUpperCase() && word.length > 1) {
+    fixed = corrected[0].toUpperCase() + corrected.slice(1);
+  } else {
+    fixed = corrected;
+  }
+  if (fixed === word) return null;
+  return { wordStart: tokenStart, wordEnd: pos, fixed: prefix + fixed + suffix };
+}
 
 /**
  * Walk text nodes inside `container` to find the DOM node + offset
@@ -37,6 +72,7 @@ function findTextNodeAtOffset(container, targetOffset) {
  */
 export default function ChatInputCustom({
   onSend,
+  onSendGif,
   disabled,
   npcs = [],
   npcEmotions = {},
@@ -67,6 +103,10 @@ export default function ChatInputCustom({
   const recognitionRef = useRef(null);
   const micBaseRef = useRef('');
   const micFinalRef = useRef('');
+  const [flashRange, setFlashRange] = useState(null);
+  const flashTimer = useRef(null);
+  const lastCorrectionRef = useRef(null);   // { start, end, reverted }
+
   const textRef = useRef(text);
   textRef.current = text;
   const cursorPosRef = useRef(cursorPos);
@@ -289,11 +329,32 @@ export default function ChatInputCustom({
       top = rangeRect.top - displayRect.top + display.scrollTop;
       height = rangeRect.height;
 
-      // Collapsed range might have zero height — use line height as fallback
+      // Collapsed range might have zero height (e.g. inside font-size:0 italic
+      // markers) — probe nearby characters for a valid rect, then fall back to
+      // the display's line-height.
       if (!height) {
-        const cs = getComputedStyle(display);
-        const lh = parseFloat(cs.lineHeight);
-        height = isNaN(lh) ? parseFloat(cs.fontSize) * 1.4 : lh;
+        for (let d = 1; d <= 2; d++) {
+          for (const probe of [pos - d, pos + d]) {
+            if (probe < 0 || probe > text.length) continue;
+            const r2 = findTextNodeAtOffset(content, probe);
+            if (!r2) continue;
+            const rng2 = document.createRange();
+            rng2.setStart(r2.node, r2.offset);
+            rng2.collapse(true);
+            const rect2 = rng2.getBoundingClientRect();
+            if (rect2.height > 0) {
+              top = rect2.top - displayRect.top + display.scrollTop;
+              height = rect2.height;
+              break;
+            }
+          }
+          if (height) break;
+        }
+        if (!height) {
+          const cs = getComputedStyle(display);
+          const lh = parseFloat(cs.lineHeight);
+          height = isNaN(lh) ? parseFloat(cs.fontSize) * 1.4 : lh;
+        }
       }
     }
 
@@ -532,8 +593,8 @@ export default function ChatInputCustom({
       return;
     }
 
-    // If in extras or npcs mode, tapping input switches back to keys
-    if (kbModeRef.current === 'extras' || kbModeRef.current === 'npcs') {
+    // If in extras, npcs, or gifs mode, tapping input switches back to keys
+    if (kbModeRef.current === 'extras' || kbModeRef.current === 'npcs' || kbModeRef.current === 'gifs') {
       setKbMode('keys');
     }
 
@@ -711,11 +772,34 @@ export default function ChatInputCustom({
     return () => document.removeEventListener('pointerdown', dismiss);
   }, [showPasteBtn]);
 
-  // Key handler — insert character at cursor position
+  // Key handler — insert character at cursor position (with autocorrect on space)
   const handleKey = useCallback((char) => {
     setShowPasteBtn(false);
     setShowHandle(false);
     const pos = cursorPosRef.current;
+
+    // If user is editing inside a recently-corrected word, mark it as reverted
+    const lc = lastCorrectionRef.current;
+    if (lc && !lc.reverted && char !== ' ' && pos >= lc.start && pos <= lc.end) {
+      lc.reverted = true;
+    }
+
+    // Autocorrect: when space is typed, check the word before the cursor
+    if (char === ' ') {
+      const ac = autocorrectAtCursor(textRef.current, pos, lastCorrectionRef.current);
+      if (ac) {
+        const { wordStart, wordEnd, fixed } = ac;
+        setText(prev => prev.slice(0, wordStart) + fixed + ' ' + prev.slice(wordEnd));
+        setCursorPos(wordStart + fixed.length + 1);
+        lastCorrectionRef.current = { start: wordStart, end: wordStart + fixed.length, reverted: false };
+        // Flash the corrected word
+        clearTimeout(flashTimer.current);
+        setFlashRange({ start: wordStart, end: wordStart + fixed.length });
+        flashTimer.current = setTimeout(() => setFlashRange(null), 600);
+        return;
+      }
+    }
+
     setText(prev => prev.slice(0, pos) + char + prev.slice(pos));
     setCursorPos(pos + char.length);
   }, []);
@@ -725,6 +809,12 @@ export default function ChatInputCustom({
     setShowHandle(false);
     const pos = cursorPosRef.current;
     if (pos === 0) return;
+
+    // If user is backspacing inside a recently-corrected word, mark it as reverted
+    const lc = lastCorrectionRef.current;
+    if (lc && !lc.reverted && pos > lc.start && pos <= lc.end) {
+      lc.reverted = true;
+    }
 
     const currentText = textRef.current;
     const beforeCursor = currentText.slice(0, pos);
@@ -784,7 +874,14 @@ export default function ChatInputCustom({
     setMentionQuery(null);
     setKbOpen(false);
     setKbMode('keys');
+    lastCorrectionRef.current = null;
   }, [disabled, onSend]);
+
+  const handleGifSelect = useCallback((gif) => {
+    setKbOpen(false);
+    setKbMode('keys');
+    onSendGif?.(gif);
+  }, [onSendGif]);
 
   const handleClose = useCallback(() => {
     setKbOpen(false);
@@ -869,7 +966,24 @@ export default function ChatInputCustom({
   const displayHtml = useMemo(() => {
     if (!text) return '';
 
-    let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // Autocorrect flash: wrap the corrected word before HTML-escaping
+    let plain = text;
+    let flashStart = -1, flashEnd = -1;
+    if (flashRange && flashRange.start < text.length) {
+      flashStart = flashRange.start;
+      flashEnd = Math.min(flashRange.end, text.length);
+    }
+
+    let html;
+    if (flashStart >= 0) {
+      const before = plain.slice(0, flashStart);
+      const word = plain.slice(flashStart, flashEnd);
+      const after = plain.slice(flashEnd);
+      const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      html = esc(before) + '<span class="cki-flash">' + esc(word) + '</span>' + esc(after);
+    } else {
+      html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
 
     // @mention highlighting
     if (npcs.length) {
@@ -887,7 +1001,7 @@ export default function ChatInputCustom({
     );
 
     return html;
-  }, [text, npcs]);
+  }, [text, npcs, flashRange]);
 
   const showPopup = mentionQuery !== null && filteredItems.length > 0;
 
@@ -925,14 +1039,14 @@ export default function ChatInputCustom({
         <div className="cki-row">
           <button
             type="button"
-            className={`chat-plus-btn${kbMode === 'extras' || kbMode === 'npcs' ? ' chat-plus-btn-active' : ''}`}
+            className={`chat-plus-btn${kbMode === 'extras' || kbMode === 'npcs' || kbMode === 'gifs' ? ' chat-plus-btn-active' : ''}`}
             onPointerDown={(e) => {
               e.preventDefault();
               if (!kbOpen) {
                 setKbOpen(true);
                 setKbMode('extras');
               } else {
-                setKbMode(kbMode === 'extras' || kbMode === 'npcs' ? 'keys' : 'extras');
+                setKbMode(kbMode === 'extras' || kbMode === 'npcs' || kbMode === 'gifs' ? 'keys' : 'extras');
               }
             }}
             aria-label="Extras menu"
@@ -963,13 +1077,13 @@ export default function ChatInputCustom({
             )}
             <div ref={displayRef} className="cki-display">
               <span ref={contentRef} dangerouslySetInnerHTML={{ __html: displayHtml }} />
-              {kbOpen && !hasSelection && (
+              {kbOpen && !hasSelection && kbMode !== 'gifs' && (
                 <div ref={cursorOverlayRef} className={`cki-cursor-overlay${loupeInfo ? ' cki-cursor-dragging' : ''}`}>
                   <div className="cki-cursor-line" />
                 </div>
               )}
             </div>
-            {kbOpen && showHandle && !hasSelection && (
+            {kbOpen && showHandle && !hasSelection && kbMode !== 'gifs' && (
               <div
                 ref={handleRef}
                 className="cki-cursor-handle"
@@ -1052,6 +1166,7 @@ export default function ChatInputCustom({
         onGroupMention={handleGroupMention}
         listening={listening}
         onToggleMic={toggleMic}
+        onGifSelect={handleGifSelect}
       />
       </div>
     </>

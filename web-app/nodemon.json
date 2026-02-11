@@ -1,0 +1,9 @@
+{
+  "ignore": [
+    "data/*",
+    "client/*",
+    "*.test.js",
+    "node_modules"
+  ],
+  "delay": "500"
+}

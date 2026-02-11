@@ -34,5 +34,59 @@
     "text": "Hello, friend! What knowledge or adventure do you seek today? The winds of fate are ever in motion. Speak your mind!",
     "emotion": "idle",
     "timestamp": "2026-02-09T19:56:01.745Z"
+  },
+  {
+    "id": "5ce2550a-1cb7-4a5e-b78f-c926f46864c2",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@marcel",
+    "timestamp": "2026-02-11T02:39:20.584Z"
+  },
+  {
+    "id": "fdd84eb0-71cf-45b0-adc9-e84752d5941b",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@marcel hello",
+    "timestamp": "2026-02-11T02:39:33.301Z"
+  },
+  {
+    "id": "4592591d-6d1d-499b-8e11-044d81f7c0d2",
+    "role": "player",
+    "type": "gif",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "gifUrl": "https://media4.giphy.com/media/TPJAvvWbSN61O/200w.gif?cid=08b926b0gykzlgqvuwrzsgbgyuivsr56bthzivvr3perl4tl&ep=v1_gifs_search&rid=200w.gif&ct=g",
+    "gifWidth": 200,
+    "gifHeight": 200,
+    "text": "Wants South Carolina GIF",
+    "timestamp": "2026-02-11T08:24:54.011Z"
+  },
+  {
+    "id": "efd339c4-8c26-4224-b7ca-0728cfe8dbff",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Marcel there goes my hero",
+    "timestamp": "2026-02-11T08:25:12.048Z"
+  },
+  {
+    "id": "731fc446-91b0-4720-a4b5-b9209d9cabb1",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Watch me as I go 🎸\n\nDon't get too misty-eyed, I'm just here to help you avoid doing actual work.",
+    "emotion": "idle",
+    "timestamp": "2026-02-11T08:25:17.172Z",
+    "reactions": {
+      "✨": [
+        "424061511833747467"
+      ]
+    }
   }
 ]

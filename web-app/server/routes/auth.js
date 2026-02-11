@@ -40,7 +40,7 @@ router.get('/callback', async (req, res) => {
   const { code } = req.query;
 
   if (!code) {
-    return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}?error=no_code`);
+    return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/#/?error=no_code`);
   }
 
   try {
@@ -72,11 +72,11 @@ router.get('/callback', async (req, res) => {
 
     // Redirect to frontend with token in URL for the SPA to grab
     const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-    res.redirect(`${clientUrl}/auth-callback?token=${token}`);
+    res.redirect(`${clientUrl}/#/auth-callback?token=${token}`);
   } catch (err) {
     console.error('[Auth] OAuth callback error:', err.message);
     const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-    res.redirect(`${clientUrl}?error=auth_failed`);
+    res.redirect(`${clientUrl}/#/?error=auth_failed`);
   }
 });
 

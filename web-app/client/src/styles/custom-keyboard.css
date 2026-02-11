@@ -8,7 +8,8 @@
   flex-shrink: 0;
 }
 
-.ck-bottom-bar:has(.ck-emoji-expanded) {
+.ck-bottom-bar:has(.ck-emoji-expanded),
+.ck-bottom-bar:has(.ck-gifs-expanded) {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -126,6 +127,13 @@
   background: rgba(212, 168, 67, 0.12);
   border-color: var(--color-gold-dim);
   color: var(--color-gold);
+}
+
+.ck-key-side {
+  flex: 1;
+  max-width: 36px;
+  font-size: 1.1rem;
+  color: var(--text-muted);
 }
 
 .ck-key-space {
@@ -366,6 +374,17 @@
   50% { opacity: 0; }
 }
 
+/* ---- Autocorrect flash ---- */
+
+.cki-flash {
+  animation: cki-flash-pop 0.6s ease-out;
+}
+
+@keyframes cki-flash-pop {
+  0%   { color: var(--color-gold); text-shadow: 0 0 6px rgba(212, 168, 67, 0.6); }
+  100% { color: inherit; text-shadow: none; }
+}
+
 /* ---- Magnifier Loupe (shown during cursor drag) ---- */
 
 .cki-loupe {
@@ -510,25 +529,29 @@
 
 /* ---- Expanded / Expanding Container Flex ---- */
 
-.ck-container:has(.ck-emoji-expanded) {
+.ck-container:has(.ck-emoji-expanded),
+.ck-container:has(.ck-gifs-expanded) {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
-.ck-container:has(.ck-emoji-expanded) .ck-board {
+.ck-container:has(.ck-emoji-expanded) .ck-board,
+.ck-container:has(.ck-gifs-expanded) .ck-board {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
-.ck-container:has(.ck-emoji-expanded) .ck-emoji-area {
+.ck-container:has(.ck-emoji-expanded) .ck-emoji-area,
+.ck-container:has(.ck-gifs-expanded) .ck-gifs-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  height: auto;
 }
 
 .ck-emoji-cell {
@@ -753,6 +776,156 @@
   color: var(--color-gold);
   font-size: 1.1rem;
   font-weight: 700;
+}
+
+/* ---- GIFs Panel ---- */
+
+.ck-gifs-panel {
+  display: flex;
+  flex-direction: column;
+  height: 254px;
+  box-sizing: border-box;
+  padding: 8px 12px 0;
+}
+
+.ck-gifs-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.ck-gifs-search-display {
+  flex: 1;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid #3a3020;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #221d16, #1a1610);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  box-shadow: var(--shadow-inset);
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ck-gifs-search-display.ck-gifs-search-active {
+  border-color: var(--color-gold-dim);
+  box-shadow: var(--shadow-inset), 0 0 6px rgba(212, 168, 67, 0.15);
+}
+
+.ck-gifs-search-placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.ck-gifs-search-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--color-gold);
+  margin-left: 1px;
+  flex-shrink: 0;
+  animation: cki-blink 1s step-end infinite;
+}
+
+.ck-gifs-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid #3a3020;
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+
+.ck-gifs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 130px;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ck-gifs-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.ck-gifs-grid.ck-gifs-expanding,
+.ck-gifs-grid.ck-gifs-collapsing {
+  overflow: hidden;
+}
+
+.ck-gifs-grid.ck-gifs-expanded {
+  flex: 1;
+  height: 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.ck-gif-cell {
+  overflow: hidden;
+  border-radius: 4px;
+  border: none;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ck-gif-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+.ck-gif-cell.ck-key-pressed {
+  opacity: 0.7;
+  transform: scale(0.97);
+}
+
+.ck-gifs-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 24px 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.ck-gifs-attribution {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 4px 0;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
 }
 
 /* ---- Effects Overlay ---- */

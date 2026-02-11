@@ -214,6 +214,10 @@ async function pickRespondingNpc(locationNpcs, message, recentHistory = []) {
   const mentioned = locationNpcs.filter(npc => {
     const entry = registry[npc];
     if (!entry) return false;
+
+    // Skip NPCs handled by external systems (like Marcel/Clawdbot)
+    if (entry.handledBy) return false;
+
     const names = [entry.displayName, entry.username, npc].filter(Boolean);
     return names.some(name =>
       message.toLowerCase().includes(`@${name.toLowerCase()}`)

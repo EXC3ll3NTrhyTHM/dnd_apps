@@ -5,7 +5,7 @@
 .location-chat {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100dvh;
   background-color: var(--bg-dark);
   background-image: var(--tex-leather);
   background-size: 512px 512px;
@@ -273,6 +273,12 @@
   gap: 8px;
   max-width: 85%;
   animation: bubbleIn 0.2s ease-out;
+  /* Prevent browser's native long-press text selection / callout from
+     firing before our custom 500ms long-press handler */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
 }
 
 @keyframes bubbleIn {
@@ -317,8 +323,6 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  -webkit-user-select: text;
-  user-select: text;
 }
 
 .chat-bubble-name {
@@ -342,10 +346,6 @@
   font-size: 0.9rem;
   line-height: 1.5;
   word-wrap: break-word;
-  -webkit-user-select: text;
-  user-select: text;
-  -webkit-touch-callout: default;
-  cursor: text;
 }
 
 .chat-bubble-text em {
@@ -393,6 +393,15 @@
   box-shadow:
     inset 0 1px 0 rgba(143, 184, 160, 0.05),
     0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* ---- GIF Bubble (no background, just rounded image) ---- */
+
+.chat-bubble-gif {
+  max-width: 220px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  display: block;
 }
 
 /* ---- Typing Indicator ---- */
@@ -803,9 +812,288 @@
   font-size: 1.1rem;
 }
 
-/* ---- Expanded Emoji Picker — hide chat to give near-fullscreen space ---- */
+/* ---- Reaction Pills (below message text) ---- */
 
-.location-chat:has(.ck-emoji-expanded) .chat-messages-container {
+.chat-bubble-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 0 2px;
+}
+
+.chat-bubble-player .chat-bubble-reactions {
+  justify-content: flex-end;
+}
+
+.reaction-pill {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border: 1px solid rgba(90, 74, 50, 0.4);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.reaction-pill:active {
+  transform: scale(0.95);
+}
+
+.reaction-pill-active {
+  border-color: var(--color-gold-dim);
+  background: rgba(212, 168, 67, 0.15);
+}
+
+.reaction-pill-emoji {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.reaction-pill-count {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  line-height: 1;
+  min-width: 8px;
+  text-align: center;
+}
+
+.reaction-pill-active .reaction-pill-count {
+  color: var(--color-gold);
+}
+
+/* ---- Reaction Quick Bar (long-press floating bar) ---- */
+
+.reaction-bar {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: linear-gradient(180deg, #2a2218, #1e1a12);
+  border: 1px solid var(--color-gold-dim);
+  border-radius: 24px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(200, 170, 110, 0.08);
+  z-index: 300;
+  animation: reactionBarPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes reactionBarPop {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.reaction-bar-emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: background 0.1s ease, transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.reaction-bar-emoji:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.reaction-bar-emoji:active {
+  transform: scale(1.2);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.reaction-bar-plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-gold-dim);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--color-gold);
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  margin-left: 2px;
+}
+
+.reaction-bar-plus:hover {
+  background: rgba(212, 168, 67, 0.15);
+}
+
+.reaction-bar-plus:active {
+  transform: scale(0.95);
+}
+
+/* ---- Emoji Picker Sheet (bottom-sheet overlay) ---- */
+
+.emoji-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 400;
+  animation: fadeIn 0.2s ease;
+}
+
+.emoji-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 55vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #1a1510;
+  background-image: var(--tex-wood);
+  background-size: 512px 512px;
+  border-top: 2px solid var(--color-gold-dim);
+  border-radius: 12px 12px 0 0;
+  z-index: 401;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.emoji-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 8px;
+  flex-shrink: 0;
+}
+
+.emoji-sheet-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--color-gold);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.emoji-sheet-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.emoji-sheet-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 12px 8px;
+  border-bottom: 1px solid rgba(90, 74, 50, 0.3);
+  flex-shrink: 0;
+}
+
+.emoji-sheet-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0.5;
+}
+
+.emoji-sheet-tab-active {
+  opacity: 1;
+  background: rgba(212, 168, 67, 0.12);
+}
+
+.emoji-sheet-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 12px 16px;
+  padding-bottom: calc(16px + var(--safe-area-bottom));
+  scrollbar-width: none;
+}
+
+.emoji-sheet-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.emoji-sheet-category-header {
+  position: sticky;
+  top: 0;
+  padding: 8px 4px 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: #1a1510;
+  background-image: var(--tex-wood);
+  background-size: 512px 512px;
+  z-index: 1;
+}
+
+.emoji-sheet-cells {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+}
+
+.emoji-sheet-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: background 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.emoji-sheet-cell:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.emoji-sheet-cell:active {
+  background: rgba(212, 168, 67, 0.15);
+  transform: scale(1.15);
+}
+
+/* ---- Expanded Emoji/GIF Picker — hide chat to give near-fullscreen space ---- */
+
+.location-chat:has(.ck-emoji-expanded) .chat-messages-container,
+.location-chat:has(.ck-gifs-expanded) .chat-messages-container {
   flex: 0 0 0;
   overflow: hidden;
   min-height: 0;

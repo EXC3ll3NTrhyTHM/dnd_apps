@@ -12,6 +12,8 @@ import { useAuth } from '../hooks/useAuth';
 import ChatBubble from '../components/ChatBubble';
 import ChatInput from '../components/ChatInput';
 import ChatInputCustom from '../components/ChatInputCustom';
+import EmojiReactionBar from '../components/EmojiReactionBar';
+import EmojiPickerSheet from '../components/EmojiPickerSheet';
 import EffectsOverlay, { useEffects } from '../components/EffectsOverlay';
 import ItemCard from '../components/ItemCard';
 import Toast from '../components/Toast';
@@ -36,6 +38,7 @@ export default function LocationChat() {
   const [location, setLocation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [npcEmotions, setNpcEmotions] = useState({});
+  const [typingNpcs, setTypingNpcs] = useState({}); // { npcId: { displayName, timestamp } }
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(null);
@@ -44,6 +47,8 @@ export default function LocationChat() {
   const [toast, setToast] = useState(null);
   const [viewMode, setViewMode] = useState('scene'); // 'scene' | 'chat'
   const [insertNpc, setInsertNpc] = useState(null);
+  const [reactionBar, setReactionBar] = useState(null); // { messageId, targetRect }
+  const [emojiSheet, setEmojiSheet] = useState(null); // { messageId }
 
   const messagesEndRef = useRef(null);
   const chatAreaRef = useRef(null);
@@ -56,6 +61,62 @@ export default function LocationChat() {
   const knownIdsRef = useRef(new Set());
 
   const isAdmin = ADMIN_IDS.includes(user?.id || '');
+
+  // ── WebSocket: Real-time typing and messages ──
+  useEffect(() => {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Use the hostname, but force port 3420 if we're on the dev port 5173
+    const host = window.location.hostname;
+    const port = window.location.port === '5173' ? '3420' : window.location.port;
+    const wsUrl = `${protocol}//${host}${port ? `:${port}` : ''}/ws`;
+    
+    let ws;
+    let reconnectTimer;
+
+    function connect() {
+      console.log(`[LocationChat] Connecting to WS: ${wsUrl}`);
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => console.log('[LocationChat] WS Connected');
+
+      ws.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload.locationId !== locationId) return;
+
+          if (payload.type === 'typing') {
+            setTypingNpcs(prev => {
+              const next = { ...prev };
+              if (payload.typing) {
+                next[payload.npc] = { 
+                  displayName: payload.npcDisplayName || 'Marcel',
+                  timestamp: Date.now()
+                };
+              } else {
+                delete next[payload.npc];
+              }
+              return next;
+            });
+          }
+        } catch (err) {
+          console.error('[LocationChat] WS message error:', err);
+        }
+      };
+
+      ws.onclose = () => {
+        console.warn('[LocationChat] WS Disconnected, reconnecting in 3s...');
+        reconnectTimer = setTimeout(connect, 3000);
+      };
+
+      ws.onerror = (err) => console.error('[LocationChat] WS Error:', err);
+    }
+
+    connect();
+    return () => {
+      if (ws) ws.close();
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+    };
+  }, [locationId]);
 
   // ── Back-button: scene↔chat history management ──
   const hasSceneRef = useRef(false);
@@ -134,22 +195,49 @@ export default function LocationChat() {
         const data = await api(
           `/api/chat/locations/${locationId}/messages?since=${encodeURIComponent(latestTimestampRef.current)}`
         );
+        
+        // Handle new messages
         const newMsgs = (data.messages || []).filter(m => m.id && !knownIdsRef.current.has(m.id));
         if (newMsgs.length > 0) {
           newMsgs.forEach(m => knownIdsRef.current.add(m.id));
-          // Update latest timestamp
           const newest = newMsgs[newMsgs.length - 1].timestamp;
           if (newest > latestTimestampRef.current) {
             latestTimestampRef.current = newest;
           }
           setMessages(prev => [...prev, ...newMsgs]);
-          // Update NPC emotions from polled messages
+
           newMsgs.forEach(m => {
             if (m.role === 'npc' && m.emotion) {
               setNpcEmotions(prev => ({ ...prev, [m.npc]: m.emotion }));
             }
           });
           playSound('npcResponse');
+        }
+
+        // Merge reactions from polling into existing messages
+        if (data.reactions) {
+          setMessages(prev => {
+            let changed = false;
+            const updated = prev.map(msg => {
+              if (!msg.id || !data.reactions[msg.id]) return msg;
+              const incoming = data.reactions[msg.id];
+              if (JSON.stringify(msg.reactions || {}) !== JSON.stringify(incoming)) {
+                changed = true;
+                return { ...msg, reactions: incoming };
+              }
+              return msg;
+            });
+            return changed ? updated : prev;
+          });
+        }
+
+        // Handle typing indicators from API response
+        if (data.typing) {
+          const typingMap = {};
+          data.typing.forEach(t => {
+            typingMap[t.id] = { displayName: t.displayName };
+          });
+          setTypingNpcs(typingMap);
         }
       } catch {
         // Polling failure is non-fatal
@@ -265,7 +353,7 @@ export default function LocationChat() {
 
     playSound('messageSent');
 
-    // Optimistic player message (will be replaced by server version with id/userId)
+    // Optimistic player message
     const optimisticMsg = {
       role: 'player',
       text,
@@ -277,22 +365,19 @@ export default function LocationChat() {
     };
     setMessages(prev => [...prev, optimisticMsg]);
 
-    // Show typing indicators only for @mentioned NPCs
-    const typingId = Date.now();
-    const mentionedNpcs = location?.npcs.filter(npc =>
-      text.toLowerCase().includes(`@${npc.displayName.toLowerCase()}`)
-    ) || [];
+    // Show typing indicators only for @mentioned NPCs (except Marcel, who is handled via WS)
+    const mentionedNpcs = (location?.npcs || []).filter(npc =>
+      npc.id !== 'marcel' && text.toLowerCase().includes(`@${npc.displayName.toLowerCase()}`)
+    );
 
-    const typingBubbles = mentionedNpcs.map((npc, i) => ({
-      role: 'npc',
-      npc: npc.id,
-      npcDisplayName: npc.displayName,
-      typing: true,
-      _typingId: typingId + i
-    }));
-
-    if (typingBubbles.length > 0) {
-      setMessages(prev => [...prev, ...typingBubbles]);
+    if (mentionedNpcs.length > 0) {
+      setTypingNpcs(prev => {
+        const next = { ...prev };
+        mentionedNpcs.forEach(npc => {
+          next[npc.id] = { displayName: npc.displayName, timestamp: Date.now() };
+        });
+        return next;
+      });
     }
 
     try {
@@ -312,9 +397,18 @@ export default function LocationChat() {
       }
 
       setMessages(prev => {
-        // Replace optimistic player msg + typing bubbles with server versions
-        const withoutOptimistic = prev.filter(m => !m._typingId && !m._optimistic);
-        return [...withoutOptimistic, data.playerMessage, ...data.responses];
+        // Remove optimistic player msg
+        const filtered = prev.filter(m => !m._optimistic);
+        return [...filtered, data.playerMessage, ...data.responses];
+      });
+
+      // Clear typing indicators for NPCs who just responded
+      setTypingNpcs(prev => {
+        const next = { ...prev };
+        data.responses.forEach(resp => {
+          delete next[resp.npc];
+        });
+        return next;
       });
 
       playSound('npcResponse');
@@ -325,14 +419,105 @@ export default function LocationChat() {
         }
       });
     } catch (err) {
-      setMessages(prev => prev.filter(m => !m._typingId));
+      // Clear manual typing bubbles on error
+      setTypingNpcs(prev => {
+        const next = { ...prev };
+        mentionedNpcs.forEach(npc => delete next[npc.id]);
+        return next;
+      });
+      setMessages(prev => prev.filter(m => !m._optimistic));
       console.error('Failed to send message:', err);
       setToast({ type: 'error', message: err.message || 'Failed to send message' });
     } finally {
       setSending(false);
       sendingRef.current = false;
     }
-  }, [sending, locationId, location]);
+  }, [sending, locationId, location, user, playSound]);
+
+  // Send GIF message — no NPC response expected
+  const handleSendGif = useCallback(async (gif) => {
+    if (sending) return;
+    setSending(true);
+    sendingRef.current = true;
+
+    playSound('messageSent');
+
+    const optimisticMsg = {
+      role: 'player',
+      type: 'gif',
+      gifUrl: gif.url,
+      gifWidth: gif.width,
+      gifHeight: gif.height,
+      text: gif.title || '',
+      userId: user?.id,
+      playerName: user?.characterName || user?.global_name || user?.username || 'You',
+      playerAvatar: user?.avatar,
+      timestamp: new Date().toISOString(),
+      _optimistic: true
+    };
+    setMessages(prev => [...prev, optimisticMsg]);
+
+    try {
+      const data = await api(`/api/chat/locations/${locationId}/message`, {
+        method: 'POST',
+        body: JSON.stringify({
+          type: 'gif',
+          gifUrl: gif.url,
+          gifWidth: gif.width,
+          gifHeight: gif.height,
+          message: gif.title || ''
+        })
+      });
+
+      if (data.playerMessage?.id) knownIdsRef.current.add(data.playerMessage.id);
+      const newest = data.playerMessage?.timestamp;
+      if (newest && (!latestTimestampRef.current || newest > latestTimestampRef.current)) {
+        latestTimestampRef.current = newest;
+      }
+
+      setMessages(prev => {
+        const filtered = prev.filter(m => !m._optimistic);
+        return [...filtered, data.playerMessage];
+      });
+    } catch (err) {
+      setMessages(prev => prev.filter(m => !m._optimistic));
+      console.error('Failed to send GIF:', err);
+      setToast({ type: 'error', message: err.message || 'Failed to send GIF' });
+    } finally {
+      setSending(false);
+      sendingRef.current = false;
+    }
+  }, [sending, locationId, user, playSound]);
+
+  // Reaction handlers
+  const handleLongPress = useCallback((messageId, targetRect) => {
+    setReactionBar({ messageId, targetRect });
+  }, []);
+
+  const handleReact = useCallback(async (messageId, emoji) => {
+    setReactionBar(null);
+    setEmojiSheet(null);
+
+    try {
+      const data = await api(`/api/chat/locations/${locationId}/messages/${messageId}/react`, {
+        method: 'POST',
+        body: JSON.stringify({ emoji })
+      });
+
+      setMessages(prev => prev.map(msg =>
+        msg.id === messageId
+          ? { ...msg, reactions: Object.keys(data.reactions).length > 0 ? data.reactions : undefined }
+          : msg
+      ));
+    } catch (err) {
+      console.error('Failed to toggle reaction:', err);
+    }
+  }, [locationId]);
+
+  const handleOpenFullPicker = useCallback((messageId) => {
+    setReactionBar(null);
+    setEmojiSheet({ messageId });
+  }, []);
 
   // Menu handling
   async function openMenu(type) {
@@ -479,9 +664,30 @@ export default function LocationChat() {
                     <p>Say something to start a conversation.</p>
                   </div>
                 ) : (
-                  messages.map((msg, i) => (
-                    <ChatBubble key={msg.id || msg._typingId || i} message={msg} npcs={location.npcs} currentUserId={user?.id} />
-                  ))
+                  <>
+                    {messages.map((msg, i) => (
+                      <ChatBubble
+                        key={msg.id || i}
+                        message={msg}
+                        npcs={location.npcs}
+                        currentUserId={user?.id}
+                        onLongPress={handleLongPress}
+                        onReact={handleReact}
+                      />
+                    ))}
+                    {Object.entries(typingNpcs).map(([npcId, data]) => (
+                      <ChatBubble 
+                        key={`typing-${npcId}`} 
+                        message={{ 
+                          role: 'npc', 
+                          npc: npcId, 
+                          npcDisplayName: data.displayName, 
+                          typing: true 
+                        }} 
+                        npcs={location.npcs} 
+                      />
+                    ))}
+                  </>
                 )}
                 <div ref={messagesEndRef} />
               </div>
@@ -493,6 +699,7 @@ export default function LocationChat() {
           {USE_CUSTOM_KEYBOARD ? (
             <ChatInputCustom
               onSend={handleSend}
+              onSendGif={handleSendGif}
               disabled={sending}
               npcs={location.npcs}
               npcEmotions={npcEmotions}
@@ -510,6 +717,26 @@ export default function LocationChat() {
               groups={location.groups || {}}
               insertNpc={insertNpc}
               onInsertNpcDone={() => setInsertNpc(null)}
+            />
+          )}
+
+          {/* Reaction Bar (long-press quick emojis) */}
+          {reactionBar && (
+            <EmojiReactionBar
+              messageId={reactionBar.messageId}
+              targetRect={reactionBar.targetRect}
+              onSelect={handleReact}
+              onOpenFullPicker={handleOpenFullPicker}
+              onClose={() => setReactionBar(null)}
+            />
+          )}
+
+          {/* Emoji Picker Sheet (full grid) */}
+          {emojiSheet && (
+            <EmojiPickerSheet
+              messageId={emojiSheet.messageId}
+              onSelect={handleReact}
+              onClose={() => setEmojiSheet(null)}
             />
           )}
 

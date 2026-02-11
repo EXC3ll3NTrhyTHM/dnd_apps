@@ -13,6 +13,8 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const http = require('http');
+const { WebSocketServer } = require('ws');
 
 const authRoutes = require('./routes/auth');
 const walletRoutes = require('./routes/wallet');
@@ -21,12 +23,23 @@ const tavernRoutes = require('./routes/tavern');
 const questRoutes = require('./routes/quests');
 const leaderboardRoutes = require('./routes/leaderboard');
 const chatRoutes = require('./routes/chat');
+const clawdbotRoutes = require('./routes/clawdbot');
 const campaignRoutes = require('./routes/campaign');
 const adminRoutes = require('./routes/admin');
 const presenceRoutes = require('./routes/presence');
 
 const app = express();
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server, path: '/ws' });
 const PORT = process.env.PORT || 3420;
+
+wss.on('connection', (ws, req) => {
+  console.log(`[wss] New client connected from ${req.socket.remoteAddress}`);
+  ws.on('close', () => console.log('[wss] Client disconnected'));
+});
+
+// Export wss for use in routes
+app.set('wss', wss);
 
 // ============================================
 // MIDDLEWARE
@@ -70,6 +83,8 @@ app.use('/api/tavern', tavernRoutes);
 app.use('/api/quests', questRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/chat', chatRoutes);
+clawdbotRoutes.app = app;
+app.use('/api/clawdbot', clawdbotRoutes);
 app.use('/api/campaign', campaignRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/presence', presenceRoutes);
@@ -110,7 +125,7 @@ app.use((err, req, res, next) => {
 // START
 // ============================================
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`\n🐉 Dragon's Hollow API server running on port ${PORT}`);
   console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
   if (process.env.NODE_ENV !== 'production') {

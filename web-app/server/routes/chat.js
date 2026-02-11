@@ -19,8 +19,9 @@ const {
   pickRespondingNpc,
   writeWebJournal
 } = require('../lib/dialogue');
+const { getTypingInLocation, setNpcTyping } = require('../lib/typing');
+const clawdbotRoutes = require('./clawdbot');
 
-// DM Discord user IDs (same list as campaign.js)
 const DM_USER_IDS = (process.env.DM_USER_IDS || '').split(',').filter(Boolean);
 
 function isLocationLocked(location, userId) {
@@ -168,6 +169,9 @@ function releaseLock(locationId) {
 // Track message counts for journal writes per NPC (shared, not per-user)
 const messageCounters = new Map();
 
+// Export helper for other routes
+router.setNpcTyping = setNpcTyping;
+
 // ============================================
 // ROUTES
 // ============================================
@@ -270,7 +274,71 @@ router.get('/locations/:locationId/messages', authRequired, (req, res) => {
   }
 
   const newMessages = history.filter(msg => msg.timestamp > since);
-  res.json({ messages: newMessages });
+  const typing = getTypingInLocation(locationId);
+
+  // Build reactions map for all messages that have reactions
+  const reactions = {};
+  for (const msg of history) {
+    if (msg.id && msg.reactions && Object.keys(msg.reactions).length > 0) {
+      reactions[msg.id] = msg.reactions;
+    }
+  }
+
+  res.json({
+    messages: newMessages,
+    reactions,
+    typing: Object.entries(typing).map(([id, data]) => ({
+      id,
+      displayName: data.displayName
+    }))
+  });
+});
+
+/**
+ * GET /api/chat/gifs
+ * Proxy to GIPHY API — search or trending GIFs
+ */
+router.get('/gifs', authRequired, async (req, res) => {
+  const apiKey = process.env.GIPHY_API_KEY;
+  if (!apiKey) {
+    return res.status(503).json({ error: 'GIF service not configured' });
+  }
+
+  const { q, limit = '20', offset = '0' } = req.query;
+  const params = new URLSearchParams({
+    api_key: apiKey,
+    limit,
+    offset,
+    rating: 'pg-13',
+  });
+
+  const endpoint = q
+    ? `https://api.giphy.com/v1/gifs/search?${params}&q=${encodeURIComponent(q)}`
+    : `https://api.giphy.com/v1/gifs/trending?${params}`;
+
+  try {
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      return res.status(502).json({ error: 'GIPHY API error' });
+    }
+    const data = await response.json();
+    const results = (data.data || []).map(r => {
+      const fixed = r.images?.fixed_width;
+      const small = r.images?.fixed_width_small;
+      return {
+        id: r.id,
+        title: r.title || '',
+        url: fixed?.url || small?.url || '',
+        preview: small?.url || fixed?.url || '',
+        width: parseInt(fixed?.width, 10) || 200,
+        height: parseInt(fixed?.height, 10) || 150,
+      };
+    });
+    res.json({ results, next: String(parseInt(offset, 10) + results.length) });
+  } catch (err) {
+    console.error('[chat] GIPHY fetch error:', err.message);
+    res.status(502).json({ error: 'Failed to fetch GIFs' });
+  }
 });
 
 /**
@@ -279,7 +347,58 @@ router.get('/locations/:locationId/messages', authRequired, (req, res) => {
  */
 router.post('/locations/:locationId/message', authRequired, async (req, res) => {
   const { locationId } = req.params;
-  const { message } = req.body;
+  const { message, type, gifUrl, gifWidth, gifHeight } = req.body;
+
+  // Handle GIF messages — no NPC response
+  if (type === 'gif') {
+    if (!gifUrl || typeof gifUrl !== 'string' || !/^https:\/\/media[0-4]?\.giphy\.com\//.test(gifUrl)) {
+      return res.status(400).json({ error: 'Invalid GIF URL' });
+    }
+
+    if (!checkRateLimit(req.user.id)) {
+      return res.status(429).json({ error: 'Too many messages. Please wait a moment.' });
+    }
+
+    const locations = loadLocations();
+    const location = locations[locationId];
+    if (!location) {
+      return res.status(404).json({ error: 'Location not found' });
+    }
+    if (isLocationLocked(location, req.user.id) && !DM_USER_IDS.includes(req.user.id)) {
+      return res.status(403).json({ error: 'This location is currently locked' });
+    }
+
+    updatePlayerInfo(req.user);
+
+    await acquireLock(locationId);
+    try {
+      const history = loadHistory(locationId);
+      const playerName = getPlayerName(req.user);
+
+      const playerMsg = {
+        id: crypto.randomUUID(),
+        role: 'player',
+        type: 'gif',
+        userId: req.user.id,
+        playerName,
+        playerAvatar: req.user.avatar,
+        gifUrl,
+        gifWidth: gifWidth || 220,
+        gifHeight: gifHeight || 165,
+        text: message || '',
+        timestamp: new Date().toISOString()
+      };
+      history.push(playerMsg);
+      saveHistory(locationId, history);
+
+      return res.json({ playerMessage: playerMsg, responses: [] });
+    } catch (error) {
+      console.error('[chat] GIF message error:', error.message);
+      return res.status(500).json({ error: 'Failed to save GIF message' });
+    } finally {
+      releaseLock(locationId);
+    }
+  }
 
   if (!message || typeof message !== 'string' || message.trim().length === 0) {
     return res.status(400).json({ error: 'Message is required' });
@@ -331,10 +450,16 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
     // Pick which NPC(s) should respond — only @mentioned NPCs
     const respondingNpcs = await pickRespondingNpc(locationNpcs, message, history);
 
+    // Check for Marcel (Clawdbot) mention specifically
+    const isMarcelMentioned = message.toLowerCase().includes('@marcel');
+    if (isMarcelMentioned) {
+      clawdbotRoutes.enqueueMention(locationId, playerMsg);
+    }
+
     // No NPCs mentioned — just record the player message, no NPC responses
     if (respondingNpcs.length === 0) {
       saveHistory(locationId, history);
-      return res.json({ playerMessage: playerMsg, responses: [] });
+      return res.json({ playerMessage: playerMsg, responses: [], marcelMentioned: isMarcelMentioned });
     }
 
     const registry = loadNpcRegistry();
@@ -490,6 +615,69 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
   } catch (error) {
     console.error('[chat] 1-on-1 message error:', error.message);
     res.status(500).json({ error: 'Failed to generate response' });
+  } finally {
+    releaseLock(locationId);
+  }
+});
+
+/**
+ * POST /api/chat/locations/:locationId/messages/:messageId/react
+ * Toggle an emoji reaction on a message
+ */
+router.post('/locations/:locationId/messages/:messageId/react', authRequired, async (req, res) => {
+  const { locationId, messageId } = req.params;
+  const { emoji } = req.body;
+
+  if (!emoji || typeof emoji !== 'string') {
+    return res.status(400).json({ error: 'Emoji is required' });
+  }
+
+  const locations = loadLocations();
+  if (!locations[locationId]) {
+    return res.status(404).json({ error: 'Location not found' });
+  }
+
+  const userId = req.user.id;
+
+  await acquireLock(locationId);
+  try {
+    const history = loadHistory(locationId);
+    const message = history.find(m => m.id === messageId);
+
+    if (!message) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    if (!message.reactions) message.reactions = {};
+
+    if (!message.reactions[emoji]) {
+      message.reactions[emoji] = [];
+    }
+
+    const idx = message.reactions[emoji].indexOf(userId);
+    if (idx === -1) {
+      // Add reaction
+      message.reactions[emoji].push(userId);
+    } else {
+      // Remove reaction
+      message.reactions[emoji].splice(idx, 1);
+      // Clean up empty arrays
+      if (message.reactions[emoji].length === 0) {
+        delete message.reactions[emoji];
+      }
+    }
+
+    // Clean up empty reactions object
+    if (Object.keys(message.reactions).length === 0) {
+      delete message.reactions;
+    }
+
+    saveHistory(locationId, history);
+
+    res.json({ reactions: message.reactions || {} });
+  } catch (error) {
+    console.error('[chat] React error:', error.message);
+    res.status(500).json({ error: 'Failed to toggle reaction' });
   } finally {
     releaseLock(locationId);
   }

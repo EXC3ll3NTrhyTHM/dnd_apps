@@ -36,7 +36,7 @@
 
 ### UI/Display
 - [ ] Rotate screen message displays during page reload/blank screen
-- [ ] DM controls show for everybody (should be DM-only)
+- [x] DM controls show for everybody (should be DM-only)
 
 ### Chat/Messaging
 - [ ] NPCs still respond when no @mention is added (should require mention)
@@ -59,6 +59,18 @@
   - Plus icon opens drawer under keyboard
   - Multiple options in drawer
   - Could include NPC or player icon selector
+
+### Mini-Games
+- [ ] **Class-Based Card Game**
+  - Tavern mini-game between quests
+  - Each player's D&D class = unique deck/playstyle
+  - Ideas:
+    - **Cleric** - Healing/buff cards, outlast opponents
+    - **Ranger** - Trap cards, chip damage over time
+    - **Monk** - Combo chains, high skill ceiling
+    - **Rogue** - Discard/steal from opponent's hand
+  - Simple rules, class flavor makes it replayable
+  - Could bet gold, earn rewards, or just for fun
 
 ### Progression System
 - [ ] Daily and weekly quests for experience
@@ -133,7 +145,7 @@
   - Could tie to location or be manual override
 
 ### Authentication
-- [ ] **Sign in with Discord** - OAuth2 login
+- [x] **Sign in with Discord** - OAuth2 login
   - No passwords to remember, uses existing Discord session
   - Works on mobile (opens Discord app or web auth)
   - User clicks "Sign in with Discord" → Authorize → redirected back logged in

@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import Layout from './components/Layout';
@@ -34,21 +33,6 @@ function ProtectedRoute({ children }) {
 
 export default function App() {
   const { user, loading } = useAuth();
-
-  // Track visual viewport height globally so all pages respond to
-  // iOS address bar and virtual keyboard changes
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    function onResize() {
-      document.documentElement.style.setProperty('--vv-height', `${vv.height}px`);
-    }
-
-    onResize();
-    vv.addEventListener('resize', onResize);
-    return () => vv.removeEventListener('resize', onResize);
-  }, []);
 
   return (
     <Routes>

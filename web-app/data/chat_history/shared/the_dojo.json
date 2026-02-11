@@ -61,5 +61,18 @@
     "text": "The usual — wind patterns, training strategies, and a bit of peace. What about you? Looking for a good fight or just a break?",
     "emotion": "idle",
     "timestamp": "2026-02-09T07:03:48.936Z"
+  },
+  {
+    "id": "5675b78b-d5ae-4d6d-b6a1-23f034f8505b",
+    "role": "player",
+    "type": "gif",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "gifUrl": "https://media1.giphy.com/media/anSiSGG5YaXeBn5gv4/200w.gif?cid=08b926b01msybcktklvleil5ghlhdf5ywhxa6z8ln7tu1ujc&ep=v1_gifs_trending&rid=200w.gif&ct=g",
+    "gifWidth": 200,
+    "gifHeight": 248,
+    "text": "Breathe Chill Out GIF by CSDRMS",
+    "timestamp": "2026-02-11T06:43:49.378Z"
   }
 ]
