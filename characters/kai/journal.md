@@ -13,3 +13,9 @@
 [2026-02-04] Today was electrifying as I watched Ximena channel her fiery spirit and prepare to unleash an incredible firestorm. Her determination ignited something within me, and I coordinated my water magic to protect her while we charged into battle together, feeling unstoppable with our combined strengths. Djinn's encouragement about patience resonated deeply, fueling my resolve to master my abilities alongside my friends, and I can't wait to see how far we can push each other in our training!
 
 [2026-02-09] Today was filled with energy and anticipation as I greeted Master Nalyd and Tyren. I couldn't contain my excitement for the training ahead and eagerly awaited Nalyd’s announcements, hoping for thrilling news.
+
+[2026-02-10] Today, I had the pleasure of congratulating Ximena on becoming Grandmaster's apprentice — she truly deserves it! Master Nalyd returned for a visit, and I could hardly contain my excitement; we shared a warm hug, and I promised we’d make him proud while he’s away.
+
+[2026-02-10] Today, I showed Master Nalyd my hands, proud of the calluses that speak of my hard work. We then hurried inside the dojo for a private meeting, and I couldn't contain my excitement as I leaned in, eager to hear what was coming next.
+
+[2026-02-10] Today, Nalyd unveiled a crucial plan to monitor the students for wounds connected to the Weaver's blood spell. I accepted the gravity of my role in this and committed to keeping an extra watch, fueled by the shared determination to take down this powerful foe together.

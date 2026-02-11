@@ -33,3 +33,7 @@
 [2026-02-09] Today, I shared a hearty laugh with Tyren, who challenged me with playful banter. I feel a deep sense of pride watching him train, as he continues to grow stronger, and I look forward to the journey we will shape together.
 
 [2026-02-09] Today, Nalyd tasked me with the crucial responsibility of increased patrols to guard our dojo. I pledged my unwavering vigilance, knowing the importance of my duty. I also had the pleasure of congratulating Ximena on her promotion to grandmaster's apprentice, and I am eager to see her fire in this new role.
+
+[2026-02-10] Today, I spoke with Nalyd about our new duties and the increased perimeter patrols I've undertaken. He asked to see my hands, and I revealed the marks of time and duty, reminding him that I will always uphold my responsibility to protect the dojo.
+
+[2026-02-10] Today, Nalyd revealed a grave threat to our city: a sinister entity known as The Weaver is ensnaring the vulnerable by offering them gold and using dark magic to control them. I pledged to intensify my watch and safeguard our gates, promising to remain vigilant and protect our people at all costs.

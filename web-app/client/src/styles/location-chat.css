@@ -5,9 +5,7 @@
 .location-chat {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
-  height: var(--vv-height, 100dvh);
+  height: 100%;
   background-color: var(--bg-dark);
   background-image: var(--tex-leather);
   background-size: 512px 512px;
@@ -199,8 +197,18 @@
 
 /* ---- Chat Messages Area (Parchment Page) ---- */
 
+.chat-messages-container {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .chat-messages {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column-reverse;
@@ -211,6 +219,25 @@
   box-shadow:
     inset 0 8px 20px rgba(0, 0, 0, 0.3),
     inset 0 -4px 12px rgba(0, 0, 0, 0.2);
+  /* Hide native scrollbar — custom indicator replaces it */
+  scrollbar-width: none;
+}
+
+.chat-messages::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---- Custom Scroll Indicator ---- */
+
+.chat-scroll-thumb {
+  position: fixed;
+  width: 4px;
+  border-radius: 2px;
+  background: rgba(255, 220, 150, 0.25);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 5;
 }
 
 /* Inner wrapper keeps messages in correct top-to-bottom order */
@@ -778,8 +805,13 @@
 
 /* ---- Expanded Emoji Picker — hide chat to give near-fullscreen space ---- */
 
-.location-chat:has(.ck-emoji-expanded) .chat-messages {
+.location-chat:has(.ck-emoji-expanded) .chat-messages-container {
   flex: 0 0 0;
   overflow: hidden;
   min-height: 0;
+}
+
+/* Prevent overscroll bounce on chat when keyboard is open — avoids jitter during drag-to-close */
+.location-chat:has(.ck-container) .chat-messages {
+  overscroll-behavior-y: none;
 }

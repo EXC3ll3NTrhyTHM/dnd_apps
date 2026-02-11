@@ -138,6 +138,7 @@ export default function ChatInputCustom({
       el.style.willChange = '';
       el.style.transform = '';
       el.style.transition = '';
+      el.style.overflow = '';
     };
 
     const onTouchStart = (e) => {
@@ -150,7 +151,7 @@ export default function ChatInputCustom({
       if (!armed || !state.atBottom) return;
       const dy = e.touches[0].clientY - state.startY;
 
-      if (!state.active && dy > 10) {
+      if (!state.active && dy > 4) {
         const rect = bar.getBoundingClientRect();
         state.startH = rect.height;
         // Measure input bar so we know where to stop the slide
@@ -158,6 +159,9 @@ export default function ChatInputCustom({
         state.inputH = formEl ? formEl.offsetHeight : 0;
         state.active = true;
         state.activateY = e.touches[0].clientY;
+
+        // Lock scroll during drag — prevents internal scrollTop shifts that cause jitter
+        el.style.overflow = 'hidden';
 
         // Pull bar out of flow — chat fills freed space (one reflow).
         bar.style.position = 'fixed';
@@ -824,6 +828,43 @@ export default function ChatInputCustom({
     setCursorPos(newPos);
   }, []);
 
+  // Insert group @mentions (all members) from the npcs panel
+  const handleGroupMention = useCallback((group) => {
+    const mention = group.members.map(name => `@${name}`).join(' ') + ' ';
+    const prev = textRef.current;
+    const pos = cursorPosRef.current;
+    const base = pos === prev.length && prev.length && !prev.endsWith(' ')
+      ? prev + ' '
+      : prev;
+    const newPos = pos === prev.length ? base.length + mention.length : pos + mention.length;
+    if (pos === prev.length) {
+      setText(base + mention);
+    } else {
+      setText(prev.slice(0, pos) + mention + prev.slice(pos));
+    }
+    setCursorPos(newPos);
+  }, []);
+
+  // Build mention groups for the npcs panel (@Everyone + custom groups)
+  const mentionGroups = useMemo(() => {
+    const items = [];
+    if (npcs.length >= 2) {
+      items.push({
+        id: 'everyone',
+        displayName: 'Everyone',
+        members: npcs.map(n => n.displayName),
+      });
+    }
+    for (const [groupId, group] of Object.entries(groups)) {
+      items.push({
+        id: groupId,
+        displayName: group.displayName,
+        members: group.members || [],
+      });
+    }
+    return items;
+  }, [npcs, groups]);
+
   // ── Display HTML — full text with formatting, NO cursor (cursor is an overlay) ──
   const displayHtml = useMemo(() => {
     if (!text) return '';
@@ -973,18 +1014,20 @@ export default function ChatInputCustom({
               </svg>
             ) : '😊'}
           </button>
-          <button
-            type="button"
-            className="chat-send-btn"
-            disabled={!text.trim() || disabled}
-            aria-label="Send message"
-            onPointerDown={(e) => { e.preventDefault(); handleSubmit(); }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13" />
-              <polygon points="22 2 15 22 11 13 2 9 22 2" />
-            </svg>
-          </button>
+          {text.trim() && (
+            <button
+              type="button"
+              className="chat-send-btn"
+              disabled={disabled}
+              aria-label="Send message"
+              onPointerDown={(e) => { e.preventDefault(); handleSubmit(); }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -1004,7 +1047,9 @@ export default function ChatInputCustom({
         onModeChange={setKbMode}
         npcs={npcs}
         npcEmotions={npcEmotions}
+        mentionGroups={mentionGroups}
         onNpcMention={handleNpcMention}
+        onGroupMention={handleGroupMention}
         listening={listening}
         onToggleMic={toggleMic}
       />

@@ -1,8 +1,9 @@
 /**
  * Auth Routes - Discord OAuth2 Flow
  * 
- * GET  /api/auth/login    - Redirect to Discord
- * GET  /api/auth/callback  - Handle Discord callback, issue JWT
+ * GET  /api/auth/discord-url - Return Discord OAuth2 URL as JSON
+ * GET  /api/auth/login      - Redirect to Discord (fallback)
+ * GET  /api/auth/callback    - Handle Discord callback, issue JWT
  * GET  /api/auth/me        - Get current user (requires auth)
  * POST /api/auth/logout    - Clear session
  */
@@ -24,7 +25,12 @@ function loadPlayers() {
 
 const router = express.Router();
 
-// Redirect to Discord OAuth2
+// Return Discord OAuth2 URL as JSON (avoids server-side redirect for mobile deep linking)
+router.get('/discord-url', (req, res) => {
+  res.json({ url: getAuthorizationUrl() });
+});
+
+// Redirect to Discord OAuth2 (fallback)
 router.get('/login', (req, res) => {
   res.redirect(getAuthorizationUrl());
 });

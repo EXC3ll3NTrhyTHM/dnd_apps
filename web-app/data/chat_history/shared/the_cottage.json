@@ -138,5 +138,23 @@
     "text": "Glad you approve! Just remember, I’m here to keep your royal self safe, even when I’m up to no good. Chaos is just part of the job description!",
     "emotion": "happy",
     "timestamp": "2026-02-09T06:58:13.417Z"
+  },
+  {
+    "id": "d5c2c08d-5ca1-4f57-88ea-87f3c2b2c885",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "@Mira @Mira @Mira @Mira",
+    "timestamp": "2026-02-10T07:23:51.057Z"
+  },
+  {
+    "id": "e814dd81-8b72-4dcc-8690-486631f53142",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "You’ve got my attention, Your Majesty! What’s on your mind? More nicknames, or are we plotting a little adventure?",
+    "emotion": "happy",
+    "timestamp": "2026-02-10T07:23:52.460Z"
   }
 ]

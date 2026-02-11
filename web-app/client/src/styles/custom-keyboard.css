@@ -741,6 +741,20 @@
   white-space: nowrap;
 }
 
+.ck-npcs-group-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(212, 168, 67, 0.15), rgba(140, 100, 20, 0.25));
+  border: 2px solid var(--color-gold-dim);
+  color: var(--color-gold);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
 /* ---- Effects Overlay ---- */
 
 .fx-overlay {

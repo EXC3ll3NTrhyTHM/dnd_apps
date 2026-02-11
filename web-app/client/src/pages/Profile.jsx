@@ -8,9 +8,11 @@ import '../styles/profile.css';
 import '../styles/leaderboard.css';
 
 const RANK_DECORATIONS = ['👑', '🥈', '🥉'];
+const ADMIN_IDS = ['424061511833747467'];
 
 export default function Profile() {
   const { user, wallet, logout } = useAuth();
+  const isAdmin = ADMIN_IDS.includes(user?.id || '');
   const audioMuted = useAudioMuted();
   const [inventory, setInventory] = useState(null);
   const [leaderboard, setLeaderboard] = useState(null);
@@ -159,9 +161,11 @@ export default function Profile() {
 
       {/* Admin link + Logout */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <Link to="/admin" className="btn btn-outline" style={{ textAlign: 'center', textDecoration: 'none' }}>
-          DM Controls
-        </Link>
+        {isAdmin && (
+          <Link to="/admin" className="btn btn-outline" style={{ textAlign: 'center', textDecoration: 'none' }}>
+            DM Controls
+          </Link>
+        )}
         <button className="btn btn-outline btn-logout" onClick={logout}>
           Log Out
         </button>

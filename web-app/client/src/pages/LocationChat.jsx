@@ -47,6 +47,8 @@ export default function LocationChat() {
 
   const messagesEndRef = useRef(null);
   const chatAreaRef = useRef(null);
+  const scrollThumbRef = useRef(null);
+  const scrollFadeRef = useRef(null);
   const playSound = useUiSounds();
   const [effect, triggerEffect, clearEffect] = useEffects();
   const latestTimestampRef = useRef(null);
@@ -96,20 +98,6 @@ export default function LocationChat() {
     }
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
-  }, []);
-
-  // Keep chat layout above the virtual keyboard on iOS/Android
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    function onResize() {
-      document.documentElement.style.setProperty('--vv-height', `${vv.height}px`);
-    }
-
-    onResize();
-    vv.addEventListener('resize', onResize);
-    return () => vv.removeEventListener('resize', onResize);
   }, []);
 
   // Presence: join on mount, heartbeat every 10s, leave on unmount
@@ -234,6 +222,41 @@ export default function LocationChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Custom scroll indicator — shows translucent thumb on scroll, fades after idle
+  useEffect(() => {
+    const el = chatAreaRef.current;
+    const thumb = scrollThumbRef.current;
+    if (!el || !thumb) return;
+
+    const onScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      if (scrollHeight <= clientHeight + 1) return;
+
+      const rect = el.getBoundingClientRect();
+      const maxScroll = scrollHeight - clientHeight;
+      const thumbH = Math.max(30, (clientHeight / scrollHeight) * clientHeight);
+      // column-reverse uses negative scrollTop; abs gives distance from bottom
+      const ratio = maxScroll > 0 ? Math.min(1, Math.abs(scrollTop) / maxScroll) : 0;
+      const top = (1 - ratio) * (clientHeight - thumbH);
+
+      thumb.style.height = `${thumbH}px`;
+      thumb.style.top = `${rect.top + top}px`;
+      thumb.style.right = `${window.innerWidth - rect.right + 2}px`;
+      thumb.style.opacity = '1';
+
+      clearTimeout(scrollFadeRef.current);
+      scrollFadeRef.current = setTimeout(() => {
+        thumb.style.opacity = '0';
+      }, 800);
+    };
+
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      clearTimeout(scrollFadeRef.current);
+    };
+  }, [location, viewMode]);
+
   // Send message — always uses room endpoint, server picks responding NPCs
   const handleSend = useCallback(async (text) => {
     if (sending) return;
@@ -254,29 +277,23 @@ export default function LocationChat() {
     };
     setMessages(prev => [...prev, optimisticMsg]);
 
-    // Show typing indicators for @mentioned NPCs, or a generic one if none mentioned
+    // Show typing indicators only for @mentioned NPCs
     const typingId = Date.now();
     const mentionedNpcs = location?.npcs.filter(npc =>
       text.toLowerCase().includes(`@${npc.displayName.toLowerCase()}`)
     ) || [];
 
-    const typingBubbles = mentionedNpcs.length > 0
-      ? mentionedNpcs.map((npc, i) => ({
-          role: 'npc',
-          npc: npc.id,
-          npcDisplayName: npc.displayName,
-          typing: true,
-          _typingId: typingId + i
-        }))
-      : [{
-          role: 'npc',
-          npc: location?.npcs[0]?.id || '?',
-          npcDisplayName: '',
-          typing: true,
-          _typingId: typingId
-        }];
+    const typingBubbles = mentionedNpcs.map((npc, i) => ({
+      role: 'npc',
+      npc: npc.id,
+      npcDisplayName: npc.displayName,
+      typing: true,
+      _typingId: typingId + i
+    }));
 
-    setMessages(prev => [...prev, ...typingBubbles]);
+    if (typingBubbles.length > 0) {
+      setMessages(prev => [...prev, ...typingBubbles]);
+    }
 
     try {
       const data = await api(`/api/chat/locations/${locationId}/message`, {
@@ -452,21 +469,24 @@ export default function LocationChat() {
           </div>
 
           {/* Chat Messages — column-reverse so browser natively anchors to bottom */}
-          <div className="chat-messages" ref={chatAreaRef}>
-            <div className="chat-messages-inner">
-              {messages.length === 0 ? (
-                <div className="chat-messages-empty">
-                  <span className="chat-messages-empty-icon">💬</span>
-                  <p>You've entered {location.name}.</p>
-                  <p>Say something to start a conversation.</p>
-                </div>
-              ) : (
-                messages.map((msg, i) => (
-                  <ChatBubble key={msg.id || msg._typingId || i} message={msg} npcs={location.npcs} currentUserId={user?.id} />
-                ))
-              )}
-              <div ref={messagesEndRef} />
+          <div className="chat-messages-container">
+            <div className="chat-messages" ref={chatAreaRef}>
+              <div className="chat-messages-inner">
+                {messages.length === 0 ? (
+                  <div className="chat-messages-empty">
+                    <span className="chat-messages-empty-icon">💬</span>
+                    <p>You've entered {location.name}.</p>
+                    <p>Say something to start a conversation.</p>
+                  </div>
+                ) : (
+                  messages.map((msg, i) => (
+                    <ChatBubble key={msg.id || msg._typingId || i} message={msg} npcs={location.npcs} currentUserId={user?.id} />
+                  ))
+                )}
+                <div ref={messagesEndRef} />
+              </div>
             </div>
+            <div ref={scrollThumbRef} className="chat-scroll-thumb" />
           </div>
 
           {/* Chat Input */}

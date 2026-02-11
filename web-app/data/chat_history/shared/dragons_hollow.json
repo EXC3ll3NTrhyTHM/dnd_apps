@@ -88,5 +88,68 @@
     "text": "Hey there, friend! *leans casually against the bar* How's life treating you today? Found any trouble worth chasing?",
     "emotion": "happy",
     "timestamp": "2026-02-10T05:39:21.298Z"
+  },
+  {
+    "id": "4b8322e6-b443-469b-84a3-01fb53b3110e",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "hello",
+    "timestamp": "2026-02-10T06:08:26.419Z"
+  },
+  {
+    "id": "4a2cc7f2-15fa-491c-af87-9917908826ee",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Mira hello",
+    "timestamp": "2026-02-10T07:12:13.854Z"
+  },
+  {
+    "id": "d13537e7-cd84-4b24-b877-3d6c250a9363",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Hello, hello! You look like you’ve got something on your mind. What's cooking?",
+    "emotion": "happy",
+    "timestamp": "2026-02-10T07:12:14.786Z"
+  },
+  {
+    "id": "418ec2be-d671-46f5-973d-5140da8dc84a",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Bonesy bones?",
+    "timestamp": "2026-02-10T07:12:21.928Z"
+  },
+  {
+    "id": "37c2c8f6-e87d-4344-bffa-f8d8be422551",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Yo, I’m right here, maaaan! Just vibing, you know? What’s up? You need something?",
+    "emotion": "happy",
+    "timestamp": "2026-02-10T07:12:23.471Z"
+  },
+  {
+    "id": "726412d5-c3cd-44a1-a701-0e0e89a80820",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Bonesy sup bones?",
+    "timestamp": "2026-02-10T07:12:35.068Z"
+  },
+  {
+    "id": "531c28bc-01f3-4520-952a-9e3b933dea10",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Sup, broooo? Just chillin' and soaking in the good vibes around here. You need a snack or a drink? I'm always down to share!",
+    "emotion": "happy",
+    "timestamp": "2026-02-10T07:12:37.208Z"
   }
 ]

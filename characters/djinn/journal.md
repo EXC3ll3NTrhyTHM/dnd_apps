@@ -21,3 +21,7 @@
 [2026-02-09] Today, I introduced myself to Jeanette, The Architect's mother, with the honor and respect befitting my station. I also had the pleasure of greeting Grand Master Nalyd, whose presence invigorated the dojo.
 
 [2026-02-09] Today, we focused on fortifying the dojo's defenses with the earth students, embracing the unyielding power of our unity. I took a moment to congratulate Ximena on her new title as grandmaster's apprentice, wishing her well as Nalyd departed, reaffirming our commitment to his teachings.
+
+[2026-02-10] Today, I reported our progress on the new duties to Nalyd, emphasizing our unity and discipline amidst the challenges. Upon request, I displayed my unblemished hands, affirming my readiness, and then led the Elites to the dojo for a private discussion.
+
+[2026-02-10] Today, Nalyd revealed a sinister threat known as The Weaver, who is ensnaring the desperate with promises of gold and binding them with a cursed mark. I resolved to mobilize the Elites for discreet surveillance on the city's citizens, prioritizing their safety as we prepare to confront this insidious foe.

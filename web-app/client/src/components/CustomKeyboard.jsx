@@ -51,7 +51,7 @@ function playKeyTap() {
 const CustomKeyboard = memo(function CustomKeyboard({
   open, onKey, onBackspace, onSubmit, onClose, onPaste, onLeft, onRight, disabled, playSound,
   mode, onModeChange,
-  npcs, npcEmotions, onNpcMention, listening, onToggleMic,
+  npcs, npcEmotions, mentionGroups, onNpcMention, onGroupMention, listening, onToggleMic,
 }) {
   const [shifted, setShifted] = useState(false);
   const [symbols, setSymbols] = useState(false);
@@ -70,7 +70,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
 
   // Keep callback refs current so the delegation handler stays stable
   const refs = useRef({});
-  refs.current = { onKey, onBackspace, onSubmit, onClose, onPaste, onLeft, onRight, playSound, disabled, onModeChange, onNpcMention, onToggleMic };
+  refs.current = { onKey, onBackspace, onSubmit, onClose, onPaste, onLeft, onRight, playSound, disabled, onModeChange, onNpcMention, onGroupMention, onToggleMic };
 
   const shiftedRef = useRef(false);
   const symbolsRef = useRef(false);
@@ -124,90 +124,137 @@ const CustomKeyboard = memo(function CustomKeyboard({
     return () => observer.disconnect();
   }, [mode, open, expanded]);
 
-  // Drag-to-expand: touch handlers on the scroll element
+  // Drag-to-expand: GPU-composited translateY for zero layout reflow during drag.
+  // At drag start the bottom bar goes position:fixed and the emoji area is set to
+  // full height (extending below viewport). During drag only bar.style.transform
+  // changes — pure GPU compositing, no layout per frame. The bar slides up like a
+  // bottom sheet, revealing emoji content from below the viewport.
   useEffect(() => {
     if (mode !== 'emoji' || expanded) return;
     const el = emojiScrollRef.current;
     if (!el) return;
 
-    const measureMaxH = () => {
-      // Measure how much space the chat-messages area can yield
-      const chatMessages = el.closest('.location-chat')?.querySelector('.chat-messages');
-      const available = chatMessages?.offsetHeight || 0;
-      return COMPACT_H + available;
+    const bar = el.closest('.ck-bottom-bar');
+    const chatContainer = el.closest('.location-chat')?.querySelector('.chat-messages-container');
+    if (!bar) return;
+
+    const state = { active: false, startY: 0, excessH: 0, activateY: 0, barH: 0 };
+
+    const clearBarStyles = () => {
+      bar.style.position = '';
+      bar.style.top = '';
+      bar.style.left = '';
+      bar.style.width = '';
+      bar.style.zIndex = '';
+      bar.style.willChange = '';
+      bar.style.transform = '';
+      bar.style.transition = '';
+    };
+
+    const clearAll = () => {
+      clearBarStyles();
+      el.style.height = '';
+      el.classList.remove('ck-emoji-expanding');
+      if (chatContainer) {
+        chatContainer.style.transform = '';
+        chatContainer.style.willChange = '';
+      }
     };
 
     const onTouchStart = (e) => {
-      dragState.current = {
-        active: false,
-        startY: e.touches[0].clientY,
-        currentH: COMPACT_H,
-        maxH: 500,
-      };
+      state.startY = e.touches[0].clientY;
+      state.active = false;
     };
 
     const onTouchMove = (e) => {
-      const d = dragState.current;
-      const dy = d.startY - e.touches[0].clientY; // positive = finger moving up
+      const dy = state.startY - e.touches[0].clientY; // positive = finger moving up
 
-      if (!d.active && dy > 10) {
-        d.active = true;
+      if (!state.active && dy > 10) {
+        // Measure available space
+        const chatEl = chatContainer?.querySelector('.chat-messages');
+        const available = chatEl?.offsetHeight || 0;
+        if (available < 20) return; // no room to expand
+        const maxH = COMPACT_H + available;
+        state.excessH = available;
+        state.activateY = e.touches[0].clientY;
+        state.active = true;
+
+        // Snapshot bar position before any style changes
+        const barRect = bar.getBoundingClientRect();
+        state.barH = barRect.height;
+
+        // Pull bar to position:fixed at its current position (single reflow)
+        bar.style.position = 'fixed';
+        bar.style.top = `${barRect.top}px`;
+        bar.style.left = `${barRect.left}px`;
+        bar.style.width = `${barRect.width}px`;
+        bar.style.zIndex = '100';
+
+        // Counter-translate chat: bar leaving flow causes chat to grow by barH,
+        // shift it back so messages don't jump
+        if (chatContainer) {
+          chatContainer.style.willChange = 'transform';
+          chatContainer.style.transform = `translateY(${-state.barH}px)`;
+        }
+
+        // Pre-render emoji at full height — bar extends below viewport
+        el.style.height = `${maxH}px`;
         el.classList.add('ck-emoji-expanding');
-        // Force reflow so :has() layout changes apply, then measure
-        d.maxH = measureMaxH();
+        bar.style.willChange = 'transform';
       }
 
-      if (d.active) {
+      if (state.active) {
         e.preventDefault();
-        const newH = Math.max(COMPACT_H, Math.min(COMPACT_H + dy, d.maxH));
-        d.currentH = newH;
-        el.style.height = `${newH}px`;
+        // Pure GPU: only translateY changes per frame
+        const offset = Math.max(0, Math.min(state.excessH, state.activateY - e.touches[0].clientY));
+        bar.style.transform = `translateY(${-offset}px)`;
       }
     };
 
     const onTouchEnd = () => {
-      const d = dragState.current;
-      if (!d.active) return;
-      d.active = false;
+      if (!state.active) return;
+      state.active = false;
 
-      const currentH = d.currentH;
-      const threshold = COMPACT_H + (d.maxH - COMPACT_H) * 0.3;
+      const match = bar.style.transform.match(/translateY\((-?[0-9.]+)px\)/);
+      const currentTY = match ? Math.abs(parseFloat(match[1])) : 0;
+      const progress = state.excessH > 0 ? currentTY / state.excessH : 0;
       let cleaned = false;
 
-      if (currentH >= threshold) {
-        // Snap to expanded
-        const remaining = d.maxH - currentH;
+      if (progress >= 0.3) {
+        // Snap to expanded — animate translateY to full offset
+        const remaining = state.excessH - currentTY;
         const duration = Math.max(80, Math.min(300, remaining * 0.8));
-        el.style.transition = `height ${duration}ms ease-out`;
-        el.style.height = `${d.maxH}px`;
+        bar.style.transition = `transform ${duration}ms ease-out`;
+        bar.style.transform = `translateY(${-state.excessH}px)`;
 
         const cleanup = () => {
           if (cleaned) return;
           cleaned = true;
-          el.style.transition = '';
-          el.style.height = '';
-          el.classList.remove('ck-emoji-expanding');
+          bar.style.transition = '';
+          // Keep inline height as bridge — prevents flash while React re-renders
           setExpanded(true);
-          el.removeEventListener('transitionend', cleanup);
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              clearAll();
+            });
+          });
+          bar.removeEventListener('transitionend', cleanup);
         };
-        el.addEventListener('transitionend', cleanup, { once: true });
+        bar.addEventListener('transitionend', cleanup, { once: true });
         setTimeout(cleanup, duration + 50);
       } else {
-        // Snap back to compact
-        const remaining = currentH - COMPACT_H;
-        const duration = Math.max(80, Math.min(300, remaining * 0.8));
-        el.style.transition = `height ${duration}ms ease-out`;
-        el.style.height = `${COMPACT_H}px`;
+        // Snap back to compact — animate translateY to 0
+        const duration = Math.max(80, Math.min(300, currentTY * 0.8));
+        bar.style.transition = `transform ${duration}ms ease-out`;
+        bar.style.transform = 'translateY(0)';
 
         const cleanup = () => {
           if (cleaned) return;
           cleaned = true;
-          el.style.transition = '';
-          el.style.height = '';
-          el.classList.remove('ck-emoji-expanding');
-          el.removeEventListener('transitionend', cleanup);
+          clearAll();
+          bar.removeEventListener('transitionend', cleanup);
         };
-        el.addEventListener('transitionend', cleanup, { once: true });
+        bar.addEventListener('transitionend', cleanup, { once: true });
         setTimeout(cleanup, duration + 50);
       }
     };
@@ -220,16 +267,45 @@ const CustomKeyboard = memo(function CustomKeyboard({
       el.removeEventListener('touchstart', onTouchStart);
       el.removeEventListener('touchmove', onTouchMove);
       el.removeEventListener('touchend', onTouchEnd);
+      clearAll();
     };
   }, [mode, expanded, open]);
 
-  // Drag-to-collapse: when expanded and scrolled to top, drag down to shrink
+  // Drag-to-collapse: GPU-composited translateY, mirrors the expand technique.
+  // Bar goes position:fixed, then slides DOWN with translateY, revealing the chat
+  // behind it. Chat also translates in sync (two GPU transforms, zero layout).
   useEffect(() => {
     if (mode !== 'emoji' || !expanded) return;
     const el = emojiScrollRef.current;
     if (!el) return;
 
-    const state = { active: false, startY: 0, startH: 0, atTop: false };
+    const bar = el.closest('.ck-bottom-bar');
+    const chatContainer = el.closest('.location-chat')?.querySelector('.chat-messages-container');
+    if (!bar) return;
+
+    const state = { active: false, startY: 0, excessH: 0, activateY: 0, barH: 0, atTop: false };
+
+    const clearBarStyles = () => {
+      bar.style.position = '';
+      bar.style.top = '';
+      bar.style.left = '';
+      bar.style.width = '';
+      bar.style.zIndex = '';
+      bar.style.willChange = '';
+      bar.style.transform = '';
+      bar.style.transition = '';
+    };
+
+    const clearAll = () => {
+      clearBarStyles();
+      el.style.height = '';
+      el.classList.remove('ck-emoji-collapsing');
+      if (chatContainer) {
+        chatContainer.style.transform = '';
+        chatContainer.style.willChange = '';
+        chatContainer.style.transition = '';
+      }
+    };
 
     const onTouchStart = (e) => {
       state.atTop = el.scrollTop <= 1;
@@ -242,18 +318,44 @@ const CustomKeyboard = memo(function CustomKeyboard({
       const dy = e.touches[0].clientY - state.startY; // positive = finger moving down
 
       if (!state.active && dy > 10) {
-        state.startH = el.offsetHeight;
+        const startH = el.offsetHeight;
+        state.excessH = startH - COMPACT_H;
+        if (state.excessH < 20) { state.active = false; return; }
+        state.activateY = e.touches[0].clientY;
         state.active = true;
-        // Switch from flex-based to inline height; keep npc-bar hidden via collapsing class
+
+        // Snapshot bar position
+        const barRect = bar.getBoundingClientRect();
+        state.barH = barRect.height;
+
+        // Switch from flex to inline height, then go fixed
         el.classList.remove('ck-emoji-expanded');
         el.classList.add('ck-emoji-collapsing');
-        el.style.height = `${state.startH}px`;
+        el.style.height = `${startH}px`;
+
+        bar.style.position = 'fixed';
+        bar.style.top = `${barRect.top}px`;
+        bar.style.left = `${barRect.left}px`;
+        bar.style.width = `${barRect.width}px`;
+        bar.style.zIndex = '100';
+
+        // Counter-translate chat so messages don't jump
+        if (chatContainer) {
+          chatContainer.style.willChange = 'transform';
+          chatContainer.style.transform = `translateY(${-state.barH}px)`;
+        }
+
+        bar.style.willChange = 'transform';
       }
 
       if (state.active) {
         e.preventDefault();
-        const newH = Math.max(COMPACT_H, state.startH - dy);
-        el.style.height = `${newH}px`;
+        // Both GPU-composited: bar slides down, chat slides down in sync
+        const offset = Math.max(0, Math.min(state.excessH, e.touches[0].clientY - state.activateY));
+        bar.style.transform = `translateY(${offset}px)`;
+        if (chatContainer) {
+          chatContainer.style.transform = `translateY(${-state.barH + offset}px)`;
+        }
       }
     };
 
@@ -261,45 +363,61 @@ const CustomKeyboard = memo(function CustomKeyboard({
       if (!state.active) return;
       state.active = false;
 
-      const currentH = parseFloat(el.style.height);
-      const threshold = state.startH - (state.startH - COMPACT_H) * 0.3;
+      const match = bar.style.transform.match(/translateY\(([0-9.]+)px\)/);
+      const currentTY = match ? parseFloat(match[1]) : 0;
+      const progress = state.excessH > 0 ? currentTY / state.excessH : 0;
       let cleaned = false;
 
-      if (currentH <= threshold) {
-        // Snap to compact
-        const remaining = currentH - COMPACT_H;
+      if (progress >= 0.3) {
+        // Snap to compact — animate both transforms
+        const remaining = state.excessH - currentTY;
         const duration = Math.max(80, Math.min(300, remaining * 0.8));
-        el.style.transition = `height ${duration}ms ease-out`;
-        el.style.height = `${COMPACT_H}px`;
+        bar.style.transition = `transform ${duration}ms ease-out`;
+        bar.style.transform = `translateY(${state.excessH}px)`;
+        if (chatContainer) {
+          chatContainer.style.transition = `transform ${duration}ms ease-out`;
+          chatContainer.style.transform = `translateY(${-state.barH + state.excessH}px)`;
+        }
 
         const cleanup = () => {
           if (cleaned) return;
           cleaned = true;
-          el.style.transition = '';
-          el.style.height = '';
-          el.classList.remove('ck-emoji-collapsing');
+          bar.style.transition = '';
           setExpanded(false);
-          el.removeEventListener('transitionend', cleanup);
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              clearAll();
+            });
+          });
+          bar.removeEventListener('transitionend', cleanup);
         };
-        el.addEventListener('transitionend', cleanup, { once: true });
+        bar.addEventListener('transitionend', cleanup, { once: true });
         setTimeout(cleanup, duration + 50);
       } else {
-        // Snap back to expanded
-        const remaining = state.startH - currentH;
-        const duration = Math.max(80, Math.min(300, remaining * 0.8));
-        el.style.transition = `height ${duration}ms ease-out`;
-        el.style.height = `${state.startH}px`;
+        // Snap back to expanded — animate both transforms back
+        const duration = Math.max(80, Math.min(300, currentTY * 0.8));
+        bar.style.transition = `transform ${duration}ms ease-out`;
+        bar.style.transform = 'translateY(0)';
+        if (chatContainer) {
+          chatContainer.style.transition = `transform ${duration}ms ease-out`;
+          chatContainer.style.transform = `translateY(${-state.barH}px)`;
+        }
 
         const cleanup = () => {
           if (cleaned) return;
           cleaned = true;
-          el.style.transition = '';
-          el.style.height = '';
           el.classList.remove('ck-emoji-collapsing');
           el.classList.add('ck-emoji-expanded');
-          el.removeEventListener('transitionend', cleanup);
+          clearBarStyles();
+          el.style.height = '';
+          if (chatContainer) {
+            chatContainer.style.transform = '';
+            chatContainer.style.willChange = '';
+            chatContainer.style.transition = '';
+          }
+          bar.removeEventListener('transitionend', cleanup);
         };
-        el.addEventListener('transitionend', cleanup, { once: true });
+        bar.addEventListener('transitionend', cleanup, { once: true });
         setTimeout(cleanup, duration + 50);
       }
     };
@@ -312,6 +430,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
       el.removeEventListener('touchstart', onTouchStart);
       el.removeEventListener('touchmove', onTouchMove);
       el.removeEventListener('touchend', onTouchEnd);
+      clearAll();
     };
   }, [mode, expanded, open]);
 
@@ -415,6 +534,11 @@ const CustomKeyboard = memo(function CustomKeyboard({
       const npcId = btn.dataset.npcId;
       const npc = (npcs || []).find(n => n.id === npcId);
       if (npc) refs.current.onNpcMention?.(npc);
+    } else if (action === 'group-mention') {
+      playKeyTap();
+      const groupId = btn.dataset.groupId;
+      const group = (mentionGroups || []).find(g => g.id === groupId);
+      if (group) refs.current.onGroupMention?.(group);
     } else if (action === 'back-to-extras') {
       playKeyTap();
       onModeChange('extras');
@@ -550,6 +674,20 @@ const CustomKeyboard = memo(function CustomKeyboard({
               <span className="ck-npcs-label">Mention an NPC</span>
             </div>
             <div className="ck-npcs-grid">
+              {(mentionGroups || []).map(group => (
+                <button
+                  key={`group-${group.id}`}
+                  className="ck-npcs-item ck-npcs-group-item"
+                  data-action="group-mention"
+                  data-group-id={group.id}
+                  type="button"
+                >
+                  <div className="ck-npcs-group-icon">
+                    {group.id === 'everyone' ? '👥' : group.displayName.charAt(0)}
+                  </div>
+                  <span className="ck-npcs-name">{group.displayName}</span>
+                </button>
+              ))}
               {(npcs || []).map(npc => (
                 <button
                   key={npc.id}

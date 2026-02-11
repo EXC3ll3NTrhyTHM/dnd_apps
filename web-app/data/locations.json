@@ -2,6 +2,8 @@
   "the_collective": {
     "name": "The Collective",
     "description": "The castle hub where adventurers gather",
+    "locked": false,
+    "lockedFor": [],
     "npcs": [
       "marcel"
     ],
@@ -97,6 +99,8 @@
   "dragons_hollow": {
     "name": "Dragon's Hollow",
     "description": "The tavern at the heart of Okhan",
+    "locked": false,
+    "lockedFor": [],
     "npcs": [
       "bonesy",
       "mira",
@@ -209,6 +213,10 @@
   "the_barracks": {
     "name": "The Barracks",
     "description": "Where the generals plan and strategize",
+    "locked": false,
+    "lockedFor": [
+      "228241331296665600"
+    ],
     "npcs": [
       "cena",
       "jonah",
@@ -299,6 +307,12 @@
   "the_veil": {
     "name": "The Veil",
     "description": "Aly's spy network, cloaked in shadow",
+    "locked": false,
+    "lockedFor": [
+      "1073385140669128725",
+      "1374906408046166036",
+      "765984341595521024"
+    ],
     "npcs": [
       "aurelia",
       "brynleaf",
@@ -395,6 +409,13 @@
   "the_cottage": {
     "name": "The Cottage",
     "description": "A cozy woodland retreat",
+    "locked": false,
+    "lockedFor": [
+      "1374906408046166036",
+      "1073385140669128725",
+      "765978025937469481",
+      "765984341595521024"
+    ],
     "npcs": [
       "mira"
     ],
@@ -454,6 +475,8 @@
   "the_dojo": {
     "name": "The Dojo",
     "description": "Training grounds where warriors hone their craft",
+    "locked": false,
+    "lockedFor": [],
     "npcs": [
       "djinn",
       "kai",

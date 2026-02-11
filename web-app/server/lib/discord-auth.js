@@ -10,9 +10,12 @@
  */
 
 const DISCORD_API = 'https://discord.com/api/v10';
+const DISCORD_OAUTH_AUTHORIZE = 'https://discord.com/oauth2/authorize';
 
 /**
  * Generate the Discord OAuth2 authorization URL
+ * Uses the user-facing URL (not the API endpoint) so mobile OSes
+ * can deep-link into the Discord app.
  */
 function getAuthorizationUrl() {
   const params = new URLSearchParams({
@@ -21,7 +24,7 @@ function getAuthorizationUrl() {
     response_type: 'code',
     scope: 'identify'
   });
-  return `${DISCORD_API}/oauth2/authorize?${params.toString()}`;
+  return `${DISCORD_OAUTH_AUTHORIZE}?${params.toString()}`;
 }
 
 /**

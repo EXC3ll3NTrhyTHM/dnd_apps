@@ -271,6 +271,7 @@ function GroupCard({ loc, onSave, onToast }) {
 export default function Admin() {
   const { phase, setPhase } = useTheme();
   const [locations, setLocations] = useState([]);
+  const [players, setPlayers] = useState([]);
   const [localPhase, setLocalPhase] = useState(phase);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
@@ -282,6 +283,16 @@ export default function Admin() {
 
   useEffect(() => {
     loadLocations();
+    loadPlayers();
+  }, []);
+
+  const loadPlayers = useCallback(async () => {
+    try {
+      const data = await api('/api/campaign/players');
+      setPlayers(data.players);
+    } catch {
+      // silently fail — players list is non-critical
+    }
   }, []);
 
   const loadLocations = useCallback(async () => {
@@ -331,6 +342,32 @@ export default function Admin() {
       updateLocationNpcs(locationId, npcs.filter(n => n !== npcId));
     } else {
       updateLocationNpcs(locationId, [...npcs, npcId]);
+    }
+  }
+
+  async function toggleLocked(locationId, currentlyLocked) {
+    try {
+      await api('/api/campaign/locations/visibility', {
+        method: 'POST',
+        body: JSON.stringify({ locationId, locked: !currentlyLocked })
+      });
+      setToast({ type: 'success', message: currentlyLocked ? 'Location unlocked' : 'Location locked' });
+      loadLocations();
+    } catch (err) {
+      setToast({ type: 'error', message: err.data?.error || 'Failed to update visibility' });
+    }
+  }
+
+  async function togglePlayerLock(locationId, userId, currentlyLocked) {
+    try {
+      await api('/api/campaign/locations/player-visibility', {
+        method: 'POST',
+        body: JSON.stringify({ locationId, userId, locked: !currentlyLocked })
+      });
+      setToast({ type: 'success', message: currentlyLocked ? 'Player access restored' : 'Player locked out' });
+      loadLocations();
+    } catch (err) {
+      setToast({ type: 'error', message: err.data?.error || 'Failed to update player visibility' });
     }
   }
 
@@ -402,16 +439,41 @@ export default function Admin() {
             padding: 12,
             background: 'var(--bg-card)',
             borderRadius: 8,
-            border: '1px solid var(--border-color)'
+            border: `1px solid ${loc.locked ? 'rgba(180, 60, 60, 0.4)' : 'var(--border-color)'}`,
+            opacity: loc.locked ? 0.6 : 1,
+            transition: 'opacity 0.2s ease, border-color 0.2s ease'
           }}>
-            <h3 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '0.95rem',
-              color: 'var(--color-gold)',
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
               marginBottom: 8
             }}>
-              {loc.name}
-            </h3>
+              <h3 style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '0.95rem',
+                color: 'var(--color-gold)',
+                margin: 0
+              }}>
+                {loc.locked ? '\uD83D\uDD12 ' : ''}{loc.name}
+              </h3>
+              <button
+                onClick={() => toggleLocked(loc.id, loc.locked)}
+                style={{
+                  padding: '3px 10px',
+                  borderRadius: 6,
+                  border: `1px solid ${loc.locked ? 'rgba(180, 60, 60, 0.5)' : 'var(--border-color)'}`,
+                  background: loc.locked ? 'rgba(180, 60, 60, 0.15)' : 'transparent',
+                  color: loc.locked ? '#e06060' : 'var(--text-muted)',
+                  fontSize: '0.7rem',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-body)',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                {loc.locked ? 'Unlock' : 'Lock'}
+              </button>
+            </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
               {ALL_NPCS.map(npcId => {
                 const isPresent = loc.npcs.some(n => n.id === npcId);
@@ -436,6 +498,46 @@ export default function Admin() {
                 );
               })}
             </div>
+            {/* Player Access */}
+            {players.length > 0 && (
+              <div style={{ marginTop: 10 }}>
+                <div style={{
+                  fontSize: '0.7rem',
+                  color: 'var(--text-muted)',
+                  marginBottom: 4,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  Player Access
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {players.map(player => {
+                    const isLocked = (loc.lockedFor || []).includes(player.id);
+                    const label = player.characterName || player.displayName || ('...' + player.id.slice(-4));
+                    return (
+                      <button
+                        key={player.id}
+                        onClick={() => togglePlayerLock(loc.id, player.id, isLocked)}
+                        style={{
+                          padding: '4px 10px',
+                          borderRadius: 12,
+                          border: `1px solid ${isLocked ? 'rgba(180, 60, 60, 0.5)' : 'var(--color-gold-dim)'}`,
+                          background: isLocked ? 'rgba(180, 60, 60, 0.15)' : 'rgba(212, 168, 67, 0.15)',
+                          color: isLocked ? '#e06060' : 'var(--color-gold)',
+                          fontSize: '0.75rem',
+                          cursor: 'pointer',
+                          fontFamily: 'var(--font-body)',
+                          textDecoration: isLocked ? 'line-through' : 'none',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </section>

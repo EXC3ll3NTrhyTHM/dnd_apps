@@ -20,6 +20,15 @@ const {
   writeWebJournal
 } = require('../lib/dialogue');
 
+// DM Discord user IDs (same list as campaign.js)
+const DM_USER_IDS = (process.env.DM_USER_IDS || '').split(',').filter(Boolean);
+
+function isLocationLocked(location, userId) {
+  if (location.locked) return true;
+  if (Array.isArray(location.lockedFor) && location.lockedFor.includes(userId)) return true;
+  return false;
+}
+
 const DATA_DIR = path.resolve(__dirname, '..', '..', 'data');
 const HISTORY_DIR = path.join(DATA_DIR, 'chat_history');
 const SHARED_DIR = path.join(HISTORY_DIR, 'shared');
@@ -43,12 +52,15 @@ function getPlayerName(user) {
   return players[user.id]?.characterName || user.global_name || user.username;
 }
 
-// Persist avatar URL so enrichHistory can backfill old messages
-function updatePlayerAvatar(user) {
+// Persist avatar URL and display name so enrichHistory can backfill old messages
+function updatePlayerInfo(user) {
   const players = loadPlayers();
   if (!players[user.id]) players[user.id] = {};
-  if (players[user.id].avatar !== user.avatar) {
-    players[user.id].avatar = user.avatar;
+  const p = players[user.id];
+  const displayName = user.global_name || user.username || null;
+  if (p.avatar !== user.avatar || p.displayName !== displayName) {
+    p.avatar = user.avatar;
+    p.displayName = displayName;
     savePlayers(players);
   }
 }
@@ -167,8 +179,11 @@ const messageCounters = new Map();
 router.get('/locations', authRequired, (req, res) => {
   const locations = loadLocations();
   const registry = loadNpcRegistry();
+  const isDM = DM_USER_IDS.includes(req.user.id);
 
-  const result = Object.entries(locations).map(([id, loc]) => {
+  const result = Object.entries(locations)
+    .filter(([, loc]) => isDM || !isLocationLocked(loc, req.user.id))
+    .map(([id, loc]) => {
     const npcList = (loc.npcs || []).map(npcName => {
       const entry = registry[npcName];
       return {
@@ -202,7 +217,9 @@ router.get('/locations', authRequired, (req, res) => {
       mapIcon: loc.mapIcon || null,
       scene: loc.scene || null,
       npcs: npcList,
-      groups
+      groups,
+      locked: !!loc.locked,
+      lockedFor: isDM ? (loc.lockedFor || []) : undefined
     };
   });
 
@@ -221,6 +238,10 @@ router.get('/locations/:locationId/history', authRequired, (req, res) => {
     return res.status(404).json({ error: 'Location not found' });
   }
 
+  if (isLocationLocked(locations[locationId], req.user.id) && !DM_USER_IDS.includes(req.user.id)) {
+    return res.status(403).json({ error: 'This location is currently locked' });
+  }
+
   const history = enrichHistory(loadHistory(locationId));
   res.json({ history, locationId });
 });
@@ -236,6 +257,10 @@ router.get('/locations/:locationId/messages', authRequired, (req, res) => {
   const locations = loadLocations();
   if (!locations[locationId]) {
     return res.status(404).json({ error: 'Location not found' });
+  }
+
+  if (isLocationLocked(locations[locationId], req.user.id) && !DM_USER_IDS.includes(req.user.id)) {
+    return res.status(403).json({ error: 'This location is currently locked' });
   }
 
   const history = enrichHistory(loadHistory(locationId));
@@ -275,12 +300,16 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
     return res.status(404).json({ error: 'Location not found' });
   }
 
+  if (isLocationLocked(location, req.user.id) && !DM_USER_IDS.includes(req.user.id)) {
+    return res.status(403).json({ error: 'This location is currently locked' });
+  }
+
   const locationNpcs = location.npcs || [];
   if (locationNpcs.length === 0) {
     return res.status(400).json({ error: 'No NPCs at this location' });
   }
 
-  updatePlayerAvatar(req.user);
+  updatePlayerInfo(req.user);
 
   await acquireLock(locationId);
   try {
@@ -299,8 +328,14 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
     };
     history.push(playerMsg);
 
-    // Pick which NPC(s) should respond
+    // Pick which NPC(s) should respond — only @mentioned NPCs
     const respondingNpcs = await pickRespondingNpc(locationNpcs, message, history);
+
+    // No NPCs mentioned — just record the player message, no NPC responses
+    if (respondingNpcs.length === 0) {
+      saveHistory(locationId, history);
+      return res.json({ playerMessage: playerMsg, responses: [] });
+    }
 
     const registry = loadNpcRegistry();
     const responses = [];
@@ -384,11 +419,15 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
     return res.status(404).json({ error: 'Location not found' });
   }
 
+  if (isLocationLocked(location, req.user.id) && !DM_USER_IDS.includes(req.user.id)) {
+    return res.status(403).json({ error: 'This location is currently locked' });
+  }
+
   if (!location.npcs.includes(npcName)) {
     return res.status(400).json({ error: `${npcName} is not at this location` });
   }
 
-  updatePlayerAvatar(req.user);
+  updatePlayerInfo(req.user);
 
   await acquireLock(locationId);
   try {

@@ -209,64 +209,18 @@ async function generateResponse(npcName, playerName, message, history = [], loca
 // ============================================
 
 async function pickRespondingNpc(locationNpcs, message, recentHistory = []) {
-  // If only one NPC at the location, they respond
-  if (locationNpcs.length === 1) {
-    return [locationNpcs[0]];
-  }
-
-  // If the message mentions an NPC by name, they respond
+  // Only NPCs explicitly @mentioned will respond
   const registry = loadNpcRegistry();
   const mentioned = locationNpcs.filter(npc => {
     const entry = registry[npc];
     if (!entry) return false;
-    const names = [npc, entry.displayName, entry.username].filter(Boolean);
-    return names.some(name => message.toLowerCase().includes(name.toLowerCase()));
+    const names = [entry.displayName, entry.username, npc].filter(Boolean);
+    return names.some(name =>
+      message.toLowerCase().includes(`@${name.toLowerCase()}`)
+    );
   });
 
-  if (mentioned.length > 0) {
-    return mentioned;
-  }
-
-  // Use LLM to pick who should respond
-  try {
-    const npcDescriptions = locationNpcs.map(npc => {
-      const { soul } = loadCharacterContext(npc);
-      const firstLines = soul.split('\n').slice(0, 10).join('\n');
-      return `- ${npc}: ${firstLines.substring(0, 200)}`;
-    }).join('\n');
-
-    const recentContext = recentHistory.slice(-5).map(h =>
-      `${h.npc || h.playerName || 'Player'}: ${h.text}`
-    ).join('\n');
-
-    const ai = getOpenAI();
-    const response = await ai.chat.completions.create({
-      model: process.env.CHAT_MODEL || 'gpt-4o-mini',
-      max_tokens: 50,
-      temperature: 0.3,
-      messages: [
-        {
-          role: 'system',
-          content: `You decide which NPC(s) should respond to a player's message in a location-based chat. Pick 1-2 NPCs who would most naturally respond based on the message content and their personalities. Respond with ONLY a JSON array of NPC names, e.g. ["bonesy"] or ["nibby", "bonesy"].`
-        },
-        {
-          role: 'user',
-          content: `Available NPCs:\n${npcDescriptions}\n\nRecent conversation:\n${recentContext}\n\nPlayer says: "${message}"\n\nWho responds?`
-        }
-      ]
-    });
-
-    const raw = response.choices[0].message.content.trim();
-    const picked = JSON.parse(raw);
-
-    // Validate picks are actually at this location
-    const valid = picked.filter(n => locationNpcs.includes(n));
-    return valid.length > 0 ? valid.slice(0, 2) : [locationNpcs[0]];
-  } catch (error) {
-    console.error('[dialogue] Error picking NPC:', error.message);
-    // Fallback: pick a random NPC
-    return [locationNpcs[Math.floor(Math.random() * locationNpcs.length)]];
-  }
+  return mentioned;
 }
 
 // ============================================

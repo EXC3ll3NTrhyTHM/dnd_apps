@@ -215,7 +215,7 @@ export default function Map() {
         <LocationTransition
           locationId={transitioning.id}
           locationName={transitioning.name}
-          onComplete={() => navigate(`/location/${transitioning.id}`)}
+          onComplete={() => navigate(`/location/${transitioning.id}`, { replace: true })}
         />
       )}
       {/* Header overlay */}
