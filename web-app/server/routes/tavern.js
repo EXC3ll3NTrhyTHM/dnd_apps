@@ -53,6 +53,19 @@ router.post('/buy', authRequired, async (req, res) => {
   const result = await waitForSignalResult(signalId, 8000);
 
   if (result.success) {
+    let xpAwarded = 0;
+    try {
+      const xp = require('../lib/xp');
+      const before = xp.getXpRecord(req.user.id, req.user.username).total_xp;
+      xp.awardGoldSpendXp(req.user.id, req.user.username, item.price);
+      xp.incrementLifetimeStat(req.user.id, req.user.username, 'tavern_purchases');
+      const after = xp.getXpRecord(req.user.id, req.user.username).total_xp;
+      xpAwarded = after - before;
+    } catch (e) { console.error('[xp]', e.message); }
+
+    let newAchievements = [];
+    try { newAchievements = require('../lib/achievements').checkAchievements(req.user.id, req.user.username, 'purchase_tavern').newAchievements; } catch (e) { console.error('[achievements]', e.message); }
+
     res.json({
       success: true,
       message: `You ordered ${item.name} from Tam!`,
@@ -62,7 +75,9 @@ router.post('/buy', authRequired, async (req, res) => {
         price: item.price,
         flavor_text: item.flavor_text
       },
-      balance: result.balance_after
+      balance: result.balance_after,
+      xpAwarded,
+      newAchievements
     });
   } else {
     res.status(400).json({

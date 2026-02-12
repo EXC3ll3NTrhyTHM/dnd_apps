@@ -28,7 +28,20 @@ router.post('/join', authRequired, (req, res) => {
     return res.status(400).json({ error: 'locationId required' });
   }
   presence.join(locationId, req.user);
-  res.json({ success: true });
+  let xpAwarded = 0;
+  try {
+    const xp = require('../lib/xp');
+    const before = xp.getXpRecord(req.user.id, req.user.username).total_xp;
+    xp.awardLocationVisitXp(req.user.id, req.user.username, locationId);
+    xp.awardDailyLoginXp(req.user.id, req.user.username);
+    const after = xp.getXpRecord(req.user.id, req.user.username).total_xp;
+    xpAwarded = after - before;
+  } catch (e) { console.error('[xp]', e.message); }
+
+  let newAchievements = [];
+  try { newAchievements = require('../lib/achievements').checkAchievements(req.user.id, req.user.username, 'location_visited').newAchievements; } catch (e) { console.error('[achievements]', e.message); }
+
+  res.json({ success: true, xpAwarded, newAchievements });
 });
 
 /**

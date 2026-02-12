@@ -17,17 +17,53 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Noto+Sans+Runic&display=swap" rel="stylesheet" />
 
   <title>Dragon's Hollow</title>
 </head>
 <body>
   <div id="root"></div>
-  <div class="landscape-block">
+
+  <!-- Splash screen: visible immediately with inline styles, removed once React mounts -->
+  <div id="splash" style="
+    position: fixed;
+    inset: 0;
+    z-index: 99998;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: #0c0a07;
+    font-family: 'Cinzel', serif;
+    color: #e8dcc8;
+    transition: opacity 0.4s ease;
+  ">
+    <div style="font-size: 48px;">🐉</div>
+    <div style="
+      font-size: 22px;
+      font-weight: 600;
+      color: #d4a843;
+      letter-spacing: 2px;
+    ">Dragon's Hollow</div>
+    <div style="
+      width: 32px;
+      height: 32px;
+      border: 3px solid #33291c;
+      border-top-color: #d4a843;
+      border-radius: 50%;
+      animation: splash-spin 0.8s linear infinite;
+    "></div>
+    <style>@keyframes splash-spin { to { transform: rotate(360deg); } }</style>
+  </div>
+
+  <!-- Hidden by default; CSS media query shows it in landscape -->
+  <div class="landscape-block" style="display:none">
     <div class="landscape-block-icon">📱</div>
     <div class="landscape-block-text">Rotate Your Device</div>
     <div>Dragon's Hollow is best experienced in portrait mode</div>
   </div>
+
   <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

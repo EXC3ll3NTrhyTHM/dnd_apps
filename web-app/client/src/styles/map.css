@@ -47,6 +47,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  touch-action: none; /* prevent browser from hijacking touch for scroll/pan */
 }
 
 .map-image {
@@ -100,6 +101,12 @@
   position: relative;
   z-index: 2;
   transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.map-marker-icon-portrait {
+  padding: 0;
+  background: none;
+  overflow: hidden;
 }
 
 .map-marker:active .map-marker-icon,
@@ -280,6 +287,21 @@
   transform: scale(0.97);
 }
 
+/* ---- Unread Message Indicator (on marker) ---- */
+
+.map-marker-unread {
+  position: absolute;
+  top: 2px;
+  left: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  box-shadow: 0 0 6px rgba(212, 168, 67, 0.7);
+  pointer-events: none;
+  z-index: 3;
+}
+
 /* ---- Player Presence Badge (on marker) ---- */
 
 .map-marker-player-badge {
@@ -359,6 +381,139 @@
   to { transform: rotate(360deg); }
 }
 
+/* No arrow variant */
+.map-popup.arrow-none::after {
+  display: none;
+}
+
+/* ---- Marcel DM Popup ---- */
+
+.map-popup-dm {
+  width: 220px;
+}
+
+.map-popup-dm-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.map-popup-dm-portrait {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--color-gold-dim);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.map-popup-dm-players {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-stitch) transparent;
+}
+
+.map-popup-dm-player-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+}
+
+.map-popup-dm-player-row:hover,
+.map-popup-dm-player-row:active {
+  background: rgba(212, 168, 67, 0.1);
+  border-color: var(--color-gold-dim);
+}
+
+.map-popup-dm-player-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-stitch);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.map-popup-dm-player-avatar-placeholder {
+  background: var(--bg-elevated);
+}
+
+.map-popup-dm-player-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-popup-dm-player-unread {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  box-shadow: 0 0 6px rgba(212, 168, 67, 0.7);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.map-popup-dm-empty {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 8px 0;
+}
+
+/* ---- Gesture Draw Trail Canvas ---- */
+
+.map-gesture-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+}
+
+/* ---- Summoning Hint — Runic M (Mannaz ᛗ) ---- */
+
+.map-summon-hint {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  font-family: 'Noto Sans Runic', serif;
+  font-size: 22rem;
+  font-weight: 400;
+  color: #a855f7;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  animation: hint-m-pulse 20s ease-in-out infinite;
+  text-shadow:
+    0 0 20px rgba(168, 85, 247, 0.4),
+    0 0 50px rgba(168, 85, 247, 0.2),
+    0 0 80px rgba(128, 45, 207, 0.1);
+}
+
+@keyframes hint-m-pulse {
+  0%, 12%, 22%, 100% { opacity: 0; }
+  15%, 19% { opacity: 0.35; }
+}
+
 /* Fade out map content during transition */
 .map-page.transitioning .map-container,
 .map-page.transitioning .map-overlay-header {
@@ -369,6 +524,4 @@
 .map-page.transitioning {
   background: #000;
 }
-
-
 

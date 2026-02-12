@@ -75,5 +75,5 @@ export const SKIP_WORDS = new Set([
   'bonesy', 'kumo', 'ximena', 'mai', 'ember', 'brynleaf', 'mira', 'rhea',
   'nibby', 'jonah', 'cena', 'kai', 'aurelia', 'ithrae', 'djinn', 'marcel',
   'varrow', 'marella', 'blackwell', 'dawnwrath', 'galecrest', 'zenatsu',
-  'stoic',
+  'stoic', 'discord',
 ]);

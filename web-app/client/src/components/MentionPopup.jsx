@@ -23,13 +23,20 @@ export default function MentionPopup({ items, activeIndex, onSelect }) {
           key={item.type === 'group' ? `group-${item.id}` : item.id}
           ref={i === activeIndex ? activeRef : null}
           className={`mention-popup-item${i === activeIndex ? ' mention-popup-item-active' : ''}${item.type === 'group' ? ' mention-popup-group' : ''}`}
-          onMouseDown={(e) => {
+          onPointerDown={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             onSelect(item);
           }}
         >
           {item.type === 'group' ? (
             <span className="mention-popup-group-icon">@</span>
+          ) : item.type === 'player' ? (
+            <img
+              src={item.avatar}
+              alt={item.displayName}
+              className="mention-popup-player-avatar"
+            />
           ) : (
             <NpcPortrait npcId={item.id} size={28} />
           )}

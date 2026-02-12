@@ -1,13 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../hooks/useApi';
+import { useAuth } from '../hooks/useAuth';
 import NpcPortrait from '../components/NpcPortrait';
 import LocationTransition from '../components/LocationTransition';
+import SummonEffect from '../components/SummonEffect';
 import { pauseAmbientAudio } from '../components/Layout';
 import { useUiSounds } from '../hooks/useUiSounds';
+import { createRecognizer } from '../lib/gestureRecognizer';
 import '../styles/map.css';
 
 const MAP_SRC = '/images/okhan_map.webp';
+const ADMIN_IDS = ['424061511833747467'];
+const DRAW_THRESHOLD = 30; // px before entering draw mode
 
 export default function Map() {
   const [locations, setLocations] = useState([]);
@@ -15,27 +20,47 @@ export default function Map() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [popupStyle, setPopupStyle] = useState(null);
-  const [transitioning, setTransitioning] = useState(null); // { id, name } or null
-  const [presence, setPresence] = useState({}); // { locationId: [{ id, username, avatar }] }
+  const [transitioning, setTransitioning] = useState(null);
+  const [presence, setPresence] = useState({});
+  const [unread, setUnread] = useState({});
+  const [summoning, setSummoning] = useState(null); // { gesturePoints } or null
 
   const containerRef = useRef(null);
   const popupRef = useRef(null);
+  const canvasRef = useRef(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
   const playSound = useUiSounds();
+  const isDM = ADMIN_IDS.includes(user?.id || '');
+
+  // Gesture tracking refs
+  const gestureRef = useRef({
+    isTracking: false,
+    isDrawing: false,
+    startPos: null,
+    recognizer: null,
+    points: [],       // raw screen points for trail + replay
+    suppressClick: false,
+  });
+
+  // Check if Marcel has been summoned before (for hint visibility)
+  const hasSummoned = useRef(localStorage.getItem('dh_marcel_summoned') === 'true');
 
   useEffect(() => {
     loadLocations();
   }, []);
 
-  // Fetch presence on mount and poll every 5s for near-live tracking
   useEffect(() => {
-    function fetchPresence() {
+    function fetchPresenceAndUnread() {
       api('/api/presence').then(data => {
         setPresence(data.presence || {});
       }).catch(() => {});
+      api('/api/chat/unread').then(data => {
+        setUnread(data.unread || {});
+      }).catch(() => {});
     }
-    fetchPresence();
-    const interval = setInterval(fetchPresence, 5000);
+    fetchPresenceAndUnread();
+    const interval = setInterval(fetchPresenceAndUnread, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -50,7 +75,7 @@ export default function Map() {
     }
   }
 
-  // Calculate smart popup position that stays on screen and avoids other markers
+  // Calculate smart popup position
   const calcPopupPosition = useCallback((locId) => {
     const container = containerRef.current;
     if (!container) return null;
@@ -60,45 +85,38 @@ export default function Map() {
 
     const containerRect = container.getBoundingClientRect();
     const popupWidth = 210;
-    const popupHeight = 160; // approximate
+    const popupHeight = 160;
     const markerSize = 36;
     const padding = 12;
 
-    // Marker position in pixels within the container
     const markerX = (loc.mapCoords.x / 100) * containerRect.width;
     const markerY = (loc.mapCoords.y / 100) * containerRect.height;
 
-    // Default: popup above marker, centered horizontally
     let popupX = markerX - popupWidth / 2;
     let popupY = markerY - popupHeight - markerSize - 8;
-    let arrowSide = 'bottom'; // arrow points down
+    let arrowSide = 'bottom';
 
-    // If popup goes off the top, show below marker instead
     if (popupY < padding) {
       popupY = markerY + markerSize + 8;
-      arrowSide = 'top'; // arrow points up
+      arrowSide = 'top';
     }
 
-    // If popup goes off the bottom (when shown below)
     if (popupY + popupHeight > containerRect.height - padding) {
       popupY = markerY - popupHeight - markerSize - 8;
       arrowSide = 'bottom';
     }
 
-    // Clamp horizontal position to stay on screen
     if (popupX < padding) {
       popupX = padding;
     } else if (popupX + popupWidth > containerRect.width - padding) {
       popupX = containerRect.width - popupWidth - padding;
     }
 
-    // Check if popup overlaps any other marker
-    const otherLocations = locations.filter(l => l.id !== locId && l.mapCoords);
+    const otherLocations = locations.filter(l => l.id !== locId && l.mapCoords && !l.isMarcelDm);
     for (const other of otherLocations) {
       const otherX = (other.mapCoords.x / 100) * containerRect.width;
       const otherY = (other.mapCoords.y / 100) * containerRect.height;
 
-      // Check if the other marker falls inside the popup bounds (with some buffer)
       const buffer = 8;
       const overlaps = (
         otherX > popupX - buffer &&
@@ -108,23 +126,18 @@ export default function Map() {
       );
 
       if (overlaps) {
-        // Try to shift the popup to avoid the overlap
-        // If marker is to the left of popup center, shift popup right
         if (otherX < markerX) {
           const shiftX = (popupX + popupWidth + buffer) - otherX;
-          // Only shift if it doesn't push off screen
           if (popupX + shiftX + popupWidth <= containerRect.width - padding) {
             popupX += shiftX;
           }
         } else {
-          // Shift popup left
           const shiftX = otherX - (popupX - buffer);
           if (popupX - shiftX >= padding) {
             popupX -= shiftX;
           }
         }
 
-        // If horizontal shift didn't help, try flipping vertical
         if (arrowSide === 'bottom') {
           const altY = markerY + markerSize + 8;
           if (altY + popupHeight <= containerRect.height - padding) {
@@ -141,7 +154,6 @@ export default function Map() {
       }
     }
 
-    // Calculate arrow horizontal offset to point at marker
     const arrowX = markerX - popupX;
     const arrowClampedX = Math.max(20, Math.min(popupWidth - 20, arrowX));
 
@@ -153,10 +165,8 @@ export default function Map() {
     };
   }, [locations]);
 
-  // Recalc popup position when selection changes
   useEffect(() => {
     if (selectedLocation) {
-      // Small delay to ensure DOM is ready
       requestAnimationFrame(() => {
         const style = calcPopupPosition(selectedLocation);
         setPopupStyle(style);
@@ -166,7 +176,6 @@ export default function Map() {
     }
   }, [selectedLocation, calcPopupPosition]);
 
-  // Recalc on resize
   useEffect(() => {
     function handleResize() {
       if (selectedLocation) {
@@ -188,14 +197,180 @@ export default function Map() {
     e.stopPropagation();
     playSound('buttonTap');
     const loc = locations.find(l => l.id === locId);
+
+    if (loc?.isMarcelDm) {
+      const dmUserId = user?.id;
+      setSelectedLocation(null);
+      setTransitioning({ id: `marcel_dm_${dmUserId}`, name: 'Marcel DM' });
+      pauseAmbientAudio();
+      return;
+    }
+
     setSelectedLocation(null);
     setTransitioning({ id: locId, name: loc?.name || locId });
     pauseAmbientAudio();
-  }, [locations, playSound]);
+  }, [locations, playSound, user]);
 
   const handleMapTap = useCallback(() => {
+    if (gestureRef.current.suppressClick) {
+      gestureRef.current.suppressClick = false;
+      return;
+    }
     setSelectedLocation(null);
   }, []);
+
+  // ---- Gesture drawing helpers ----
+
+  function clearCanvas() {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function drawTrailSegment(from, to) {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+
+    ctx.save();
+    ctx.strokeStyle = '#a855f7';
+    ctx.lineWidth = 3 * dpr;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.shadowColor = '#a855f7';
+    ctx.shadowBlur = 12 * dpr;
+    ctx.globalAlpha = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(from.x * dpr, from.y * dpr);
+    ctx.lineTo(to.x * dpr, to.y * dpr);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function resizeCanvas() {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+    const rect = container.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+  }
+
+  // ---- Pointer event handlers for gesture detection ----
+
+  const handlePointerDown = useCallback((e) => {
+    // Skip if target is inside a marker
+    if (e.target.closest('.map-marker') || e.target.closest('.map-popup')) return;
+
+    const g = gestureRef.current;
+    g.recognizer = createRecognizer();
+    g.isTracking = true;
+    g.isDrawing = false;
+    g.suppressClick = false;
+
+    const container = containerRef.current;
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    g.startPos = { x, y };
+    g.points = [{ x, y }];
+    g.recognizer.addPoint(x, y);
+
+    resizeCanvas();
+    clearCanvas();
+  }, []);
+
+  const handlePointerMove = useCallback((e) => {
+    const g = gestureRef.current;
+    if (!g.isTracking) return;
+
+    const container = containerRef.current;
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Check if past threshold to start drawing
+    if (!g.isDrawing) {
+      const dx = x - g.startPos.x;
+      const dy = y - g.startPos.y;
+      if (Math.sqrt(dx * dx + dy * dy) > DRAW_THRESHOLD) {
+        g.isDrawing = true;
+        g.suppressClick = true;
+      } else {
+        return;
+      }
+    }
+
+    const segment = g.recognizer.addPoint(x, y);
+    g.points.push({ x, y });
+    if (segment) {
+      drawTrailSegment({ x: segment[0].x, y: segment[0].y }, { x: segment[1].x, y: segment[1].y });
+    }
+  }, []);
+
+  const handlePointerUp = useCallback((e) => {
+    const g = gestureRef.current;
+    if (!g.isTracking) return;
+    console.log('[Gesture] pointerUp type:', e?.type, 'points:', g.points.length);
+    g.isTracking = false;
+
+    if (g.isDrawing && g.recognizer) {
+      console.log('[Gesture] points:', g.points.length, 'drawing:', g.isDrawing);
+      const result = g.recognizer.recognize();
+      console.log('[Gesture] result:', result);
+      if (result === 'M') {
+        // Successful M gesture — trigger summoning
+        const points = [...g.points];
+        g.isDrawing = false;
+        clearCanvas();
+
+        const marcelLoc = locations.find(l => l.isMarcelDm);
+        if (marcelLoc) {
+          localStorage.setItem('dh_marcel_summoned', 'true');
+          hasSummoned.current = true;
+
+          if (isDM) {
+            // DM: fetch player list for the picker
+            api('/api/marcel-dm/players').then(data => {
+              setSummoning({ gesturePoints: points, dmPlayers: data.players || [] });
+            }).catch(() => {
+              setSummoning({ gesturePoints: points, dmPlayers: [] });
+            });
+          } else {
+            setSummoning({ gesturePoints: points });
+          }
+        }
+        return;
+      }
+    }
+
+    g.isDrawing = false;
+    clearCanvas();
+  }, [locations, isDM]);
+
+  // Handle summoning completion → navigate to Marcel DM (regular players)
+  const handleSummonComplete = useCallback((reason) => {
+    setSummoning(null);
+    if (reason === 'dismiss') return; // DM dismissed the picker
+    const marcelLoc = locations.find(l => l.isMarcelDm);
+    if (marcelLoc) {
+      const dmUserId = user?.id;
+      pauseAmbientAudio();
+      navigate(`/location/marcel_dm_${dmUserId}`, { replace: true });
+    }
+  }, [locations, user, navigate]);
+
+  // DM picks a player from the summoning picker
+  const handlePickPlayer = useCallback((targetUserId) => {
+    setSummoning(null);
+    pauseAmbientAudio();
+    navigate(`/location/marcel_dm_${targetUserId}`, { replace: true });
+  }, [navigate]);
 
   const selectedLoc = locations.find(l => l.id === selectedLocation);
 
@@ -218,13 +393,33 @@ export default function Map() {
           onComplete={() => navigate(`/location/${transitioning.id}`, { replace: true })}
         />
       )}
+
+      {/* Summoning overlay */}
+      {summoning && (
+        <SummonEffect
+          onComplete={handleSummonComplete}
+          onPickPlayer={handlePickPlayer}
+          gesturePoints={summoning.gesturePoints}
+          isDM={isDM}
+          dmPlayers={summoning.dmPlayers || []}
+          unread={unread}
+        />
+      )}
+
       {/* Header overlay */}
       <div className="map-overlay-header">
         <h1 className="map-title">Okhan</h1>
       </div>
 
-      {/* Map container - static, no zoom/pan */}
-      <div ref={containerRef} className="map-container">
+      {/* Map container */}
+      <div
+        ref={containerRef}
+        className="map-container"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+      >
         {/* Map image */}
         <img
           src={MAP_SRC}
@@ -234,11 +429,15 @@ export default function Map() {
           draggable={false}
         />
 
-        {/* Location markers */}
+        {/* Gesture draw trail canvas */}
+        <canvas ref={canvasRef} className="map-gesture-canvas" />
+
+        {/* Location markers — filter out Marcel DM pin */}
         {mapLoaded && locations.map(loc => {
           if (!loc.mapCoords) return null;
-          const isSelected = selectedLocation === loc.id;
+          if (loc.isMarcelDm) return null;
 
+          const isSelected = selectedLocation === loc.id;
           const playerCount = (presence[loc.id] || []).length;
 
           return (
@@ -253,7 +452,7 @@ export default function Map() {
             >
               <div className="map-marker-pin">
                 <div className="map-marker-icon">
-                  <span>{loc.mapIcon || '📍'}</span>
+                  <span>{loc.mapIcon || '\uD83D\uDCCD'}</span>
                 </div>
                 <div className="map-marker-spike" />
                 {!isSelected && <div className="map-marker-pulse" />}
@@ -261,12 +460,20 @@ export default function Map() {
               {playerCount > 0 && (
                 <div className="map-marker-player-badge">{playerCount}</div>
               )}
+              {unread[loc.id] && (
+                <div className="map-marker-unread" />
+              )}
             </div>
           );
         })}
 
-        {/* Popup - positioned absolutely in container with smart placement */}
-        {selectedLoc && popupStyle && (
+        {/* Faint pulsing rune hint (Ehwaz = M-shaped rune) */}
+        {mapLoaded && (
+          <div className="map-summon-hint">{'\u16D6'}</div>
+        )}
+
+        {/* Popup */}
+        {selectedLoc && !selectedLoc.isMarcelDm && popupStyle && (
           <div
             ref={popupRef}
             className={`map-popup arrow-${popupStyle.arrowSide}`}

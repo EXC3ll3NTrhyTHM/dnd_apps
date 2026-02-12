@@ -308,3 +308,175 @@
 .pwa-update-btn:active {
   transform: scale(0.97);
 }
+
+/* ---- Mention Toast ---- */
+
+.mention-toast {
+  position: fixed;
+  top: calc(12px + var(--safe-area-top));
+  left: 16px;
+  right: 16px;
+  padding: 14px 18px;
+  border-radius: 4px;
+  background: linear-gradient(165deg, #2a2318, #201c14);
+  border: 1px solid var(--color-gold-dim);
+  border-left: 3px solid var(--color-gold);
+  box-shadow: var(--shadow-lg), 0 0 12px rgba(212, 168, 67, 0.15);
+  z-index: 450;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.mention-toast-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mention-toast-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.mention-toast-header strong {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--color-gold-bright);
+}
+
+.mention-toast-location {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.mention-toast-body {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 6px;
+}
+
+.mention-toast-tap {
+  font-size: 0.65rem;
+  color: var(--color-gold-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ---- XP Float ---- */
+.xp-float {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 300;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  text-shadow: 0 0 8px rgba(212, 168, 67, 0.6), 0 2px 4px rgba(0,0,0,0.7);
+  pointer-events: none;
+  animation: xp-float-up 1.2s ease-out forwards;
+}
+
+@keyframes xp-float-up {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-60px);
+  }
+}
+
+/* ---- Achievement Toast ---- */
+
+.achievement-toast {
+  position: fixed;
+  top: calc(12px + var(--safe-area-top));
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 4px;
+  background: linear-gradient(165deg, #2a2318, #1c1812);
+  border: 1px solid var(--color-gold-dim);
+  box-shadow: var(--shadow-lg), 0 0 16px rgba(212, 168, 67, 0.2);
+  z-index: 500;
+  cursor: pointer;
+  animation: achievement-toast-slide 0.4s ease-out;
+}
+
+@keyframes achievement-toast-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.achievement-toast-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(212, 168, 67, 0.4));
+}
+
+.achievement-toast-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.achievement-toast-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-gold);
+  margin-bottom: 2px;
+}
+
+.achievement-toast-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+
+.achievement-toast-rewards {
+  display: flex;
+  gap: 8px;
+}
+
+.achievement-toast-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.achievement-toast-xp {
+  background: rgba(120, 130, 220, 0.2);
+  color: #a8b4ff;
+  border: 1px solid rgba(120, 130, 220, 0.3);
+}
+
+.achievement-toast-gold {
+  background: rgba(212, 168, 67, 0.15);
+  color: var(--color-gold-bright);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+}

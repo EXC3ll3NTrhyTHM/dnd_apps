@@ -54,6 +54,19 @@ router.post('/buy', authRequired, (req, res) => {
   // Add item to inventory
   const inventory = addItemToInventory(req.user.id, item);
 
+  let xpAwarded = 0;
+  try {
+    const xp = require('../lib/xp');
+    const before = xp.getXpRecord(req.user.id, req.user.username).total_xp;
+    xp.awardGoldSpendXp(req.user.id, req.user.username, item.price);
+    xp.incrementLifetimeStat(req.user.id, req.user.username, 'shop_purchases');
+    const after = xp.getXpRecord(req.user.id, req.user.username).total_xp;
+    xpAwarded = after - before;
+  } catch (e) { console.error('[xp]', e.message); }
+
+  let newAchievements = [];
+  try { newAchievements = require('../lib/achievements').checkAchievements(req.user.id, req.user.username, 'purchase_shop').newAchievements; } catch (e) { console.error('[achievements]', e.message); }
+
   res.json({
     success: true,
     message: `Purchased ${item.name} for ${item.price}G`,
@@ -64,7 +77,9 @@ router.post('/buy', authRequired, (req, res) => {
       category: categoryDisplay
     },
     balance: wallet.balance,
-    inventory
+    inventory,
+    xpAwarded,
+    newAchievements
   });
 });
 

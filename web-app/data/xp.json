@@ -1,0 +1,73 @@
+{
+  "424061511833747467": {
+    "user_id": "424061511833747467",
+    "username": "excellentrhythm",
+    "total_xp": 489,
+    "last_updated": "2026-02-12T03:04:23.750Z",
+    "daily": {
+      "date": "2026-02-12",
+      "messages_sent": 30,
+      "reactions_given": 7,
+      "locations_visited": [
+        "marcel_dm_424061511833747467",
+        "the_dojo",
+        "the_collective",
+        "the_cottage",
+        "the_barracks",
+        "dragons_hollow",
+        "marcel_dm_228241331296665600"
+      ],
+      "login_claimed": true
+    },
+    "gold_conversion_done": false,
+    "lifetime": {
+      "messages_sent": 27,
+      "reactions_given": 5,
+      "locations_visited": [
+        "the_cottage",
+        "marcel_dm_424061511833747467",
+        "dragons_hollow",
+        "the_dojo",
+        "marcel_dm_228241331296665600"
+      ],
+      "gold_spent": 0,
+      "tavern_purchases": 0,
+      "shop_purchases": 0,
+      "gifs_sent": 0,
+      "images_sent": 0
+    }
+  },
+  "228241331296665600": {
+    "user_id": "228241331296665600",
+    "username": "badbeachpeach",
+    "total_xp": 216,
+    "last_updated": "2026-02-12T01:35:26.728Z",
+    "daily": {
+      "date": "2026-02-12",
+      "messages_sent": 9,
+      "reactions_given": 8,
+      "locations_visited": [
+        "the_cottage",
+        "the_dojo",
+        "the_collective",
+        "the_veil",
+        "dragons_hollow",
+        "marcel_dm_228241331296665600"
+      ],
+      "login_claimed": true
+    },
+    "gold_conversion_done": false,
+    "lifetime": {
+      "messages_sent": 4,
+      "reactions_given": 0,
+      "locations_visited": [
+        "the_cottage"
+      ],
+      "gold_spent": 0,
+      "tavern_purchases": 0,
+      "shop_purchases": 0,
+      "gifs_sent": 0,
+      "images_sent": 0
+    }
+  }
+}

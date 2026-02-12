@@ -5,9 +5,9 @@
  * otherwise shows the default chat interface.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { api } from '../hooks/useApi';
+import { api, apiUpload } from '../hooks/useApi';
 import { useAuth } from '../hooks/useAuth';
 import ChatBubble from '../components/ChatBubble';
 import ChatInput from '../components/ChatInput';
@@ -17,6 +17,9 @@ import EmojiPickerSheet from '../components/EmojiPickerSheet';
 import EffectsOverlay, { useEffects } from '../components/EffectsOverlay';
 import ItemCard from '../components/ItemCard';
 import Toast from '../components/Toast';
+import XpFloat from '../components/XpFloat';
+import AchievementToast from '../components/AchievementToast';
+const DiceOverlay = lazy(() => import('../components/DiceOverlay'));
 import SceneAudio from './scenes/SceneAudio';
 import { getSceneComponent } from './scenes';
 import { useUiSounds } from '../hooks/useUiSounds';
@@ -47,8 +50,30 @@ export default function LocationChat() {
   const [toast, setToast] = useState(null);
   const [viewMode, setViewMode] = useState('scene'); // 'scene' | 'chat'
   const [insertNpc, setInsertNpc] = useState(null);
-  const [reactionBar, setReactionBar] = useState(null); // { messageId, targetRect }
+  const [players, setPlayers] = useState([]);
+  const [reactionBar, setReactionBar] = useState(null); // { messageId, targetRect, canDelete }
   const [emojiSheet, setEmojiSheet] = useState(null); // { messageId }
+  const [xpFloat, setXpFloat] = useState(null);
+  const [achievementQueue, setAchievementQueue] = useState([]);
+  const [diceRoll, setDiceRoll] = useState(null);
+  const [diceOverlayEnabled] = useState(() => {
+    const stored = localStorage.getItem('dh_dice_overlay');
+    return stored !== 'false';
+  });
+
+  const showXpFloat = (amount) => {
+    if (amount > 0) setXpFloat({ amount, key: Date.now() });
+  };
+
+  const queueAchievements = useCallback((arr) => {
+    if (arr && arr.length > 0) {
+      setAchievementQueue(prev => [...prev, ...arr]);
+    }
+  }, []);
+
+  const dismissAchievement = useCallback(() => {
+    setAchievementQueue(prev => prev.slice(1));
+  }, []);
 
   const messagesEndRef = useRef(null);
   const chatAreaRef = useRef(null);
@@ -61,6 +86,10 @@ export default function LocationChat() {
   const knownIdsRef = useRef(new Set());
 
   const isAdmin = ADMIN_IDS.includes(user?.id || '');
+
+  // Marcel DM detection
+  const isMarcelDm = locationId?.startsWith('marcel_dm_');
+  const marcelDmUserId = isMarcelDm ? locationId.replace('marcel_dm_', '') : null;
 
   // ── WebSocket: Real-time typing and messages ──
   useEffect(() => {
@@ -88,7 +117,7 @@ export default function LocationChat() {
             setTypingNpcs(prev => {
               const next = { ...prev };
               if (payload.typing) {
-                next[payload.npc] = { 
+                next[payload.npc] = {
                   displayName: payload.npcDisplayName || 'Marcel',
                   timestamp: Date.now()
                 };
@@ -97,6 +126,25 @@ export default function LocationChat() {
               }
               return next;
             });
+          }
+
+          if (payload.type === 'reaction') {
+            setMessages(prev => prev.map(msg =>
+              msg.id === payload.messageId
+                ? { ...msg, reactions: payload.reactions }
+                : msg
+            ));
+          }
+
+          if (payload.type === 'dice_roll' && payload.message) {
+            const msg = payload.message;
+            if (msg.id && !knownIdsRef.current.has(msg.id)) {
+              knownIdsRef.current.add(msg.id);
+              if (msg.timestamp && (!latestTimestampRef.current || msg.timestamp > latestTimestampRef.current)) {
+                latestTimestampRef.current = msg.timestamp;
+              }
+              setMessages(prev => [...prev, msg]);
+            }
           }
         } catch (err) {
           console.error('[LocationChat] WS message error:', err);
@@ -166,6 +214,9 @@ export default function LocationChat() {
     api('/api/presence/join', {
       method: 'POST',
       body: JSON.stringify({ locationId })
+    }).then(data => {
+      if (data?.xpAwarded) showXpFloat(data.xpAwarded);
+      if (data?.newAchievements) queueAchievements(data.newAchievements);
     }).catch(() => {});
 
     const interval = setInterval(() => {
@@ -184,6 +235,13 @@ export default function LocationChat() {
         { type: 'application/json' }
       );
       navigator.sendBeacon('/api/presence/leave', blob);
+
+      // Mark as read on leave so own messages don't trigger the unread dot
+      fetch(`/api/chat/locations/${locationId}/mark-read`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        keepalive: true
+      }).catch(() => {});
     };
   }, [locationId]);
 
@@ -192,9 +250,10 @@ export default function LocationChat() {
     const interval = setInterval(async () => {
       if (sendingRef.current || !latestTimestampRef.current) return;
       try {
-        const data = await api(
-          `/api/chat/locations/${locationId}/messages?since=${encodeURIComponent(latestTimestampRef.current)}`
-        );
+        const pollUrl = isMarcelDm
+          ? `/api/marcel-dm/channel/messages?userId=${marcelDmUserId}&since=${encodeURIComponent(latestTimestampRef.current)}`
+          : `/api/chat/locations/${locationId}/messages?since=${encodeURIComponent(latestTimestampRef.current)}`;
+        const data = await api(pollUrl);
         
         // Handle new messages
         const newMsgs = (data.messages || []).filter(m => m.id && !knownIdsRef.current.has(m.id));
@@ -212,6 +271,13 @@ export default function LocationChat() {
             }
           });
           playSound('npcResponse');
+        }
+
+        // Remove deleted messages
+        if (data.deletedIds && data.deletedIds.length > 0) {
+          const deletedSet = new Set(data.deletedIds);
+          setMessages(prev => prev.filter(m => !m.id || !deletedSet.has(m.id)));
+          data.deletedIds.forEach(id => knownIdsRef.current.delete(id));
         }
 
         // Merge reactions from polling into existing messages
@@ -254,12 +320,27 @@ export default function LocationChat() {
 
   async function loadLocationAndHistory() {
     try {
-      const [locData, histData] = await Promise.all([
-        api('/api/chat/locations'),
-        api(`/api/chat/locations/${locationId}/history`)
-      ]);
+      let loc, histData;
 
-      const loc = locData.locations.find(l => l.id === locationId);
+      if (isMarcelDm) {
+        // Marcel DM: fetch channel info and history from DM endpoints
+        const [channelData, histResult] = await Promise.all([
+          api(`/api/marcel-dm/channel?userId=${marcelDmUserId}`),
+          api(`/api/marcel-dm/channel/history?userId=${marcelDmUserId}`)
+        ]);
+        loc = channelData.location;
+        histData = histResult;
+        queueAchievements(channelData.newAchievements);
+      } else {
+        const [locData, histResult] = await Promise.all([
+          api('/api/chat/locations'),
+          api(`/api/chat/locations/${locationId}/history`)
+        ]);
+        loc = locData.locations.find(l => l.id === locationId);
+        histData = histResult;
+        if (locData.players) setPlayers(locData.players);
+      }
+
       if (!loc) {
         navigate('/map');
         return;
@@ -283,6 +364,9 @@ export default function LocationChat() {
       knownIdsRef.current = ids;
       latestTimestampRef.current = latest;
 
+      // Mark location as read for this user
+      api(`/api/chat/locations/${locationId}/mark-read`, { method: 'POST' }).catch(() => {});
+
       // Start in scene mode if location has a custom scene, otherwise chat
       const SceneComponent = getSceneComponent(locationId);
       setViewMode(SceneComponent && loc.scene ? 'scene' : 'chat');
@@ -303,11 +387,19 @@ export default function LocationChat() {
     }
   }
 
-  // Scroll to bottom when new messages arrive (after initial load)
+  // Auto-scroll only when new messages arrive AND user is already near the bottom.
+  // column-reverse: scrollTop 0 = at bottom, negative = scrolled up.
+  const prevMsgCountRef = useRef(0);
   useEffect(() => {
     if (messages.length === 0) return;
-    // column-reverse handles initial position; just smooth-scroll on new messages
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > prevMsgCountRef.current) {
+      const el = chatAreaRef.current;
+      const nearBottom = !el || Math.abs(el.scrollTop) < 150;
+      if (nearBottom) {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    prevMsgCountRef.current = messages.length;
   }, [messages]);
 
   // Custom scroll indicator — shows translucent thumb on scroll, fades after idle
@@ -381,7 +473,10 @@ export default function LocationChat() {
     }
 
     try {
-      const data = await api(`/api/chat/locations/${locationId}/message`, {
+      const sendUrl = isMarcelDm
+        ? `/api/marcel-dm/channel/message?userId=${marcelDmUserId}`
+        : `/api/chat/locations/${locationId}/message`;
+      const data = await api(sendUrl, {
         method: 'POST',
         body: JSON.stringify({ message: text })
       });
@@ -418,6 +513,8 @@ export default function LocationChat() {
           setNpcEmotions(prev => ({ ...prev, [resp.npc]: resp.emotion }));
         }
       });
+
+      queueAchievements(data.newAchievements);
     } catch (err) {
       // Clear manual typing bubbles on error
       setTypingNpcs(prev => {
@@ -458,7 +555,10 @@ export default function LocationChat() {
     setMessages(prev => [...prev, optimisticMsg]);
 
     try {
-      const data = await api(`/api/chat/locations/${locationId}/message`, {
+      const gifSendUrl = isMarcelDm
+        ? `/api/marcel-dm/channel/message?userId=${marcelDmUserId}`
+        : `/api/chat/locations/${locationId}/message`;
+      const data = await api(gifSendUrl, {
         method: 'POST',
         body: JSON.stringify({
           type: 'gif',
@@ -479,6 +579,8 @@ export default function LocationChat() {
         const filtered = prev.filter(m => !m._optimistic);
         return [...filtered, data.playerMessage];
       });
+
+      queueAchievements(data.newAchievements);
     } catch (err) {
       setMessages(prev => prev.filter(m => !m._optimistic));
       console.error('Failed to send GIF:', err);
@@ -489,17 +591,134 @@ export default function LocationChat() {
     }
   }, [sending, locationId, user, playSound]);
 
+  // Send image — file upload with optimistic blob preview
+  const handleSendImage = useCallback(async (file) => {
+    if (sending) return;
+    setSending(true);
+    sendingRef.current = true;
+
+    playSound('messageSent');
+
+    // Create optimistic preview with blob URL
+    const blobUrl = URL.createObjectURL(file);
+
+    // Read image dimensions before upload
+    const dims = await new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+      img.onerror = () => resolve({ w: null, h: null });
+      img.src = blobUrl;
+    });
+
+    const optimisticMsg = {
+      role: 'player',
+      type: 'image',
+      imageUrl: blobUrl,
+      imageWidth: dims.w,
+      imageHeight: dims.h,
+      text: '',
+      userId: user?.id,
+      playerName: user?.characterName || user?.global_name || user?.username || 'You',
+      playerAvatar: user?.avatar,
+      timestamp: new Date().toISOString(),
+      _optimistic: true,
+      _blobUrl: blobUrl
+    };
+    setMessages(prev => [...prev, optimisticMsg]);
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('channelId', locationId);
+      formData.append('caption', '');
+      if (dims.w) formData.append('imageWidth', String(dims.w));
+      if (dims.h) formData.append('imageHeight', String(dims.h));
+
+      const data = await apiUpload('/api/chat/upload', formData);
+
+      // Preload the server URL so the swap is instant (no flash)
+      await new Promise((resolve) => {
+        const img = new Image();
+        img.onload = resolve;
+        img.onerror = resolve;
+        img.src = data.playerMessage.imageUrl;
+      });
+
+      if (data.playerMessage?.id) knownIdsRef.current.add(data.playerMessage.id);
+      const newest = data.playerMessage?.timestamp;
+      if (newest && (!latestTimestampRef.current || newest > latestTimestampRef.current)) {
+        latestTimestampRef.current = newest;
+      }
+
+      setMessages(prev => {
+        const filtered = prev.filter(m => !m._optimistic);
+        return [...filtered, data.playerMessage];
+      });
+
+      queueAchievements(data.newAchievements);
+    } catch (err) {
+      setMessages(prev => prev.filter(m => !m._optimistic));
+      console.error('Failed to upload image:', err);
+      setToast({ type: 'error', message: err.message || 'Failed to upload image' });
+    } finally {
+      URL.revokeObjectURL(blobUrl);
+      setSending(false);
+      sendingRef.current = false;
+    }
+  }, [sending, locationId, user, playSound]);
+
+  // Dice roll handler — show 3D dice first, then POST results after they settle
+  const handleDiceRoll = useCallback((notation) => {
+    setDiceRoll({ notation, diceColor: '#F97316' });
+  }, []);
+
+  const handleDiceResult = useCallback(async (rolls) => {
+    const notation = diceRoll?.notation;
+    if (!notation) return;
+    try {
+      const data = await api(`/api/chat/locations/${locationId}/dice-roll`, {
+        method: 'POST',
+        body: JSON.stringify({ notation, rolls })
+      });
+      if (data.message) {
+        if (data.message.id && !knownIdsRef.current.has(data.message.id)) {
+          knownIdsRef.current.add(data.message.id);
+          if (data.message.timestamp && (!latestTimestampRef.current || data.message.timestamp > latestTimestampRef.current)) {
+            latestTimestampRef.current = data.message.timestamp;
+          }
+          setMessages(prev => [...prev, data.message]);
+        }
+      }
+    } catch (err) {
+      const msg = err.data?.error || err.message || 'Failed to save dice roll';
+      setToast({ type: 'error', message: msg });
+    }
+  }, [locationId, diceRoll?.notation]);
+
   // Reaction handlers
   const handleLongPress = useCallback((messageId, targetRect) => {
-    setReactionBar({ messageId, targetRect });
-  }, []);
+    // Find the message to determine if it can be deleted
+    const msg = messages.find(m => m.id === messageId);
+    let canDelete = false;
+    if (msg) {
+      if (isAdmin) {
+        canDelete = true;
+      } else if (msg.role === 'player' && msg.userId === user?.id) {
+        canDelete = true;
+      }
+    }
+    setReactionBar({ messageId, targetRect, canDelete });
+  }, [messages, isAdmin, user]);
 
   const handleReact = useCallback(async (messageId, emoji) => {
     setReactionBar(null);
     setEmojiSheet(null);
 
     try {
-      const data = await api(`/api/chat/locations/${locationId}/messages/${messageId}/react`, {
+      const reactUrl = isMarcelDm
+        ? `/api/marcel-dm/channel/messages/${messageId}/react?userId=${marcelDmUserId}`
+        : `/api/chat/locations/${locationId}/messages/${messageId}/react`;
+      const data = await api(reactUrl, {
         method: 'POST',
         body: JSON.stringify({ emoji })
       });
@@ -509,6 +728,9 @@ export default function LocationChat() {
           ? { ...msg, reactions: Object.keys(data.reactions).length > 0 ? data.reactions : undefined }
           : msg
       ));
+
+      if (data.xpAwarded) showXpFloat(data.xpAwarded);
+      queueAchievements(data.newAchievements);
     } catch (err) {
       console.error('Failed to toggle reaction:', err);
     }
@@ -518,6 +740,20 @@ export default function LocationChat() {
     setReactionBar(null);
     setEmojiSheet({ messageId });
   }, []);
+
+  const handleDelete = useCallback(async (messageId) => {
+    try {
+      // Marcel DM channels don't currently support delete, but keep the path for consistency
+      await api(`/api/chat/locations/${locationId}/messages/${messageId}`, {
+        method: 'DELETE'
+      });
+      setMessages(prev => prev.filter(m => m.id !== messageId));
+      knownIdsRef.current.delete(messageId);
+    } catch (err) {
+      console.error('Failed to delete message:', err);
+      setToast({ type: 'error', message: err.message || 'Failed to delete message' });
+    }
+  }, [locationId]);
 
   // Menu handling
   async function openMenu(type) {
@@ -564,6 +800,8 @@ export default function LocationChat() {
       setMessages(prev => [...prev, purchaseMsg]);
 
       playSound('purchase');
+      if (result.xpAwarded) showXpFloat(result.xpAwarded);
+      queueAchievements(result.newAchievements);
       setToast({ type: 'success', message: result.message || `Purchased ${item.name}!` });
     } catch (err) {
       setToast({ type: 'error', message: err.data?.error || 'Purchase failed' });
@@ -630,7 +868,7 @@ export default function LocationChat() {
         <div className="location-chat">
           {/* Header */}
           <div className="chat-header">
-            <button className="chat-back-btn" onClick={() => { playSound('buttonTap'); hasScene ? handleBackToScene() : navigate('/map'); }}>
+            <button className="chat-back-btn" onClick={() => { playSound('buttonTap'); (hasScene && !isMarcelDm) ? handleBackToScene() : navigate('/map'); }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
@@ -670,6 +908,7 @@ export default function LocationChat() {
                         key={msg.id || i}
                         message={msg}
                         npcs={location.npcs}
+                        players={players}
                         currentUserId={user?.id}
                         onLongPress={handleLongPress}
                         onReact={handleReact}
@@ -700,14 +939,17 @@ export default function LocationChat() {
             <ChatInputCustom
               onSend={handleSend}
               onSendGif={handleSendGif}
+              onSendImage={handleSendImage}
               disabled={sending}
               npcs={location.npcs}
               npcEmotions={npcEmotions}
               groups={location.groups || {}}
+              players={players}
               insertNpc={insertNpc}
               onInsertNpcDone={() => setInsertNpc(null)}
               playSound={playSound}
               scrollContainerRef={chatAreaRef}
+              onDiceRoll={handleDiceRoll}
             />
           ) : (
             <ChatInput
@@ -728,6 +970,8 @@ export default function LocationChat() {
               onSelect={handleReact}
               onOpenFullPicker={handleOpenFullPicker}
               onClose={() => setReactionBar(null)}
+              canDelete={reactionBar.canDelete}
+              onDelete={handleDelete}
             />
           )}
 
@@ -778,6 +1022,36 @@ export default function LocationChat() {
 
       {/* Effects overlay — renders above custom keyboard */}
       <EffectsOverlay effect={effect} onDone={clearEffect} />
+
+      {/* 3D Dice Overlay */}
+      {diceRoll && diceOverlayEnabled && (
+        <Suspense fallback={null}>
+          <DiceOverlay
+            notation={diceRoll.notation}
+            themeColor={diceRoll.diceColor || '#F97316'}
+            onResult={handleDiceResult}
+            onDone={() => setDiceRoll(null)}
+          />
+        </Suspense>
+      )}
+
+      {/* XP Float */}
+      {xpFloat && (
+        <XpFloat
+          key={xpFloat.key}
+          amount={xpFloat.amount}
+          onDone={() => setXpFloat(null)}
+        />
+      )}
+
+      {/* Achievement Toast */}
+      {achievementQueue.length > 0 && (
+        <AchievementToast
+          key={achievementQueue[0].id}
+          achievement={achievementQueue[0]}
+          onDismiss={dismissAchievement}
+        />
+      )}
 
       {/* Toast */}
       {toast && (

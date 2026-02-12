@@ -3,6 +3,8 @@ import { getAudioMuted } from '../hooks/useAudioSettings';
 import { EMOJI_CATEGORIES } from '../data/emojiData';
 import { api } from '../hooks/useApi';
 import NpcPortrait from './NpcPortrait';
+import { matchSwipePath } from '../utils/swipeMatch';
+import DicePanel from './DicePanel';
 
 const NUMBERS_ROW = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
@@ -49,15 +51,31 @@ function playKeyTap() {
  * Custom on-screen QWERTY keyboard with emoji picker.
  * Uses event delegation (single handler) for fast response on rapid typing.
  */
+const LETTER_KEYS = new Set('abcdefghijklmnopqrstuvwxyz'.split(''));
+
+// Find which precomputed key rect contains the given screen coordinates
+function findKeyAtCoord(x, y, keyRects) {
+  for (const k of keyRects) {
+    if (x >= k.rect.left && x <= k.rect.right && y >= k.rect.top && y <= k.rect.bottom) return k;
+  }
+  return null;
+}
+
 const CustomKeyboard = memo(function CustomKeyboard({
   open, onKey, onBackspace, onSubmit, onClose, onPaste, onLeft, onRight, disabled, playSound,
   mode, onModeChange,
   npcs, npcEmotions, mentionGroups, onNpcMention, onGroupMention, listening, onToggleMic,
   onGifSelect,
+  onImagePick,
+  inputText,
+  players, onPlayerMention,
+  onSwipeWord, onSwipeReplace,
+  onDiceRoll,
 }) {
   const [shifted, setShifted] = useState(false);
   const [symbols, setSymbols] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [contactTab, setContactTab] = useState(null); // null | 'groups' | 'npcs' | 'players'
   const [activeCategory, setActiveCategory] = useState(EMOJI_CATEGORIES[0].id);
   const [gifQuery, setGifQuery] = useState('');
   const [gifResults, setGifResults] = useState([]);
@@ -72,13 +90,21 @@ const CustomKeyboard = memo(function CustomKeyboard({
   const activeCategoryRef = useRef(EMOJI_CATEGORIES[0].id);
   const gifsGridRef = useRef(null);
   const gifDebounceRef = useRef(null);
+  const previewRef = useRef(null);
+  const previewTimerRef = useRef(null);
+
+  // Swipe-to-type state
+  const [swipeSuggestion, setSwipeSuggestion] = useState(null); // { words: string[], selected: number } | null
+  const swipeState = useRef({ active: false, startX: 0, startY: 0, startBtn: null, keys: [], lastKey: '', points: [], pointerId: null, isTouch: false, keyRects: [] });
+  const canvasRef = useRef(null);
+  const boardRef = useRef(null);
 
   // Drag-to-expand state
   const dragState = useRef({ active: false, startY: 0, currentH: COMPACT_H, maxH: 500 });
 
   // Keep callback refs current so the delegation handler stays stable
   const refs = useRef({});
-  refs.current = { onKey, onBackspace, onSubmit, onClose, onPaste, onLeft, onRight, playSound, disabled, onModeChange, onNpcMention, onGroupMention, onToggleMic, onGifSelect };
+  refs.current = { onKey, onBackspace, onSubmit, onClose, onPaste, onLeft, onRight, playSound, disabled, onModeChange, onNpcMention, onGroupMention, onPlayerMention, onToggleMic, onGifSelect, onImagePick, onSwipeWord, onSwipeReplace };
 
   const shiftedRef = useRef(false);
   const symbolsRef = useRef(false);
@@ -90,10 +116,146 @@ const CustomKeyboard = memo(function CustomKeyboard({
     if (open) initKeyTapAudio();
   }, [open]);
 
-  // Reset expanded when keyboard closes
+  // Reset expanded and contact tab when keyboard closes
   useEffect(() => {
-    if (!open) setExpanded(false);
+    if (!open) {
+      setExpanded(false);
+      setContactTab(null);
+    }
   }, [open]);
+
+  // Native touch event handling for swipe tracking.
+  // Mobile browsers cancel pointer events (pointercancel) when they detect finger
+  // movement on elements with touch-action:manipulation. By handling touchmove
+  // natively with preventDefault(), we keep control of the touch AND do the swipe
+  // tracking directly — more reliable than pointer events on iOS/Android.
+  useEffect(() => {
+    const board = boardRef.current;
+    if (!board || !open) return;
+
+    const onTouchMove = (e) => {
+      const sw = swipeState.current;
+      if (!sw.isTouch) return; // not tracking a touch swipe
+      e.preventDefault(); // prevent browser from canceling our gesture
+
+      const touch = e.touches[0];
+      if (!touch) return;
+      const boardRect = board.getBoundingClientRect();
+
+      const dx = touch.clientX - sw.startX;
+      const dy = touch.clientY - sw.startY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      // Activate swipe mode once finger moves > 20px from start
+      if (!sw.active && dist > 20) {
+        sw.active = true;
+      }
+
+      if (!sw.active) return;
+
+      // Track trail point
+      sw.points.push({ x: touch.clientX - boardRect.left, y: touch.clientY - boardRect.top });
+      drawTrail(sw.points);
+
+      // Detect which key the finger is over using precomputed bounding rects
+      const hit = findKeyAtCoord(touch.clientX, touch.clientY, sw.keyRects);
+      if (hit && hit.char !== sw.lastKey) {
+        sw.keys.push(hit.char);
+        sw.lastKey = hit.char;
+      }
+
+      // Live word predictions (throttled to every 150ms)
+      const now = Date.now();
+      if (sw.points.length >= 5 && now - sw.lastPredictTime > 150) {
+        sw.lastPredictTime = now;
+        const candidates = matchSwipePath([...sw.points], sw.keyRects, { left: boardRect.left, top: boardRect.top });
+        if (candidates.length > 0) {
+          setSwipeSuggestion({ words: candidates, selected: 0, capitalize: shiftedRef.current && !symbolsRef.current });
+        }
+      }
+    };
+
+    const onTouchEnd = () => {
+      const sw = swipeState.current;
+      if (!sw.isTouch) return;
+
+      const wasActive = sw.active;
+      const swPoints = [...sw.points];
+      const swKeyRects = sw.keyRects;
+      const startBtn = sw.startBtn;
+
+      // Clean up swipe state
+      sw.isTouch = false;
+      sw.pointerId = null;
+      sw.active = false;
+      sw.startBtn = null;
+      sw.keyRects = [];
+      sw.keys = [];
+      sw.points = [];
+      clearSwipeHighlights();
+      clearTrailCanvas();
+
+      if (wasActive && swPoints.length >= 2) {
+        // Swipe completed — match word using shape-template comparison
+        const boardRect = board.getBoundingClientRect();
+        const candidates = matchSwipePath(swPoints, swKeyRects, { left: boardRect.left, top: boardRect.top });
+        if (candidates.length > 0) {
+          playKeyTap();
+          const capitalize = shiftedRef.current && !symbolsRef.current;
+          let word = candidates[0];
+          if (capitalize) {
+            word = word[0].toUpperCase() + word.slice(1);
+            setShifted(false);
+          }
+          refs.current.onSwipeWord?.(word);
+          if (candidates.length > 1) {
+            setSwipeSuggestion({ words: candidates, selected: 0, capitalize });
+          } else {
+            setSwipeSuggestion(null);
+          }
+        } else if (startBtn) {
+          // No match — fall back to first letter as a normal tap
+          flash(startBtn);
+          playKeyTap();
+          const char = startBtn.dataset.char;
+          const out = shiftedRef.current && !symbolsRef.current ? char.toUpperCase() : char;
+          refs.current.onKey(out);
+          if (shiftedRef.current && !symbolsRef.current) setShifted(false);
+        }
+        return;
+      }
+
+      // Not a swipe (small movement) — treat as normal tap
+      if (startBtn) {
+        flash(startBtn);
+        playKeyTap();
+        const char = startBtn.dataset.char;
+        const out = shiftedRef.current && !symbolsRef.current ? char.toUpperCase() : char;
+        refs.current.onKey(out);
+        showPreview(startBtn, out);
+        if (shiftedRef.current && !symbolsRef.current) setShifted(false);
+      }
+    };
+
+    board.addEventListener('touchmove', onTouchMove, { passive: false });
+    board.addEventListener('touchend', onTouchEnd);
+    return () => {
+      board.removeEventListener('touchmove', onTouchMove);
+      board.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [open]);
+
+  // Auto-capitalize: shift on when input is empty or after sentence-ending punctuation + space
+  useEffect(() => {
+    if (symbolsRef.current) return;
+    if (!inputText) {
+      setShifted(true);
+      return;
+    }
+    if (/[.!?]\s$/.test(inputText) || inputText.endsWith('\n')) {
+      setShifted(true);
+    }
+  }, [inputText]);
 
   // Clean up timers on unmount
   useEffect(() => {
@@ -490,6 +652,82 @@ const CustomKeyboard = memo(function CustomKeyboard({
     }
   }, [mode]);
 
+  const showPreview = (btn, char) => {
+    const el = previewRef.current;
+    if (!el) return;
+    clearTimeout(previewTimerRef.current);
+    const rect = btn.getBoundingClientRect();
+    el.textContent = char;
+    const left = Math.max(28, Math.min(window.innerWidth - 28, rect.left + rect.width / 2));
+    el.style.left = `${left}px`;
+    el.style.top = `${rect.top - 8}px`;
+    el.classList.add('ck-key-preview-visible');
+    previewTimerRef.current = setTimeout(() => {
+      el.classList.remove('ck-key-preview-visible');
+    }, 300);
+  };
+
+  const hidePreview = () => {
+    clearTimeout(previewTimerRef.current);
+    previewRef.current?.classList.remove('ck-key-preview-visible');
+  };
+
+  // ── Swipe trail canvas helpers ──
+  const initTrailCanvas = () => {
+    const canvas = canvasRef.current;
+    const board = boardRef.current;
+    if (!canvas || !board) return;
+    const rect = board.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+
+  const drawTrail = (points) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (points.length < 2) return;
+    // Glow
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+    ctx.strokeStyle = 'rgba(212, 168, 67, 0.2)';
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    // Core line
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+    ctx.strokeStyle = 'rgba(212, 168, 67, 0.6)';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+  };
+
+  const clearTrailCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    // Reset canvas by reassigning width — clears all content regardless of DPR transform
+    canvas.width = canvas.width; // eslint-disable-line no-self-assign
+  };
+
+  const clearSwipeHighlights = () => {
+    const board = boardRef.current;
+    if (!board) return;
+    board.querySelectorAll('.ck-key-swiping').forEach(el => el.classList.remove('ck-key-swiping'));
+  };
+
   const flash = (btn) => {
     btn.classList.add('ck-key-pressed');
     setTimeout(() => btn.classList.remove('ck-key-pressed'), 100);
@@ -505,23 +743,75 @@ const CustomKeyboard = memo(function CustomKeyboard({
     }
 
     e.preventDefault();
-    flash(btn);
 
     const { onKey, onBackspace, onSubmit, onClose, onPaste, playSound, disabled, onModeChange } = refs.current;
     const action = btn.dataset.action;
 
+    // Flash all keys except swipeable letter keys (those flash on pointer up if it's a tap)
+    const isSwipeable = action === 'key' && !symbolsRef.current && !gifSearchActive && LETTER_KEYS.has(btn.dataset.char);
+    if (!isSwipeable) flash(btn);
+
     if (action === 'key') {
       if (!gifSearchActive && disabled) return;
-      playKeyTap();
       const char = btn.dataset.char;
+
+      // Start swipe tracking for letter keys in keys mode (not symbols, not gif search)
+      if (!symbolsRef.current && !gifSearchActive && LETTER_KEYS.has(char)) {
+        const board = boardRef.current;
+        const boardRect = board?.getBoundingClientRect();
+        const sw = swipeState.current;
+        sw.active = false; // not active yet — activated on move > 20px
+        sw.startX = e.clientX;
+        sw.startY = e.clientY;
+        sw.startBtn = btn;
+        sw.keys = [char];
+        sw.lastKey = char;
+        sw.points = boardRect ? [{ x: e.clientX - boardRect.left, y: e.clientY - boardRect.top }] : [];
+        sw.lastPredictTime = 0;
+        sw.pointerId = e.pointerId;
+        sw.isTouch = (e.pointerType === 'touch');
+
+        // Precompute bounding rects of all letter keys for coordinate-based hit testing
+        // (eliminates unreliable elementsFromPoint / elementFromPoint on mobile)
+        sw.keyRects = [];
+        if (board) {
+          const allKeys = board.querySelectorAll('[data-action="key"]');
+          for (const k of allKeys) {
+            const c = k.dataset.char;
+            if (c && LETTER_KEYS.has(c)) {
+              sw.keyRects.push({ char: c, rect: k.getBoundingClientRect(), el: k });
+            }
+          }
+        }
+
+        initTrailCanvas(); // size canvas now so coordinates are consistent
+        return; // defer — don't dispatch key yet
+      }
+
+      // Non-letter key or symbols/gif mode: dispatch immediately
+      playKeyTap();
       const out = shiftedRef.current && !symbolsRef.current ? char.toUpperCase() : char;
       if (gifSearchActive) {
         setGifQuery(q => q + out);
       } else {
+        setSwipeSuggestion(null);
         onKey(out);
+      }
+      showPreview(btn, out);
+      if (shiftedRef.current && !symbolsRef.current) setShifted(false);
+    } else if (action === 'space') {
+      // Clear swipe suggestion on space press
+      setSwipeSuggestion(null);
+      if (!gifSearchActive && disabled) return;
+      playKeyTap();
+      if (gifSearchActive) {
+        setGifQuery(q => q + ' ');
+      } else {
+        onKey(' ');
       }
       if (shiftedRef.current && !symbolsRef.current) setShifted(false);
     } else if (action === 'backspace') {
+      setSwipeSuggestion(null);
       if (!gifSearchActive && disabled) return;
       playKeyTap();
       if (gifSearchActive) {
@@ -545,15 +835,6 @@ const CustomKeyboard = memo(function CustomKeyboard({
     } else if (action === 'symbols') {
       playKeyTap();
       setSymbols(s => !s);
-    } else if (action === 'space') {
-      if (!gifSearchActive && disabled) return;
-      playKeyTap();
-      if (gifSearchActive) {
-        setGifQuery(q => q + ' ');
-      } else {
-        onKey(' ');
-      }
-      if (shiftedRef.current && !symbolsRef.current) setShifted(false);
     } else if (action === 'return') {
       if (disabled) return;
       playKeyTap();
@@ -596,8 +877,9 @@ const CustomKeyboard = memo(function CustomKeyboard({
         const header = scrollEl.querySelector(`[data-category-header="${catId}"]`);
         if (header) header.scrollIntoView({ behavior: 'smooth' });
       }
-    } else if (action === 'open-npcs') {
+    } else if (action === 'open-contacts') {
       playKeyTap();
+      setContactTab(null);
       onModeChange('npcs');
     } else if (action === 'toggle-mic') {
       playKeyTap();
@@ -607,18 +889,36 @@ const CustomKeyboard = memo(function CustomKeyboard({
       const npcId = btn.dataset.npcId;
       const npc = (npcs || []).find(n => n.id === npcId);
       if (npc) refs.current.onNpcMention?.(npc);
+    } else if (action === 'player-mention') {
+      playKeyTap();
+      const playerId = btn.dataset.playerId;
+      const player = (players || []).find(p => p.id === playerId);
+      if (player) refs.current.onPlayerMention?.(player);
     } else if (action === 'group-mention') {
       playKeyTap();
       const groupId = btn.dataset.groupId;
       const group = (mentionGroups || []).find(g => g.id === groupId);
       if (group) refs.current.onGroupMention?.(group);
+    } else if (action === 'contact-tab') {
+      playKeyTap();
+      setContactTab(btn.dataset.tab);
+    } else if (action === 'back-from-contact-tab') {
+      playKeyTap();
+      setContactTab(null);
     } else if (action === 'back-to-extras') {
       playKeyTap();
       setGifSearchActive(false);
+      setContactTab(null);
       onModeChange('extras');
+    } else if (action === 'open-image-picker') {
+      playKeyTap();
+      refs.current.onImagePick?.();
     } else if (action === 'open-gifs') {
       playKeyTap();
       onModeChange('gifs');
+    } else if (action === 'open-dice') {
+      playKeyTap();
+      onModeChange('dice');
     } else if (action === 'gif-select') {
       playKeyTap();
       const gifId = btn.dataset.gifId;
@@ -639,13 +939,125 @@ const CustomKeyboard = memo(function CustomKeyboard({
     }
   };
 
+  // ── Swipe pointer move on .ck-board (desktop/mouse fallback) ──
+  const handleBoardPointerMove = (e) => {
+    const sw = swipeState.current;
+    if (sw.isTouch) return; // touch swipes use native handlers
+    if (sw.pointerId === null || e.pointerId !== sw.pointerId) return;
+
+    const board = boardRef.current;
+    if (!board) return;
+    const boardRect = board.getBoundingClientRect();
+
+    const dx = e.clientX - sw.startX;
+    const dy = e.clientY - sw.startY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    // Activate swipe mode once finger moves > 20px from start
+    if (!sw.active && dist > 20) {
+      sw.active = true;
+      initTrailCanvas();
+    }
+
+    if (!sw.active) return;
+
+    // Track trail point
+    sw.points.push({ x: e.clientX - boardRect.left, y: e.clientY - boardRect.top });
+    drawTrail(sw.points);
+
+    // Detect which key using precomputed bounding rects
+    const hit = findKeyAtCoord(e.clientX, e.clientY, sw.keyRects);
+    if (hit && hit.char !== sw.lastKey) {
+      sw.keys.push(hit.char);
+      sw.lastKey = hit.char;
+    }
+
+    // Live word predictions (throttled to every 150ms)
+    const now = Date.now();
+    if (sw.points.length >= 5 && now - sw.lastPredictTime > 150) {
+      sw.lastPredictTime = now;
+      const candidates = matchSwipePath([...sw.points], sw.keyRects, { left: boardRect.left, top: boardRect.top });
+      if (candidates.length > 0) {
+        setSwipeSuggestion({ words: candidates, selected: 0, capitalize: shiftedRef.current && !symbolsRef.current });
+      }
+    }
+  };
+
   const handlePointerUp = (e) => {
+    hidePreview();
+
+    // ── Swipe finalization (desktop only — touch uses native touchend) ──
+    const sw = swipeState.current;
+    if (sw.pointerId !== null && e.pointerId === sw.pointerId && !sw.isTouch) {
+      const wasActive = sw.active;
+      const swPoints = [...sw.points];
+      const swKeyRects = sw.keyRects;
+      const startBtn = sw.startBtn;
+
+      // Clean up swipe state
+      sw.pointerId = null;
+      sw.active = false;
+      sw.startBtn = null;
+      sw.keyRects = [];
+      sw.keys = [];
+      sw.points = [];
+      clearSwipeHighlights();
+      clearTrailCanvas();
+
+      if (wasActive && swPoints.length >= 2) {
+        // Swipe completed — match word using shape-template comparison
+        const board = boardRef.current;
+        const boardRect = board?.getBoundingClientRect();
+        const candidates = boardRect
+          ? matchSwipePath(swPoints, swKeyRects, { left: boardRect.left, top: boardRect.top })
+          : [];
+        if (candidates.length > 0) {
+          playKeyTap();
+          const capitalize = shiftedRef.current && !symbolsRef.current;
+          let word = candidates[0];
+          if (capitalize) {
+            word = word[0].toUpperCase() + word.slice(1);
+            setShifted(false);
+          }
+          refs.current.onSwipeWord?.(word);
+          if (candidates.length > 1) {
+            setSwipeSuggestion({ words: candidates, selected: 0, capitalize });
+          } else {
+            setSwipeSuggestion(null);
+          }
+        } else if (startBtn) {
+          // No match — fall back to first letter as a normal tap
+          flash(startBtn);
+          playKeyTap();
+          const char = startBtn.dataset.char;
+          const out = shiftedRef.current && !symbolsRef.current ? char.toUpperCase() : char;
+          refs.current.onKey(out);
+          showPreview(startBtn, out);
+          if (shiftedRef.current && !symbolsRef.current) setShifted(false);
+        }
+        return;
+      }
+
+      // Not a swipe (small movement) — treat as normal tap
+      if (startBtn) {
+        flash(startBtn);
+        playKeyTap();
+        const char = startBtn.dataset.char;
+        const out = shiftedRef.current && !symbolsRef.current ? char.toUpperCase() : char;
+        refs.current.onKey(out);
+        showPreview(startBtn, out);
+        if (shiftedRef.current && !symbolsRef.current) setShifted(false);
+      }
+      return;
+    }
+
+    // ── Emoji / GIF tap ──
     if (emojiTap.current) {
       const { btn, x, y } = emojiTap.current;
       emojiTap.current = null;
-      const dx = Math.abs(e.clientX - x);
-      const dy = Math.abs(e.clientY - y);
-      if (dx < 10 && dy < 10) {
+      const edx = Math.abs(e.clientX - x);
+      const edy = Math.abs(e.clientY - y);
+      if (edx < 10 && edy < 10) {
         flash(btn);
         if (btn.classList.contains('ck-gif-cell')) {
           playKeyTap();
@@ -675,11 +1087,32 @@ const CustomKeyboard = memo(function CustomKeyboard({
   };
 
   const handlePointerCancel = () => {
+    // Clean up swipe state (skip for touch — native touchend handles cleanup)
+    const sw = swipeState.current;
+    if (sw.pointerId !== null && !sw.isTouch) {
+      sw.pointerId = null;
+      sw.active = false;
+      sw.startBtn = null;
+      sw.keyRects = [];
+      clearSwipeHighlights();
+      clearTrailCanvas();
+    }
     emojiTap.current = null;
     clearTimeout(backspaceTimer.current);
     clearInterval(backspaceInterval.current);
     clearTimeout(repeatTimer.current);
     clearInterval(repeatInterval.current);
+  };
+
+  // Handle suggestion bar tap — replace the inserted word
+  const handleSuggestionTap = (word, index) => {
+    // Use stored capitalize flag (shift was already cleared after initial swipe insert)
+    setSwipeSuggestion(prev => {
+      if (!prev) return null;
+      if (prev.capitalize) word = word[0].toUpperCase() + word.slice(1);
+      refs.current.onSwipeReplace?.(word);
+      return { ...prev, selected: index };
+    });
   };
 
   if (!open) return null;
@@ -767,8 +1200,10 @@ const CustomKeyboard = memo(function CustomKeyboard({
   return (
     <div className="ck-container">
       <div
+        ref={boardRef}
         className="ck-board"
         onPointerDown={handlePointerDown}
+        onPointerMove={handleBoardPointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerCancel}
         onPointerCancel={handlePointerCancel}
@@ -814,7 +1249,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
           <div className="ck-extras-panel">
             <button
               className="ck-extras-btn"
-              data-action="open-npcs"
+              data-action="open-contacts"
               type="button"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -823,7 +1258,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
-              <span>NPCs</span>
+              <span>Contacts</span>
             </button>
             <button
               className={`ck-extras-btn${listening ? ' ck-extras-btn-active' : ''}`}
@@ -838,6 +1273,17 @@ const CustomKeyboard = memo(function CustomKeyboard({
               </svg>
               <span>Speech to Text</span>
             </button>
+            <label
+              className="ck-extras-btn"
+              htmlFor="chat-image-input"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+              <span>Photo</span>
+            </label>
             <button
               className="ck-extras-btn"
               data-action="open-gifs"
@@ -849,55 +1295,146 @@ const CustomKeyboard = memo(function CustomKeyboard({
               </svg>
               <span>GIFs</span>
             </button>
+            <button
+              className="ck-extras-btn"
+              data-action="open-dice"
+              type="button"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="3" />
+                <circle cx="8" cy="8" r="1.5" fill="currentColor" stroke="none" />
+                <circle cx="16" cy="8" r="1.5" fill="currentColor" stroke="none" />
+                <circle cx="8" cy="16" r="1.5" fill="currentColor" stroke="none" />
+                <circle cx="16" cy="16" r="1.5" fill="currentColor" stroke="none" />
+                <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+              </svg>
+              <span>Dice</span>
+            </button>
           </div>
         ) : mode === 'npcs' ? (
           <div className="ck-npcs-panel">
             <div className="ck-npcs-header">
               <button
                 className="ck-npcs-back"
-                data-action="back-to-extras"
+                data-action={contactTab ? 'back-from-contact-tab' : 'back-to-extras'}
                 type="button"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="15 18 9 12 15 6" />
                 </svg>
               </button>
-              <span className="ck-npcs-label">Mention an NPC</span>
+              <span className="ck-npcs-label">
+                {contactTab === 'groups' ? 'Groups' : contactTab === 'npcs' ? 'NPCs' : contactTab === 'players' ? 'Players' : 'Contacts'}
+              </span>
             </div>
-            <div className="ck-npcs-grid">
-              {(mentionGroups || []).map(group => (
+            {!contactTab ? (
+              <div className="ck-contacts-menu">
+                {(mentionGroups || []).length > 0 && (
+                  <button
+                    className="ck-contacts-menu-btn"
+                    data-action="contact-tab"
+                    data-tab="groups"
+                    type="button"
+                  >
+                    <div className="ck-contacts-menu-icon">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                      </svg>
+                    </div>
+                    <span>Groups</span>
+                    <span className="ck-contacts-menu-count">{(mentionGroups || []).length}</span>
+                  </button>
+                )}
                 <button
-                  key={`group-${group.id}`}
-                  className="ck-npcs-item ck-npcs-group-item"
-                  data-action="group-mention"
-                  data-group-id={group.id}
+                  className="ck-contacts-menu-btn"
+                  data-action="contact-tab"
+                  data-tab="npcs"
                   type="button"
                 >
-                  <div className="ck-npcs-group-icon">
-                    {group.id === 'everyone' ? '👥' : group.displayName.charAt(0)}
+                  <div className="ck-contacts-menu-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
                   </div>
-                  <span className="ck-npcs-name">{group.displayName}</span>
+                  <span>NPCs</span>
+                  <span className="ck-contacts-menu-count">{(npcs || []).length}</span>
                 </button>
-              ))}
-              {(npcs || []).map(npc => (
-                <button
-                  key={npc.id}
-                  className="ck-npcs-item"
-                  data-action="npc-mention"
-                  data-npc-id={npc.id}
-                  type="button"
-                >
-                  <NpcPortrait
-                    npcId={npc.id}
-                    emotion={npcEmotions?.[npc.id] || 'idle'}
-                    size={44}
-                  />
-                  <span className="ck-npcs-name">
-                    {npc.displayName.split(' ')[0]}
-                  </span>
-                </button>
-              ))}
-            </div>
+                {(players || []).length > 0 && (
+                  <button
+                    className="ck-contacts-menu-btn"
+                    data-action="contact-tab"
+                    data-tab="players"
+                    type="button"
+                  >
+                    <div className="ck-contacts-menu-icon">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="8" r="5" />
+                        <path d="M20 21a8 8 0 1 0-16 0" />
+                      </svg>
+                    </div>
+                    <span>Players</span>
+                    <span className="ck-contacts-menu-count">{(players || []).length}</span>
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="ck-npcs-grid">
+                {contactTab === 'groups' && (mentionGroups || []).map(group => (
+                  <button
+                    key={`group-${group.id}`}
+                    className="ck-npcs-item ck-npcs-group-item"
+                    data-action="group-mention"
+                    data-group-id={group.id}
+                    type="button"
+                  >
+                    <div className="ck-npcs-group-icon">
+                      {group.id === 'everyone' ? '👥' : group.displayName.charAt(0)}
+                    </div>
+                    <span className="ck-npcs-name">{group.displayName}</span>
+                  </button>
+                ))}
+                {contactTab === 'npcs' && (npcs || []).map(npc => (
+                  <button
+                    key={npc.id}
+                    className="ck-npcs-item"
+                    data-action="npc-mention"
+                    data-npc-id={npc.id}
+                    type="button"
+                  >
+                    <NpcPortrait
+                      npcId={npc.id}
+                      emotion={npcEmotions?.[npc.id] || 'idle'}
+                      size={44}
+                    />
+                    <span className="ck-npcs-name">
+                      {npc.displayName.split(' ')[0]}
+                    </span>
+                  </button>
+                ))}
+                {contactTab === 'players' && (players || []).map(player => (
+                  <button
+                    key={`player-${player.id}`}
+                    className="ck-npcs-item ck-npcs-player-item"
+                    data-action="player-mention"
+                    data-player-id={player.id}
+                    type="button"
+                  >
+                    <img
+                      src={player.avatar}
+                      alt={player.characterName}
+                      className="ck-npcs-player-avatar"
+                    />
+                    <span className="ck-npcs-name">
+                      {player.characterName}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ) : mode === 'gifs' ? (
           gifSearchActive ? (
@@ -952,9 +1489,38 @@ const CustomKeyboard = memo(function CustomKeyboard({
               <div className="ck-gifs-attribution">Powered by GIPHY</div>
             </div>
           )
+        ) : mode === 'dice' ? (
+          <DicePanel
+            onRoll={onDiceRoll}
+            onBack={() => onModeChange('extras')}
+          />
         ) : (
-          <>{keyboardRows}</>
+          <>
+            {/* Swipe suggestion bar */}
+            {swipeSuggestion && swipeSuggestion.words.length > 1 && (
+              <div className="ck-swipe-suggestions">
+                {swipeSuggestion.words.map((w, i) => (
+                  <button
+                    key={w}
+                    className={`ck-swipe-suggestion${i === swipeSuggestion.selected ? ' ck-swipe-suggestion-active' : ''}`}
+                    type="button"
+                    onPointerDown={(ev) => { ev.preventDefault(); ev.stopPropagation(); handleSuggestionTap(w, i); }}
+                  >
+                    {w}
+                  </button>
+                ))}
+              </div>
+            )}
+            {keyboardRows}
+          </>
         )}
+
+        {/* Canvas overlay for swipe trail — only in keys mode */}
+        {mode === 'keys' && !symbols && (
+          <canvas ref={canvasRef} className="ck-swipe-canvas" />
+        )}
+
+        <div ref={previewRef} className="ck-key-preview" />
 
         {/* Bottom row — keys mode or gif search mode */}
         {(mode === 'keys' || (mode === 'gifs' && gifSearchActive)) && (

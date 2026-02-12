@@ -25,3 +25,7 @@
 [2026-02-10] Today, I reported our progress on the new duties to Nalyd, emphasizing our unity and discipline amidst the challenges. Upon request, I displayed my unblemished hands, affirming my readiness, and then led the Elites to the dojo for a private discussion.
 
 [2026-02-10] Today, Nalyd revealed a sinister threat known as The Weaver, who is ensnaring the desperate with promises of gold and binding them with a cursed mark. I resolved to mobilize the Elites for discreet surveillance on the city's citizens, prioritizing their safety as we prepare to confront this insidious foe.
+
+[2026-02-11] Today, I had the honor of bowing before Nalyd, our Grand Master, as we acknowledged his wisdom. Tyren's respectful gesture towards the Warriors reminded us of the strength within our community, and I wished him a safe journey as he departed, eager for the tales he would bring back.
+
+[2026-02-12] Today, I had the honor of joining Grand Master Nalyd for a splendid squid and seafood feast. Surrounded by laughter and shared stories, I felt the warmth of camaraderie envelop us, a reminder of the bonds we forge through our journeys together.

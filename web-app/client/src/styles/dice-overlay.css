@@ -1,0 +1,62 @@
+/* ── Dice Overlay ── */
+.dice-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.dice-overlay-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* dice-box creates a canvas inside #dice-overlay-canvas — make sure it fills */
+.dice-overlay-canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── Result banner — shows server total when dice settle ── */
+.dice-result-banner {
+  position: absolute;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: dice-result-pop 0.3s ease-out;
+}
+
+.dice-result-notation {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.dice-result-total {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow:
+    0 0 20px rgba(249, 115, 22, 0.8),
+    0 2px 8px rgba(0, 0, 0, 0.9);
+  line-height: 1;
+}
+
+@keyframes dice-result-pop {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}

@@ -21,3 +21,13 @@
 [2026-02-10] Today, Kai's infectious enthusiasm filled the air as he expressed his eagerness for our students' training. Nalyd requested to see my hands, which I revealed without hesitation, and we agreed to convene inside the dojo for a private discussion, stirring a sense of anticipation in me for what insights might unfold.
 
 [2026-02-10] Today, I learned of a terrifying threat to our city—a villain known as The Weaver, who ensnares the desperate with dark magic and manipulates them into serving his sinister agenda. I feel a heavy responsibility to protect our community and resolve to keep a watchful eye while educating our students discreetly about the signs of this danger.
+
+[2026-02-11] Today, I engaged in a moment of camaraderie with Tyren and the others in the dojo as we shared a respectful exchange of bows. His humility and departure filled me with pride, and I encouraged the group to continue uplifting one another on our journeys.
+
+[2026-02-12] I felt a surge of excitement when Nalyd decided to stay the night; his presence always fuels our ambitions. Kai's enthusiasm was infectious as we discussed our training, and I could sense the potential we possess with the Twin Hurricane. Together, we are truly a force to be reckoned with.
+
+[2026-02-12] Today, we gathered around a grand feast filled with seafood, laughter, and stories. The warmth of camaraderie was palpable as we shared our experiences and reflected on our journey, reminding me of the strength we find in unity.
+
+[2026-02-12] Tonight, Master Djinn reminded us all of the importance of rest, but the energy in the air was too strong to resist. I found myself swept into a late-night patrol with Ximena and Kai, our spirits alight with adventure as we prepared to hone our skills under the stars.
+
+[2026-02-12] After our invigorating sparring session, I felt energized by the exchanges and grateful for the spirited practice with my companions. As we concluded the night, Ximena's vibrant energy reminded me of our camaraderie, and I embraced the idea of sharing a few more moments of conversation with Kai before we turned in for the night.

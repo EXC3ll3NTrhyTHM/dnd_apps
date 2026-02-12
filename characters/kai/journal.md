@@ -19,3 +19,13 @@
 [2026-02-10] Today, I showed Master Nalyd my hands, proud of the calluses that speak of my hard work. We then hurried inside the dojo for a private meeting, and I couldn't contain my excitement as I leaned in, eager to hear what was coming next.
 
 [2026-02-10] Today, Nalyd unveiled a crucial plan to monitor the students for wounds connected to the Weaver's blood spell. I accepted the gravity of my role in this and committed to keeping an extra watch, fueled by the shared determination to take down this powerful foe together.
+
+[2026-02-11] Today, I shared a laugh with Tyren as I gave him a deep bow, recognizing his hard work. He playfully refused to bow himself before heading out, but I can't wait to challenge him when he returns!
+
+[2026-02-12] Today, Mai and I decided to train together to harness our elemental powers, which filled me with excitement. When Nalyd announced he would be staying the night, I felt a surge of energy and couldn’t wait to impress him with our progress as the Twin Hurricane.
+
+[2026-02-12] Today took an exciting turn as Mai proposed a feast after training, and I couldn't hold back my enthusiasm! The squid and seafood spread was incredible, and I was all in for sharing stories and challenging everyone to top my wild tales—especially looking forward to hearing from Mai!
+
+[2026-02-12] Tonight was electric with excitement as we decided to venture out for a night patrol instead of resting. I couldn’t contain my energy and challenged Mai and Ximena to spar with me, eager to show off our skills under the stars.
+
+[2026-02-12] Today was invigorating as I watched the sparring session come to an end, buzzing with adrenaline. I had a delightful conversation with Mai about new training techniques, filled with enthusiasm for our combined abilities, but reluctantly agreed to rest when Nalyd insisted it was time for bed.

@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.png', 'apple-touch-icon.png'],
       manifest: {
         name: "Dragon's Hollow",
@@ -38,8 +38,9 @@ export default defineConfig({
         ]
       },
       workbox: {
+        importScripts: ['/sw-push.js'],
         globPatterns: ['**/*.{js,css,html,ico,woff2}'],
-        globIgnores: ['**/textures/**'],
+        globIgnores: ['**/textures/**', '**/assets/dice-box/**'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/cdn\.discordapp\.com\/.*/i,
@@ -56,6 +57,9 @@ export default defineConfig({
       }
     })
   ],
+  optimizeDeps: {
+    include: ['@3d-dice/dice-box'],
+  },
   server: {
     port: 5173,
     allowedHosts: ['okhan-architect.com'],
@@ -71,6 +75,14 @@ export default defineConfig({
       '/sounds': {
         target: 'http://localhost:3420',
         changeOrigin: true
+      },
+      '/uploads': {
+        target: 'http://localhost:3420',
+        changeOrigin: true
+      },
+      '/ws': {
+        target: 'ws://localhost:3420',
+        ws: true
       }
     }
   }

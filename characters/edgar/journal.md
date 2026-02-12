@@ -13,3 +13,7 @@
 [2026-02-10] Today, we gathered inside the dojo for a private meeting, with Nalyd emphasizing the importance of secrecy. I affirmed my commitment to keeping our discussions confidential, sensing the gravity of what was to unfold.
 
 [2026-02-10] Today, Nalyd warned me against using my abilities to combat The Weaver’s blood spell, stressing that our focus should be on defeating the Weaver himself. I felt the strength of his resolve and pledged my support, knowing that unity will be our greatest weapon.
+
+[2026-02-11] Today, I exchanged words with Tyren and witnessed the respect he has for the dojo and his companions. As he departed to seek greater challenges at the Dragon, I felt a sense of pride; the bond among us strengthens with every journey taken.
+
+[2026-02-12] I joined Nalyd for a seafood feast, a bit of humor between us about the slippery fare. I mostly listened to the lively stories and laughter around the table, offering a reminder that every tale carries its weight.

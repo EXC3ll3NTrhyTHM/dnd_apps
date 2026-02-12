@@ -1,0 +1,410 @@
+/* ============================================
+   SUMMON EFFECT - Marcel Gesture Summoning
+   ============================================ */
+
+.summon-effect {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  pointer-events: all;
+}
+
+/* ---- Dark Overlay ---- */
+
+.summon-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.5s ease;
+}
+
+.phase-glow .summon-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.phase-sigil .summon-overlay,
+.phase-reveal .summon-overlay {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.phase-transition .summon-overlay {
+  background: #000;
+  transition: background 0.3s ease;
+}
+
+/* Dismiss: fade entire overlay to transparent (back to map) */
+.phase-dismiss .summon-overlay {
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.35s ease;
+}
+
+.phase-dismiss .summon-canvas,
+.phase-dismiss .summon-sigil,
+.phase-dismiss .summon-portrait,
+.phase-dismiss .summon-dm-picker {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.phase-dismiss .summon-flash {
+  display: none;
+}
+
+/* ---- Canvas (M replay + particles) ---- */
+
+.summon-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.phase-glow .summon-canvas,
+.phase-sigil .summon-canvas,
+.phase-reveal .summon-canvas {
+  opacity: 1;
+}
+
+.phase-transition .summon-canvas {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* ---- Arcane Sigil ---- */
+
+.summon-sigil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  width: 200px;
+  height: 200px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.phase-sigil .summon-sigil,
+.phase-reveal .summon-sigil {
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.phase-transition .summon-sigil {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.summon-circle {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(168, 85, 247, 0.6);
+  border-radius: 50%;
+  transform: scale(0);
+  animation: summon-circle-expand 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  box-shadow:
+    0 0 20px rgba(168, 85, 247, 0.3),
+    inset 0 0 20px rgba(168, 85, 247, 0.1);
+}
+
+.summon-circle-inner {
+  inset: 20px;
+  border-color: rgba(168, 85, 247, 0.35);
+  animation-delay: 0.15s;
+  box-shadow:
+    0 0 12px rgba(168, 85, 247, 0.2),
+    inset 0 0 12px rgba(168, 85, 247, 0.08);
+}
+
+@keyframes summon-circle-expand {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(90deg);
+    opacity: 1;
+  }
+}
+
+/* ---- Orbiting Runes ---- */
+
+.summon-runes {
+  position: absolute;
+  inset: 0;
+  animation: summon-runes-spin 6s linear infinite;
+}
+
+@keyframes summon-runes-spin {
+  to { transform: rotate(360deg); }
+}
+
+.summon-rune {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  font-size: 0.75rem;
+  color: rgba(168, 85, 247, 0.7);
+  text-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform:
+    rotate(calc(360deg / var(--rune-total) * var(--rune-index)))
+    translateY(-110px)
+    rotate(calc(-360deg / var(--rune-total) * var(--rune-index)));
+  opacity: 0;
+  animation: summon-rune-appear 0.4s ease forwards;
+  animation-delay: calc(0.1s * var(--rune-index));
+}
+
+@keyframes summon-rune-appear {
+  from {
+    opacity: 0;
+    transform:
+      rotate(calc(360deg / var(--rune-total) * var(--rune-index)))
+      translateY(-80px)
+      rotate(calc(-360deg / var(--rune-total) * var(--rune-index)));
+  }
+  to {
+    opacity: 1;
+    transform:
+      rotate(calc(360deg / var(--rune-total) * var(--rune-index)))
+      translateY(-110px)
+      rotate(calc(-360deg / var(--rune-total) * var(--rune-index)));
+  }
+}
+
+/* ---- Portrait Reveal ---- */
+
+.summon-portrait {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.3);
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.phase-reveal .summon-portrait {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.phase-transition .summon-portrait {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1.1);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.summon-portrait .npc-portrait {
+  border: 3px solid rgba(168, 85, 247, 0.6);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+}
+
+.summon-portrait-glow {
+  position: absolute;
+  inset: -30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%);
+  animation: summon-glow-pulse 1.5s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes summon-glow-pulse {
+  from { opacity: 0.5; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1.15); }
+}
+
+/* ---- Flash (transition phase) ---- */
+
+.summon-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, #000 70%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.phase-transition .summon-flash {
+  animation: summon-flash-anim 0.4s ease forwards;
+}
+
+@keyframes summon-flash-anim {
+  0%   { opacity: 0; }
+  30%  { opacity: 1; }
+  100% { opacity: 1; background: #000; }
+}
+
+/* ---- DM Player Picker ---- */
+
+.summon-dm-picker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  z-index: 20;
+  width: min(320px, 85vw);
+  max-height: 70vh;
+  background: linear-gradient(165deg, rgba(30, 20, 40, 0.95), rgba(15, 10, 25, 0.98));
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow:
+    0 0 40px rgba(168, 85, 247, 0.15),
+    0 16px 48px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.phase-pick .summon-dm-picker {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: all;
+}
+
+.phase-transition .summon-dm-picker {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.95);
+  transition: opacity 0.2s ease;
+}
+
+.summon-dm-picker-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.summon-dm-picker-header .npc-portrait {
+  border: 2px solid rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+}
+
+.summon-dm-picker-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #c9a0ff;
+  letter-spacing: 0.04em;
+}
+
+.summon-dm-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  max-height: 45vh;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168, 85, 247, 0.3) transparent;
+  margin-bottom: 12px;
+}
+
+.summon-dm-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(168, 85, 247, 0.06);
+  border: 1px solid rgba(168, 85, 247, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+}
+
+.summon-dm-picker-row:hover,
+.summon-dm-picker-row:active {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.35);
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.15);
+}
+
+.summon-dm-picker-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(168, 85, 247, 0.3);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.summon-dm-picker-avatar-empty {
+  background: rgba(168, 85, 247, 0.15);
+}
+
+.summon-dm-picker-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.summon-dm-picker-unread {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #a855f7;
+  box-shadow: 0 0 6px rgba(168, 85, 247, 0.7);
+  flex-shrink: 0;
+}
+
+.summon-dm-picker-empty {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  padding: 16px 0;
+}
+
+.summon-dm-picker-dismiss {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.summon-dm-picker-dismiss:hover {
+  border-color: rgba(168, 85, 247, 0.4);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Hide portrait + sigil during pick phase to clear space */
+.phase-pick .summon-portrait {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.phase-pick .summon-sigil {
+  opacity: 0.15;
+  transform: translate(-50%, -50%) scale(1.5);
+  transition: opacity 0.4s ease, transform 0.6s ease;
+}

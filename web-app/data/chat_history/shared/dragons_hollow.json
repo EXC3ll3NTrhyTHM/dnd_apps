@@ -1,178 +1,5 @@
 [
   {
-    "id": "6fcb016d-6589-45f2-aa10-5af42f8e366c",
-    "role": "npc",
-    "npc": "bonesy",
-    "npcDisplayName": "Bonesy",
-    "text": "Oh man, I gotchu, bro! *pulls out a half-eaten sandwich* You want the rest of this? It's still got some good vibes, I swear!",
-    "emotion": "happy",
-    "timestamp": "2026-02-10T05:38:45.684Z"
-  },
-  {
-    "id": "37ef33e0-bc91-4ca6-89e9-3c30c16e43c6",
-    "role": "npc",
-    "npc": "kumo",
-    "npcDisplayName": "Kumo",
-    "text": "Ah, hunger can be a fierce opponent. I can ask around for food. What would you like? Something hearty or something light?",
-    "emotion": "thoughtful",
-    "timestamp": "2026-02-10T05:38:47.521Z"
-  },
-  {
-    "id": "f7fac111-a539-488d-997c-64bc4bee85d7",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Mira Hi friend",
-    "timestamp": "2026-02-10T05:39:19.865Z"
-  },
-  {
-    "id": "f8b9e35c-b3bb-41ca-95b4-ba91a51b2830",
-    "role": "npc",
-    "npc": "mira",
-    "npcDisplayName": "Mira",
-    "text": "Hey there, friend! *leans casually against the bar* How's life treating you today? Found any trouble worth chasing?",
-    "emotion": "happy",
-    "timestamp": "2026-02-10T05:39:21.298Z"
-  },
-  {
-    "id": "4b8322e6-b443-469b-84a3-01fb53b3110e",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "hello",
-    "timestamp": "2026-02-10T06:08:26.419Z"
-  },
-  {
-    "id": "4a2cc7f2-15fa-491c-af87-9917908826ee",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Mira hello",
-    "timestamp": "2026-02-10T07:12:13.854Z"
-  },
-  {
-    "id": "d13537e7-cd84-4b24-b877-3d6c250a9363",
-    "role": "npc",
-    "npc": "mira",
-    "npcDisplayName": "Mira",
-    "text": "Hello, hello! You look like you’ve got something on your mind. What's cooking?",
-    "emotion": "happy",
-    "timestamp": "2026-02-10T07:12:14.786Z"
-  },
-  {
-    "id": "418ec2be-d671-46f5-973d-5140da8dc84a",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Bonesy bones?",
-    "timestamp": "2026-02-10T07:12:21.928Z"
-  },
-  {
-    "id": "37c2c8f6-e87d-4344-bffa-f8d8be422551",
-    "role": "npc",
-    "npc": "bonesy",
-    "npcDisplayName": "Bonesy",
-    "text": "Yo, I’m right here, maaaan! Just vibing, you know? What’s up? You need something?",
-    "emotion": "happy",
-    "timestamp": "2026-02-10T07:12:23.471Z"
-  },
-  {
-    "id": "726412d5-c3cd-44a1-a701-0e0e89a80820",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Bonesy sup bones?",
-    "timestamp": "2026-02-10T07:12:35.068Z"
-  },
-  {
-    "id": "531c28bc-01f3-4520-952a-9e3b933dea10",
-    "role": "npc",
-    "npc": "bonesy",
-    "npcDisplayName": "Bonesy",
-    "text": "Sup, broooo? Just chillin' and soaking in the good vibes around here. You need a snack or a drink? I'm always down to share!",
-    "emotion": "happy",
-    "timestamp": "2026-02-10T07:12:37.208Z"
-  },
-  {
-    "id": "8a44b40e-3330-45a6-a3d8-3b469dbc2582",
-    "role": "npc",
-    "npc": "marcel",
-    "npcDisplayName": "Marcel",
-    "text": "Ah, the Dragons Hollow? Pretty quiet actually. Bonesy's behind the bar as usual, probably polishing glasses and muttering about something. Kumo's around somewhere being mysterious. Haven't heard much drama today.\n\nYou planning to swing by, or just checking in from Shield duty? 🍺",
-    "emotion": "idle",
-    "timestamp": "2026-02-11T02:58:27.002Z"
-  },
-  {
-    "id": "e981fe14-0b4f-4415-b7bf-eaab1b59f0e7",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Marcel hello",
-    "timestamp": "2026-02-11T02:59:16.875Z"
-  },
-  {
-    "id": "a0fa133d-3c75-4944-bf3c-d88da971b979",
-    "role": "npc",
-    "npc": "marcel",
-    "npcDisplayName": "Marcel",
-    "text": "Hey Blake! What's up?",
-    "emotion": "idle",
-    "timestamp": "2026-02-11T02:59:23.714Z"
-  },
-  {
-    "id": "31bb229a-6a26-4281-8101-5e6923194dc4",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Marcel can you see the barracks channel message hisory?",
-    "timestamp": "2026-02-11T03:23:00.372Z"
-  },
-  {
-    "id": "d9960d57-3ee3-4291-b915-e51fd1b8e8bb",
-    "role": "npc",
-    "npc": "marcel",
-    "npcDisplayName": "Marcel",
-    "text": "Oh, man, I can’t see all that! I just hang out here, you know? But if you need info, I can help you find someone who knows! What’s cooking?",
-    "emotion": "idle",
-    "timestamp": "2026-02-11T03:23:01.975Z"
-  },
-  {
-    "id": "fe6cdfa8-57c0-424c-8610-29ad5e20bcc6",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Bonesy test",
-    "timestamp": "2026-02-11T04:45:47.915Z"
-  },
-  {
-    "id": "4547dfb5-da47-4ad1-a046-a75c7a4e62a5",
-    "role": "npc",
-    "npc": "bonesy",
-    "npcDisplayName": "Bonesy",
-    "text": "Testin’ the vibes, huh? All good here, bro! Just keepin’ it chill and flowing!",
-    "emotion": "happy",
-    "timestamp": "2026-02-11T04:45:50.068Z",
-    "reactions": {
-      "😂": [
-        "424061511833747467"
-      ],
-      "💀": [
-        "424061511833747467"
-      ],
-      "👀": [
-        "424061511833747467"
-      ]
-    }
-  },
-  {
     "id": "5a75679a-1b1f-4d3f-adb1-7115442ab664",
     "role": "player",
     "userId": "424061511833747467",
@@ -305,5 +132,170 @@
     "gifHeight": 84,
     "text": "lord of the rings hobbit GIF",
     "timestamp": "2026-02-11T07:00:22.549Z"
+  },
+  {
+    "id": "741f166a-9e1d-4155-aec7-81d77f62b42b",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "@Bonesy hey",
+    "timestamp": "2026-02-11T22:30:02.740Z"
+  },
+  {
+    "id": "4fdcbfae-0e3f-4b20-8494-106e7d99b6a2",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Heyyy Acacia! What’s up, my friend? You want a drink or some snacks? I got the good stuff!",
+    "emotion": "happy",
+    "timestamp": "2026-02-11T22:30:05.798Z"
+  },
+  {
+    "id": "3b0ffa44-310f-4ad1-b461-9c5cd16aa4a0",
+    "role": "player",
+    "type": "image",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "imageUrl": "/uploads/8e22b2f3-b592-40da-a597-58eff3ecd53b.png",
+    "imageWidth": 1024,
+    "imageHeight": 1536,
+    "text": "",
+    "timestamp": "2026-02-11T23:31:55.739Z",
+    "reactions": {
+      "🔥": [
+        "424061511833747467"
+      ]
+    }
+  },
+  {
+    "id": "3444cab2-d42c-464b-ad18-424c6f481dec",
+    "role": "player",
+    "type": "image",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "imageUrl": "/uploads/9b1b5a01-4afa-489d-b196-016ba6193476.png",
+    "imageWidth": 1024,
+    "imageHeight": 1536,
+    "text": "",
+    "timestamp": "2026-02-11T23:32:06.539Z"
+  },
+  {
+    "id": "4dee8c96-c373-4e62-8f54-782f70f9b5b0",
+    "role": "player",
+    "type": "image",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "imageUrl": "/uploads/ac19c0aa-c366-4e97-9ede-12ac2ec22fd1.png",
+    "imageWidth": 1536,
+    "imageHeight": 1024,
+    "text": "",
+    "timestamp": "2026-02-11T23:33:30.800Z"
+  },
+  {
+    "id": "99f70062-366d-4ad3-9d81-71554adc7683",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Bonesy hey",
+    "timestamp": "2026-02-11T23:47:03.173Z"
+  },
+  {
+    "id": "5c87359c-ad34-41ba-89ea-30929f951700",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Heyyy again! You know I'm always around, just vibin'. What’s on your mind, bro?",
+    "emotion": "idle",
+    "timestamp": "2026-02-11T23:47:04.721Z"
+  },
+  {
+    "id": "833bfa0e-392c-45f7-a9c8-f3f6fe6b51b2",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Bonesy hey",
+    "timestamp": "2026-02-11T23:49:43.855Z"
+  },
+  {
+    "id": "25c442fc-8e97-4bfc-ad9c-38a6c89bba86",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Yo, yo! I’m right here, man! You need something? Or just feelin' the vibe?",
+    "emotion": "idle",
+    "timestamp": "2026-02-11T23:49:45.003Z"
+  },
+  {
+    "id": "cd1c7038-c05b-452d-85b2-08aa78189504",
+    "role": "player",
+    "type": "image",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "imageUrl": "/uploads/0304d5a4-ac36-46a2-934c-19a7af2703e5.png",
+    "imageWidth": 1024,
+    "imageHeight": 1536,
+    "text": "",
+    "timestamp": "2026-02-12T01:00:51.737Z"
+  },
+  {
+    "id": "5c74a0d0-fb3a-4ba5-b1ee-dde1a6dbad88",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "notation": "1d4",
+    "rolls": [
+      2
+    ],
+    "total": 2,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T02:58:07.849Z"
+  },
+  {
+    "id": "8a18d74c-061e-42e8-9bd6-9974ee673588",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "notation": "1d4",
+    "rolls": [
+      1
+    ],
+    "total": 1,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T03:01:18.054Z"
+  },
+  {
+    "id": "84bb0b3a-e2aa-4443-8b04-ec3caeba58f6",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "notation": "1d4",
+    "rolls": [
+      4
+    ],
+    "total": 4,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T03:04:23.745Z"
   }
 ]

@@ -1,21 +1,25 @@
-import { useMemo, useRef, useCallback } from 'react';
+import { useMemo, useRef, useCallback, useState, useEffect } from 'react';
 import NpcPortrait from './NpcPortrait';
 
 /**
- * Render message text with @NpcName mention highlights and *italic* formatting.
+ * Render message text with @mention highlights and *italic* formatting.
+ * Highlights both NPC and player @mentions.
  * Uses a single regex pass so both patterns work together.
  */
-function HighlightedText({ text, npcs }) {
+function HighlightedText({ text, npcs, players }) {
   const parts = useMemo(() => {
     if (!text) return [text];
 
     // Build a combined regex with two alternatives:
-    //   1) @NpcName mention (if npcs provided)
+    //   1) @Name mention (NPCs + players, if provided)
     //   2) *italic text*
     let mentionAlt = null;
-    if (npcs?.length) {
-      const names = npcs.map(n => n.displayName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-      mentionAlt = `(@(?:${names.join('|')}))`;
+    const allNames = [
+      ...(npcs || []).map(n => n.displayName),
+      ...(players || []).map(p => p.characterName),
+    ].filter(Boolean).map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    if (allNames.length) {
+      mentionAlt = `(@(?:${allNames.join('|')}))`;
     }
     const italicAlt = '\\*([^*]+)\\*';
     const combined = mentionAlt ? `${mentionAlt}|${italicAlt}` : italicAlt;
@@ -44,28 +48,99 @@ function HighlightedText({ text, npcs }) {
       result.push(text.slice(lastIndex));
     }
     return result;
-  }, [text, npcs]);
+  }, [text, npcs, players]);
 
   return <>{parts}</>;
 }
 
-/** Reaction pills row below message content */
-function ReactionPills({ reactions, currentUserId, onReact, messageId }) {
+/** Resolve a reaction userId to a display name */
+function resolveReactorName(userId, npcs, players) {
+  // NPC names are stored as plain strings like 'marcel', 'kai', etc.
+  const npc = (npcs || []).find(n => n.id === userId || n.displayName === userId);
+  if (npc) return npc.displayName || userId;
+  const player = (players || []).find(p => p.id === userId);
+  if (player) return player.characterName || userId;
+  // Capitalize if it looks like an NPC id
+  if (userId && !/^\d+$/.test(userId)) return userId.charAt(0).toUpperCase() + userId.slice(1);
+  return userId;
+}
+
+/** Reaction pills row below message content — long-press to see who reacted */
+function ReactionPills({ reactions, currentUserId, onReact, messageId, npcs, players }) {
+  const [tooltip, setTooltip] = useState(null); // emoji key or null
+  const longPressTimer = useRef(null);
+  const didLongPress = useRef(false);
+
+  // Dismiss tooltip on any scroll or tap elsewhere
+  useEffect(() => {
+    if (!tooltip) return;
+    const dismiss = () => setTooltip(null);
+    document.addEventListener('pointerdown', dismiss, true);
+    document.addEventListener('scroll', dismiss, true);
+    return () => {
+      document.removeEventListener('pointerdown', dismiss, true);
+      document.removeEventListener('scroll', dismiss, true);
+    };
+  }, [tooltip]);
+
   if (!reactions || Object.keys(reactions).length === 0) return null;
+
+  const handlePillPointerDown = (e, emoji) => {
+    didLongPress.current = false;
+    longPressTimer.current = setTimeout(() => {
+      didLongPress.current = true;
+      longPressTimer.current = null;
+      setTooltip(prev => prev === emoji ? null : emoji);
+    }, 400);
+  };
+
+  const handlePillPointerUp = (e, emoji) => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    if (!didLongPress.current) {
+      // Normal tap — toggle reaction
+      e.stopPropagation();
+      setTooltip(null);
+      onReact(messageId, emoji);
+    }
+  };
+
+  const handlePillPointerCancel = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
 
   return (
     <div className="chat-bubble-reactions">
       {Object.entries(reactions).map(([emoji, userIds]) => {
         const active = userIds.includes(currentUserId);
+        const showTooltip = tooltip === emoji;
         return (
-          <button
-            key={emoji}
-            className={`reaction-pill${active ? ' reaction-pill-active' : ''}`}
-            onClick={(e) => { e.stopPropagation(); onReact(messageId, emoji); }}
-          >
-            <span className="reaction-pill-emoji">{emoji}</span>
-            <span className="reaction-pill-count">{userIds.length}</span>
-          </button>
+          <div key={emoji} className="reaction-pill-wrapper">
+            <button
+              className={`reaction-pill${active ? ' reaction-pill-active' : ''}`}
+              onPointerDown={(e) => handlePillPointerDown(e, emoji)}
+              onPointerUp={(e) => handlePillPointerUp(e, emoji)}
+              onPointerCancel={handlePillPointerCancel}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="reaction-pill-emoji">{emoji}</span>
+              <span className="reaction-pill-count">{userIds.length}</span>
+            </button>
+            {showTooltip && (
+              <div className="reaction-tooltip" onClick={(e) => e.stopPropagation()}>
+                {userIds.map((uid, i) => (
+                  <span key={uid} className="reaction-tooltip-name">
+                    {resolveReactorName(uid, npcs, players)}{i < userIds.length - 1 ? ', ' : ''}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         );
       })}
     </div>
@@ -78,7 +153,7 @@ function ReactionPills({ reactions, currentUserId, onReact, messageId }) {
  * Own player messages are right-aligned.
  * Other players' messages are left-aligned with a distinct accent.
  */
-export default function ChatBubble({ message, npcs, currentUserId, onLongPress, onReact }) {
+export default function ChatBubble({ message, npcs, players, currentUserId, onLongPress, onReact }) {
   const isPlayer = message.role === 'player';
   const isTyping = message.typing;
   const canInteract = !isTyping && !message._optimistic && message.id;
@@ -173,8 +248,48 @@ export default function ChatBubble({ message, npcs, currentUserId, onLongPress, 
       currentUserId={currentUserId}
       onReact={onReact}
       messageId={message.id}
+      npcs={npcs}
+      players={players}
     />
   ) : null;
+
+  // Dice roll message — centered, special layout
+  if (message.type === 'dice_roll') {
+    return (
+      <div className="chat-bubble chat-bubble-dice" {...interactionProps}>
+        {message.playerAvatar && (
+          <img
+            src={message.playerAvatar}
+            alt={message.playerName || 'Player'}
+            className="chat-bubble-portrait chat-bubble-player-avatar"
+          />
+        )}
+        <div className="chat-bubble-content">
+          {message.playerName && (
+            <span className="chat-bubble-name chat-bubble-name-dice">{message.playerName}</span>
+          )}
+          <div className="dice-roll-result">
+            <span className="dice-roll-notation">{message.notation}</span>
+            <div className="dice-roll-values">
+              {message.rolls.map((val, i) => (
+                <span
+                  key={i}
+                  className={`dice-value${message.kept && !message.kept.includes(i) ? ' dice-dropped' : ''}`}
+                >
+                  {val}
+                </span>
+              ))}
+            </div>
+            {message.modifier !== 0 && message.modifier != null && (
+              <span className="dice-modifier">{message.modifier > 0 ? '+' : ''}{message.modifier}</span>
+            )}
+            <span className="dice-total">= {message.total}</span>
+          </div>
+          {reactionPills}
+        </div>
+      </div>
+    );
+  }
 
   if (isPlayer) {
     const isOtherPlayer = message.userId && message.userId !== currentUserId;
@@ -212,6 +327,44 @@ export default function ChatBubble({ message, npcs, currentUserId, onLongPress, 
       );
     }
 
+    if (message.type === 'image') {
+      return (
+        <div
+          className={`chat-bubble ${isOtherPlayer ? 'chat-bubble-other-player' : 'chat-bubble-player'}`}
+          {...interactionProps}
+        >
+          {message.playerAvatar && (
+            <img
+              src={message.playerAvatar}
+              alt={message.playerName || 'Player'}
+              className="chat-bubble-portrait chat-bubble-player-avatar"
+            />
+          )}
+          <div className="chat-bubble-content">
+            {message.playerName && (
+              <span className={`chat-bubble-name ${isOtherPlayer ? 'chat-bubble-name-other' : 'chat-bubble-name-player'}`}>
+                {message.playerName}
+              </span>
+            )}
+            <img
+              className="chat-bubble-image"
+              src={message.imageUrl}
+              alt={message.text || 'Image'}
+              width={message.imageWidth || undefined}
+              height={message.imageHeight || undefined}
+              loading="lazy"
+            />
+            {message.text && (
+              <p className="chat-bubble-text chat-bubble-caption">
+                <HighlightedText text={message.text} npcs={npcs} players={players} />
+              </p>
+            )}
+            {reactionPills}
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div
         className={`chat-bubble ${isOtherPlayer ? 'chat-bubble-other-player' : 'chat-bubble-player'}`}
@@ -231,7 +384,7 @@ export default function ChatBubble({ message, npcs, currentUserId, onLongPress, 
             </span>
           )}
           <p className="chat-bubble-text">
-            <HighlightedText text={message.text} npcs={npcs} />
+            <HighlightedText text={message.text} npcs={npcs} players={players} />
           </p>
           {reactionPills}
         </div>
@@ -253,10 +406,27 @@ export default function ChatBubble({ message, npcs, currentUserId, onLongPress, 
           <div className="chat-typing-indicator">
             <span /><span /><span />
           </div>
+        ) : message.type === 'image' ? (
+          <>
+            <img
+              className="chat-bubble-image"
+              src={message.imageUrl}
+              alt={message.text || 'Image'}
+              width={message.imageWidth || undefined}
+              height={message.imageHeight || undefined}
+              loading="lazy"
+            />
+            {message.text && (
+              <p className="chat-bubble-text chat-bubble-caption">
+                <HighlightedText text={message.text} npcs={npcs} players={players} />
+              </p>
+            )}
+            {reactionPills}
+          </>
         ) : (
           <>
             <p className="chat-bubble-text">
-              <HighlightedText text={message.text} npcs={npcs} />
+              <HighlightedText text={message.text} npcs={npcs} players={players} />
             </p>
             {reactionPills}
           </>

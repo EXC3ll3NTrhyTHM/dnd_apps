@@ -47,18 +47,57 @@
 ## Feature Requests ✨
 
 ### Chat/Input
-- [ ] **Message Reactions** ⚡ *Priority - Tonight*
+- [x] **Message Reactions** ⚡ *Priority - Tonight*
   - Emoji reactions on individual messages (Discord/Slack style)
   - Tap/long-press message to add reaction
   - Show reaction counts under message
   - Quick reaction bar (most used emojis)
+
+- [ ] **Quick Actions Button** (Keyboard Shortcut)
+  - Button near keyboard for most-used extras
+  - Opens mini menu: dice, spells, emotes, items, etc.
+  - Player can customize their shortcuts
+  - One tap access to frequent actions without menu diving
   
 - [ ] Add autocomplete to keyboard
 - [ ] Clicking player sprite should add their @tag to text input (not working)
-- [ ] Image sharing support
+- [ ] Image sharing support ⚡ *Priority*
   - Plus icon opens drawer under keyboard
   - Multiple options in drawer
   - Could include NPC or player icon selector
+
+- [x] **Private Marcel Chat** ⚡ *Priority*
+  - Each player gets a private DM channel with Marcel on the app
+  - Same functionality as Discord DMs but in-app
+  - **Summon Gesture** - Draw an "M" on screen to summon Marcel
+    - Gesture recognition for the letter M
+    - Use **Jager** library ([GitHub](https://github.com/vmikhav/jager)) - built for drawn symbol recognition
+    - Chat appears as overlay with magical animation (smoke, shimmer)
+    - Feels like a summoning ritual, not just opening a chat
+    - Remove Marcel pin from map (not a physical place)
+    - Could have a subtle hint/tutorial on first use
+    - Future: more patterns (⭐ for quests, 🎲 for dice, etc.)
+
+### Dice Rolling
+- [ ] **3D Dice Roller** ⚡ *Priority - Tonight (2026-02-11)*
+  - **Core Requirements:**
+    - Throw 3D physics-based dice onto the screen
+    - Track what they land on and automatically add player's modifier
+    - Everyone sees when someone throws dice (global broadcast)
+    - **Rate limiting** - prevent spam in every chat
+    - **Global overlay toggle** - option to hide other players' dice if you don't want to see them
+  - **Tech Stack:**
+    - Recommended: `@3d-dice/dice-box` (npm)
+    - BabylonJS + AmmoJS physics, web workers for performance
+  - Full D&D dice set: d4, d6, d8, d10, d12, d20, d100
+  - Advanced notation support:
+    - `2d20kh1` - advantage (keep highest)
+    - `2d20kl1` - disadvantage (keep lowest)
+    - `4d6dl1` - stat rolling (drop lowest)
+    - `2d6+4` - modifiers
+  - Themes available (gemstone, rust, etc.)
+  - Demo: [fantasticdice.games](https://fantasticdice.games)
+  - Full Roll20 dice spec with parser add-on
 
 ### Mini-Games
 - [ ] **Class-Based Card Game**
@@ -77,8 +116,53 @@
   - Example: "Send 10 messages"
   - Rewards XP/gold for engagement
 
+- [ ] **Hidden Lore Videos (NotebookLM)**
+  - AI-generated videos from campaign sources
+  - Hidden in the world for players to discover naturally
+  - Achievement + XP reward when found
+  - Could be: hidden room, interactable object, NPC secret dialogue
+  - Makes exploration rewarding
+
+- [ ] **Character Quizzes**
+  - Quizzes based on player's character lore/backstory
+  - "How well do you know your character?"
+  - Rewards XP on completion
+  - Could scale XP by score (higher score = more XP)
+  - Maybe unlock character insights or bonus lore
+
 ### Access Control
 - [ ] Block players from visiting certain locations (DM-controlled)
+
+### Social
+- [ ] **Friends / Players List**
+  - Accessible to all players
+  - Shows: avatar, name, last online ("2 hours ago"), last location
+  - See who's around and where they're hanging out
+  - Click to view player profile
+  - Maybe quick actions: jump to their location, send DM
+
+- [ ] **Player Profile View** (Snapchat-style)
+  - Click player icon → opens their profile
+  - **Stats section:**
+    - Gold, XP, Level
+    - Most visited location
+    - Quests completed
+  - **Inventory section:** their items
+  - **Gallery section:** images they've uploaded
+  - Clean, scrollable profile layout
+
+- [ ] **Location Info View** (Discord-style)
+  - Click location name → opens location details
+  - Media gallery: all images uploaded to that location
+  - Grid view like Discord's channel media
+  - Maybe also: location description, who's currently there, recent activity
+
+- [ ] **Chat Presence Sprites** (Snapchat-style)
+  - Little character sprite shows when you open a chat
+  - Player chats: their character avatar
+  - Location chats: show sprites of everyone currently there
+  - Static sprite, just visual flair for presence
+  - Makes chats feel more personal/alive
 
 ### Emotes
 - [ ] **Clash Royale Style Emotes**
@@ -151,6 +235,12 @@
   - User clicks "Sign in with Discord" → Authorize → redirected back logged in
   - Gets Discord ID, username, avatar automatically
   - Setup: Discord Developer Portal app + OAuth2 redirect URL + `/auth/discord` callback endpoint
+
+- [ ] **Join Request / Approval System**
+  - New users request to join instead of auto-access
+  - DM/admin sees pending requests and approves or denies
+  - Keeps randos out, only approved players get in
+  - Could show request reason: "I'm in Blake's Thursday game"
 
 ### DM Controls
 - [ ] **DM Steering Mode** - Queue and guide AI responses

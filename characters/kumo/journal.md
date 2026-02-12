@@ -37,3 +37,13 @@
 [2026-02-10] Today, I spoke with Nalyd about our new duties and the increased perimeter patrols I've undertaken. He asked to see my hands, and I revealed the marks of time and duty, reminding him that I will always uphold my responsibility to protect the dojo.
 
 [2026-02-10] Today, Nalyd revealed a grave threat to our city: a sinister entity known as The Weaver is ensnaring the vulnerable by offering them gold and using dark magic to control them. I pledged to intensify my watch and safeguard our gates, promising to remain vigilant and protect our people at all costs.
+
+[2026-02-11] Today, I watched Tyren emerge from the tattoo chair, and I felt a swell of pride as he showcased his new look and physique. I praised his hard work and passion, reminding him that true strength comes from within, and shared a hearty laugh with Nalyd as we celebrated Tyren's accomplishments and the spirit of our dojo.
+
+[2026-02-12] I watched as Tyren left for the Dragon, feeling a warmth in his camaraderie. Nalyd mentioned heading there too; I assured him I'd keep the gate secure. When Tyren returned, I invited him to enjoy the training of the students, knowing he appreciates such moments.
+
+[2026-02-12] I encountered strangers in the woods today, their weary appearance filling me with unease. They approached the dojo gate but did not enter; instead, they lingered, watching with intent. I made it clear they were not welcome without purpose, and now I must remain vigilant as they retreat into the shadows of the forest.
+
+[2026-02-12] Today, Tyren and I shared a brief moment of camaraderie with a fist bump; his departure left me feeling proud of our bond. When Nalyd announced he would stay the night, I felt a sense of duty to protect our dojo, promising to keep watch through the dark hours ahead.
+
+[2026-02-12] Tonight, we gathered for a hearty meal filled with laughter and camaraderie. As we raised our cups in a toast to friendship and the dojo, I felt a deep sense of contentment, knowing I would keep watch alongside Nalyd and Tyren as the night unfolded.

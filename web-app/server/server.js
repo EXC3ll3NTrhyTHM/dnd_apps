@@ -27,6 +27,12 @@ const clawdbotRoutes = require('./routes/clawdbot');
 const campaignRoutes = require('./routes/campaign');
 const adminRoutes = require('./routes/admin');
 const presenceRoutes = require('./routes/presence');
+const marcelDmRoutes = require('./routes/marcelDm');
+const uploadRoutes = require('./routes/upload');
+const xpRoutes = require('./routes/xp');
+const notificationRoutes = require('./routes/notifications');
+const achievementRoutes = require('./routes/achievements');
+const diceRoutes = require('./routes/dice');
 
 const app = express();
 const server = http.createServer(app);
@@ -35,6 +41,21 @@ const PORT = process.env.PORT || 3420;
 
 wss.on('connection', (ws, req) => {
   console.log(`[wss] New client connected from ${req.socket.remoteAddress}`);
+
+  ws.on('message', (data) => {
+    try {
+      const msg = JSON.parse(data);
+      if (msg.type === 'identify') {
+        ws.userId = msg.userId || null;
+        ws.currentLocation = msg.currentLocation || null;
+      } else if (msg.type === 'updateLocation') {
+        ws.currentLocation = msg.currentLocation || null;
+      }
+    } catch {
+      // ignore non-JSON messages
+    }
+  });
+
   ws.on('close', () => console.log('[wss] Client disconnected'));
 });
 
@@ -71,6 +92,10 @@ if (process.env.NODE_ENV !== 'production') {
 const staticCache = { maxAge: '7d' };
 app.use('/images', express.static(path.join(__dirname, '..', 'images'), staticCache));
 app.use('/sounds', express.static(path.join(__dirname, '..', 'sounds'), staticCache));
+app.use('/uploads', express.static(path.join(__dirname, '..', 'data', 'uploads'), {
+  maxAge: '30d',
+  immutable: true
+}));
 
 // ============================================
 // API ROUTES
@@ -83,11 +108,17 @@ app.use('/api/tavern', tavernRoutes);
 app.use('/api/quests', questRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/chat', uploadRoutes);
+app.use('/api/chat', diceRoutes);
 clawdbotRoutes.app = app;
 app.use('/api/clawdbot', clawdbotRoutes);
 app.use('/api/campaign', campaignRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/presence', presenceRoutes);
+app.use('/api/marcel-dm', marcelDmRoutes);
+app.use('/api/xp', xpRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/achievements', achievementRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

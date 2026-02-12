@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { authRequired } = require('../middleware/auth');
+const { acquireLock, releaseLock } = require('../lib/locks');
 const {
   loadLocations,
   loadNpcRegistry,
@@ -20,6 +21,7 @@ const {
   writeWebJournal
 } = require('../lib/dialogue');
 const { getTypingInLocation, setNpcTyping } = require('../lib/typing');
+const { notifyPlayerMentions } = require('../lib/notifications');
 const clawdbotRoutes = require('./clawdbot');
 
 const DM_USER_IDS = (process.env.DM_USER_IDS || '').split(',').filter(Boolean);
@@ -87,6 +89,36 @@ const rateLimits = new Map();
 const RATE_LIMIT = 5; // requests per minute
 const RATE_WINDOW = 60 * 1000;
 
+// Track recently deleted message IDs per location (for polling)
+// Map<locationId, { ids: Set<string>, timers: Map<string, timeout> }>
+const deletedIds = new Map();
+const DELETED_TTL = 60 * 1000; // auto-clean after 60s
+
+function trackDeletedId(locationId, messageId) {
+  if (!deletedIds.has(locationId)) {
+    deletedIds.set(locationId, { ids: new Set(), timers: new Map() });
+  }
+  const entry = deletedIds.get(locationId);
+  entry.ids.add(messageId);
+  // Auto-clean after TTL
+  const timer = setTimeout(() => {
+    entry.ids.delete(messageId);
+    entry.timers.delete(messageId);
+    if (entry.ids.size === 0) deletedIds.delete(locationId);
+  }, DELETED_TTL);
+  entry.timers.set(messageId, timer);
+}
+
+function consumeDeletedIds(locationId) {
+  const entry = deletedIds.get(locationId);
+  if (!entry || entry.ids.size === 0) return [];
+  const ids = [...entry.ids];
+  // Clear timers and remove
+  for (const timer of entry.timers.values()) clearTimeout(timer);
+  deletedIds.delete(locationId);
+  return ids;
+}
+
 function checkRateLimit(userId) {
   const now = Date.now();
   const userRequests = rateLimits.get(userId) || [];
@@ -130,40 +162,6 @@ function saveHistory(locationId, history) {
   const tmpPath = histPath + '.tmp';
   fs.writeFileSync(tmpPath, JSON.stringify(trimmed, null, 2));
   fs.renameSync(tmpPath, histPath);
-}
-
-// ============================================
-// PER-LOCATION MUTEX (prevents concurrent writes)
-// ============================================
-
-const locationLocks = new Map();
-
-function acquireLock(locationId) {
-  if (!locationLocks.has(locationId)) {
-    locationLocks.set(locationId, { locked: false, queue: [] });
-  }
-  const lock = locationLocks.get(locationId);
-
-  return new Promise(resolve => {
-    if (!lock.locked) {
-      lock.locked = true;
-      resolve();
-    } else {
-      lock.queue.push(resolve);
-    }
-  });
-}
-
-function releaseLock(locationId) {
-  const lock = locationLocks.get(locationId);
-  if (!lock) return;
-
-  if (lock.queue.length > 0) {
-    const next = lock.queue.shift();
-    next();
-  } else {
-    lock.locked = false;
-  }
 }
 
 // Track message counts for journal writes per NPC (shared, not per-user)
@@ -227,7 +225,30 @@ router.get('/locations', authRequired, (req, res) => {
     };
   });
 
-  res.json({ locations: result });
+  // Append virtual Marcel DM marker
+  result.push({
+    id: 'marcel_dm',
+    name: 'Marcel DM',
+    description: 'Private message with Marcel',
+    features: [],
+    mapCoords: { x: 8, y: 92 },
+    mapIcon: '✉️',
+    scene: null,
+    npcs: [{ id: 'marcel', displayName: 'Marcel', hasPortrait: true }],
+    groups: {},
+    locked: false,
+    isMarcelDm: true
+  });
+
+  // Include player list for @mention support
+  const players = loadPlayers();
+  const playerList = Object.entries(players).map(([userId, p]) => ({
+    id: userId,
+    characterName: p.characterName || p.displayName || userId,
+    avatar: p.avatar || null,
+  }));
+
+  res.json({ locations: result, players: playerList });
 });
 
 /**
@@ -284,9 +305,12 @@ router.get('/locations/:locationId/messages', authRequired, (req, res) => {
     }
   }
 
+  const deleted = consumeDeletedIds(locationId);
+
   res.json({
     messages: newMessages,
     reactions,
+    deletedIds: deleted,
     typing: Object.entries(typing).map(([id, data]) => ({
       id,
       displayName: data.displayName
@@ -391,7 +415,14 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
       history.push(playerMsg);
       saveHistory(locationId, history);
 
-      return res.json({ playerMessage: playerMsg, responses: [] });
+      try { require('../lib/xp').awardMessageXp(req.user.id, req.user.username); } catch (e) { console.error('[xp]', e.message); }
+      try { require('../lib/xp').incrementLifetimeStat(req.user.id, req.user.username, 'gifs_sent'); } catch (e) { console.error('[xp]', e.message); }
+      notifyPlayerMentions(playerMsg.text, locationId, location.name, playerName, req.app, req.user.id);
+
+      let newAchievements = [];
+      try { newAchievements = require('../lib/achievements').checkAchievements(req.user.id, req.user.username, 'message_sent', { hour: new Date().getUTCHours() }).newAchievements; } catch (e) { console.error('[achievements]', e.message); }
+
+      return res.json({ playerMessage: playerMsg, responses: [], newAchievements });
     } catch (error) {
       console.error('[chat] GIF message error:', error.message);
       return res.status(500).json({ error: 'Failed to save GIF message' });
@@ -454,12 +485,49 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
     const isMarcelMentioned = message.toLowerCase().includes('@marcel');
     if (isMarcelMentioned) {
       clawdbotRoutes.enqueueMention(locationId, playerMsg);
+
+      // Schedule a delayed 👀 reaction from Marcel on the player's message
+      const msgId = playerMsg.id;
+      setTimeout(async () => {
+        await acquireLock(locationId);
+        try {
+          const hist = loadHistory(locationId);
+          const msg = hist.find(m => m.id === msgId);
+          if (msg) {
+            if (!msg.reactions) msg.reactions = {};
+            if (!msg.reactions['👀']) msg.reactions['👀'] = [];
+            if (!msg.reactions['👀'].includes('marcel')) {
+              msg.reactions['👀'].push('marcel');
+            }
+            saveHistory(locationId, hist);
+
+            const wss = req.app.get('wss');
+            if (wss) {
+              const payload = JSON.stringify({
+                type: 'reaction',
+                locationId,
+                messageId: msgId,
+                reactions: msg.reactions
+              });
+              wss.clients.forEach(client => {
+                if (client.readyState === 1) client.send(payload);
+              });
+            }
+          }
+        } finally {
+          releaseLock(locationId);
+        }
+      }, 1500);
     }
 
     // No NPCs mentioned — just record the player message, no NPC responses
     if (respondingNpcs.length === 0) {
       saveHistory(locationId, history);
-      return res.json({ playerMessage: playerMsg, responses: [], marcelMentioned: isMarcelMentioned });
+      try { require('../lib/xp').awardMessageXp(req.user.id, req.user.username); } catch (e) { console.error('[xp]', e.message); }
+      notifyPlayerMentions(playerMsg.text, locationId, location.name, playerName, req.app, req.user.id);
+      let newAchievements = [];
+      try { newAchievements = require('../lib/achievements').checkAchievements(req.user.id, req.user.username, 'message_sent', { hour: new Date().getUTCHours() }).newAchievements; } catch (e) { console.error('[achievements]', e.message); }
+      return res.json({ playerMessage: playerMsg, responses: [], marcelMentioned: isMarcelMentioned, newAchievements });
     }
 
     const registry = loadNpcRegistry();
@@ -505,9 +573,22 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
 
     saveHistory(locationId, history);
 
+    try { require('../lib/xp').awardMessageXp(req.user.id, req.user.username); } catch (e) { console.error('[xp]', e.message); }
+
+    // Notify @mentions in the player message
+    notifyPlayerMentions(playerMsg.text, locationId, location.name, playerName, req.app, req.user.id);
+    // Notify @mentions in each NPC response
+    for (const npcMsg of responses) {
+      notifyPlayerMentions(npcMsg.text, locationId, location.name, npcMsg.npcDisplayName, req.app);
+    }
+
+    let newAchievements = [];
+    try { newAchievements = require('../lib/achievements').checkAchievements(req.user.id, req.user.username, 'message_sent', { hour: new Date().getUTCHours() }).newAchievements; } catch (e) { console.error('[achievements]', e.message); }
+
     res.json({
       playerMessage: playerMsg,
-      responses
+      responses,
+      newAchievements
     });
   } catch (error) {
     console.error('[chat] Room message error:', error.message);
@@ -597,6 +678,12 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
     history.push(npcMsg);
     saveHistory(locationId, history);
 
+    try { require('../lib/xp').awardMessageXp(req.user.id, req.user.username); } catch (e) { console.error('[xp]', e.message); }
+
+    // Notify @mentions in the player message and NPC response
+    notifyPlayerMentions(playerMsg.text, locationId, location.name, playerName, req.app, req.user.id);
+    notifyPlayerMentions(npcMsg.text, locationId, location.name, npcMsg.npcDisplayName, req.app);
+
     // Journal tracking (per-NPC, shared)
     const count = (messageCounters.get(npcName) || 0) + 1;
     messageCounters.set(npcName, count);
@@ -608,9 +695,13 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
       );
     }
 
+    let newAchievements = [];
+    try { newAchievements = require('../lib/achievements').checkAchievements(req.user.id, req.user.username, 'message_sent', { hour: new Date().getUTCHours() }).newAchievements; } catch (e) { console.error('[achievements]', e.message); }
+
     res.json({
       playerMessage: playerMsg,
-      responses: [npcMsg]
+      responses: [npcMsg],
+      newAchievements
     });
   } catch (error) {
     console.error('[chat] 1-on-1 message error:', error.message);
@@ -654,10 +745,20 @@ router.post('/locations/:locationId/messages/:messageId/react', authRequired, as
       message.reactions[emoji] = [];
     }
 
+    let xpAwarded = 0;
+    let newAchievements = [];
     const idx = message.reactions[emoji].indexOf(userId);
     if (idx === -1) {
       // Add reaction
       message.reactions[emoji].push(userId);
+      try {
+        const xp = require('../lib/xp');
+        const before = xp.getXpRecord(userId, req.user.username).total_xp;
+        xp.awardReactionXp(userId, req.user.username);
+        const after = xp.getXpRecord(userId, req.user.username).total_xp;
+        xpAwarded = after - before;
+      } catch (e) { console.error('[xp]', e.message); }
+      try { newAchievements = require('../lib/achievements').checkAchievements(userId, req.user.username, 'reaction_added').newAchievements; } catch (e) { console.error('[achievements]', e.message); }
     } else {
       // Remove reaction
       message.reactions[emoji].splice(idx, 1);
@@ -674,12 +775,150 @@ router.post('/locations/:locationId/messages/:messageId/react', authRequired, as
 
     saveHistory(locationId, history);
 
-    res.json({ reactions: message.reactions || {} });
+    res.json({ reactions: message.reactions || {}, xpAwarded, newAchievements });
   } catch (error) {
     console.error('[chat] React error:', error.message);
     res.status(500).json({ error: 'Failed to toggle reaction' });
   } finally {
     releaseLock(locationId);
+  }
+});
+
+/**
+ * DELETE /api/chat/locations/:locationId/messages/:messageId
+ * Delete a message — own player messages or any message if admin
+ */
+router.delete('/locations/:locationId/messages/:messageId', authRequired, async (req, res) => {
+  const { locationId, messageId } = req.params;
+
+  const locations = loadLocations();
+  if (!locations[locationId]) {
+    return res.status(404).json({ error: 'Location not found' });
+  }
+
+  const userId = req.user.id;
+  const isAdmin = DM_USER_IDS.includes(userId);
+
+  await acquireLock(locationId);
+  try {
+    const history = loadHistory(locationId);
+    const msgIndex = history.findIndex(m => m.id === messageId);
+
+    if (msgIndex === -1) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    const message = history[msgIndex];
+
+    // Authorization: player messages can be deleted by owner or admin; NPC messages only by admin
+    if (message.role === 'player') {
+      if (message.userId !== userId && !isAdmin) {
+        return res.status(403).json({ error: 'Cannot delete another player\'s message' });
+      }
+    } else {
+      // NPC or other message types — admin only
+      if (!isAdmin) {
+        return res.status(403).json({ error: 'Only admins can delete NPC messages' });
+      }
+    }
+
+    // Clean up uploaded image file if this was an image message
+    if (message.type === 'image' && message.imageUrl) {
+      const filename = path.basename(message.imageUrl);
+      const filePath = path.join(DATA_DIR, 'uploads', filename);
+      fs.unlink(filePath, () => {}); // best-effort cleanup
+    }
+
+    history.splice(msgIndex, 1);
+    saveHistory(locationId, history);
+    trackDeletedId(locationId, messageId);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[chat] Delete error:', error.message);
+    res.status(500).json({ error: 'Failed to delete message' });
+  } finally {
+    releaseLock(locationId);
+  }
+});
+
+/**
+ * POST /api/chat/locations/:locationId/mark-read
+ * Mark a location as read for the current user
+ */
+router.post('/locations/:locationId/mark-read', authRequired, (req, res) => {
+  const { locationId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const players = loadPlayers();
+    if (!players[userId]) players[userId] = {};
+    if (!players[userId].lastReadTimestamps) players[userId].lastReadTimestamps = {};
+    players[userId].lastReadTimestamps[locationId] = new Date().toISOString();
+    savePlayers(players);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[chat] Mark-read error:', error.message);
+    res.status(500).json({ error: 'Failed to mark as read' });
+  }
+});
+
+/**
+ * GET /api/chat/unread
+ * Returns which locations have unread messages for the current user
+ */
+router.get('/unread', authRequired, (req, res) => {
+  try {
+    const players = loadPlayers();
+    const lastRead = players[req.user.id]?.lastReadTimestamps || {};
+    const unread = {};
+
+    // Check each shared location history file
+    if (fs.existsSync(SHARED_DIR)) {
+      const files = fs.readdirSync(SHARED_DIR).filter(f => f.endsWith('.json'));
+      for (const file of files) {
+        const locationId = file.replace('.json', '');
+        try {
+          const history = JSON.parse(fs.readFileSync(path.join(SHARED_DIR, file), 'utf-8'));
+          if (history.length === 0) continue;
+          const lastMsg = history[history.length - 1];
+          if (!lastMsg.timestamp) continue;
+          const userLastRead = lastRead[locationId];
+          if (!userLastRead || lastMsg.timestamp > userLastRead) {
+            unread[locationId] = true;
+          }
+        } catch {
+          // Skip unreadable files
+        }
+      }
+    }
+
+    // Check Marcel DM channels
+    const dmDir = path.join(HISTORY_DIR, 'marcel_dm');
+    if (fs.existsSync(dmDir)) {
+      const dmFiles = fs.readdirSync(dmDir).filter(f => f.endsWith('.json'));
+      for (const file of dmFiles) {
+        const channelKey = file.replace('.json', '');
+        const locationId = `marcel_dm_${channelKey}`;
+        try {
+          const history = JSON.parse(fs.readFileSync(path.join(dmDir, file), 'utf-8'));
+          if (history.length === 0) continue;
+          const lastMsg = history[history.length - 1];
+          if (!lastMsg.timestamp) continue;
+          const userLastRead = lastRead[locationId];
+          if (!userLastRead || lastMsg.timestamp > userLastRead) {
+            unread[locationId] = true;
+          }
+        } catch {
+          // Skip unreadable files
+        }
+      }
+    }
+
+    res.json({ unread });
+  } catch (error) {
+    console.error('[chat] Unread check error:', error.message);
+    res.status(500).json({ error: 'Failed to check unread status' });
   }
 });
 

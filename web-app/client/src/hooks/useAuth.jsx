@@ -6,6 +6,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [wallet, setWallet] = useState(null);
+  const [xpInfo, setXpInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Load token from localStorage on mount
@@ -26,11 +27,13 @@ export function AuthProvider({ children }) {
       const data = await api('/api/auth/me');
       setUser(data.user);
       setWallet(data.wallet);
+      setXpInfo(data.xp || null);
     } catch (err) {
       // Token invalid, clear it
       localStorage.removeItem('dh_token');
       setUser(null);
       setWallet(null);
+      setXpInfo(null);
     } finally {
       setLoading(false);
     }
@@ -50,14 +53,24 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('dh_token');
     setUser(null);
     setWallet(null);
+    setXpInfo(null);
   }
 
   function refreshWallet(newWallet) {
     setWallet(newWallet);
   }
 
+  async function refreshXp() {
+    try {
+      const data = await api('/api/xp/me');
+      setXpInfo(data);
+    } catch (e) {
+      console.error('Failed to refresh XP:', e);
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, wallet, loading, login, logout, refreshWallet, fetchMe }}>
+    <AuthContext.Provider value={{ user, wallet, xpInfo, loading, login, logout, refreshWallet, refreshXp, fetchMe }}>
       {children}
     </AuthContext.Provider>
   );

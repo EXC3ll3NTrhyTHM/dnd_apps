@@ -1,18 +1,18 @@
 /**
  * Leaderboard Routes
- * 
- * GET /api/leaderboard - Top players by gold balance
+ *
+ * GET /api/leaderboard - Top players by XP / level
  */
 
 const express = require('express');
 const { authOptional } = require('../middleware/auth');
-const { getLeaderboard } = require('../lib/economy');
+const { getXpLeaderboard } = require('../lib/xp');
 
 const router = express.Router();
 
 router.get('/', authOptional, (req, res) => {
   const limit = Math.min(parseInt(req.query.limit) || 10, 50);
-  const leaderboard = getLeaderboard(limit);
+  const leaderboard = getXpLeaderboard(limit);
 
   res.json({
     leaderboard,

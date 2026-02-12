@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../hooks/useApi';
 import { useAuth } from '../hooks/useAuth';
 import { useAudioMuted, setAudioMuted } from '../hooks/useAudioSettings';
+import { usePushNotifications } from '../hooks/usePushNotifications';
 import GoldBadge from '../components/GoldBadge';
 import '../styles/profile.css';
 import '../styles/leaderboard.css';
@@ -11,12 +12,18 @@ const RANK_DECORATIONS = ['👑', '🥈', '🥉'];
 const ADMIN_IDS = ['424061511833747467'];
 
 export default function Profile() {
-  const { user, wallet, logout } = useAuth();
+  const { user, wallet, xpInfo, refreshXp, logout } = useAuth();
   const isAdmin = ADMIN_IDS.includes(user?.id || '');
   const audioMuted = useAudioMuted();
+  const push = usePushNotifications();
   const [inventory, setInventory] = useState(null);
   const [leaderboard, setLeaderboard] = useState(null);
+  const [achievements, setAchievements] = useState(null);
+  const [achievementStats, setAchievementStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mutedChannels, setMutedChannels] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [muteExpanded, setMuteExpanded] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -24,17 +31,47 @@ export default function Profile() {
 
   async function loadData() {
     try {
-      const [invData, lbData] = await Promise.all([
+      const [invData, lbData, achData] = await Promise.all([
         api('/api/inventory'),
-        api('/api/leaderboard')
+        api('/api/leaderboard'),
+        api('/api/achievements/me'),
+        refreshXp()
       ]);
       setInventory(invData);
       setLeaderboard(lbData.leaderboard);
+      setAchievements(achData.achievements);
+      setAchievementStats(achData.stats);
     } catch (err) {
       console.error('Failed to load profile data:', err);
     } finally {
       setLoading(false);
     }
+
+    // Load notification settings
+    try {
+      const settings = await api('/api/notifications/settings');
+      setMutedChannels(settings.mutedChannels || []);
+    } catch { /* ignore */ }
+  }
+
+  async function loadLocationsForMute() {
+    if (locations.length > 0) return;
+    try {
+      const data = await api('/api/chat/locations');
+      setLocations(data.locations || []);
+    } catch { /* ignore */ }
+  }
+
+  async function toggleMuteChannel(channelId) {
+    const isMuted = mutedChannels.includes(channelId);
+    try {
+      const endpoint = isMuted ? '/api/notifications/unmute-channel' : '/api/notifications/mute-channel';
+      const result = await api(endpoint, {
+        method: 'POST',
+        body: JSON.stringify({ channelId })
+      });
+      setMutedChannels(result.mutedChannels);
+    } catch { /* ignore */ }
   }
 
   if (!user) return null;
@@ -60,6 +97,30 @@ export default function Profile() {
         </div>
       </div>
 
+      {/* XP & Level */}
+      {xpInfo && (
+        <div className="xp-card">
+          <div className="xp-level-badge">
+            <span className="xp-level-number">{xpInfo.level}</span>
+            <span className="xp-level-label">Level</span>
+          </div>
+          <div className="xp-details">
+            <div className="xp-progress-bar-container">
+              <div
+                className="xp-progress-bar-fill"
+                style={{ width: xpInfo.xp_for_next > 0 ? `${Math.min(100, (xpInfo.xp_in_level / xpInfo.xp_for_next) * 100)}%` : '100%' }}
+              />
+            </div>
+            <span className="xp-progress-text">
+              {xpInfo.xp_for_next > 0
+                ? `${xpInfo.xp_in_level.toLocaleString()} / ${xpInfo.xp_for_next.toLocaleString()} XP`
+                : 'MAX LEVEL'}
+            </span>
+            <span className="xp-total">Total: {xpInfo.total_xp.toLocaleString()} XP</span>
+          </div>
+        </div>
+      )}
+
       {/* Gold stats */}
       {wallet && (
         <div className="stats-grid">
@@ -79,6 +140,38 @@ export default function Profile() {
             <span className="stat-label">Spent</span>
           </div>
         </div>
+      )}
+
+      {/* Achievements */}
+      {achievements && (
+        <section className="profile-section">
+          <h2 className="section-title">
+            Achievements
+            {achievementStats && (
+              <span className="achievements-count">{achievementStats.unlocked} / {achievementStats.total}</span>
+            )}
+          </h2>
+          <div className="achievements-grid">
+            {achievements.map(ach => (
+              <div
+                key={ach.id}
+                className={`achievement-card ${ach.unlockedAt ? 'achievement-card-unlocked' : 'achievement-card-locked'}`}
+              >
+                <span className="achievement-card-icon">{ach.icon}</span>
+                <div className="achievement-card-info">
+                  <div className="achievement-card-name">{ach.name}</div>
+                  <div className="achievement-card-desc">{ach.description}</div>
+                  {ach.unlockedAt && (ach.xp > 0 || ach.gold > 0) && (
+                    <div className="achievement-card-rewards">
+                      {ach.xp > 0 && <span className="achievement-reward-xp">+{ach.xp} XP</span>}
+                      {ach.gold > 0 && <span className="achievement-reward-gold">+{ach.gold}G</span>}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
       {/* Inventory */}
@@ -131,9 +224,9 @@ export default function Profile() {
                   {entry.rank <= 3 ? RANK_DECORATIONS[entry.rank - 1] : `#${entry.rank}`}
                 </span>
                 <span className="lb-name">{entry.username}</span>
-                <span className="lb-gold">
-                  <span className="gold-icon">🪙</span>
-                  {entry.balance}G
+                <span className="lb-xp">
+                  <span className="lb-level">Lv{entry.level}</span>
+                  {entry.total_xp.toLocaleString()} XP
                 </span>
               </div>
             ))}
@@ -156,6 +249,48 @@ export default function Profile() {
               onChange={(e) => setAudioMuted(e.target.checked)}
             />
           </label>
+
+          <label className="settings-row">
+            <span className="settings-label">
+              Push Notifications
+              {push.permission === 'denied' && (
+                <span className="settings-hint"> (blocked in browser)</span>
+              )}
+              {!push.supported && push.permission !== 'denied' && (
+                <span className="settings-hint"> (not available)</span>
+              )}
+            </span>
+            <input
+              type="checkbox"
+              className="settings-toggle"
+              checked={push.isEnabled}
+              disabled={push.loading || push.permission === 'denied' || !push.supported}
+              onChange={() => push.isEnabled ? push.disable() : push.enable()}
+            />
+          </label>
+
+          <div className="settings-row settings-row-expandable" onClick={() => { setMuteExpanded(!muteExpanded); if (!muteExpanded) loadLocationsForMute(); }}>
+            <span className="settings-label">Muted Channels</span>
+            <span className="settings-chevron">{muteExpanded ? '\u25B2' : '\u25BC'}</span>
+          </div>
+          {muteExpanded && (
+            <div className="settings-mute-list">
+              {locations.length === 0 && (
+                <p className="empty-state" style={{ padding: '8px 16px', margin: 0, fontSize: '0.8rem' }}>Loading...</p>
+              )}
+              {locations.map(loc => (
+                <label key={loc.id} className="settings-mute-item">
+                  <span className="settings-label">{loc.name}</span>
+                  <input
+                    type="checkbox"
+                    className="settings-toggle"
+                    checked={mutedChannels.includes(loc.id)}
+                    onChange={() => toggleMuteChannel(loc.id)}
+                  />
+                </label>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

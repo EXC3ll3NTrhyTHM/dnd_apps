@@ -29,7 +29,7 @@ export default function Leaderboard() {
     return (
       <div className="page-loading">
         <div className="loading-spinner" />
-        <p>Counting everyone's gold...</p>
+        <p>Tallying experience points...</p>
       </div>
     );
   }
@@ -42,7 +42,7 @@ export default function Leaderboard() {
     <div className="page leaderboard-page">
       <div className="page-header">
         <h1 className="page-title">🏆 Leaderboard</h1>
-        <p className="page-subtitle">Who's got the deepest pockets?</p>
+        <p className="page-subtitle">Who's earned the most experience?</p>
       </div>
 
       <div className="leaderboard-list">
@@ -55,9 +55,9 @@ export default function Leaderboard() {
               {entry.rank <= 3 ? RANK_DECORATIONS[entry.rank - 1] : `#${entry.rank}`}
             </span>
             <span className="lb-name">{entry.username}</span>
-            <span className="lb-gold">
-              <span className="gold-icon">🪙</span>
-              {entry.balance}G
+            <span className="lb-xp">
+              <span className="lb-level">Lv{entry.level}</span>
+              {entry.total_xp.toLocaleString()} XP
             </span>
           </div>
         ))}

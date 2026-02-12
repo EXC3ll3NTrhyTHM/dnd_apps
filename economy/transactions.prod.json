@@ -273,6 +273,73 @@
         "item_name": "Blunt"
       },
       "timestamp": "2026-02-10T01:40:30.407Z"
+    },
+    {
+      "id": "tx_1770858540000_canopy1",
+      "user_id": "1374906408046166036",
+      "username": "Tyren",
+      "type": "diplomacy_reward",
+      "amount": 75,
+      "balance_after": 525,
+      "metadata": {
+        "event": "canopy_kingdom_alliance",
+        "title": "Warden of the Canopy",
+        "description": "Formed alliance with King Nuttsworth III"
+      },
+      "timestamp": "2026-02-11T21:09:00.000Z"
+    },
+    {
+      "id": "tx_1770858540001_canopy2",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "diplomacy_reward",
+      "amount": 75,
+      "balance_after": 375,
+      "metadata": {
+        "event": "canopy_kingdom_alliance",
+        "title": "Storm-Brother to the Canopy",
+        "description": "Formed alliance with King Nuttsworth III"
+      },
+      "timestamp": "2026-02-11T21:09:00.000Z"
+    },
+    {
+      "id": "tx_1770859775420_40rszi",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 455,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "night_owl"
+      },
+      "timestamp": "2026-02-12T01:29:35.420Z"
+    },
+    {
+      "id": "tx_1770859995809_zs6jna",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 310,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "night_owl"
+      },
+      "timestamp": "2026-02-12T01:33:15.809Z"
+    },
+    {
+      "id": "tx_1770860408223_y96lrm",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 480,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "marcels_pen_pal"
+      },
+      "timestamp": "2026-02-12T01:40:08.223Z"
     }
   ]
 }

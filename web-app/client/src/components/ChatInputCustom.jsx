@@ -73,14 +73,17 @@ function findTextNodeAtOffset(container, targetOffset) {
 export default function ChatInputCustom({
   onSend,
   onSendGif,
+  onSendImage,
   disabled,
   npcs = [],
   npcEmotions = {},
   groups = {},
+  players = [],
   insertNpc,
   onInsertNpcDone,
   playSound,
   scrollContainerRef,
+  onDiceRoll,
 }) {
   const [text, setText] = useState('');
   const [cursorPos, setCursorPos] = useState(0);
@@ -107,12 +110,17 @@ export default function ChatInputCustom({
   const flashTimer = useRef(null);
   const lastCorrectionRef = useRef(null);   // { start, end, reverted }
 
+  const fileInputRef = useRef(null);
+  const lastSwipeRef = useRef(null); // { pos, length } of last swipe-inserted word
+
   const textRef = useRef(text);
   textRef.current = text;
   const cursorPosRef = useRef(cursorPos);
   cursorPosRef.current = cursorPos;
   const npcsRef = useRef(npcs);
   npcsRef.current = npcs;
+  const playersRef = useRef(players);
+  playersRef.current = players;
 
   // Back button: close keyboard instead of navigating away
   const kbOpenRef = useRef(false);
@@ -399,7 +407,7 @@ export default function ChatInputCustom({
     onInsertNpcDone?.();
   }, [insertNpc, onInsertNpcDone]);
 
-  // Build combined mention items: @Everyone + groups + individual NPCs
+  // Build combined mention items: @Everyone + groups + individual NPCs + players
   const allItems = useMemo(() => {
     const items = [];
     if (npcs.length >= 2) {
@@ -421,8 +429,16 @@ export default function ChatInputCustom({
     for (const npc of npcs) {
       items.push({ type: 'npc', ...npc });
     }
+    for (const player of players) {
+      items.push({
+        type: 'player',
+        id: player.id,
+        displayName: player.characterName,
+        avatar: player.avatar,
+      });
+    }
     return items;
-  }, [npcs, groups]);
+  }, [npcs, groups, players]);
 
   // Filtered items for the popup
   const filteredItems = useMemo(() => {
@@ -593,8 +609,8 @@ export default function ChatInputCustom({
       return;
     }
 
-    // If in extras, npcs, or gifs mode, tapping input switches back to keys
-    if (kbModeRef.current === 'extras' || kbModeRef.current === 'npcs' || kbModeRef.current === 'gifs') {
+    // If in extras, npcs, gifs, or dice mode, tapping input switches back to keys
+    if (kbModeRef.current === 'extras' || kbModeRef.current === 'npcs' || kbModeRef.current === 'gifs' || kbModeRef.current === 'dice') {
       setKbMode('keys');
     }
 
@@ -776,6 +792,7 @@ export default function ChatInputCustom({
   const handleKey = useCallback((char) => {
     setShowPasteBtn(false);
     setShowHandle(false);
+    lastSwipeRef.current = null; // clear swipe replace on manual edit
     const pos = cursorPosRef.current;
 
     // If user is editing inside a recently-corrected word, mark it as reverted
@@ -844,6 +861,14 @@ export default function ChatInputCustom({
         return;
       }
     }
+    for (const player of playersRef.current) {
+      const mention = `@${player.characterName}`;
+      if (beforeCursor.endsWith(mention)) {
+        setText(prev => prev.slice(0, pos - mention.length) + prev.slice(pos));
+        setCursorPos(pos - mention.length);
+        return;
+      }
+    }
 
     const glen = prevGraphemeLength(currentText, pos);
     setText(prev => prev.slice(0, pos - glen) + prev.slice(pos));
@@ -865,6 +890,28 @@ export default function ChatInputCustom({
     });
   }, []);
 
+  // ── Swipe-to-type handlers ──
+  const handleSwipeWord = useCallback((word) => {
+    setShowPasteBtn(false);
+    setShowHandle(false);
+    const pos = cursorPosRef.current;
+    const insert = word + ' ';
+    setText(prev => prev.slice(0, pos) + insert + prev.slice(pos));
+    const newPos = pos + insert.length;
+    setCursorPos(newPos);
+    lastSwipeRef.current = { pos, length: insert.length };
+  }, []);
+
+  const handleSwipeReplace = useCallback((newWord) => {
+    const last = lastSwipeRef.current;
+    if (!last) return;
+    const replace = newWord + ' ';
+    setText(prev => prev.slice(0, last.pos) + replace + prev.slice(last.pos + last.length));
+    const newPos = last.pos + replace.length;
+    setCursorPos(newPos);
+    lastSwipeRef.current = { pos: last.pos, length: replace.length };
+  }, []);
+
   const handleSubmit = useCallback(() => {
     const trimmed = textRef.current.trim();
     if (!trimmed || disabled) return;
@@ -875,6 +922,7 @@ export default function ChatInputCustom({
     setKbOpen(false);
     setKbMode('keys');
     lastCorrectionRef.current = null;
+    lastSwipeRef.current = null;
   }, [disabled, onSend]);
 
   const handleGifSelect = useCallback((gif) => {
@@ -882,6 +930,27 @@ export default function ChatInputCustom({
     setKbMode('keys');
     onSendGif?.(gif);
   }, [onSendGif]);
+
+  const handleDiceRoll = useCallback((notation) => {
+    setKbOpen(false);
+    setKbMode('keys');
+    onDiceRoll?.(notation);
+  }, [onDiceRoll]);
+
+  const handleImagePick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileChange = useCallback((e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setKbOpen(false);
+      setKbMode('keys');
+      onSendImage?.(file);
+    }
+    // Reset so the same file can be re-selected
+    e.target.value = '';
+  }, [onSendImage]);
 
   const handleClose = useCallback(() => {
     setKbOpen(false);
@@ -911,6 +980,23 @@ export default function ChatInputCustom({
   // Insert NPC @mention from the npcs panel (stays in npcs mode for multi-tagging)
   const handleNpcMention = useCallback((npc) => {
     const mention = `@${npc.displayName} `;
+    const prev = textRef.current;
+    const pos = cursorPosRef.current;
+    const base = pos === prev.length && prev.length && !prev.endsWith(' ')
+      ? prev + ' '
+      : prev;
+    const newPos = pos === prev.length ? base.length + mention.length : pos + mention.length;
+    if (pos === prev.length) {
+      setText(base + mention);
+    } else {
+      setText(prev.slice(0, pos) + mention + prev.slice(pos));
+    }
+    setCursorPos(newPos);
+  }, []);
+
+  // Insert player @mention from the mention panel
+  const handlePlayerMention = useCallback((player) => {
+    const mention = `@${player.characterName} `;
     const prev = textRef.current;
     const pos = cursorPosRef.current;
     const base = pos === prev.length && prev.length && !prev.endsWith(' ')
@@ -985,11 +1071,14 @@ export default function ChatInputCustom({
       html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    // @mention highlighting
-    if (npcs.length) {
-      const names = npcs.map(n => n.displayName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    // @mention highlighting (NPCs + players)
+    const allNames = [
+      ...npcs.map(n => n.displayName),
+      ...players.map(p => p.characterName),
+    ].filter(Boolean).map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    if (allNames.length) {
       html = html.replace(
-        new RegExp(`(@(?:${names.join('|')}))`, 'g'),
+        new RegExp(`(@(?:${allNames.join('|')}))`, 'g'),
         '<span class="mention-highlight-inline">$1</span>'
       );
     }
@@ -1001,7 +1090,7 @@ export default function ChatInputCustom({
     );
 
     return html;
-  }, [text, npcs, flashRange]);
+  }, [text, npcs, players, flashRange]);
 
   const showPopup = mentionQuery !== null && filteredItems.length > 0;
 
@@ -1017,6 +1106,16 @@ export default function ChatInputCustom({
 
   return (
     <>
+      {/* Hidden file input for image uploads — uses id so a <label> can trigger it natively on iOS */}
+      <input
+        id="chat-image-input"
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+
       {/* Magnifier loupe during drag */}
       {loupeInfo && loupeExcerpt && (
         <div
@@ -1039,14 +1138,14 @@ export default function ChatInputCustom({
         <div className="cki-row">
           <button
             type="button"
-            className={`chat-plus-btn${kbMode === 'extras' || kbMode === 'npcs' || kbMode === 'gifs' ? ' chat-plus-btn-active' : ''}`}
+            className={`chat-plus-btn${kbMode === 'extras' || kbMode === 'npcs' || kbMode === 'gifs' || kbMode === 'dice' ? ' chat-plus-btn-active' : ''}`}
             onPointerDown={(e) => {
               e.preventDefault();
               if (!kbOpen) {
                 setKbOpen(true);
                 setKbMode('extras');
               } else {
-                setKbMode(kbMode === 'extras' || kbMode === 'npcs' || kbMode === 'gifs' ? 'keys' : 'extras');
+                setKbMode(kbMode === 'extras' || kbMode === 'npcs' || kbMode === 'gifs' || kbMode === 'dice' ? 'keys' : 'extras');
               }
             }}
             aria-label="Extras menu"
@@ -1167,6 +1266,13 @@ export default function ChatInputCustom({
         listening={listening}
         onToggleMic={toggleMic}
         onGifSelect={handleGifSelect}
+        onImagePick={handleImagePick}
+        inputText={text}
+        players={players}
+        onPlayerMention={handlePlayerMention}
+        onSwipeWord={handleSwipeWord}
+        onSwipeReplace={handleSwipeReplace}
+        onDiceRoll={handleDiceRoll}
       />
       </div>
     </>

@@ -295,6 +295,32 @@
 - If Nalyd's provoking them solo, that's dangerous. The shadows nearly killed me and Ximena when we were a full squad.
 - Someone needs to watch his back. Guess that's me.
 
+## February 11, 2026 - The Canopy Kingdom
+
+### Climbed the Great Tree
+- Went with Tyren and Uncle Nalyd to climb the huge tree in the center of the Ranger Woods
+- Climbed double as fast as Tyren (finally proving my agility)
+- At the top, we found a hidden kingdom of intelligent squirrels
+
+### King Nuttsworth III
+- Giant squirrel, wolfhound-sized, ruled for sixty winters
+- Tyren and Nalyd gave him weed as tribute - he called it "The Sacred Leaf"
+- Nalyd almost got shanked by squirrels with tiny daggers when he tried to grab coins from the Hoard
+- Tyren got named "Warden of the Canopy" and Cal became "Sky-Shield"
+- Nalyd redeemed himself, got named "Storm-Brother to the Canopy"
+
+### What I Witnessed
+- This was mainly a Tyren and Nalyd moment. I was there, I climbed, I watched.
+- But I saw something real: a whole kingdom hidden in the trees that nobody knew about
+- Cal spoke to the squirrels in some ancient language. Squirrel kits climbed on his feathers.
+- Nuttsworth cried actual tears when Tyren pledged to help them
+- There's a war brewing with owls led by some guy called Lord Hootsalot
+
+### My Role
+- Minimal this time. I was along for the journey, not the diplomacy.
+- But now I know about the Canopy Kingdom. That's Ranger territory.
+- If the owls attack, The Ghost will be ready.
+
 ---
 
 *These memories shape who Nibby is. He carries them - the triumphs and the shame - into every interaction.*

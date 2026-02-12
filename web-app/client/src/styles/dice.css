@@ -1,0 +1,160 @@
+/* ── Dice Panel ── */
+.dice-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 12px 12px;
+  height: 100%;
+}
+
+.dice-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dice-panel-back {
+  background: none;
+  border: none;
+  color: #d4a843;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.dice-panel-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e8dcc8;
+  letter-spacing: 0.5px;
+}
+
+.dice-panel-roll-btn {
+  background: linear-gradient(135deg, #d4a843, #b8892e);
+  color: #1a1a2e;
+  border: none;
+  border-radius: 16px;
+  padding: 6px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dice-panel-roll-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.dice-panel-roll-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Notation display bar */
+.dice-notation-bar {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(212, 168, 67, 0.2);
+  border-radius: 8px;
+  padding: 6px 10px;
+  min-height: 32px;
+}
+
+.dice-notation-text {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  font-weight: 600;
+  color: #d4a843;
+  letter-spacing: 0.5px;
+}
+
+.dice-notation-bar:not(:has(.dice-notation-clear)) .dice-notation-text {
+  color: rgba(232, 220, 200, 0.35);
+  font-weight: 400;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.dice-notation-clear {
+  background: none;
+  border: none;
+  color: rgba(232, 220, 200, 0.5);
+  padding: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* Dice grid — 7 buttons */
+.dice-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.dice-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(212, 168, 67, 0.25);
+  border-radius: 8px;
+  color: #e8dcc8;
+  padding: 10px 0;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s;
+}
+
+.dice-btn:active {
+  background: rgba(212, 168, 67, 0.2);
+  transform: scale(0.95);
+}
+
+.dice-btn-label {
+  pointer-events: none;
+}
+
+/* Modifier row */
+.dice-modifiers {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dice-mod-btn {
+  flex: 1;
+  min-width: 48px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(212, 168, 67, 0.15);
+  border-radius: 6px;
+  color: #c0b89e;
+  padding: 7px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  transition: background 0.1s;
+}
+
+.dice-mod-btn:active {
+  background: rgba(212, 168, 67, 0.2);
+}
+
+.dice-mod-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.dice-mod-active {
+  background: rgba(212, 168, 67, 0.25);
+  border-color: rgba(212, 168, 67, 0.5);
+  color: #d4a843;
+}

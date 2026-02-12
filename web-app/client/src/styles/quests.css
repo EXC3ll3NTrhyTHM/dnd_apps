@@ -16,3 +16,77 @@
   flex-direction: column;
   gap: 0;
 }
+
+/* ============================================
+   DAILY GOALS
+   ============================================ */
+
+.daily-goals-section {
+  margin-bottom: 24px;
+}
+
+.daily-goals-section .section-title {
+  margin-bottom: 10px;
+}
+
+.daily-goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.daily-goal-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  transition: opacity 0.2s ease;
+}
+
+.daily-goal-done {
+  opacity: 0.55;
+}
+
+.daily-goal-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  width: 28px;
+  text-align: center;
+}
+
+.daily-goal-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.daily-goal-label {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.daily-goal-progress {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.daily-goal-xp {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #a8b4ff;
+  white-space: nowrap;
+}
+
+.daily-goal-check {
+  color: var(--color-success, #5cb85c);
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}

@@ -1,27 +1,27 @@
 {
   "424061511833747467": {
     "user_id": "424061511833747467",
-    "username": "The Architect",
-    "balance": 445,
-    "lifetime_earned": 550,
+    "username": "excellentrhythm",
+    "balance": 480,
+    "lifetime_earned": 585,
     "lifetime_spent": 105,
-    "last_updated": "2026-02-06T02:35:20.001Z"
+    "last_updated": "2026-02-12T01:40:08.221Z"
   },
   "1374906408046166036": {
     "user_id": "1374906408046166036",
     "username": "Tyren",
-    "balance": 450,
-    "lifetime_earned": 550,
+    "balance": 525,
+    "lifetime_earned": 625,
     "lifetime_spent": 100,
-    "last_updated": "2026-02-10T01:40:30.404Z"
+    "last_updated": "2026-02-11T21:09:00.000Z"
   },
   "1073385140669128725": {
     "user_id": "1073385140669128725",
     "username": "Nalyd",
-    "balance": 300,
-    "lifetime_earned": 300,
+    "balance": 375,
+    "lifetime_earned": 375,
     "lifetime_spent": 0,
-    "last_updated": "2026-02-08T02:42:00.000Z"
+    "last_updated": "2026-02-11T21:09:00.000Z"
   },
   "765978025937469481": {
     "user_id": "765978025937469481",
@@ -42,9 +42,9 @@
   "228241331296665600": {
     "user_id": "228241331296665600",
     "username": "badbeachpeach",
-    "balance": 300,
-    "lifetime_earned": 300,
+    "balance": 310,
+    "lifetime_earned": 310,
     "lifetime_spent": 0,
-    "last_updated": "2026-02-09T04:59:00.000Z"
+    "last_updated": "2026-02-12T01:33:15.805Z"
   }
 }

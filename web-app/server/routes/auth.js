@@ -15,6 +15,7 @@ const jwt = require('jsonwebtoken');
 const { getAuthorizationUrl, exchangeCode, fetchUser, getAvatarUrl } = require('../lib/discord-auth');
 const { authRequired } = require('../middleware/auth');
 const { getWallet, getInventory } = require('../lib/economy');
+const { getXpRecord, getLevelFromXp } = require('../lib/xp');
 
 const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
 
@@ -99,6 +100,9 @@ router.get('/me', authRequired, (req, res) => {
     } catch {}
   }
 
+  const xpRecord = getXpRecord(req.user.id, req.user.username);
+  const levelInfo = getLevelFromXp(xpRecord.total_xp);
+
   res.json({
     user: {
       id: req.user.id,
@@ -112,7 +116,14 @@ router.get('/me', authRequired, (req, res) => {
       lifetime_earned: wallet.lifetime_earned,
       lifetime_spent: wallet.lifetime_spent
     },
-    inventory
+    inventory,
+    xp: {
+      total_xp: xpRecord.total_xp,
+      level: levelInfo.level,
+      xp_in_level: levelInfo.xpInCurrentLevel,
+      xp_for_next: levelInfo.xpForNextLevel,
+      xp_to_next: levelInfo.xpToNextLevel
+    }
   });
 });
 

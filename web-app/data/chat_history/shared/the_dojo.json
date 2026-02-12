@@ -74,5 +74,125 @@
     "gifHeight": 248,
     "text": "Breathe Chill Out GIF by CSDRMS",
     "timestamp": "2026-02-11T06:43:49.378Z"
+  },
+  {
+    "id": "02497a53-293e-4089-a833-02736ed74a1a",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "hi I'm the queen @Djinn Zenatsu @Kai Xi Yang @Mai Xi Yang @Doc Edgar @Ximena Reyes @Kumo",
+    "timestamp": "2026-02-12T00:15:48.493Z"
+  },
+  {
+    "id": "87ff4b1f-d78b-458c-ab1e-13ecba7078c1",
+    "role": "npc",
+    "npc": "djinn",
+    "npcDisplayName": "Djinn Zenatsu",
+    "text": "Your Highness, it is an honor. How can we serve you today?",
+    "emotion": "idle",
+    "timestamp": "2026-02-12T00:15:49.611Z",
+    "reactions": {
+      "❤️": [
+        "228241331296665600"
+      ]
+    }
+  },
+  {
+    "id": "6e60430c-6fd8-4726-ba24-6f4e188119ad",
+    "role": "npc",
+    "npc": "kai",
+    "npcDisplayName": "Kai Xi Yang",
+    "text": "Hi, Queen Acacia! What brings you to the dojo today? Ready to team up for some training or maybe a spar?",
+    "emotion": "happy",
+    "timestamp": "2026-02-12T00:15:51.109Z",
+    "reactions": {
+      "❤️": [
+        "228241331296665600"
+      ]
+    }
+  },
+  {
+    "id": "61fd0573-94ea-4b82-b027-dbb83adb1065",
+    "role": "npc",
+    "npc": "mai",
+    "npcDisplayName": "Mai Xi Yang",
+    "text": "Greetings, Queen Acacia. It's a pleasure to see you. Please, what can we do for you today?",
+    "emotion": "idle",
+    "timestamp": "2026-02-12T00:15:52.392Z",
+    "reactions": {
+      "❤️": [
+        "228241331296665600"
+      ]
+    }
+  },
+  {
+    "id": "6b8f8925-3f73-4203-b595-a921eb07d726",
+    "role": "npc",
+    "npc": "edgar",
+    "npcDisplayName": "Doc Edgar",
+    "text": "Your presence commands attention, Queen Acacia. What can we do for you?",
+    "emotion": "idle",
+    "timestamp": "2026-02-12T00:15:53.491Z",
+    "reactions": {
+      "❤️": [
+        "228241331296665600"
+      ]
+    }
+  },
+  {
+    "id": "8dd4c20a-c2b4-4c70-b570-c31618ac5728",
+    "role": "npc",
+    "npc": "ximena",
+    "npcDisplayName": "Ximena Reyes",
+    "text": "¡Hola, Reina Acacia! The dojo is at your service. What fiery mission do you have for us today?",
+    "emotion": "happy",
+    "timestamp": "2026-02-12T00:15:55.074Z",
+    "reactions": {
+      "❤️": [
+        "228241331296665600"
+      ]
+    }
+  },
+  {
+    "id": "c17ccce5-f2e2-4c30-9913-8c2eca5af190",
+    "role": "npc",
+    "npc": "kumo",
+    "npcDisplayName": "Kumo",
+    "text": "Welcome, Queen Acacia. Your arrival is always a cause for celebration. How may we assist you today?",
+    "emotion": "idle",
+    "timestamp": "2026-02-12T00:15:57.034Z",
+    "reactions": {
+      "❤️": [
+        "228241331296665600"
+      ]
+    }
+  },
+  {
+    "id": "36096037-7500-464c-b2be-bd50984f26d5",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "just wanted to say hi!",
+    "timestamp": "2026-02-12T00:16:24.171Z"
+  },
+  {
+    "id": "7916e60e-8a38-4823-95e5-36f306b9c8e5",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Djinn Zenatsu Hey",
+    "timestamp": "2026-02-12T01:58:08.145Z"
+  },
+  {
+    "id": "2d46a9db-5fbe-4a0f-a989-3579510350bb",
+    "role": "npc",
+    "npc": "djinn",
+    "npcDisplayName": "Djinn Zenatsu",
+    "text": "Hello again. Good to see you. Is there something on your mind?",
+    "emotion": "idle",
+    "timestamp": "2026-02-12T01:58:09.689Z"
   }
 ]

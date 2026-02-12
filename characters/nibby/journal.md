@@ -24,3 +24,7 @@
 [2026-02-04] We went into the woods to investigate strange markings. Got ambushed by Dire Shadowcats, then a massive Shadow Stalker showed up. It knocked Ximena unconscious. Nalyd went Ignition form and punched clean through its chest, killing it. Scariest night of my life but we handled it as a team. Tyren saved me from a pouncing cat. Took Ximena to get medical help after.
 
 [2026-02-04] Today, I waved goodbye to Tyren and felt a swell of appreciation as he headed home. Ximena and I pumped each other up for our check-up, ready to tackle whatever came our way—I even threw in a mock heroic pose to keep the spirits high!
+
+[2026-02-11] Today, Nalyd and Tyren proposed climbing that massive tree in the Ranger Forest. I shared my suspicions about it hiding something intriguing, perhaps even dangerous. Adventure truly beckons, and I can’t wait to scout it out!
+
+[2026-02-11] Today, Tyren offered me a smoke, which I found amusing given my reputation as The Ghost. After that, we decided to climb a massive tree, and I couldn't help but admire Tyren's speed while reminding him to be careful—after all, I have a ghostly image to uphold!

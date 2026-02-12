@@ -22,3 +22,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </HashRouter>
   </React.StrictMode>
 );
+
+// Fade out and remove the splash screen
+const splash = document.getElementById('splash');
+if (splash) {
+  splash.style.opacity = '0';
+  splash.addEventListener('transitionend', () => splash.remove());
+}

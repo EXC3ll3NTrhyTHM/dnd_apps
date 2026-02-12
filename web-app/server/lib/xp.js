@@ -1,0 +1,420 @@
+/**
+ * XP System Data Layer
+ *
+ * Tracks player XP, levels, and daily activity.
+ * Uses atomic writes (write .tmp then rename) to avoid corruption.
+ * XP data is web-app only (not shared with Discord bots).
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const XP_PATH = path.resolve(__dirname, '..', '..', 'data', 'xp.json');
+const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
+
+// ============================================
+// XP CONSTANTS
+// ============================================
+
+const XP_PER_MESSAGE = 5;
+const XP_PER_REACTION = 2;
+const XP_PER_LOCATION_VISIT = 15;
+const XP_DAILY_LOGIN = 25;
+const XP_PER_GOLD_SPENT = 1;
+
+const MAX_DAILY_MESSAGES = 50;
+const MAX_DAILY_REACTIONS = 50;
+
+const GOLD_TO_XP_RATIO = 0.5;
+
+const BASE_XP = 5000;
+const LEVEL_MULTIPLIER = 1.3;
+const MIN_LEVEL = 4;
+const MAX_LEVEL = 20;
+
+// Pre-compute level thresholds (cumulative XP needed for each level)
+const LEVEL_THRESHOLDS = [];
+(function buildThresholds() {
+  let cumulative = 0;
+  for (let lvl = MIN_LEVEL; lvl <= MAX_LEVEL; lvl++) {
+    const xpForThisLevel = Math.round(BASE_XP * Math.pow(LEVEL_MULTIPLIER, lvl - MIN_LEVEL));
+    cumulative += xpForThisLevel;
+    LEVEL_THRESHOLDS.push({ level: lvl, cumulativeXp: cumulative, xpForLevel: xpForThisLevel });
+  }
+})();
+
+// ============================================
+// ATOMIC I/O
+// ============================================
+
+function atomicWrite(filePath, data) {
+  const tempPath = filePath + '.tmp';
+  fs.writeFileSync(tempPath, JSON.stringify(data, null, 2));
+  fs.renameSync(tempPath, filePath);
+}
+
+function loadXpData() {
+  try {
+    return JSON.parse(fs.readFileSync(XP_PATH, 'utf-8'));
+  } catch (err) {
+    return {};
+  }
+}
+
+function saveXpData(data) {
+  atomicWrite(XP_PATH, data);
+}
+
+// ============================================
+// DAILY RESET
+// ============================================
+
+function getTodayDate() {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+function ensureFreshDaily(record) {
+  const today = getTodayDate();
+  if (!record.daily || record.daily.date !== today) {
+    record.daily = {
+      date: today,
+      messages_sent: 0,
+      reactions_given: 0,
+      locations_visited: [],
+      login_claimed: false
+    };
+  }
+  return record;
+}
+
+function ensureLifetime(record) {
+  if (!record.lifetime) {
+    record.lifetime = {
+      messages_sent: 0,
+      reactions_given: 0,
+      locations_visited: [],
+      gold_spent: 0,
+      tavern_purchases: 0,
+      shop_purchases: 0,
+      gifs_sent: 0,
+      images_sent: 0,
+    };
+  }
+  return record;
+}
+
+// ============================================
+// GET OR CREATE
+// ============================================
+
+function getXpRecord(userId, username) {
+  const data = loadXpData();
+  if (!data[userId]) {
+    data[userId] = {
+      user_id: userId,
+      username: username || 'Unknown',
+      total_xp: 0,
+      last_updated: new Date().toISOString(),
+      daily: {
+        date: getTodayDate(),
+        messages_sent: 0,
+        reactions_given: 0,
+        locations_visited: [],
+        login_claimed: false
+      },
+      gold_conversion_done: false
+    };
+    saveXpData(data);
+  }
+  const record = data[userId];
+  if (username && record.username !== username) {
+    record.username = username;
+  }
+  ensureFreshDaily(record);
+  return record;
+}
+
+// ============================================
+// LEVEL CALCULATION
+// ============================================
+
+function getLevelFromXp(totalXp) {
+  let level = MIN_LEVEL;
+  let prevCumulative = 0;
+
+  for (const threshold of LEVEL_THRESHOLDS) {
+    if (totalXp < threshold.cumulativeXp) {
+      return {
+        level,
+        xpForNextLevel: threshold.xpForLevel,
+        xpInCurrentLevel: totalXp - prevCumulative,
+        xpToNextLevel: threshold.cumulativeXp - totalXp
+      };
+    }
+    level = threshold.level + 1;
+    prevCumulative = threshold.cumulativeXp;
+  }
+
+  // Max level reached
+  const lastThreshold = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
+  return {
+    level: MAX_LEVEL,
+    xpForNextLevel: 0,
+    xpInCurrentLevel: totalXp - (lastThreshold.cumulativeXp - lastThreshold.xpForLevel),
+    xpToNextLevel: 0
+  };
+}
+
+// ============================================
+// XP AWARD FUNCTIONS
+// ============================================
+
+function awardMessageXp(userId, username) {
+  const data = loadXpData();
+  if (!data[userId]) {
+    getXpRecord(userId, username); // creates it
+    return awardMessageXp(userId, username); // retry with fresh data
+  }
+  const record = data[userId];
+  ensureFreshDaily(record);
+  ensureLifetime(record);
+
+  record.lifetime.messages_sent += 1;
+
+  if (record.daily.messages_sent >= MAX_DAILY_MESSAGES) {
+    saveXpData(data); // save lifetime even if daily capped
+    return record;
+  }
+
+  record.daily.messages_sent += 1;
+  record.total_xp += XP_PER_MESSAGE;
+  record.last_updated = new Date().toISOString();
+  saveXpData(data);
+  return record;
+}
+
+function awardReactionXp(userId, username) {
+  const data = loadXpData();
+  if (!data[userId]) {
+    getXpRecord(userId, username);
+    return awardReactionXp(userId, username);
+  }
+  const record = data[userId];
+  ensureFreshDaily(record);
+  ensureLifetime(record);
+
+  record.lifetime.reactions_given += 1;
+
+  if (record.daily.reactions_given >= MAX_DAILY_REACTIONS) {
+    saveXpData(data);
+    return record;
+  }
+
+  record.daily.reactions_given += 1;
+  record.total_xp += XP_PER_REACTION;
+  record.last_updated = new Date().toISOString();
+  saveXpData(data);
+  return record;
+}
+
+function awardLocationVisitXp(userId, username, locationId) {
+  const data = loadXpData();
+  if (!data[userId]) {
+    getXpRecord(userId, username);
+    return awardLocationVisitXp(userId, username, locationId);
+  }
+  const record = data[userId];
+  ensureFreshDaily(record);
+  ensureLifetime(record);
+
+  // Track unique lifetime visits
+  if (!record.lifetime.locations_visited.includes(locationId)) {
+    record.lifetime.locations_visited.push(locationId);
+  }
+
+  if (record.daily.locations_visited.includes(locationId)) {
+    saveXpData(data);
+    return record; // already visited today
+  }
+
+  record.daily.locations_visited.push(locationId);
+  record.total_xp += XP_PER_LOCATION_VISIT;
+  record.last_updated = new Date().toISOString();
+  saveXpData(data);
+  return record;
+}
+
+function awardDailyLoginXp(userId, username) {
+  const data = loadXpData();
+  if (!data[userId]) {
+    getXpRecord(userId, username);
+    return awardDailyLoginXp(userId, username);
+  }
+  const record = data[userId];
+  ensureFreshDaily(record);
+
+  if (record.daily.login_claimed) {
+    return record; // already claimed today
+  }
+
+  record.daily.login_claimed = true;
+  record.total_xp += XP_DAILY_LOGIN;
+  record.last_updated = new Date().toISOString();
+  saveXpData(data);
+  return record;
+}
+
+function awardGoldSpendXp(userId, username, goldAmount) {
+  const data = loadXpData();
+  if (!data[userId]) {
+    getXpRecord(userId, username);
+    return awardGoldSpendXp(userId, username, goldAmount);
+  }
+  const record = data[userId];
+  ensureFreshDaily(record);
+  ensureLifetime(record);
+
+  record.lifetime.gold_spent += goldAmount;
+
+  const xpGained = Math.floor(goldAmount * XP_PER_GOLD_SPENT);
+  if (xpGained <= 0) {
+    saveXpData(data);
+    return record;
+  }
+
+  record.total_xp += xpGained;
+  record.last_updated = new Date().toISOString();
+  saveXpData(data);
+  return record;
+}
+
+function awardQuestXp(userId, username, questId, amount) {
+  const data = loadXpData();
+  if (!data[userId]) {
+    getXpRecord(userId, username);
+    return awardQuestXp(userId, username, questId, amount);
+  }
+  const record = data[userId];
+  ensureFreshDaily(record);
+
+  record.total_xp += amount;
+  record.last_updated = new Date().toISOString();
+  saveXpData(data);
+  return record;
+}
+
+function dmAwardXp(userId, username, amount, reason) {
+  const data = loadXpData();
+  if (!data[userId]) {
+    getXpRecord(userId, username);
+    return dmAwardXp(userId, username, amount, reason);
+  }
+  const record = data[userId];
+  ensureFreshDaily(record);
+
+  record.total_xp += amount;
+  record.last_updated = new Date().toISOString();
+  saveXpData(data);
+  return record;
+}
+
+function incrementLifetimeStat(userId, username, stat, amount = 1) {
+  const data = loadXpData();
+  if (!data[userId]) {
+    getXpRecord(userId, username);
+    return incrementLifetimeStat(userId, username, stat, amount);
+  }
+  const record = data[userId];
+  ensureLifetime(record);
+  if (typeof record.lifetime[stat] === 'number') {
+    record.lifetime[stat] += amount;
+  }
+  saveXpData(data);
+  return record;
+}
+
+function convertGoldToXp(userId, username, goldBalance) {
+  const data = loadXpData();
+  if (!data[userId]) {
+    getXpRecord(userId, username);
+    return convertGoldToXp(userId, username, goldBalance);
+  }
+  const record = data[userId];
+
+  if (record.gold_conversion_done) {
+    return { success: false, message: 'Gold conversion already done for this player.' };
+  }
+
+  const xpGained = Math.floor(goldBalance * GOLD_TO_XP_RATIO);
+  record.total_xp += xpGained;
+  record.gold_conversion_done = true;
+  record.last_updated = new Date().toISOString();
+  saveXpData(data);
+  return { success: true, xp_gained: xpGained, total_xp: record.total_xp };
+}
+
+// ============================================
+// LEADERBOARD
+// ============================================
+
+function getXpLeaderboard(limit = 10) {
+  const xpData = loadXpData();
+  let players = {};
+  try { players = JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8')); }
+  catch { /* ignore */ }
+
+  return Object.values(xpData)
+    .sort((a, b) => b.total_xp - a.total_xp)
+    .slice(0, limit)
+    .map((record, i) => {
+      const levelInfo = getLevelFromXp(record.total_xp);
+      return {
+        rank: i + 1,
+        user_id: record.user_id,
+        username: players[record.user_id]?.characterName || record.username,
+        total_xp: record.total_xp,
+        level: levelInfo.level
+      };
+    });
+}
+
+module.exports = {
+  // I/O
+  loadXpData,
+  saveXpData,
+
+  // Core
+  getXpRecord,
+  getLevelFromXp,
+  ensureFreshDaily,
+  ensureLifetime,
+  incrementLifetimeStat,
+
+  // Awards
+  awardMessageXp,
+  awardReactionXp,
+  awardLocationVisitXp,
+  awardDailyLoginXp,
+  awardGoldSpendXp,
+  awardQuestXp,
+  dmAwardXp,
+  convertGoldToXp,
+
+  // Leaderboard
+  getXpLeaderboard,
+
+  // Constants
+  XP_PER_MESSAGE,
+  XP_PER_REACTION,
+  XP_PER_LOCATION_VISIT,
+  XP_DAILY_LOGIN,
+  XP_PER_GOLD_SPENT,
+  MAX_DAILY_MESSAGES,
+  MAX_DAILY_REACTIONS,
+  GOLD_TO_XP_RATIO,
+  BASE_XP,
+  LEVEL_MULTIPLIER,
+  MIN_LEVEL,
+  MAX_LEVEL,
+  LEVEL_THRESHOLDS
+};

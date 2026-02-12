@@ -3,10 +3,10 @@ import { registerSW } from 'virtual:pwa-register';
 
 export default function PwaUpdateBanner() {
   const [needRefresh, setNeedRefresh] = useState(false);
-  const [updateSW, setUpdateSW] = useState(null);
 
   useEffect(() => {
-    const update = registerSW({
+    registerSW({
+      immediate: true,
       onNeedRefresh() {
         setNeedRefresh(true);
       },
@@ -14,7 +14,6 @@ export default function PwaUpdateBanner() {
         // silently ready for offline
       }
     });
-    setUpdateSW(() => update);
   }, []);
 
   if (!needRefresh) return null;
@@ -24,9 +23,9 @@ export default function PwaUpdateBanner() {
       <span className="pwa-update-text">A new version is available</span>
       <button
         className="pwa-update-btn"
-        onClick={() => updateSW?.(true)}
+        onClick={() => window.location.reload()}
       >
-        Update
+        Refresh
       </button>
     </div>
   );

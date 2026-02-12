@@ -10,16 +10,31 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { 
-  loadLocations, 
-  loadNpcRegistry 
+const {
+  loadLocations,
+  loadNpcRegistry
 } = require('../lib/dialogue');
+const multer = require('multer');
 const { WebSocket } = require('ws');
 const { setNpcTyping } = require('../lib/typing');
+const { notifyPlayerMentions } = require('../lib/notifications');
 
 const DATA_DIR = path.resolve(__dirname, '..', '..', 'data');
 const HISTORY_DIR = path.join(DATA_DIR, 'chat_history', 'shared');
+const DM_HISTORY_DIR = path.join(DATA_DIR, 'chat_history', 'marcel_dm');
 const PLAYERS_PATH = path.join(DATA_DIR, 'players.json');
+
+// Resolve history file path — marcel_dm_* channels use a separate directory
+function resolveHistoryPath(channelId) {
+  const dmMatch = channelId.match(/^marcel_dm_(.+)$/);
+  if (dmMatch) {
+    if (!fs.existsSync(DM_HISTORY_DIR)) {
+      fs.mkdirSync(DM_HISTORY_DIR, { recursive: true });
+    }
+    return path.join(DM_HISTORY_DIR, `${dmMatch[1]}.json`);
+  }
+  return path.join(HISTORY_DIR, `${channelId}.json`);
+}
 
 // In-memory queue for messages mentioning Marcel
 // In a real app, this might be Redis or a database table
@@ -127,6 +142,23 @@ router.get('/channels', (req, res) => {
     description: loc.description,
     npcs: loc.npcs || []
   }));
+
+  // Also list marcel_dm_* channels from the DM directory
+  try {
+    const dmFiles = fs.readdirSync(DM_HISTORY_DIR).filter(f => f.endsWith('.json'));
+    for (const f of dmFiles) {
+      const userId = f.replace('.json', '');
+      channels.push({
+        id: `marcel_dm_${userId}`,
+        name: `Marcel DM (${userId})`,
+        description: 'Private Marcel DM channel',
+        npcs: ['marcel']
+      });
+    }
+  } catch {
+    // DM directory may not exist yet
+  }
+
   res.json({ channels });
 });
 
@@ -136,8 +168,8 @@ router.get('/channels', (req, res) => {
  */
 router.get('/channels/:id/messages', (req, res) => {
   const { id } = req.params;
-  const histPath = path.join(HISTORY_DIR, `${id}.json`);
-  
+  const histPath = resolveHistoryPath(id);
+
   try {
     const history = JSON.parse(fs.readFileSync(histPath, 'utf-8'));
     res.json({ history });
@@ -156,7 +188,7 @@ router.post('/channels/:id/messages', (req, res) => {
 
   if (!text) return res.status(400).json({ error: 'Text is required' });
 
-  const histPath = path.join(HISTORY_DIR, `${id}.json`);
+  const histPath = resolveHistoryPath(id);
   let history = [];
   try {
     history = JSON.parse(fs.readFileSync(histPath, 'utf-8'));
@@ -198,6 +230,14 @@ router.post('/channels/:id/messages', (req, res) => {
   
   try {
     fs.writeFileSync(histPath, JSON.stringify(trimmed, null, 2));
+
+    // Notify @mentions in Marcel's message
+    if (router.app) {
+      const locations = loadLocations();
+      const locName = locations[id]?.name || id;
+      notifyPlayerMentions(text, id, locName, 'Marcel', router.app);
+    }
+
     res.json({ success: true, message: npcMsg });
   } catch (error) {
     res.status(500).json({ error: 'Failed to save message' });
@@ -224,6 +264,107 @@ router.get('/users/:id', (req, res) => {
   } catch {
     res.status(500).json({ error: 'Failed to load players' });
   }
+});
+
+/**
+ * POST /api/clawdbot/channels/:id/upload
+ * Bot/NPC image upload — multipart/form-data
+ */
+const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
+const UPLOAD_LOG_PATH = path.join(DATA_DIR, 'upload_log.json');
+const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+const botStorage = multer.diskStorage({
+  destination: UPLOADS_DIR,
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+    cb(null, `${crypto.randomUUID()}${ext}`);
+  }
+});
+
+const botUpload = multer({
+  storage: botStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (ALLOWED_MIMES.includes(file.mimetype)) cb(null, true);
+    else cb(new Error('Invalid file type'));
+  }
+});
+
+router.post('/channels/:id/upload', (req, res) => {
+  botUpload.single('image')(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    const { id } = req.params;
+    const { caption, npc, emotion } = req.body;
+    const filename = req.file.filename;
+    const imageUrl = `/uploads/${filename}`;
+    const registry = loadNpcRegistry();
+    const npcName = npc || 'marcel';
+
+    const npcMsg = {
+      id: crypto.randomUUID(),
+      role: 'npc',
+      type: 'image',
+      npc: npcName,
+      npcDisplayName: registry[npcName]?.displayName || 'Marcel',
+      imageUrl,
+      imageWidth: null,
+      imageHeight: null,
+      text: caption || '',
+      emotion: emotion || 'idle',
+      timestamp: new Date().toISOString()
+    };
+
+    const histPath = resolveHistoryPath(id);
+    let history = [];
+    try { history = JSON.parse(fs.readFileSync(histPath, 'utf-8')); }
+    catch { /* ignore */ }
+
+    history.push(npcMsg);
+    setNpcTyping(id, npcMsg.npc, npcMsg.npcDisplayName, false);
+
+    const trimmed = history.slice(-30);
+    try {
+      fs.writeFileSync(histPath, JSON.stringify(trimmed, null, 2));
+    } catch (error) {
+      return res.status(500).json({ error: 'Failed to save message' });
+    }
+
+    // Log the upload
+    let log = [];
+    try { log = JSON.parse(fs.readFileSync(UPLOAD_LOG_PATH, 'utf-8')); }
+    catch { /* first entry */ }
+    log.push({
+      id: npcMsg.id,
+      filename,
+      originalName: req.file.originalname,
+      mimeType: req.file.mimetype,
+      sizeBytes: req.file.size,
+      width: null,
+      height: null,
+      uploadedBy: 'bot',
+      uploaderName: npcMsg.npcDisplayName,
+      channel: id,
+      channelType: id.startsWith('marcel_dm_') ? 'marcel_dm' : 'shared',
+      messageId: npcMsg.id,
+      timestamp: npcMsg.timestamp
+    });
+    const tmpLog = UPLOAD_LOG_PATH + '.tmp';
+    fs.writeFileSync(tmpLog, JSON.stringify(log, null, 2));
+    fs.renameSync(tmpLog, UPLOAD_LOG_PATH);
+
+    res.json({ success: true, message: npcMsg });
+  });
 });
 
 module.exports = router;

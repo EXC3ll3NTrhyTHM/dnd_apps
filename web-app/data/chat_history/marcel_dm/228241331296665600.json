@@ -1,0 +1,25 @@
+[
+  {
+    "id": "6a16c509-25b7-457b-ad17-17c15b33ec93",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "Hiii",
+    "timestamp": "2026-02-12T00:46:45.314Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "7109f423-8d1e-4ef7-8322-e2d475913af9",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Hey Acacia! What's up?",
+    "emotion": "idle",
+    "timestamp": "2026-02-12T00:46:50.389Z"
+  }
+]

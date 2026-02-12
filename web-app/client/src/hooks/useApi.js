@@ -38,6 +38,36 @@ export async function api(endpoint, options = {}) {
 }
 
 /**
+ * Upload helper for multipart/form-data (no Content-Type header — browser sets boundary)
+ */
+export async function apiUpload(endpoint, formData) {
+  const token = localStorage.getItem('dh_token');
+
+  const headers = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE}${endpoint}`, {
+    method: 'POST',
+    headers,
+    body: formData,
+    credentials: 'include'
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    const error = new Error(data.error || 'Upload failed');
+    error.status = response.status;
+    error.data = data;
+    throw error;
+  }
+
+  return data;
+}
+
+/**
  * Hook-style fetcher for simple GET requests
  */
 export function useApiFetch(endpoint) {
