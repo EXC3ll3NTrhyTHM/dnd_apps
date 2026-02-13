@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect, memo } from 'react';
+import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { getAudioMuted } from '../hooks/useAudioSettings';
 import { EMOJI_CATEGORIES } from '../data/emojiData';
 import { api } from '../hooks/useApi';
 import NpcPortrait from './NpcPortrait';
 import { matchSwipePath } from '../utils/swipeMatch';
+import { getNpcFreqs, bumpNpcFreq } from '../lib/npcFreq';
 import DicePanel from './DicePanel';
 
 const NUMBERS_ROW = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
@@ -17,7 +18,7 @@ const ROWS = [
 const SYMBOLS_ROWS = [
   ['@', '#', '$', '&', '*', '-', '+', '(', ')', '/'],
   ['\\', '|', '~', '`', '=', '{', '}', '[', ']'],
-  ['!', '"', "'", ':', ';', ',', '?', '.'],
+  ['!', '"', "'", ':', ';', ',', '?'],
 ];
 
 const COMPACT_H = 254;
@@ -71,6 +72,8 @@ const CustomKeyboard = memo(function CustomKeyboard({
   players, onPlayerMention,
   onSwipeWord, onSwipeReplace,
   onDiceRoll,
+  onUseItem,
+  locationId,
 }) {
   const [shifted, setShifted] = useState(false);
   const [symbols, setSymbols] = useState(false);
@@ -95,16 +98,33 @@ const CustomKeyboard = memo(function CustomKeyboard({
 
   // Swipe-to-type state
   const [swipeSuggestion, setSwipeSuggestion] = useState(null); // { words: string[], selected: number } | null
+  const [npcFreqBump, setNpcFreqBump] = useState(0);
+
+  // Items inventory state
+  const [itemsList, setItemsList] = useState(null); // null = not loaded
+  const [usingItem, setUsingItem] = useState(false);
+
   const swipeState = useRef({ active: false, startX: 0, startY: 0, startBtn: null, keys: [], lastKey: '', points: [], pointerId: null, isTouch: false, keyRects: [] });
   const canvasRef = useRef(null);
   const boardRef = useRef(null);
+  const cachedKeyRectsRef = useRef(null);
 
   // Drag-to-expand state
   const dragState = useRef({ active: false, startY: 0, currentH: COMPACT_H, maxH: 500 });
 
+  // NPCs + players sorted by mention frequency (for suggestion bar quick-mention, top 4)
+  const sortedContacts = useMemo(() => {
+    const items = [];
+    for (const npc of (npcs || [])) items.push({ type: 'npc', id: npc.id, data: npc });
+    for (const p of (players || [])) items.push({ type: 'player', id: p.id, data: p });
+    if (items.length === 0) return [];
+    const freqs = getNpcFreqs(locationId);
+    return items.sort((a, b) => (freqs[b.id] || 0) - (freqs[a.id] || 0)).slice(0, 4);
+  }, [npcs, players, locationId, npcFreqBump]);
+
   // Keep callback refs current so the delegation handler stays stable
   const refs = useRef({});
-  refs.current = { onKey, onBackspace, onSubmit, onClose, onPaste, onLeft, onRight, playSound, disabled, onModeChange, onNpcMention, onGroupMention, onPlayerMention, onToggleMic, onGifSelect, onImagePick, onSwipeWord, onSwipeReplace };
+  refs.current = { onKey, onBackspace, onSubmit, onClose, onPaste, onLeft, onRight, playSound, disabled, onModeChange, onNpcMention, onGroupMention, onPlayerMention, onToggleMic, onGifSelect, onImagePick, onSwipeWord, onSwipeReplace, onUseItem };
 
   const shiftedRef = useRef(false);
   const symbolsRef = useRef(false);
@@ -115,6 +135,28 @@ const CustomKeyboard = memo(function CustomKeyboard({
   useEffect(() => {
     if (open) initKeyTapAudio();
   }, [open]);
+
+  // Cache letter key bounding rects so we don't force layout reflow on every tap.
+  // Recompute when layout changes (open, symbols toggle, mode).
+  useEffect(() => {
+    cachedKeyRectsRef.current = null; // invalidate
+    if (!open || mode !== 'keys' || symbols) return;
+    // Defer to next frame so the DOM has settled
+    const raf = requestAnimationFrame(() => {
+      const board = boardRef.current;
+      if (!board) return;
+      const rects = [];
+      const allKeys = board.querySelectorAll('[data-action="key"]');
+      for (const k of allKeys) {
+        const c = k.dataset.char;
+        if (c && LETTER_KEYS.has(c)) {
+          rects.push({ char: c, rect: k.getBoundingClientRect(), el: k });
+        }
+      }
+      cachedKeyRectsRef.current = rects;
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [open, symbols, mode]);
 
   // Reset expanded and contact tab when keyboard closes
   useEffect(() => {
@@ -261,7 +303,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
   useEffect(() => {
     return () => {
       clearTimeout(backspaceTimer.current);
-      clearInterval(backspaceInterval.current);
+      clearTimeout(backspaceInterval.current);
       clearTimeout(repeatTimer.current);
       clearInterval(repeatInterval.current);
     };
@@ -664,7 +706,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
     el.classList.add('ck-key-preview-visible');
     previewTimerRef.current = setTimeout(() => {
       el.classList.remove('ck-key-preview-visible');
-    }, 300);
+    }, 120);
   };
 
   const hidePreview = () => {
@@ -771,18 +813,8 @@ const CustomKeyboard = memo(function CustomKeyboard({
         sw.pointerId = e.pointerId;
         sw.isTouch = (e.pointerType === 'touch');
 
-        // Precompute bounding rects of all letter keys for coordinate-based hit testing
-        // (eliminates unreliable elementsFromPoint / elementFromPoint on mobile)
-        sw.keyRects = [];
-        if (board) {
-          const allKeys = board.querySelectorAll('[data-action="key"]');
-          for (const k of allKeys) {
-            const c = k.dataset.char;
-            if (c && LETTER_KEYS.has(c)) {
-              sw.keyRects.push({ char: c, rect: k.getBoundingClientRect(), el: k });
-            }
-          }
-        }
+        // Use cached key rects to avoid layout thrashing on every tap
+        sw.keyRects = cachedKeyRectsRef.current || [];
 
         initTrailCanvas(); // size canvas now so coordinates are consistent
         return; // defer — don't dispatch key yet
@@ -817,16 +849,24 @@ const CustomKeyboard = memo(function CustomKeyboard({
       if (gifSearchActive) {
         setGifQuery(q => q.slice(0, -1));
         backspaceTimer.current = setTimeout(() => {
-          backspaceInterval.current = setInterval(() => {
+          let delay = 120;
+          const tick = () => {
             setGifQuery(q => q.slice(0, -1));
-          }, 60);
+            if (delay > 30) delay = Math.max(30, delay - 10);
+            backspaceInterval.current = setTimeout(tick, delay);
+          };
+          backspaceInterval.current = setTimeout(tick, delay);
         }, 400);
       } else {
         onBackspace();
         backspaceTimer.current = setTimeout(() => {
-          backspaceInterval.current = setInterval(() => {
+          let delay = 120;
+          const tick = () => {
             refs.current.onBackspace();
-          }, 60);
+            if (delay > 30) delay = Math.max(30, delay - 10);
+            backspaceInterval.current = setTimeout(tick, delay);
+          };
+          backspaceInterval.current = setTimeout(tick, delay);
         }, 400);
       }
     } else if (action === 'shift') {
@@ -919,6 +959,28 @@ const CustomKeyboard = memo(function CustomKeyboard({
     } else if (action === 'open-dice') {
       playKeyTap();
       onModeChange('dice');
+    } else if (action === 'open-items') {
+      playKeyTap();
+      onModeChange('items');
+      // Fetch inventory on panel open
+      setItemsList(null);
+      api('/api/inventory')
+        .then(data => setItemsList((data.items || []).filter(i => i.type === 'consumable' && i.quantity > 0)))
+        .catch(() => setItemsList([]));
+    } else if (action === 'use-item') {
+      playKeyTap();
+      const itemId = btn.dataset.itemId;
+      if (!itemId || usingItem) return;
+      setUsingItem(true);
+      refs.current.onUseItem?.(itemId).then((updatedInventory) => {
+        if (updatedInventory) {
+          setItemsList((updatedInventory.items || []).filter(i => i.type === 'consumable' && i.quantity > 0));
+        }
+        onModeChange('extras');
+        setUsingItem(false);
+      }).catch(() => {
+        setUsingItem(false);
+      });
     } else if (action === 'gif-select') {
       playKeyTap();
       const gifId = btn.dataset.gifId;
@@ -1079,7 +1141,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
     const action = btn?.dataset.action;
     if (action === 'backspace') {
       clearTimeout(backspaceTimer.current);
-      clearInterval(backspaceInterval.current);
+      clearTimeout(backspaceInterval.current);
     } else if (action === 'left' || action === 'right') {
       clearTimeout(repeatTimer.current);
       clearInterval(repeatInterval.current);
@@ -1099,7 +1161,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
     }
     emojiTap.current = null;
     clearTimeout(backspaceTimer.current);
-    clearInterval(backspaceInterval.current);
+    clearTimeout(backspaceInterval.current);
     clearTimeout(repeatTimer.current);
     clearInterval(repeatInterval.current);
   };
@@ -1113,6 +1175,18 @@ const CustomKeyboard = memo(function CustomKeyboard({
       refs.current.onSwipeReplace?.(word);
       return { ...prev, selected: index };
     });
+  };
+
+  // Handle contact portrait tap in suggestion bar — insert @mention + bump frequency
+  const handleContactBarTap = (contact) => {
+    playKeyTap();
+    bumpNpcFreq(contact.id, locationId);
+    setNpcFreqBump(c => c + 1);
+    if (contact.type === 'npc') {
+      refs.current.onNpcMention?.(contact.data);
+    } else {
+      refs.current.onPlayerMention?.(contact.data);
+    }
   };
 
   if (!open) return null;
@@ -1297,6 +1371,18 @@ const CustomKeyboard = memo(function CustomKeyboard({
             </button>
             <button
               className="ck-extras-btn"
+              data-action="open-items"
+              type="button"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
+              </svg>
+              <span>Items</span>
+            </button>
+            <button
+              className="ck-extras-btn"
               data-action="open-dice"
               type="button"
             >
@@ -1310,6 +1396,40 @@ const CustomKeyboard = memo(function CustomKeyboard({
               </svg>
               <span>Dice</span>
             </button>
+          </div>
+        ) : mode === 'items' ? (
+          <div className="ck-items-panel">
+            <div className="ck-items-header">
+              <button className="ck-npcs-back" data-action="back-to-extras" type="button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+              <span className="ck-npcs-label">Items</span>
+            </div>
+            <div className="ck-items-list">
+              {!itemsList ? (
+                <div className="ck-items-loading">Loading inventory...</div>
+              ) : itemsList.length === 0 ? (
+                <div className="ck-items-loading">No consumable items</div>
+              ) : itemsList.map(item => (
+                <div key={item.item_id} className="ck-item-row">
+                  <div className="ck-item-info">
+                    <span className="ck-item-name">{item.name}</span>
+                    <span className="ck-item-qty">Qty: {item.quantity}</span>
+                  </div>
+                  <button
+                    className="ck-item-use-btn"
+                    data-action="use-item"
+                    data-item-id={item.item_id}
+                    type="button"
+                    disabled={usingItem}
+                  >
+                    Use
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         ) : mode === 'npcs' ? (
           <div className="ck-npcs-panel">
@@ -1392,7 +1512,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
                     type="button"
                   >
                     <div className="ck-npcs-group-icon">
-                      {group.id === 'everyone' ? '👥' : group.displayName.charAt(0)}
+                      {group.displayName.charAt(0)}
                     </div>
                     <span className="ck-npcs-name">{group.displayName}</span>
                   </button>
@@ -1496,10 +1616,10 @@ const CustomKeyboard = memo(function CustomKeyboard({
           />
         ) : (
           <>
-            {/* Swipe suggestion bar */}
-            {swipeSuggestion && swipeSuggestion.words.length > 1 && (
-              <div className="ck-swipe-suggestions">
-                {swipeSuggestion.words.map((w, i) => (
+            {/* Swipe suggestion bar — always rendered to keep board height stable */}
+            <div className="ck-swipe-suggestions">
+              {swipeSuggestion && swipeSuggestion.words.length > 1 ? (
+                swipeSuggestion.words.map((w, i) => (
                   <button
                     key={w}
                     className={`ck-swipe-suggestion${i === swipeSuggestion.selected ? ' ck-swipe-suggestion-active' : ''}`}
@@ -1508,9 +1628,32 @@ const CustomKeyboard = memo(function CustomKeyboard({
                   >
                     {w}
                   </button>
-                ))}
-              </div>
-            )}
+                ))
+              ) : !swipeSuggestion && sortedContacts.length > 0 ? (
+                sortedContacts.map(contact => (
+                  <button
+                    key={`${contact.type}-${contact.id}`}
+                    className="ck-swipe-npc"
+                    type="button"
+                    onPointerDown={(ev) => { ev.preventDefault(); ev.stopPropagation(); handleContactBarTap(contact); }}
+                  >
+                    {contact.type === 'npc' ? (
+                      <NpcPortrait
+                        npcId={contact.id}
+                        emotion={npcEmotions?.[contact.id] || 'idle'}
+                        size={26}
+                      />
+                    ) : (
+                      <img
+                        src={contact.data.avatar}
+                        alt={contact.data.characterName}
+                        className="ck-swipe-npc-avatar"
+                      />
+                    )}
+                  </button>
+                ))
+              ) : null}
+            </div>
             {keyboardRows}
           </>
         )}

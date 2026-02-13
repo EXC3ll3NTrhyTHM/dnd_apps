@@ -28,3 +28,7 @@
 [2026-02-11] Today, Nalyd and Tyren proposed climbing that massive tree in the Ranger Forest. I shared my suspicions about it hiding something intriguing, perhaps even dangerous. Adventure truly beckons, and I can’t wait to scout it out!
 
 [2026-02-11] Today, Tyren offered me a smoke, which I found amusing given my reputation as The Ghost. After that, we decided to climb a massive tree, and I couldn't help but admire Tyren's speed while reminding him to be careful—after all, I have a ghostly image to uphold!
+
+[2026-02-12] Today was a bit embarrassing as I totally zoned out during a conversation about our adventures in the squirrel kingdom, led by the enigmatic King Nuttsworth. I facepalmed when reminded of my own escapades, and even got scolded by Nalyd to stay out of the woods, which I reluctantly agreed to for now.
+
+[2026-02-12] Today, I had a serious talk with Nalyd about patience and the dangers we face. He made it clear that planning and intelligence are essential if we want to survive, and although it frustrates me to wait, I promised to stick to the plan and be ready for action when the time comes.

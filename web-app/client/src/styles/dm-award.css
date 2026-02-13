@@ -1,0 +1,154 @@
+/* ================================================
+   DM Award Effect — Screen-Edge Shimmer + Loot Particles
+   Lighter/faster than level-up. z-index 550 (below level-up 600)
+   ================================================ */
+
+.dm-award-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 550;
+  pointer-events: none;
+  overflow: hidden;
+  animation: dm-award-shimmer-pulse 2.5s ease-out forwards;
+}
+
+/* ── Screen-edge shimmer vignette ── */
+
+.dm-award-gold .dm-award-shimmer {
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 0 0 80px 20px rgba(212, 175, 55, 0.35),
+    inset 0 0 160px 40px rgba(212, 175, 55, 0.15);
+}
+
+.dm-award-xp .dm-award-shimmer {
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 0 0 80px 20px rgba(168, 85, 247, 0.35),
+    inset 0 0 160px 40px rgba(168, 85, 247, 0.15);
+}
+
+/* ── Floating particles ── */
+
+.dm-award-particles {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dm-award-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  top: 55%;
+  left: 50%;
+  opacity: 0;
+  animation: dm-award-particle-rise 2s ease-out forwards;
+  animation-delay: var(--p-delay);
+  transform: translateX(var(--p-x));
+}
+
+.dm-award-gold .dm-award-particle {
+  background: radial-gradient(circle, #ffd700 0%, #d4af37 50%, transparent 100%);
+  box-shadow: 0 0 6px 2px rgba(212, 175, 55, 0.6);
+}
+
+.dm-award-xp .dm-award-particle {
+  background: radial-gradient(circle, #c084fc 0%, #a855f7 50%, transparent 100%);
+  box-shadow: 0 0 6px 2px rgba(168, 85, 247, 0.6);
+}
+
+/* ── Floating text ── */
+
+.dm-award-text {
+  position: absolute;
+  top: 45%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-display, 'Cinzel', 'Times New Roman', serif);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  opacity: 0;
+  animation: dm-award-text-float 2s ease-out 0.1s forwards;
+}
+
+.dm-award-gold .dm-award-text {
+  color: #d4af37;
+  text-shadow:
+    0 0 12px rgba(212, 175, 55, 0.8),
+    0 0 30px rgba(212, 175, 55, 0.4);
+}
+
+.dm-award-xp .dm-award-text {
+  color: #a855f7;
+  text-shadow:
+    0 0 12px rgba(168, 85, 247, 0.8),
+    0 0 30px rgba(168, 85, 247, 0.4);
+}
+
+/* ── Exit class ── */
+
+.dm-award-overlay.dm-award-exit {
+  animation: dm-award-fade-out 0.4s ease-in forwards;
+}
+
+/* ── Keyframes ── */
+
+@keyframes dm-award-shimmer-pulse {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes dm-award-particle-rise {
+  0% {
+    opacity: 0;
+    transform: translateX(var(--p-x)) translateY(0) scale(1);
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(var(--p-x)) translateY(-45vh) scale(0.3);
+  }
+}
+
+@keyframes dm-award-text-float {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateY(0);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1) translateY(-80px);
+  }
+}
+
+@keyframes dm-award-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}

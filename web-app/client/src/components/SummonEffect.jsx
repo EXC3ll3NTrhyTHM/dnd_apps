@@ -9,7 +9,7 @@ import '../styles/summon.css';
  *
  * For DMs: after reveal, enters 'pick' phase showing a player list instead of transitioning out.
  */
-export default function SummonEffect({ onComplete, onPickPlayer, gesturePoints = [], isDM = false, dmPlayers = [], unread = {} }) {
+export default function SummonEffect({ onComplete, onPickPlayer, gesturePoints = [], isDM = false, dmPlayers = [], unread = {}, presence = {} }) {
   const [phase, setPhase] = useState('glow');
   const canvasRef = useRef(null);
   const animFrameRef = useRef(null);
@@ -120,7 +120,7 @@ export default function SummonEffect({ onComplete, onPickPlayer, gesturePoints =
         replayIdx = Math.min(replayIdx + replaySpeed, replayPoints.length);
         ctx.save();
         ctx.strokeStyle = '#a855f7';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 6;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.shadowColor = '#a855f7';
@@ -203,25 +203,33 @@ export default function SummonEffect({ onComplete, onPickPlayer, gesturePoints =
             <div className="summon-dm-picker-title">Marcel's Channels</div>
           </div>
           <div className="summon-dm-picker-list">
-            {dmPlayers.map(p => (
-              <button
-                key={p.userId}
-                className="summon-dm-picker-row"
-                onClick={() => handleSelectPlayer(p.userId)}
-              >
-                {p.avatar ? (
-                  <img src={p.avatar} alt="" className="summon-dm-picker-avatar" />
-                ) : (
-                  <div className="summon-dm-picker-avatar summon-dm-picker-avatar-empty" />
-                )}
-                <span className="summon-dm-picker-name">
-                  {p.characterName || p.displayName || p.userId}
-                </span>
-                {unread[`marcel_dm_${p.userId}`] && (
-                  <span className="summon-dm-picker-unread" />
-                )}
-              </button>
-            ))}
+            {dmPlayers.map(p => {
+              const isInDm = (presence[`marcel_dm_${p.userId}`] || []).length > 0;
+              return (
+                <button
+                  key={p.userId}
+                  className="summon-dm-picker-row"
+                  onClick={() => handleSelectPlayer(p.userId)}
+                >
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                    {p.avatar ? (
+                      <img src={p.avatar} alt="" className="summon-dm-picker-avatar" />
+                    ) : (
+                      <div className="summon-dm-picker-avatar summon-dm-picker-avatar-empty" />
+                    )}
+                    {isInDm && (
+                      <span className="summon-dm-picker-online" />
+                    )}
+                  </div>
+                  <span className="summon-dm-picker-name">
+                    {p.characterName || p.displayName || p.userId}
+                  </span>
+                  {unread[`marcel_dm_${p.userId}`] && (
+                    <span className="summon-dm-picker-unread" />
+                  )}
+                </button>
+              );
+            })}
             {dmPlayers.length === 0 && (
               <div className="summon-dm-picker-empty">No player channels yet</div>
             )}

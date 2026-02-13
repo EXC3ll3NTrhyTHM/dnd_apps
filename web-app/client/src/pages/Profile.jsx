@@ -5,6 +5,8 @@ import { useAuth } from '../hooks/useAuth';
 import { useAudioMuted, setAudioMuted } from '../hooks/useAudioSettings';
 import { usePushNotifications } from '../hooks/usePushNotifications';
 import GoldBadge from '../components/GoldBadge';
+import PlayersList from '../components/PlayersList';
+import CharacterSheet from '../components/CharacterSheet';
 import '../styles/profile.css';
 import '../styles/leaderboard.css';
 
@@ -21,9 +23,11 @@ export default function Profile() {
   const [achievements, setAchievements] = useState(null);
   const [achievementStats, setAchievementStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('profile');
   const [mutedChannels, setMutedChannels] = useState([]);
   const [locations, setLocations] = useState([]);
   const [muteExpanded, setMuteExpanded] = useState(false);
+  const [achievementsExpanded, setAchievementsExpanded] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -121,6 +125,30 @@ export default function Profile() {
         </div>
       )}
 
+      {/* Tab bar */}
+      <div className="profile-tabs">
+        <button
+          className={`profile-tab ${activeTab === 'profile' ? 'profile-tab-active' : ''}`}
+          onClick={() => setActiveTab('profile')}
+        >
+          Profile
+        </button>
+        <button
+          className={`profile-tab ${activeTab === 'players' ? 'profile-tab-active' : ''}`}
+          onClick={() => setActiveTab('players')}
+        >
+          Players
+        </button>
+      </div>
+
+      {activeTab === 'players' ? (
+        <PlayersList />
+      ) : (
+      <>
+
+      {/* Character Sheet */}
+      <CharacterSheet userId={user.id} editable={true} />
+
       {/* Gold stats */}
       {wallet && (
         <div className="stats-grid">
@@ -145,32 +173,53 @@ export default function Profile() {
       {/* Achievements */}
       {achievements && (
         <section className="profile-section">
-          <h2 className="section-title">
-            Achievements
-            {achievementStats && (
-              <span className="achievements-count">{achievementStats.unlocked} / {achievementStats.total}</span>
-            )}
-          </h2>
-          <div className="achievements-grid">
-            {achievements.map(ach => (
-              <div
-                key={ach.id}
-                className={`achievement-card ${ach.unlockedAt ? 'achievement-card-unlocked' : 'achievement-card-locked'}`}
-              >
-                <span className="achievement-card-icon">{ach.icon}</span>
-                <div className="achievement-card-info">
-                  <div className="achievement-card-name">{ach.name}</div>
-                  <div className="achievement-card-desc">{ach.description}</div>
-                  {ach.unlockedAt && (ach.xp > 0 || ach.gold > 0) && (
-                    <div className="achievement-card-rewards">
-                      {ach.xp > 0 && <span className="achievement-reward-xp">+{ach.xp} XP</span>}
-                      {ach.gold > 0 && <span className="achievement-reward-gold">+{ach.gold}G</span>}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+          <div className="achievements-header" onClick={() => setAchievementsExpanded(!achievementsExpanded)}>
+            <h2 className="section-title">
+              Achievements
+              {achievementStats && (
+                <span className="achievements-count">{achievementStats.unlocked} / {achievementStats.total}</span>
+              )}
+            </h2>
+            <span className="achievements-chevron">{achievementsExpanded ? '\u25B2' : '\u25BC'}</span>
           </div>
+          {!achievementsExpanded && (
+            <div className="achievements-preview">
+              {achievements.filter(a => a.unlockedAt).length > 0 ? (
+                achievements.filter(a => a.unlockedAt).map(ach => (
+                  <span key={ach.id} className="achievements-preview-icon" title={ach.name}>{ach.icon}</span>
+                ))
+              ) : (
+                <span className="achievements-preview-empty">No achievements yet</span>
+              )}
+            </div>
+          )}
+          {achievementsExpanded && (
+            <div className="achievements-grid">
+              {[...achievements].sort((a, b) => {
+                if (a.unlockedAt && b.unlockedAt) return b.unlockedAt.localeCompare(a.unlockedAt);
+                if (a.unlockedAt) return -1;
+                if (b.unlockedAt) return 1;
+                return 0;
+              }).map(ach => (
+                <div
+                  key={ach.id}
+                  className={`achievement-card ${ach.unlockedAt ? 'achievement-card-unlocked' : 'achievement-card-locked'}`}
+                >
+                  <span className="achievement-card-icon">{ach.icon}</span>
+                  <div className="achievement-card-info">
+                    <div className="achievement-card-name">{ach.name}</div>
+                    <div className="achievement-card-desc">{ach.description}</div>
+                    {ach.unlockedAt && (ach.xp > 0 || ach.gold > 0) && (
+                      <div className="achievement-card-rewards">
+                        {ach.xp > 0 && <span className="achievement-reward-xp">+{ach.xp} XP</span>}
+                        {ach.gold > 0 && <span className="achievement-reward-gold">+{ach.gold}G</span>}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       )}
 
@@ -293,6 +342,9 @@ export default function Profile() {
           )}
         </div>
       </section>
+
+      </>
+      )}
 
       {/* Admin link + Logout */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

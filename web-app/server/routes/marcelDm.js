@@ -14,17 +14,12 @@ const crypto = require('crypto');
 const { authRequired } = require('../middleware/auth');
 const { getTypingInLocation } = require('../lib/typing');
 
+const { loadHistory: loadChannelHistory, saveHistory: saveChannelHistory, getHistoryPage, DM_HISTORY_DIR } = require('../lib/chatHistory');
+
 const DM_USER_IDS = (process.env.DM_USER_IDS || '').split(',').filter(Boolean);
 
 const DATA_DIR = path.resolve(__dirname, '..', '..', 'data');
-const DM_HISTORY_DIR = path.join(DATA_DIR, 'chat_history', 'marcel_dm');
 const PLAYERS_PATH = path.join(DATA_DIR, 'players.json');
-const MAX_HISTORY = 30;
-
-// Ensure DM history directory exists
-if (!fs.existsSync(DM_HISTORY_DIR)) {
-  fs.mkdirSync(DM_HISTORY_DIR, { recursive: true });
-}
 
 function loadPlayers() {
   try { return JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8')); }
@@ -36,24 +31,13 @@ function getPlayerName(user) {
   return players[user.id]?.characterName || user.global_name || user.username;
 }
 
-function getHistoryPath(userId) {
-  return path.join(DM_HISTORY_DIR, `${userId}.json`);
-}
-
+// Wrap channel IDs so shared chatHistory resolves the marcel_dm path correctly
 function loadHistory(userId) {
-  try {
-    return JSON.parse(fs.readFileSync(getHistoryPath(userId), 'utf-8'));
-  } catch {
-    return [];
-  }
+  return loadChannelHistory(`marcel_dm_${userId}`);
 }
 
 function saveHistory(userId, history) {
-  const trimmed = history.slice(-MAX_HISTORY);
-  const histPath = getHistoryPath(userId);
-  const tmpPath = histPath + '.tmp';
-  fs.writeFileSync(tmpPath, JSON.stringify(trimmed, null, 2));
-  fs.renameSync(tmpPath, histPath);
+  saveChannelHistory(`marcel_dm_${userId}`, history);
 }
 
 // Enrichment: backfill player names/avatars
@@ -188,15 +172,20 @@ router.get('/channel', authRequired, (req, res) => {
 });
 
 /**
- * GET /api/marcel-dm/channel/history
- * Full chat history for the DM channel
+ * GET /api/marcel-dm/channel/history?before=<messageId>&limit=30
+ * Paginated chat history for the DM channel
  */
 router.get('/channel/history', authRequired, (req, res) => {
   const channelUserId = resolveChannelUser(req, res);
   if (!channelUserId) return;
 
-  const history = enrichHistory(loadHistory(channelUserId));
-  res.json({ history, locationId: `marcel_dm_${channelUserId}` });
+  const { before, limit } = req.query;
+  const page = getHistoryPage(`marcel_dm_${channelUserId}`, { before, limit: limit ? parseInt(limit, 10) : undefined });
+  res.json({
+    messages: enrichHistory(page.messages),
+    hasMore: page.hasMore,
+    locationId: `marcel_dm_${channelUserId}`,
+  });
 });
 
 /**

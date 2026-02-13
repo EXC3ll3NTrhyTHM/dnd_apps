@@ -117,9 +117,12 @@ export default function LocationTransition({ locationId, locationName, onComplet
     return () => preloaded.forEach(a => { a.src = ''; });
   }, [theme.preloadAudio]);
 
-  // Play location-specific sound effect(s)
+  // Play location-specific sound effect(s) — guarded so sounds only fire once
+  const soundPlayedRef = useRef(false);
   useEffect(() => {
     if (getAudioMuted()) return;
+    if (soundPlayedRef.current) return;
+    soundPlayedRef.current = true;
 
     // Build list: support both single `sound` and layered `sounds` array
     const entries = [];
@@ -150,8 +153,6 @@ export default function LocationTransition({ locationId, locationName, onComplet
       audio.src = src;
       audio.load();
     });
-
-    // No cleanup - let one-shot sounds ring out naturally after transition unmounts
   }, [theme.sound, theme.sounds]);
 
   // Tap to skip transition

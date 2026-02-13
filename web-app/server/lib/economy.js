@@ -242,6 +242,40 @@ function addItemToInventory(userId, item) {
 // ITEM LOOKUP
 // ============================================
 
+function useItem(userId, itemId) {
+  const inventories = loadInventories();
+  const inv = inventories[userId];
+  if (!inv) return { error: 'No inventory found' };
+
+  const entry = inv.items.find(i => i.item_id === itemId);
+  if (!entry || entry.quantity <= 0) return { error: 'Item not found in inventory' };
+
+  entry.quantity -= 1;
+  if (entry.quantity <= 0) {
+    inv.items = inv.items.filter(i => i.item_id !== itemId);
+  }
+
+  saveInventories(inventories);
+  return { success: true, item: entry, inventory: inv };
+}
+
+function removeItemFromInventory(userId, itemId, quantity = 1) {
+  const inventories = loadInventories();
+  if (!inventories[userId]) return null;
+
+  const inv = inventories[userId];
+  const existing = inv.items.find(i => i.item_id === itemId);
+  if (!existing || existing.quantity < quantity) return null;
+
+  existing.quantity -= quantity;
+  if (existing.quantity <= 0) {
+    inv.items = inv.items.filter(i => i.item_id !== itemId);
+  }
+
+  saveInventories(inventories);
+  return inv;
+}
+
 function findItemInCatalog(itemId) {
   const catalog = loadCatalog();
   for (const [catKey, category] of Object.entries(catalog.categories)) {
@@ -388,6 +422,8 @@ module.exports = {
   // Inventory
   getInventory,
   addItemToInventory,
+  removeItemFromInventory,
+  useItem,
 
   // Items
   findItemInCatalog,

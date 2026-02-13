@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'The Retro Font';
+  src: url('/fonts/TheRetroFont.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ============================================
    INTERACTIVE MAP - Static fit with markers
    ============================================ */
@@ -5,8 +13,7 @@
 .map-page {
   position: relative;
   width: 100%;
-  height: calc(100vh - var(--nav-height) - var(--safe-area-bottom));
-  height: calc(100dvh - var(--nav-height) - var(--safe-area-bottom));
+  height: 100%;
   overflow: hidden;
   background-color: var(--bg-deepest);
   background-image: var(--tex-leather);
@@ -363,7 +370,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: calc(100vh - var(--nav-height));
+  height: 100%;
   gap: 16px;
   color: var(--text-muted);
 }
@@ -495,7 +502,7 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 4;
-  font-family: 'Noto Sans Runic', serif;
+  font-family: 'The Retro Font', serif;
   font-size: 22rem;
   font-weight: 400;
   color: #a855f7;
@@ -512,6 +519,95 @@
 @keyframes hint-m-pulse {
   0%, 12%, 22%, 100% { opacity: 0; }
   15%, 19% { opacity: 0.35; }
+}
+
+/* ---- Fishing Pin (blue theme) ---- */
+
+.fishing-pin .map-marker-icon,
+.fishing-marker-icon {
+  border-color: #4a9eff !important;
+  background: radial-gradient(circle at 30% 30%, #1a2e4a, #0c1a30) !important;
+}
+
+.fishing-pin:active .map-marker-icon,
+.fishing-pin.selected .map-marker-icon {
+  border-color: #6cb5ff !important;
+  box-shadow: 0 0 12px rgba(74, 158, 255, 0.5) !important;
+}
+
+.fishing-marker-spike {
+  border-top-color: #4a9eff !important;
+}
+
+.fishing-marker-pulse {
+  border-color: rgba(74, 158, 255, 0.4) !important;
+}
+
+.fishing-popup-enter {
+  background: linear-gradient(180deg, #4a9eff, #2a6fd4) !important;
+  color: #fff !important;
+  border-color: #3a8ef0 !important;
+}
+
+.fishing-popup-enter:hover {
+  background: linear-gradient(180deg, #5aaeFF, #3a7fe4) !important;
+  box-shadow: 0 0 8px rgba(74, 158, 255, 0.3) !important;
+}
+
+.fishing-popup-bait {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-bottom: 10px;
+  font-size: 0.7rem;
+  color: #8ab4f8;
+}
+
+.fishing-popup-bait-item {
+  background: rgba(74, 158, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.fishing-popup-bait-item strong {
+  color: #4a9eff;
+}
+
+.fishing-popup-no-bait {
+  color: #f87171;
+  font-size: 0.7rem;
+}
+
+/* ---- Arena Pin (red theme) ---- */
+
+.arena-pin .map-marker-icon {
+  border-color: #ef4444 !important;
+  background: radial-gradient(circle at 30% 30%, #4a1a1a, #300c0c) !important;
+}
+
+.arena-pin:active .map-marker-icon,
+.arena-pin.selected .map-marker-icon {
+  border-color: #f87171 !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.5) !important;
+}
+
+.arena-pin .map-marker-spike {
+  border-top-color: #ef4444 !important;
+}
+
+.arena-pin .map-marker-pulse {
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.arena-popup-enter {
+  background: linear-gradient(180deg, #ef4444, #b91c1c) !important;
+  color: #fff !important;
+  border-color: #dc2626 !important;
+}
+
+.arena-popup-enter:hover {
+  background: linear-gradient(180deg, #f87171, #dc2626) !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.3) !important;
 }
 
 /* Fade out map content during transition */

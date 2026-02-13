@@ -168,3 +168,35 @@
   text-shadow: 0 0 4px rgba(212, 168, 67, 0.3);
 }
 
+/* ---- Overlay nav (player profile) ---- */
+
+.main-content-overlay-nav {
+  padding-bottom: 0;
+}
+
+.bottom-nav-overlay {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.bottom-nav-hidden {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---- PWA Standalone: reduce bottom safe-area padding on nav ---- */
+
+/* ---- iOS PWA standalone fix ----
+   In standalone mode the nav needs to extend into the home indicator
+   safe area. content-box lets height define the visible content area
+   (64px) while padding-bottom pushes the background into the safe
+   area below, keeping icons above the home indicator. */
+
+@media (display-mode: standalone) {
+  .bottom-nav {
+    height: 64px;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: content-box;
+  }
+}
+

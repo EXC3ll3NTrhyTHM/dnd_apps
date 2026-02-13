@@ -1,6 +1,35 @@
 {
   "424061511833747467": {
-    "items": [],
+    "items": [
+      {
+        "item_id": "ironjaw",
+        "name": "Ironjaw",
+        "type": "fish",
+        "quantity": 1,
+        "acquired_at": "2026-02-13T03:40:31.037Z"
+      },
+      {
+        "item_id": "mudcarp",
+        "name": "Mudcarp",
+        "type": "fish",
+        "quantity": 1,
+        "acquired_at": "2026-02-13T03:42:35.544Z"
+      },
+      {
+        "item_id": "silver_trout",
+        "name": "Silver Trout",
+        "type": "fish",
+        "quantity": 2,
+        "acquired_at": "2026-02-13T03:43:20.179Z"
+      },
+      {
+        "item_id": "ember_bass",
+        "name": "Ember Bass",
+        "type": "fish",
+        "quantity": 2,
+        "acquired_at": "2026-02-13T03:45:27.178Z"
+      }
+    ],
     "badges": [],
     "roles_purchased": [],
     "quests_unlocked": []
@@ -34,6 +63,27 @@
         "type": "quest_item",
         "obtained": "2026-02-08",
         "source": "The Widow's Cottage"
+      }
+    ],
+    "badges": [],
+    "roles_purchased": [],
+    "quests_unlocked": []
+  },
+  "228241331296665600": {
+    "items": [
+      {
+        "item_id": "enchanted_grub",
+        "name": "Enchanted Grub",
+        "type": "bait",
+        "quantity": 1,
+        "acquired_at": "2026-02-13T05:03:52.799Z"
+      },
+      {
+        "item_id": "ember_bass",
+        "name": "Ember Bass",
+        "type": "fish",
+        "quantity": 1,
+        "acquired_at": "2026-02-13T05:05:10.488Z"
       }
     ],
     "badges": [],

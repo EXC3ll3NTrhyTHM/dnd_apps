@@ -79,10 +79,13 @@ export function correctWord(word) {
   // 1. Contraction map
   if (lower in CONTRACTIONS) return CONTRACTIONS[lower];
 
-  // 2. Skip list — never correct these
+  // 2. Standalone "i" → "I"
+  if (lower === 'i') return 'I';
+
+  // 3. Skip list — never correct these
   if (SKIP_WORDS.has(lower)) return null;
 
-  // 3. Very short words (1-2 chars) — skip
+  // 4. Very short words (1-2 chars) — skip
   if (lower.length <= 2) return null;
 
   // 4. Already a known English word

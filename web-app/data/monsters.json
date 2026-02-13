@@ -1,0 +1,233 @@
+[
+  {
+    "id": "goblin",
+    "name": "Goblin",
+    "description": "A small, wiry creature with green skin and beady red eyes",
+    "cr": 0.25,
+    "ac": 15,
+    "maxHp": 7,
+    "attacks": [
+      {
+        "name": "Scimitar",
+        "bonus": 4,
+        "damage": "1d6+2",
+        "type": "slashing",
+        "description": "slashes with a rusty scimitar"
+      }
+    ],
+    "multiattack": 1,
+    "xpReward": 50,
+    "goldReward": 8,
+    "spawnText": "A Goblin scurries out from the shadows, brandishing a rusty scimitar!",
+    "deathText": "The Goblin lets out a shriek and collapses in a heap.",
+    "fleeText": "The Goblin squeals and darts back into the darkness.",
+    "attackTexts": [
+      "The Goblin lunges at {target} with its scimitar!",
+      "The Goblin takes a wild swing at {target}!",
+      "With a cackle, the Goblin slashes toward {target}!"
+    ],
+    "missTexts": [
+      "{target} sidesteps the Goblin's clumsy swing.",
+      "The Goblin's blade whistles past {target} harmlessly.",
+      "{target} ducks under the Goblin's wild attack."
+    ]
+  },
+  {
+    "id": "wolf",
+    "name": "Wolf",
+    "description": "A lean grey wolf with bared fangs and hungry eyes",
+    "cr": 0.25,
+    "ac": 13,
+    "maxHp": 11,
+    "attacks": [
+      {
+        "name": "Bite",
+        "bonus": 4,
+        "damage": "2d4+2",
+        "type": "piercing",
+        "description": "snaps with powerful jaws"
+      }
+    ],
+    "multiattack": 1,
+    "xpReward": 50,
+    "goldReward": 5,
+    "spawnText": "A Wolf emerges from the treeline, growling low and circling!",
+    "deathText": "The Wolf collapses with a final whimper.",
+    "fleeText": "The Wolf lets out a pained yelp and retreats into the woods.",
+    "attackTexts": [
+      "The Wolf lunges at {target}, jaws snapping!",
+      "The Wolf pounces toward {target} with bared fangs!",
+      "Snarling, the Wolf springs at {target}!"
+    ],
+    "missTexts": [
+      "{target} dodges as the Wolf snaps at empty air.",
+      "The Wolf's jaws clamp shut inches from {target}.",
+      "{target} shoves the Wolf aside before it can bite."
+    ]
+  },
+  {
+    "id": "skeleton",
+    "name": "Skeleton",
+    "description": "An animated pile of bones held together by dark magic, wielding a chipped shortsword",
+    "cr": 0.25,
+    "ac": 13,
+    "maxHp": 13,
+    "attacks": [
+      {
+        "name": "Shortsword",
+        "bonus": 4,
+        "damage": "1d6+2",
+        "type": "piercing",
+        "description": "thrusts with a chipped shortsword"
+      }
+    ],
+    "multiattack": 1,
+    "xpReward": 50,
+    "goldReward": 10,
+    "spawnText": "Bones rattle as a Skeleton rises from the ground, hollow eyes glowing!",
+    "deathText": "The Skeleton shatters into a pile of bones, the dark magic fading.",
+    "fleeText": "The Skeleton's limbs begin to clatter apart as it retreats.",
+    "attackTexts": [
+      "The Skeleton jabs its shortsword at {target}!",
+      "With empty eye sockets locked on {target}, the Skeleton strikes!",
+      "The Skeleton lurches forward, blade aimed at {target}!"
+    ],
+    "missTexts": [
+      "{target} parries the Skeleton's clumsy thrust.",
+      "The Skeleton's blade scrapes harmlessly off {target}'s guard.",
+      "{target} steps aside as the Skeleton swings wide."
+    ]
+  },
+  {
+    "id": "dire_wolf",
+    "name": "Dire Wolf",
+    "description": "A massive grey wolf the size of a horse, with glowing amber eyes",
+    "cr": 1,
+    "ac": 14,
+    "maxHp": 37,
+    "attacks": [
+      {
+        "name": "Bite",
+        "bonus": 5,
+        "damage": "2d6+3",
+        "type": "piercing",
+        "description": "lunges forward and snaps its massive jaws"
+      }
+    ],
+    "multiattack": 1,
+    "xpReward": 200,
+    "goldReward": 25,
+    "spawnText": "A Dire Wolf crashes through the underbrush, teeth bared!",
+    "deathText": "The Dire Wolf collapses with a final, echoing howl.",
+    "fleeText": "The Dire Wolf slinks back into the shadows, wounded and whimpering.",
+    "attackTexts": [
+      "The Dire Wolf lunges at {target} with snapping jaws!",
+      "The beast pounces toward {target}, fangs bared!",
+      "The Dire Wolf charges at {target}, a blur of grey fur and teeth!"
+    ],
+    "missTexts": [
+      "{target} rolls aside as the wolf snaps at empty air.",
+      "The wolf's jaws clamp shut inches from {target}.",
+      "{target} braces and deflects the massive beast's charge."
+    ]
+  },
+  {
+    "id": "ogre",
+    "name": "Ogre",
+    "description": "A hulking brute standing ten feet tall, reeking of swamp and swinging a massive greatclub",
+    "cr": 2,
+    "ac": 11,
+    "maxHp": 59,
+    "attacks": [
+      {
+        "name": "Greatclub",
+        "bonus": 6,
+        "damage": "2d8+4",
+        "type": "bludgeoning",
+        "description": "swings a massive greatclub"
+      }
+    ],
+    "multiattack": 1,
+    "xpReward": 450,
+    "goldReward": 40,
+    "spawnText": "The ground shakes as an Ogre stomps into view, bellowing with rage!",
+    "deathText": "The Ogre crashes to the earth with a thunderous impact, defeated.",
+    "fleeText": "The Ogre stumbles away, clutching its wounds and groaning.",
+    "attackTexts": [
+      "The Ogre brings its greatclub down toward {target} with terrifying force!",
+      "With a guttural roar, the Ogre swings at {target}!",
+      "The Ogre takes a massive overhead swing at {target}!"
+    ],
+    "missTexts": [
+      "{target} dives clear as the greatclub craters the ground.",
+      "The Ogre's swing goes wide, smashing into nothing.",
+      "{target} barely rolls out of the way of the crushing blow."
+    ]
+  },
+  {
+    "id": "owlbear",
+    "name": "Owlbear",
+    "description": "A fearsome hybrid beast with the body of a bear and the head of an owl, shrieking with fury",
+    "cr": 3,
+    "ac": 13,
+    "maxHp": 59,
+    "attacks": [
+      {
+        "name": "Claws",
+        "bonus": 7,
+        "damage": "2d8+5",
+        "type": "slashing",
+        "description": "rakes with massive talons"
+      }
+    ],
+    "multiattack": 2,
+    "xpReward": 700,
+    "goldReward": 55,
+    "spawnText": "An Owlbear bursts from the treeline with an ear-splitting screech!",
+    "deathText": "The Owlbear lets out one final screech and falls silent.",
+    "fleeText": "The Owlbear retreats into the forest, hooting angrily.",
+    "attackTexts": [
+      "The Owlbear swipes its massive claws at {target}!",
+      "With a terrible screech, the Owlbear rakes at {target}!",
+      "The Owlbear lunges at {target}, talons extended!"
+    ],
+    "missTexts": [
+      "{target} ducks under the Owlbear's swiping claws.",
+      "The Owlbear's talons rake the air above {target}'s head.",
+      "{target} jumps back as the Owlbear's claws miss by inches."
+    ]
+  },
+  {
+    "id": "troll",
+    "name": "Troll",
+    "description": "A lanky, green-skinned horror with long arms ending in razor-sharp claws",
+    "cr": 5,
+    "ac": 15,
+    "maxHp": 84,
+    "attacks": [
+      {
+        "name": "Claws",
+        "bonus": 7,
+        "damage": "2d6+4",
+        "type": "slashing",
+        "description": "slashes with razor-sharp claws"
+      }
+    ],
+    "multiattack": 2,
+    "xpReward": 1800,
+    "goldReward": 100,
+    "spawnText": "A Troll rises from the murky swamp, regenerating flesh knitting over old wounds!",
+    "deathText": "The Troll finally stops regenerating and collapses, defeated for good.",
+    "fleeText": "The Troll slinks back into the swamp, its wounds already closing.",
+    "attackTexts": [
+      "The Troll rakes its claws at {target}!",
+      "With unnatural speed, the Troll slashes at {target}!",
+      "The Troll swings both arms at {target}, claws extended!"
+    ],
+    "missTexts": [
+      "{target} leaps back from the Troll's sweeping claws.",
+      "The Troll's claws slash through empty air where {target} just stood.",
+      "{target} deflects the Troll's strike just in time."
+    ]
+  }
+]

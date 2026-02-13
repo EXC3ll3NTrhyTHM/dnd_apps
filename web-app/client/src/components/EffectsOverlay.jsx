@@ -13,6 +13,7 @@ export default function EffectsOverlay({ effect, onDone }) {
     <div className="fx-overlay" onAnimationEnd={onDone}>
       {effect === 'lightning' && <LightningEffect />}
       {effect === 'flash' && <FlashEffect />}
+      {effect === 'smoke' && <SmokeEffect />}
     </div>
   );
 }
@@ -30,6 +31,16 @@ function LightningEffect() {
 
 function FlashEffect() {
   return <div className="fx-flash" />;
+}
+
+function SmokeEffect() {
+  return (
+    <>
+      <div className="fx-smoke-layer fx-smoke-1" />
+      <div className="fx-smoke-layer fx-smoke-2" />
+      <div className="fx-smoke-layer fx-smoke-3" />
+    </>
+  );
 }
 
 /**

@@ -11,7 +11,7 @@ const ALL_NPCS = [
 ];
 
 /* ── Group Management Card (per location) ── */
-function GroupCard({ loc, onSave, onToast }) {
+function GroupCard({ loc, players, onSave, onToast }) {
   // Build local editable groups from the server data
   // loc.groups has { groupId: { displayName, memberIds, members } }
   const [groups, setGroups] = useState({});
@@ -207,29 +207,62 @@ function GroupCard({ loc, onSave, onToast }) {
 
             {/* Expanded: member toggles */}
             {isExpanded && (
-              <div style={{ padding: '8px 10px', display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                {locationNpcIds.map(npcId => {
-                  const isMember = group.members.includes(npcId);
-                  return (
-                    <button
-                      key={npcId}
-                      onClick={() => toggleMember(gid, npcId)}
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: 12,
-                        border: `1px solid ${isMember ? 'var(--color-gold-dim)' : 'var(--border-color)'}`,
-                        background: isMember ? 'rgba(212, 168, 67, 0.15)' : 'transparent',
-                        color: isMember ? 'var(--color-gold)' : 'var(--text-muted)',
-                        fontSize: '0.75rem',
-                        cursor: 'pointer',
-                        fontFamily: 'var(--font-body)',
-                        transition: 'all 0.15s ease'
-                      }}
-                    >
-                      {npcId}
-                    </button>
-                  );
-                })}
+              <div style={{ padding: '8px 10px' }}>
+                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>NPCs</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
+                  {locationNpcIds.map(npcId => {
+                    const isMember = group.members.includes(npcId);
+                    return (
+                      <button
+                        key={npcId}
+                        onClick={() => toggleMember(gid, npcId)}
+                        style={{
+                          padding: '4px 10px',
+                          borderRadius: 12,
+                          border: `1px solid ${isMember ? 'var(--color-gold-dim)' : 'var(--border-color)'}`,
+                          background: isMember ? 'rgba(212, 168, 67, 0.15)' : 'transparent',
+                          color: isMember ? 'var(--color-gold)' : 'var(--text-muted)',
+                          fontSize: '0.75rem',
+                          cursor: 'pointer',
+                          fontFamily: 'var(--font-body)',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {npcId}
+                      </button>
+                    );
+                  })}
+                </div>
+                {players.length > 0 && (
+                  <>
+                    <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Players</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                      {players.map(player => {
+                        const name = player.characterName;
+                        const isMember = group.members.includes(name);
+                        return (
+                          <button
+                            key={player.id}
+                            onClick={() => toggleMember(gid, name)}
+                            style={{
+                              padding: '4px 10px',
+                              borderRadius: 12,
+                              border: `1px solid ${isMember ? 'rgba(143, 184, 160, 0.5)' : 'var(--border-color)'}`,
+                              background: isMember ? 'rgba(74, 222, 128, 0.1)' : 'transparent',
+                              color: isMember ? '#8fb8a0' : 'var(--text-muted)',
+                              fontSize: '0.75rem',
+                              cursor: 'pointer',
+                              fontFamily: 'var(--font-body)',
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            {name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -263,6 +296,195 @@ function GroupCard({ loc, onSave, onToast }) {
           </button>
         )}
       </div>
+    </div>
+  );
+}
+
+/* ── Player Rewards Card ── */
+function PlayerRewards({ players, onToast }) {
+  const [selectedPlayer, setSelectedPlayer] = useState('');
+  const [goldAmount, setGoldAmount] = useState('');
+  const [xpAmount, setXpAmount] = useState('');
+  const [awarding, setAwarding] = useState(false);
+  const [lastResult, setLastResult] = useState(null);
+
+  async function awardGold(positive) {
+    const num = parseInt(goldAmount, 10);
+    if (!selectedPlayer || !num || num <= 0) return;
+    setAwarding(true);
+    try {
+      const data = await api('/api/admin/award-gold', {
+        method: 'POST',
+        body: JSON.stringify({ user_id: selectedPlayer, amount: positive ? num : -num })
+      });
+      const label = players.find(p => p.id === selectedPlayer)?.characterName || selectedPlayer;
+      setLastResult(`${positive ? '+' : '-'}${Math.abs(data.change)}G to ${label} (Balance: ${data.balance}G)`);
+      onToast({ type: 'success', message: `${positive ? 'Gave' : 'Took'} ${Math.abs(data.change)} gold ${positive ? 'to' : 'from'} ${label}` });
+      setGoldAmount('');
+    } catch (err) {
+      onToast({ type: 'error', message: err.data?.error || 'Failed to update gold' });
+    } finally {
+      setAwarding(false);
+    }
+  }
+
+  async function awardXp(positive) {
+    const num = parseInt(xpAmount, 10);
+    if (!selectedPlayer || !num || num <= 0) return;
+    setAwarding(true);
+    try {
+      const data = await api('/api/admin/award-xp', {
+        method: 'POST',
+        body: JSON.stringify({ user_id: selectedPlayer, amount: positive ? num : -num })
+      });
+      const label = players.find(p => p.id === selectedPlayer)?.characterName || selectedPlayer;
+      setLastResult(`${positive ? '+' : '-'}${Math.abs(data.change)} XP to ${label} (Total: ${data.total_xp} XP, Lvl ${data.level})`);
+      onToast({ type: 'success', message: `${positive ? 'Gave' : 'Took'} ${Math.abs(data.change)} XP ${positive ? 'to' : 'from'} ${label}` });
+      setXpAmount('');
+    } catch (err) {
+      onToast({ type: 'error', message: err.data?.error || 'Failed to update XP' });
+    } finally {
+      setAwarding(false);
+    }
+  }
+
+  const inputStyle = {
+    width: 80,
+    padding: '6px 8px',
+    borderRadius: 6,
+    border: '1px solid var(--border-color)',
+    background: 'var(--bg-surface, rgba(0,0,0,0.2))',
+    color: 'var(--text-primary)',
+    fontFamily: 'var(--font-body)',
+    fontSize: '0.85rem',
+    textAlign: 'center',
+    outline: 'none'
+  };
+
+  const btnStyle = (color) => ({
+    padding: '6px 14px',
+    borderRadius: 6,
+    border: `1px solid ${color}`,
+    background: `${color}22`,
+    color,
+    fontSize: '0.8rem',
+    cursor: awarding ? 'not-allowed' : 'pointer',
+    fontFamily: 'var(--font-body)',
+    fontWeight: 600,
+    opacity: awarding ? 0.5 : 1,
+    transition: 'all 0.15s ease'
+  });
+
+  return (
+    <div style={{
+      padding: 12,
+      background: 'var(--bg-card)',
+      borderRadius: 8,
+      border: '1px solid var(--border-color)'
+    }}>
+      {/* Player selector */}
+      <div style={{ marginBottom: 12 }}>
+        <div style={{
+          fontSize: '0.7rem', color: 'var(--text-muted)',
+          textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6
+        }}>
+          Player
+        </div>
+        <select
+          value={selectedPlayer}
+          onChange={e => { setSelectedPlayer(e.target.value); setLastResult(null); }}
+          style={{
+            width: '100%',
+            padding: '8px 10px',
+            borderRadius: 6,
+            border: '1px solid var(--border-color)',
+            background: 'var(--bg-surface, rgba(0,0,0,0.2))',
+            color: 'var(--text-primary)',
+            fontFamily: 'var(--font-body)',
+            fontSize: '0.85rem',
+            outline: 'none'
+          }}
+        >
+          <option value="">Select a player...</option>
+          {players.map(p => (
+            <option key={p.id} value={p.id}>
+              {p.characterName || p.displayName || p.id}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Gold row */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10
+      }}>
+        <span style={{ fontSize: '0.8rem', color: 'var(--color-gold)', width: 36 }}>Gold</span>
+        <input
+          type="number"
+          min="1"
+          placeholder="0"
+          value={goldAmount}
+          onChange={e => setGoldAmount(e.target.value)}
+          style={inputStyle}
+        />
+        <button
+          onClick={() => awardGold(true)}
+          disabled={awarding || !selectedPlayer || !goldAmount}
+          style={btnStyle('#4ade80')}
+        >
+          Give
+        </button>
+        <button
+          onClick={() => awardGold(false)}
+          disabled={awarding || !selectedPlayer || !goldAmount}
+          style={btnStyle('#f87171')}
+        >
+          Take
+        </button>
+      </div>
+
+      {/* XP row */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10
+      }}>
+        <span style={{ fontSize: '0.8rem', color: 'var(--color-gold)', width: 36 }}>XP</span>
+        <input
+          type="number"
+          min="1"
+          placeholder="0"
+          value={xpAmount}
+          onChange={e => setXpAmount(e.target.value)}
+          style={inputStyle}
+        />
+        <button
+          onClick={() => awardXp(true)}
+          disabled={awarding || !selectedPlayer || !xpAmount}
+          style={btnStyle('#4ade80')}
+        >
+          Give
+        </button>
+        <button
+          onClick={() => awardXp(false)}
+          disabled={awarding || !selectedPlayer || !xpAmount}
+          style={btnStyle('#f87171')}
+        >
+          Take
+        </button>
+      </div>
+
+      {/* Last result feedback */}
+      {lastResult && (
+        <div style={{
+          fontSize: '0.75rem',
+          color: 'var(--text-muted)',
+          padding: '6px 8px',
+          background: 'rgba(255,255,255,0.03)',
+          borderRadius: 4,
+          fontFamily: 'var(--font-body)'
+        }}>
+          {lastResult}
+        </div>
+      )}
     </div>
   );
 }
@@ -430,6 +652,14 @@ export default function Admin() {
         </div>
       </section>
 
+      {/* Player Rewards */}
+      {players.length > 0 && (
+        <section style={{ marginBottom: 32 }}>
+          <h2 className="section-title">Player Rewards</h2>
+          <PlayerRewards players={players} onToast={setToast} />
+        </section>
+      )}
+
       {/* NPC Location Assignment */}
       <section style={{ marginBottom: 32 }}>
         <h2 className="section-title">NPC Locations</h2>
@@ -549,6 +779,7 @@ export default function Admin() {
           <GroupCard
             key={loc.id}
             loc={loc}
+            players={players}
             onSave={loadLocations}
             onToast={setToast}
           />

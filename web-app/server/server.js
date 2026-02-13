@@ -33,6 +33,10 @@ const xpRoutes = require('./routes/xp');
 const notificationRoutes = require('./routes/notifications');
 const achievementRoutes = require('./routes/achievements');
 const diceRoutes = require('./routes/dice');
+const playersRoutes = require('./routes/players');
+const characterSheetRoutes = require('./routes/characterSheet');
+const encounterRoutes = require('./routes/encounters');
+const fishingRoutes = require('./routes/fishing');
 
 const app = express();
 const server = http.createServer(app);
@@ -119,6 +123,13 @@ app.use('/api/marcel-dm', marcelDmRoutes);
 app.use('/api/xp', xpRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/achievements', achievementRoutes);
+app.use('/api/players', playersRoutes);
+app.use('/api/character-sheet', characterSheetRoutes);
+app.use('/api/encounters', encounterRoutes);
+app.use('/api/fishing', fishingRoutes);
+
+// Start encounter timeout checker
+encounterRoutes.startTimeoutChecker(app);
 
 // Health check
 app.get('/api/health', (req, res) => {

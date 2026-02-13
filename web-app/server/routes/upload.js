@@ -18,14 +18,12 @@ const clawdbotRoutes = require('./clawdbot');
 
 const DM_USER_IDS = (process.env.DM_USER_IDS || '').split(',').filter(Boolean);
 
+const { loadHistory, saveHistory } = require('../lib/chatHistory');
+
 const DATA_DIR = path.resolve(__dirname, '..', '..', 'data');
 const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 const UPLOAD_LOG_PATH = path.join(DATA_DIR, 'upload_log.json');
-const HISTORY_DIR = path.join(DATA_DIR, 'chat_history');
-const SHARED_DIR = path.join(HISTORY_DIR, 'shared');
-const DM_HISTORY_DIR = path.join(HISTORY_DIR, 'marcel_dm');
 const PLAYERS_PATH = path.join(DATA_DIR, 'players.json');
-const MAX_HISTORY = 30;
 
 // Ensure uploads directory exists
 if (!fs.existsSync(UPLOADS_DIR)) {
@@ -65,35 +63,6 @@ function loadPlayers() {
 function getPlayerName(user) {
   const players = loadPlayers();
   return players[user.id]?.characterName || user.global_name || user.username;
-}
-
-// Resolve history file path for a channel
-function resolveHistoryPath(channelId) {
-  const dmMatch = channelId.match(/^marcel_dm_(.+)$/);
-  if (dmMatch) {
-    if (!fs.existsSync(DM_HISTORY_DIR)) {
-      fs.mkdirSync(DM_HISTORY_DIR, { recursive: true });
-    }
-    return path.join(DM_HISTORY_DIR, `${dmMatch[1]}.json`);
-  }
-  if (!fs.existsSync(SHARED_DIR)) {
-    fs.mkdirSync(SHARED_DIR, { recursive: true });
-  }
-  return path.join(SHARED_DIR, `${channelId}.json`);
-}
-
-function loadHistory(channelId) {
-  const histPath = resolveHistoryPath(channelId);
-  try { return JSON.parse(fs.readFileSync(histPath, 'utf-8')); }
-  catch { return []; }
-}
-
-function saveHistory(channelId, history) {
-  const trimmed = history.slice(-MAX_HISTORY);
-  const histPath = resolveHistoryPath(channelId);
-  const tmpPath = histPath + '.tmp';
-  fs.writeFileSync(tmpPath, JSON.stringify(trimmed, null, 2));
-  fs.renameSync(tmpPath, histPath);
 }
 
 function appendUploadLog(entry) {

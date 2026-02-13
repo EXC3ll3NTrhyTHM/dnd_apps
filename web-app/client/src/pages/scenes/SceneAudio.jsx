@@ -5,7 +5,7 @@
  * Mute is controlled globally via the audio setting in Profile.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAudioMuted } from '../../hooks/useAudioSettings';
 
 export function SceneAudio({ config, enabled = true }) {
@@ -16,6 +16,8 @@ export function SceneAudio({ config, enabled = true }) {
   const audioRef = useRef([]);     // all Audio elements
   const configKeyRef = useRef(''); // serialized config for comparison
   const pausedRef = useRef(false); // true when tab hidden OR window not focused
+  const speechResetRef = useRef(false); // true while waiting for iOS mic session to release
+  const [audioGeneration, setAudioGeneration] = useState(0); // bumped to force effect re-run
 
   // Mute/unmute existing audio without recreating elements
   useEffect(() => {
@@ -127,7 +129,7 @@ export function SceneAudio({ config, enabled = true }) {
 
     // Resume all audio (looping tracks + waiting irregular sounds)
     const resumeAll = () => {
-      if (!shouldPlay()) return;
+      if (!shouldPlay() || speechResetRef.current) return;
       audioRef.current.forEach((entry) => {
         const { audio, irregular, waiting } = entry;
         if (irregular) {
@@ -176,12 +178,66 @@ export function SceneAudio({ config, enabled = true }) {
     // Resume on user interaction (autoplay policy)
     const onInteraction = () => resumeAll();
 
+    // Pause audio while speech recognition is active.
+    // On iOS, SpeechRecognition switches the audio session to "playAndRecord"
+    // which routes audio through ringer volume / speaker. Existing Audio
+    // objects stay bound to that session even after the mic stops — reload()
+    // isn't enough. We must destroy and recreate every Audio element so iOS
+    // creates them under a fresh media-playback session.
+    // speechResetRef blocks resumeAll/onFocus/onInteraction from touching
+    // audio during the cooldown window.
+    const onSpeechChange = (e) => {
+      if (e.detail) {
+        // Mic on — immediately destroy audio so nothing can resume it
+        // while iOS has the session in playAndRecord mode
+        speechResetRef.current = true;
+        pausedRef.current = true;
+
+        // Save state then fully destroy
+        const saved = audioRef.current.map((entry) => ({
+          src: entry.audio.src,
+          savedTime: entry.audio.currentTime,
+          volume: entry.volume,
+          irregular: entry.irregular,
+          irregularPause: entry.irregularPause,
+        }));
+        audioRef.current.forEach(({ audio }) => {
+          audio.onended = null;
+          audio.pause();
+          audio.src = '';
+        });
+        audioRef.current = [];
+        // Stash for recreation later
+        audioRef._savedForSpeech = saved;
+      } else {
+        // Mic off — iOS keeps the page audio session in "playAndRecord"
+        // mode which routes all audio through ringer volume. There is no
+        // JS API to reset it. Instead of resuming into ringer volume, we
+        // force a full SceneAudio remount by clearing the config key.
+        // The next config effect run will recreate audio from scratch,
+        // which happens when the user navigates to a new location.
+        // Clear the reset lock so normal playback works on remount.
+        // After a delay, clear locks and bump generation to trigger
+        // a full effect re-run which recreates audio from scratch.
+        // The delay + fresh Audio objects give iOS the best chance of
+        // using a clean media-playback session.
+        const t = setTimeout(() => {
+          speechResetRef.current = false;
+          pausedRef.current = false;
+          configKeyRef.current = '';
+          setAudioGeneration(g => g + 1);
+        }, 1500);
+        timers.push(t);
+      }
+    };
+
     window.addEventListener('click', onInteraction);
     window.addEventListener('touchstart', onInteraction);
     window.addEventListener('pointerdown', onInteraction);
     document.addEventListener('visibilitychange', onVisibility);
     window.addEventListener('blur', onBlur);
     window.addEventListener('focus', onFocus);
+    window.addEventListener('speech-recognition-change', onSpeechChange);
 
     return () => {
       timers.forEach(clearTimeout);
@@ -198,8 +254,9 @@ export function SceneAudio({ config, enabled = true }) {
       document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('blur', onBlur);
       window.removeEventListener('focus', onFocus);
+      window.removeEventListener('speech-recognition-change', onSpeechChange);
     };
-  }, [config, enabled]);
+  }, [config, enabled, audioGeneration]);
 
   return null;
 }

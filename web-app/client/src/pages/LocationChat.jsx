@@ -19,6 +19,9 @@ import ItemCard from '../components/ItemCard';
 import Toast from '../components/Toast';
 import XpFloat from '../components/XpFloat';
 import AchievementToast from '../components/AchievementToast';
+import LevelUpOverlay from '../components/LevelUpOverlay';
+import PresenceStrip from '../components/PresenceStrip';
+import Arena from './Arena';
 const DiceOverlay = lazy(() => import('../components/DiceOverlay'));
 import SceneAudio from './scenes/SceneAudio';
 import { getSceneComponent } from './scenes';
@@ -38,6 +41,9 @@ export default function LocationChat() {
   const navigate = useNavigate();
   const { user, wallet, refreshWallet } = useAuth();
 
+  // Arena gets its own dedicated full-screen page
+  if (locationId === 'the_arena') return <Arena />;
+
   const [location, setLocation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [npcEmotions, setNpcEmotions] = useState({});
@@ -56,14 +62,22 @@ export default function LocationChat() {
   const [xpFloat, setXpFloat] = useState(null);
   const [achievementQueue, setAchievementQueue] = useState([]);
   const [diceRoll, setDiceRoll] = useState(null);
+  const [levelUp, setLevelUp] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [diceOverlayEnabled] = useState(() => {
     const stored = localStorage.getItem('dh_dice_overlay');
     return stored !== 'false';
   });
+  const [presence, setPresence] = useState([]);
 
   const showXpFloat = (amount) => {
     if (amount > 0) setXpFloat({ amount, key: Date.now() });
   };
+
+  const triggerLevelUp = useCallback((newLevel) => {
+    if (newLevel) setLevelUp(prev => Math.max(prev || 0, newLevel));
+  }, []);
 
   const queueAchievements = useCallback((arr) => {
     if (arr && arr.length > 0) {
@@ -146,6 +160,17 @@ export default function LocationChat() {
               setMessages(prev => [...prev, msg]);
             }
           }
+
+          // Item used — smoke effect + action message from other players
+          if (payload.type === 'item_used' && payload.userId !== user?.id) {
+            triggerEffect(payload.effect || 'smoke');
+            const actionMsg = {
+              role: 'system',
+              text: `*${payload.characterName || payload.username} ${payload.use_message}*`,
+              timestamp: new Date().toISOString(),
+            };
+            setMessages(prev => [...prev, actionMsg]);
+          }
         } catch (err) {
           console.error('[LocationChat] WS message error:', err);
         }
@@ -217,13 +242,27 @@ export default function LocationChat() {
     }).then(data => {
       if (data?.xpAwarded) showXpFloat(data.xpAwarded);
       if (data?.newAchievements) queueAchievements(data.newAchievements);
+      if (data?.levelUp) triggerLevelUp(data.levelUp.newLevel);
     }).catch(() => {});
+
+    // Fetch presence list initially and on heartbeat
+    const fetchPresence = () => {
+      api('/api/presence').then(data => {
+        if (data?.presence?.[locationId]) {
+          setPresence(data.presence[locationId]);
+        } else {
+          setPresence([]);
+        }
+      }).catch(() => {});
+    };
+    fetchPresence();
 
     const interval = setInterval(() => {
       api('/api/presence/heartbeat', {
         method: 'POST',
         body: JSON.stringify({ locationId })
       }).catch(() => {});
+      fetchPresence(); // Also refresh presence list
     }, 10000);
 
     return () => {
@@ -349,7 +388,8 @@ export default function LocationChat() {
       // Add locationId to the location object for convenience
       loc.id = locationId;
       setLocation(loc);
-      const history = histData.history || [];
+      const history = histData.messages || histData.history || [];
+      setHasMore(!!histData.hasMore);
       setMessages(history);
 
       // Seed known IDs and latest timestamp for polling
@@ -379,6 +419,7 @@ export default function LocationChat() {
         }
       });
       setNpcEmotions(emotions);
+
     } catch (err) {
       console.error('Failed to load location:', err);
       navigate('/map');
@@ -387,12 +428,67 @@ export default function LocationChat() {
     }
   }
 
-  // Auto-scroll only when new messages arrive AND user is already near the bottom.
+  // Load older messages when scrolling to top (infinite scroll)
+  const loadMoreRef = useRef(false);
+  const handleLoadMore = useCallback(async () => {
+    if (loadingMore || !hasMore || messages.length === 0) return;
+    loadMoreRef.current = true;
+    setLoadingMore(true);
+
+    const oldestMsg = messages[0];
+    if (!oldestMsg?.id) { setLoadingMore(false); return; }
+
+    try {
+      const url = isMarcelDm
+        ? `/api/marcel-dm/channel/history?userId=${marcelDmUserId}&before=${oldestMsg.id}&limit=30`
+        : `/api/chat/locations/${locationId}/history?before=${oldestMsg.id}&limit=30`;
+      const data = await api(url);
+      const older = data.messages || [];
+      setHasMore(!!data.hasMore);
+
+      if (older.length > 0) {
+        older.forEach(m => { if (m.id) knownIdsRef.current.add(m.id); });
+        setMessages(prev => [...older, ...prev]);
+      }
+    } catch (err) {
+      console.error('Failed to load more messages:', err);
+    } finally {
+      setLoadingMore(false);
+      loadMoreRef.current = false;
+    }
+  }, [loadingMore, hasMore, messages, locationId, isMarcelDm, marcelDmUserId]);
+
+  // Detect scroll to top for infinite scroll (column-reverse: top = most negative scrollTop)
+  useEffect(() => {
+    const el = chatAreaRef.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      if (loadMoreRef.current || !hasMore) return;
+      // In column-reverse, scrollTop is 0 at bottom and negative going up.
+      // When near the top: -scrollTop approaches (scrollHeight - clientHeight).
+      const distFromTop = el.scrollHeight - el.clientHeight + el.scrollTop;
+      if (distFromTop < 100) {
+        handleLoadMore();
+      }
+    };
+
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [handleLoadMore, hasMore]);
+
+  // Auto-scroll only when new messages arrive at the END (not when prepending older messages)
+  // AND user is already near the bottom.
   // column-reverse: scrollTop 0 = at bottom, negative = scrolled up.
   const prevMsgCountRef = useRef(0);
+  const prevOldestIdRef = useRef(null);
   useEffect(() => {
     if (messages.length === 0) return;
-    if (messages.length > prevMsgCountRef.current) {
+    const oldestId = messages[0]?.id;
+    const wasPrepend = prevOldestIdRef.current && oldestId !== prevOldestIdRef.current;
+    prevOldestIdRef.current = oldestId;
+
+    if (messages.length > prevMsgCountRef.current && !wasPrepend) {
       const el = chatAreaRef.current;
       const nearBottom = !el || Math.abs(el.scrollTop) < 150;
       if (nearBottom) {
@@ -458,8 +554,16 @@ export default function LocationChat() {
     setMessages(prev => [...prev, optimisticMsg]);
 
     // Show typing indicators only for @mentioned NPCs (except Marcel, who is handled via WS)
+    // Expand group @mentions to their member NPCs
+    const textLower = text.toLowerCase();
+    const groupMemberIds = new Set();
+    for (const group of Object.values(location?.groups || {})) {
+      if (textLower.includes(`@${group.displayName.toLowerCase()}`)) {
+        (group.memberIds || []).forEach(id => groupMemberIds.add(id));
+      }
+    }
     const mentionedNpcs = (location?.npcs || []).filter(npc =>
-      npc.id !== 'marcel' && text.toLowerCase().includes(`@${npc.displayName.toLowerCase()}`)
+      npc.id !== 'marcel' && (textLower.includes(`@${npc.displayName.toLowerCase()}`) || groupMemberIds.has(npc.id))
     );
 
     if (mentionedNpcs.length > 0) {
@@ -515,6 +619,7 @@ export default function LocationChat() {
       });
 
       queueAchievements(data.newAchievements);
+      if (data.levelUp) triggerLevelUp(data.levelUp.newLevel);
     } catch (err) {
       // Clear manual typing bubbles on error
       setTypingNpcs(prev => {
@@ -581,6 +686,7 @@ export default function LocationChat() {
       });
 
       queueAchievements(data.newAchievements);
+      if (data.levelUp) triggerLevelUp(data.levelUp.newLevel);
     } catch (err) {
       setMessages(prev => prev.filter(m => !m._optimistic));
       console.error('Failed to send GIF:', err);
@@ -656,6 +762,7 @@ export default function LocationChat() {
       });
 
       queueAchievements(data.newAchievements);
+      if (data.levelUp) triggerLevelUp(data.levelUp.newLevel);
     } catch (err) {
       setMessages(prev => prev.filter(m => !m._optimistic));
       console.error('Failed to upload image:', err);
@@ -667,12 +774,37 @@ export default function LocationChat() {
     }
   }, [sending, locationId, user, playSound]);
 
+  // Item use handler — POST to consume, trigger smoke effect, add chat message
+  const handleUseItem = useCallback(async (itemId) => {
+    try {
+      const data = await api('/api/shop/use', {
+        method: 'POST',
+        body: JSON.stringify({ item_id: itemId, locationId })
+      });
+      if (data.success) {
+        triggerEffect('smoke');
+        const characterName = user?.characterName || user?.global_name || user?.username || 'You';
+        const actionMsg = {
+          role: 'system',
+          text: `*${characterName} ${data.use_message}*`,
+          timestamp: new Date().toISOString(),
+        };
+        setMessages(prev => [...prev, actionMsg]);
+      }
+      return data.inventory;
+    } catch (err) {
+      setToast({ type: 'error', message: err.data?.error || err.message || 'Failed to use item' });
+      throw err;
+    }
+  }, [locationId, user, triggerEffect]);
+
   // Dice roll handler — show 3D dice first, then POST results after they settle
   const handleDiceRoll = useCallback((notation) => {
     setDiceRoll({ notation, diceColor: '#F97316' });
   }, []);
 
   const handleDiceResult = useCallback(async (rolls) => {
+    // Regular dice roll — POST to server
     const notation = diceRoll?.notation;
     if (!notation) return;
     try {
@@ -689,11 +821,17 @@ export default function LocationChat() {
           setMessages(prev => [...prev, data.message]);
         }
       }
+      queueAchievements(data.newAchievements);
+      if (data.levelUp) triggerLevelUp(data.levelUp.newLevel);
     } catch (err) {
       const msg = err.data?.error || err.message || 'Failed to save dice roll';
       setToast({ type: 'error', message: msg });
     }
   }, [locationId, diceRoll?.notation]);
+
+  const handleDiceDone = useCallback(() => {
+    setDiceRoll(null);
+  }, []);
 
   // Reaction handlers
   const handleLongPress = useCallback((messageId, targetRect) => {
@@ -731,6 +869,7 @@ export default function LocationChat() {
 
       if (data.xpAwarded) showXpFloat(data.xpAwarded);
       queueAchievements(data.newAchievements);
+      if (data.levelUp) triggerLevelUp(data.levelUp.newLevel);
     } catch (err) {
       console.error('Failed to toggle reaction:', err);
     }
@@ -802,6 +941,7 @@ export default function LocationChat() {
       playSound('purchase');
       if (result.xpAwarded) showXpFloat(result.xpAwarded);
       queueAchievements(result.newAchievements);
+      if (result.levelUp) triggerLevelUp(result.levelUp.newLevel);
       setToast({ type: 'success', message: result.message || `Purchased ${item.name}!` });
     } catch (err) {
       setToast({ type: 'error', message: err.data?.error || 'Purchase failed' });
@@ -813,8 +953,15 @@ export default function LocationChat() {
   // Scene interaction handlers
   const handleNpcClick = (npcId) => {
     const npc = location.npcs.find(n => n.id === npcId);
+    if (npc) {
+      setViewMode('chat');
+      setInsertNpc(npc);
+      return;
+    }
+    // Player sprites are in npcPlacements but not in npcs — match by character name
+    const player = players.find(p => p.characterName.toLowerCase() === npcId.toLowerCase());
     setViewMode('chat');
-    if (npc) setInsertNpc(npc);
+    if (player) setInsertNpc({ displayName: player.characterName });
   };
 
   const handleGatheringClick = () => {
@@ -891,6 +1038,9 @@ export default function LocationChat() {
             </div>
           </div>
 
+          {/* Presence Strip — who's here */}
+          <PresenceStrip users={presence} currentUserId={user?.id} />
+
           {/* Chat Messages — column-reverse so browser natively anchors to bottom */}
           <div className="chat-messages-container">
             <div className="chat-messages" ref={chatAreaRef}>
@@ -903,15 +1053,26 @@ export default function LocationChat() {
                   </div>
                 ) : (
                   <>
+                    {hasMore && (
+                      <div className="chat-load-more">
+                        {loadingMore ? (
+                          <div className="chat-load-more-spinner" />
+                        ) : (
+                          <button className="chat-load-more-btn" onClick={handleLoadMore}>Load older messages</button>
+                        )}
+                      </div>
+                    )}
                     {messages.map((msg, i) => (
                       <ChatBubble
                         key={msg.id || i}
                         message={msg}
                         npcs={location.npcs}
                         players={players}
+                        groups={location.groups}
                         currentUserId={user?.id}
                         onLongPress={handleLongPress}
                         onReact={handleReact}
+                        onNameTap={setInsertNpc}
                       />
                     ))}
                     {Object.entries(typingNpcs).map(([npcId, data]) => (
@@ -950,6 +1111,8 @@ export default function LocationChat() {
               playSound={playSound}
               scrollContainerRef={chatAreaRef}
               onDiceRoll={handleDiceRoll}
+              onUseItem={handleUseItem}
+              locationId={locationId}
             />
           ) : (
             <ChatInput
@@ -1027,10 +1190,11 @@ export default function LocationChat() {
       {diceRoll && diceOverlayEnabled && (
         <Suspense fallback={null}>
           <DiceOverlay
+            key={diceRoll.key || 0}
             notation={diceRoll.notation}
             themeColor={diceRoll.diceColor || '#F97316'}
             onResult={handleDiceResult}
-            onDone={() => setDiceRoll(null)}
+            onDone={handleDiceDone}
           />
         </Suspense>
       )}
@@ -1050,6 +1214,15 @@ export default function LocationChat() {
           key={achievementQueue[0].id}
           achievement={achievementQueue[0]}
           onDismiss={dismissAchievement}
+        />
+      )}
+
+      {/* Level-Up Overlay — shows after achievements clear */}
+      {levelUp && achievementQueue.length === 0 && (
+        <LevelUpOverlay
+          key={levelUp}
+          level={levelUp}
+          onDismiss={() => setLevelUp(null)}
         />
       )}
 

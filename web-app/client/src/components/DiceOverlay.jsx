@@ -6,14 +6,14 @@ import '../styles/dice-overlay.css';
  * Full-screen overlay that renders 3D dice animation using @3d-dice/dice-box.
  * Captures the physics result and sends it back via onResult callback.
  */
-export default function DiceOverlay({ notation, themeColor = '#F97316', onResult, onDone }) {
+export default function DiceOverlay({ notation, themeColor = '#F97316', modifier, forcedTotal, label, onResult, onDone }) {
   const containerRef = useRef(null);
   const diceBoxRef = useRef(null);
   const initRef = useRef(false);
   const clearTimerRef = useRef(null);
   const mountedRef = useRef(true);
-  const propsRef = useRef({ notation, themeColor, onResult, onDone });
-  propsRef.current = { notation, themeColor, onResult, onDone };
+  const propsRef = useRef({ notation, themeColor, forcedTotal, onResult, onDone });
+  propsRef.current = { notation, themeColor, forcedTotal, onResult, onDone };
   const [resultTotal, setResultTotal] = useState(null);
 
   useEffect(() => {
@@ -52,6 +52,9 @@ export default function DiceOverlay({ notation, themeColor = '#F97316', onResult
           enableShadows: true,
           lightIntensity: 1,
           onRollComplete: (results) => {
+            // In spectator mode, ignore physics results — handled by early-cut timer
+            if (propsRef.current.forcedTotal != null) return;
+
             // Extract individual die values from dice-box results
             const rolls = [];
             let total = 0;
@@ -89,6 +92,20 @@ export default function DiceOverlay({ notation, themeColor = '#F97316', onResult
         const rollNotation = buildVisualNotation(n);
         if (rollNotation) {
           box.roll(rollNotation);
+
+          // Spectator mode: let dice bounce for ~1s, then clear and show the real result
+          if (propsRef.current.forcedTotal != null) {
+            clearTimerRef.current = setTimeout(() => {
+              if (!mountedRef.current) return;
+              try { box.clear(); } catch {}
+              setResultTotal(propsRef.current.forcedTotal);
+
+              // Show result banner, then dismiss
+              clearTimerRef.current = setTimeout(() => {
+                if (mountedRef.current) propsRef.current.onDone?.();
+              }, 1500);
+            }, 1000);
+          }
         } else {
           setTimeout(() => propsRef.current.onDone?.(), 500);
         }
@@ -121,8 +138,18 @@ export default function DiceOverlay({ notation, themeColor = '#F97316', onResult
       <div id="dice-overlay-canvas" ref={containerRef} className="dice-overlay-canvas" />
       {resultTotal != null && (
         <div className="dice-result-banner">
-          <span className="dice-result-notation">{notation}</span>
-          <span className="dice-result-total">{resultTotal}</span>
+          {label && <span className="dice-result-label">{label}</span>}
+          <span className="dice-result-notation">{notation}{modifier ? ` + ${modifier}` : ''}</span>
+          {forcedTotal != null ? (
+            <span className="dice-result-total">{forcedTotal}</span>
+          ) : modifier ? (
+            <>
+              <span className="dice-result-breakdown">{resultTotal} + {modifier}</span>
+              <span className="dice-result-total">{resultTotal + modifier}</span>
+            </>
+          ) : (
+            <span className="dice-result-total">{resultTotal}</span>
+          )}
         </div>
       )}
     </div>

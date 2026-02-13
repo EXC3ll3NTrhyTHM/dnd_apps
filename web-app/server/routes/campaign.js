@@ -159,7 +159,6 @@ router.get('/players', authRequired, (req, res) => {
   // Merge player IDs from both sources
   const allIds = new Set([...Object.keys(players), ...Object.keys(wallets)]);
   const list = [...allIds]
-    .filter(id => !DM_USER_IDS.includes(id))
     .map(id => {
       const p = players[id] || {};
       const w = wallets[id] || {};

@@ -7,7 +7,17 @@
     "npcs": [
       "marcel"
     ],
-    "groups": {},
+    "groups": {
+      "new_group": {
+        "displayName": "Players",
+        "members": [
+          "Acacia",
+          "Nalyd",
+          "Aly",
+          "Tyren"
+        ]
+      }
+    },
     "features": [],
     "mapCoords": {
       "x": 50,
@@ -598,5 +608,19 @@
         }
       }
     }
+  },
+  "the_arena": {
+    "name": "The Arena",
+    "description": "Blood and glory await. Step into the pit and prove your worth.",
+    "locked": false,
+    "lockedFor": [],
+    "npcs": [],
+    "groups": {},
+    "features": [],
+    "mapCoords": {
+      "x": 50,
+      "y": 70
+    },
+    "mapIcon": "⚔️"
   }
 }

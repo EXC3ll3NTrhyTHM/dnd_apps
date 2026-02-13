@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import NpcPortrait from '../components/NpcPortrait';
 import LocationTransition from '../components/LocationTransition';
 import SummonEffect from '../components/SummonEffect';
+import FishingOverlay from '../components/FishingOverlay';
 import { pauseAmbientAudio } from '../components/Layout';
 import { useUiSounds } from '../hooks/useUiSounds';
 import { createRecognizer } from '../lib/gestureRecognizer';
@@ -24,6 +25,8 @@ export default function Map() {
   const [presence, setPresence] = useState({});
   const [unread, setUnread] = useState({});
   const [summoning, setSummoning] = useState(null); // { gesturePoints } or null
+  const [fishingOpen, setFishingOpen] = useState(false);
+  const [fishingBait, setFishingBait] = useState(null); // null = not loaded, [] = no bait
 
   const containerRef = useRef(null);
   const popupRef = useRef(null);
@@ -187,6 +190,19 @@ export default function Map() {
     return () => window.removeEventListener('resize', handleResize);
   }, [selectedLocation, calcPopupPosition]);
 
+  // Fetch bait counts when fishing pin is selected
+  useEffect(() => {
+    if (selectedLocation === '__fishing__') {
+      setFishingBait(null);
+      api('/api/inventory').then(data => {
+        const items = data.inventory?.items || data.items || [];
+        const BAIT_IDS = ['basic_worm', 'enchanted_grub', 'abyssal_lure'];
+        const bait = items.filter(i => BAIT_IDS.includes(i.item_id) && i.quantity > 0);
+        setFishingBait(bait);
+      }).catch(() => setFishingBait([]));
+    }
+  }, [selectedLocation]);
+
   const handleMarkerTap = useCallback((e, locId) => {
     e.stopPropagation();
     playSound('mapMarker');
@@ -236,7 +252,7 @@ export default function Map() {
 
     ctx.save();
     ctx.strokeStyle = '#a855f7';
-    ctx.lineWidth = 3 * dpr;
+    ctx.lineWidth = 6 * dpr;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.shadowColor = '#a855f7';
@@ -403,7 +419,13 @@ export default function Map() {
           isDM={isDM}
           dmPlayers={summoning.dmPlayers || []}
           unread={unread}
+          presence={presence}
         />
+      )}
+
+      {/* Fishing overlay */}
+      {fishingOpen && (
+        <FishingOverlay onClose={() => setFishingOpen(false)} />
       )}
 
       {/* Header overlay */}
@@ -443,7 +465,7 @@ export default function Map() {
           return (
             <div
               key={loc.id}
-              className={`map-marker ${isSelected ? 'selected' : ''}`}
+              className={`map-marker ${isSelected ? 'selected' : ''}${loc.id === 'the_arena' ? ' arena-pin' : ''}`}
               style={{
                 left: `${loc.mapCoords.x}%`,
                 top: `${loc.mapCoords.y}%`,
@@ -467,13 +489,30 @@ export default function Map() {
           );
         })}
 
-        {/* Faint pulsing rune hint (Ehwaz = M-shaped rune) */}
+        {/* Fishing pin — bottom left */}
         {mapLoaded && (
-          <div className="map-summon-hint">{'\u16D6'}</div>
+          <div
+            className={`map-marker fishing-pin ${selectedLocation === '__fishing__' ? 'selected' : ''}`}
+            style={{ left: '12%', top: '88%' }}
+            onClick={(e) => handleMarkerTap(e, '__fishing__')}
+          >
+            <div className="map-marker-pin">
+              <div className="map-marker-icon fishing-marker-icon">
+                <span>{'\ud83c\udfa3'}</span>
+              </div>
+              <div className="map-marker-spike fishing-marker-spike" />
+              {selectedLocation !== '__fishing__' && <div className="map-marker-pulse fishing-marker-pulse" />}
+            </div>
+          </div>
+        )}
+
+        {/* Faint pulsing hint — draw M to summon Marcel */}
+        {mapLoaded && (
+          <div className="map-summon-hint">M</div>
         )}
 
         {/* Popup */}
-        {selectedLoc && !selectedLoc.isMarcelDm && popupStyle && (
+        {selectedLoc && !selectedLoc.isMarcelDm && selectedLoc.id !== 'the_arena' && popupStyle && (
           <div
             ref={popupRef}
             className={`map-popup arrow-${popupStyle.arrowSide}`}
@@ -523,6 +562,116 @@ export default function Map() {
             </button>
           </div>
         )}
+
+        {/* Arena popup */}
+        {selectedLocation === 'the_arena' && mapLoaded && (() => {
+          const container = containerRef.current;
+          if (!container) return null;
+          const rect = container.getBoundingClientRect();
+          const markerX = 0.50 * rect.width;
+          const markerY = 0.70 * rect.height;
+          const popupW = 210;
+          const popupH = 150;
+          const pad = 12;
+          let px = markerX - popupW / 2;
+          if (px < pad) px = pad;
+          if (px + popupW > rect.width - pad) px = rect.width - popupW - pad;
+          const py = markerY - popupH - 10; // above the pin
+          const arrowX = Math.max(20, Math.min(popupW - 20, markerX - px));
+
+          return (
+          <div
+            className="map-popup arrow-bottom arena-popup"
+            style={{
+              left: `${px}px`,
+              top: `${py}px`,
+              '--arrow-offset': `${arrowX}px`,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="map-popup-name" style={{ color: '#ef4444' }}>{'\u2694\uFE0F'} The Arena</div>
+            <div className="map-popup-desc">Blood and glory await. Step into the pit and prove your worth.</div>
+            {(presence['the_arena'] || []).length > 0 && (
+              <div className="map-popup-players">
+                {presence['the_arena'].map(player => (
+                  <div key={player.id} className="map-popup-player" title={player.username}>
+                    <img
+                      src={player.avatar}
+                      alt={player.username}
+                      className="map-popup-player-avatar"
+                    />
+                    <span className="map-popup-player-name">{player.username}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <button
+              className="map-popup-enter arena-popup-enter"
+              onClick={(e) => handleEnterLocation(e, 'the_arena')}
+            >
+              Fight
+            </button>
+          </div>
+          );
+        })()}
+
+        {/* Fishing popup */}
+        {selectedLocation === '__fishing__' && mapLoaded && (() => {
+          const container = containerRef.current;
+          if (!container) return null;
+          const rect = container.getBoundingClientRect();
+          const markerX = 0.12 * rect.width;
+          const markerY = 0.88 * rect.height;
+          const popupW = 210;
+          const pad = 12;
+          let px = markerX - popupW / 2;
+          if (px < pad) px = pad;
+          if (px + popupW > rect.width - pad) px = rect.width - popupW - pad;
+          const py = markerY - 200;
+          const arrowX = Math.max(20, Math.min(popupW - 20, markerX - px));
+          const totalBait = fishingBait ? fishingBait.reduce((s, b) => s + b.quantity, 0) : null;
+
+          return (
+            <div
+              className="map-popup arrow-bottom fishing-popup"
+              style={{
+                left: `${px}px`,
+                top: `${py}px`,
+                '--arrow-offset': `${arrowX}px`,
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="map-popup-name" style={{ color: '#4a9eff' }}>{'\ud83c\udfa3'} Fishing Hole</div>
+              <div className="map-popup-desc">Cast your line and see what bites. Bring bait from the shop.</div>
+
+              {fishingBait === null ? (
+                <div className="fishing-popup-bait">Loading...</div>
+              ) : totalBait > 0 ? (
+                <div className="fishing-popup-bait">
+                  {fishingBait.map(b => (
+                    <span key={b.item_id} className="fishing-popup-bait-item">
+                      {b.name} <strong>x{b.quantity}</strong>
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <div className="fishing-popup-bait fishing-popup-no-bait">No bait — visit the shop!</div>
+              )}
+
+              <button
+                className="map-popup-enter fishing-popup-enter"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  playSound('buttonTap');
+                  setSelectedLocation(null);
+                  setFishingOpen(true);
+                }}
+              >
+                Fish
+              </button>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

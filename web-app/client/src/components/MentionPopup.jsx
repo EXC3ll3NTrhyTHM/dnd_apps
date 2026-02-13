@@ -23,8 +23,8 @@ export default function MentionPopup({ items, activeIndex, onSelect }) {
           key={item.type === 'group' ? `group-${item.id}` : item.id}
           ref={i === activeIndex ? activeRef : null}
           className={`mention-popup-item${i === activeIndex ? ' mention-popup-item-active' : ''}${item.type === 'group' ? ' mention-popup-group' : ''}`}
-          onPointerDown={(e) => {
-            e.preventDefault();
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={(e) => {
             e.stopPropagation();
             onSelect(item);
           }}

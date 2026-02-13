@@ -362,6 +362,18 @@
   text-overflow: ellipsis;
 }
 
+.summon-dm-picker-online {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4ade80;
+  border: 2px solid rgba(20, 10, 30, 0.9);
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.5);
+}
+
 .summon-dm-picker-unread {
   width: 8px;
   height: 8px;

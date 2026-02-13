@@ -9,6 +9,24 @@
         { "id": "item_blunt", "name": "Blunt", "price": 25, "type": "consumable", "consumable": true, "one_time": false, "max_stack": 10, "use_message": "You light up and take a long drag... The world feels a little more chill.", "description": "A hand-rolled herbal smoke. Relaxing.", "shortcuts": ["!smoke", "!spark", "!burn", "!hit blunt", "!light up"] }
       ]
     },
+    "bait": {
+      "display_name": "Bait",
+      "emoji": "\ud83e\udeb1",
+      "items": [
+        { "id": "basic_worm", "name": "Basic Worm", "price": 5, "type": "bait", "consumable": true, "one_time": false, "max_stack": 20, "description": "A fat, wriggling worm. The old reliable for any angler." },
+        { "id": "enchanted_grub", "name": "Enchanted Grub", "price": 25, "type": "bait", "consumable": true, "one_time": false, "max_stack": 10, "description": "Pulsing with faint magic. Attracts rarer fish from the deep." },
+        { "id": "abyssal_lure", "name": "Abyssal Lure", "price": 75, "type": "bait", "consumable": true, "one_time": false, "max_stack": 5, "description": "Forged from deep-sea coral. Even legendary fish can't resist its call." }
+      ]
+    },
+    "rods": {
+      "display_name": "Fishing Rods",
+      "emoji": "\ud83c\udfa3",
+      "items": [
+        { "id": "iron_rod", "name": "Iron Rod", "price": 2500, "type": "rod", "consumable": false, "one_time": true, "max_stack": 1, "description": "A sturdy iron rod. Each reel tap pulls 1.5\u00d7 harder than a bare line." },
+        { "id": "mithril_rod", "name": "Mithril Rod", "price": 10000, "type": "rod", "consumable": false, "one_time": true, "max_stack": 1, "description": "Lightweight and impossibly strong. Each reel tap pulls 2\u00d7 harder." },
+        { "id": "dragonbone_rod", "name": "Dragonbone Rod", "price": 25000, "type": "rod", "consumable": false, "one_time": true, "max_stack": 1, "description": "Carved from the spine of a wyrm. Each reel tap pulls 3\u00d7 harder. The finest rod in Okhan." }
+      ]
+    },
     "special": {
       "display_name": "Special",
       "emoji": "✨",

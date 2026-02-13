@@ -1,0 +1,137 @@
+/* ============================================
+   PRESENCE STRIP - Snapchat-style overlapping avatars
+   ============================================ */
+
+.presence-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, rgba(26, 21, 16, 0.9), rgba(20, 16, 12, 0.95));
+  border-bottom: 1px solid rgba(212, 168, 67, 0.15);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease;
+}
+
+.presence-strip:hover {
+  background: linear-gradient(180deg, rgba(32, 26, 20, 0.95), rgba(24, 20, 16, 0.98));
+}
+
+.presence-avatars {
+  display: flex;
+  align-items: center;
+}
+
+.presence-avatar {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  margin-left: -10px;
+  transition: transform 0.2s ease, margin 0.3s ease;
+}
+
+.presence-avatar:first-child {
+  margin-left: 0;
+}
+
+.presence-strip:hover .presence-avatar {
+  margin-left: -6px;
+}
+
+.presence-strip:hover .presence-avatar:first-child {
+  margin-left: 0;
+}
+
+.presence-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #1a1510;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  background: #2a2218;
+}
+
+.presence-avatar:hover {
+  transform: scale(1.15);
+  z-index: 100 !important;
+}
+
+.presence-avatar:hover img {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 8px rgba(212, 168, 67, 0.4);
+}
+
+/* Name tooltip on expanded view */
+.presence-name {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.85);
+  color: var(--color-gold);
+  font-size: 0.65rem;
+  font-family: var(--font-display);
+  white-space: nowrap;
+  border-radius: 3px;
+  pointer-events: none;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Overflow badge (+3) */
+.presence-overflow {
+  width: 32px;
+  height: 32px;
+  margin-left: -10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3d3222, #2a2218);
+  border: 2px solid #1a1510;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-gold);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Label text */
+.presence-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Expanded state - show names below each avatar */
+.presence-strip.expanded .presence-avatar {
+  margin-left: 8px;
+}
+
+.presence-strip.expanded .presence-avatar:first-child {
+  margin-left: 0;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Slide-in animation for new arrivals */
+.presence-avatar {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}

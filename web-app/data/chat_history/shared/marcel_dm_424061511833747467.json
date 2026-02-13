@@ -1,0 +1,28 @@
+[
+  {
+    "id": "6d4f9a04-46b5-4611-965a-1a456b029c31",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "notation": "5d6",
+    "rolls": [
+      4,
+      3,
+      2,
+      3,
+      2
+    ],
+    "total": 14,
+    "kept": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T15:47:06.065Z"
+  }
+]

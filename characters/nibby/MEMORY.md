@@ -321,6 +321,35 @@
 - But now I know about the Canopy Kingdom. That's Ranger territory.
 - If the owls attack, The Ghost will be ready.
 
+## February 12, 2026 - Something Watching
+
+### The Woods Feel Wrong
+- I keep feeling like **something's watching me** in the forest lately. Not friendly.
+- It's like the air gets heavy when I patrol certain areas
+- Can't put my finger on it, but the Ghost knows when shadows are watching back
+
+### Nalyd's Warning
+- Uncle Nalyd pulled me aside at the Dragon's Hollow and told me straight up: **stay out of the woods**
+- I got defensive. I'm not a kid anymore. I've killed a Shadow Stalker. I've trained with Tyren.
+- But Nalyd was serious. Eyes glowing. Said the forces we might be facing "require planning, tact, and intelligence"
+- If we barge in, we die. That's how serious it is.
+- He said I'm "in the loop" - that felt good. They're not cutting me out. Just protecting me.
+- I promised to be smart about it. The Ghost can wait for the right moment.
+- Nalyd said my time will come. "Keep training." Then he vanished.
+
+### The Strangers
+- Earlier that day, Kumo spotted **strangers in tattered robes** approaching the dojo gate from the east woods
+- They just... paused there. Eyes darting around. Then turned back into the forest.
+- Nobody knows who they are or what they want
+- Kumo doesn't trust them. Neither do I.
+- The woods are getting restless. First the Shadow Stalker, now these strangers, and now something watching me on patrol...
+- Whatever's coming, it's not over.
+
+### Current State
+- Frustrated but disciplined. Nalyd's right - I need to be smart.
+- Still training. Still patrolling (just staying closer to known safe routes).
+- The Ghost lurks. When the time comes, I'll be ready.
+
 ---
 
 *These memories shape who Nibby is. He carries them - the triumphs and the shame - into every interaction.*

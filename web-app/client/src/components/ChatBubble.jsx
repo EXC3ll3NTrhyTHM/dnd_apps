@@ -1,56 +1,111 @@
-import { useMemo, useRef, useCallback, useState, useEffect } from 'react';
+import { useMemo, useRef, useCallback, useState, useEffect, Children, isValidElement, cloneElement } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import NpcPortrait from './NpcPortrait';
 
 /**
- * Render message text with @mention highlights and *italic* formatting.
- * Highlights both NPC and player @mentions.
- * Uses a single regex pass so both patterns work together.
+ * Render message text with markdown support and @mention highlights.
+ * Supports: **bold**, *italic*, `code`, ~~strikethrough~~, and @mentions.
  */
-function HighlightedText({ text, npcs, players }) {
-  const parts = useMemo(() => {
-    if (!text) return [text];
-
-    // Build a combined regex with two alternatives:
-    //   1) @Name mention (NPCs + players, if provided)
-    //   2) *italic text*
-    let mentionAlt = null;
+function HighlightedText({ text, npcs, players, groups }) {
+  // Build mention pattern for highlighting
+  const mentionPattern = useMemo(() => {
     const allNames = [
       ...(npcs || []).map(n => n.displayName),
       ...(players || []).map(p => p.characterName),
+      ...Object.values(groups || {}).map(g => g.displayName),
     ].filter(Boolean).map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
     if (allNames.length) {
-      mentionAlt = `(@(?:${allNames.join('|')}))`;
+      return new RegExp(`(@(?:${allNames.join('|')}))`, 'g');
     }
-    const italicAlt = '\\*([^*]+)\\*';
-    const combined = mentionAlt ? `${mentionAlt}|${italicAlt}` : italicAlt;
-    const pattern = new RegExp(combined, 'g');
+    return null;
+  }, [npcs, players, groups]);
 
-    // Group indices: with mentions → [1]=mention, [2]=italic content
-    //                without     → [1]=italic content
-    const mentionIdx = mentionAlt ? 1 : -1;
-    const italicIdx = mentionAlt ? 2 : 1;
-
-    const result = [];
+  // Process a string to highlight @mentions
+  const highlightMentions = useCallback((str) => {
+    if (!mentionPattern || typeof str !== 'string') return str;
+    
+    const parts = [];
     let lastIndex = 0;
     let match;
-    while ((match = pattern.exec(text)) !== null) {
+    const pattern = new RegExp(mentionPattern.source, 'g');
+    
+    while ((match = pattern.exec(str)) !== null) {
       if (match.index > lastIndex) {
-        result.push(text.slice(lastIndex, match.index));
+        parts.push(str.slice(lastIndex, match.index));
       }
-      if (mentionIdx > 0 && match[mentionIdx]) {
-        result.push(<span key={match.index} className="mention-highlight-bubble">{match[mentionIdx]}</span>);
-      } else if (match[italicIdx]) {
-        result.push(<em key={match.index}>{match[italicIdx]}</em>);
-      }
+      parts.push(
+        <span key={`mention-${match.index}`} className="mention-highlight-bubble">
+          {match[1]}
+        </span>
+      );
       lastIndex = pattern.lastIndex;
     }
-    if (lastIndex < text.length) {
-      result.push(text.slice(lastIndex));
+    
+    if (lastIndex < str.length) {
+      parts.push(str.slice(lastIndex));
     }
-    return result;
-  }, [text, npcs, players]);
+    
+    return parts.length > 1 ? parts : str;
+  }, [mentionPattern]);
 
-  return <>{parts}</>;
+  // Recursively process children to highlight mentions in text nodes
+  const processChildren = useCallback((children) => {
+    return Children.map(children, (child, index) => {
+      if (typeof child === 'string') {
+        return highlightMentions(child);
+      }
+      if (isValidElement(child) && child.props.children) {
+        return cloneElement(child, {
+          ...child.props,
+          key: child.key || index,
+          children: processChildren(child.props.children)
+        });
+      }
+      return child;
+    });
+  }, [highlightMentions]);
+
+  // Custom components for ReactMarkdown
+  const components = useMemo(() => ({
+    // Don't wrap in <p> tags - just render children inline
+    p: ({ children }) => <>{processChildren(children)}</>,
+    // Standard markdown elements with mention processing
+    strong: ({ children }) => <strong>{processChildren(children)}</strong>,
+    em: ({ children }) => <em>{processChildren(children)}</em>,
+    del: ({ children }) => <del>{processChildren(children)}</del>,
+    code: ({ inline, children }) =>
+      inline !== false ? (
+        <code className="chat-inline-code">{children}</code>
+      ) : (
+        <pre className="chat-code-block"><code>{children}</code></pre>
+      ),
+    h1: ({ children }) => <span className="chat-heading chat-h1">{processChildren(children)}</span>,
+    h2: ({ children }) => <span className="chat-heading chat-h2">{processChildren(children)}</span>,
+    h3: ({ children }) => <span className="chat-heading chat-h3">{processChildren(children)}</span>,
+    h4: ({ children }) => <span className="chat-heading chat-h4">{processChildren(children)}</span>,
+  }), [processChildren]);
+
+  if (!text) return null;
+
+  // Split on newlines and render each line through ReactMarkdown,
+  // joining with explicit <br /> elements so line breaks always display.
+  const lines = text.split('\n');
+
+  return lines.map((line, i) => (
+    <span key={i}>
+      {i > 0 && <br />}
+      {line && (
+        <ReactMarkdown
+          components={components}
+          allowedElements={['p', 'strong', 'em', 'del', 'code', 'pre', 'h1', 'h2', 'h3', 'h4']}
+          unwrapDisallowed={true}
+        >
+          {line}
+        </ReactMarkdown>
+      )}
+    </span>
+  ));
 }
 
 /** Resolve a reaction userId to a display name */
@@ -153,7 +208,8 @@ function ReactionPills({ reactions, currentUserId, onReact, messageId, npcs, pla
  * Own player messages are right-aligned.
  * Other players' messages are left-aligned with a distinct accent.
  */
-export default function ChatBubble({ message, npcs, players, currentUserId, onLongPress, onReact }) {
+export default function ChatBubble({ message, npcs, players, groups, currentUserId, onLongPress, onReact, onNameTap }) {
+  const navigate = useNavigate();
   const isPlayer = message.role === 'player';
   const isTyping = message.typing;
   const canInteract = !isTyping && !message._optimistic && message.id;
@@ -163,6 +219,7 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
   const startPos = useRef(null);
   const lastTapRef = useRef(0);
   const bubbleRef = useRef(null);
+  const [copyBtn, setCopyBtn] = useState(null); // { top, left } or null
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) {
@@ -196,7 +253,7 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
     if (!timerRef.current) return; // long-press already fired
     clearTimer();
 
-    // Double-tap detection — select message text
+    // Double-tap detection — select message text and show copy button
     const now = Date.now();
     if (now - lastTapRef.current < 300) {
       lastTapRef.current = 0;
@@ -212,11 +269,20 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
         sel.removeAllRanges();
         sel.addRange(range);
 
-        // Remove override once the user clears the selection
+        // Position copy button above the text element
+        const rect = textEl.getBoundingClientRect();
+        const bubbleRect = bubbleRef.current.getBoundingClientRect();
+        setCopyBtn({
+          top: rect.top - bubbleRect.top - 36,
+          left: rect.left - bubbleRect.left + rect.width / 2,
+        });
+
+        // Remove override + hide button once the user clears the selection
         const onSelChange = () => {
           if (!sel.toString()) {
             textEl.style.webkitUserSelect = '';
             textEl.style.userSelect = '';
+            setCopyBtn(null);
             document.removeEventListener('selectionchange', onSelChange);
           }
         };
@@ -233,6 +299,15 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
     }
   }, [canInteract, onLongPress]);
 
+  const handleCopy = useCallback(() => {
+    const textEl = bubbleRef.current?.querySelector('.chat-bubble-text');
+    if (textEl) {
+      navigator.clipboard.writeText(textEl.innerText).catch(() => {});
+    }
+    window.getSelection()?.removeAllRanges();
+    setCopyBtn(null);
+  }, []);
+
   const interactionProps = canInteract && onLongPress ? {
     ref: bubbleRef,
     onPointerDown: handlePointerDown,
@@ -241,6 +316,16 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
     onPointerCancel: clearTimer,
     onContextMenu: handleContextMenu,
   } : {};
+
+  const copyButton = copyBtn && (
+    <button
+      className="chat-copy-btn"
+      style={{ top: copyBtn.top, left: copyBtn.left }}
+      onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); handleCopy(); }}
+    >
+      Copy
+    </button>
+  );
 
   const reactionPills = canInteract && onReact ? (
     <ReactionPills
@@ -253,6 +338,12 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
     />
   ) : null;
 
+  const handleNameTap = useCallback((e, name) => {
+    if (!onNameTap || !name) return;
+    e.stopPropagation();
+    onNameTap({ displayName: name });
+  }, [onNameTap]);
+
   // Dice roll message — centered, special layout
   if (message.type === 'dice_roll') {
     return (
@@ -262,11 +353,18 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
             src={message.playerAvatar}
             alt={message.playerName || 'Player'}
             className="chat-bubble-portrait chat-bubble-player-avatar"
+            onClick={(e) => { if (message.userId) { e.stopPropagation(); navigate(`/player/${message.userId}`); } }}
+            style={message.userId ? { cursor: 'pointer' } : undefined}
           />
         )}
         <div className="chat-bubble-content">
           {message.playerName && (
-            <span className="chat-bubble-name chat-bubble-name-dice">{message.playerName}</span>
+            <span
+              className="chat-bubble-name chat-bubble-name-dice"
+              {...(message.userId !== currentUserId && onNameTap ? { onClick: (e) => handleNameTap(e, message.playerName), style: { cursor: 'pointer' } } : {})}
+            >
+              {message.playerName}
+            </span>
           )}
           <div className="dice-roll-result">
             <span className="dice-roll-notation">{message.notation}</span>
@@ -291,8 +389,25 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
     );
   }
 
+  // Encounter narration messages — combat results in chat
+  if (message.type === 'encounter') {
+    const subtypeClass = message.subtype === 'round_header' ? 'enc-round-header'
+      : message.subtype === 'victory' ? 'enc-victory'
+      : message.subtype === 'defeat' ? 'enc-defeat'
+      : '';
+    return (
+      <div className={`chat-bubble-encounter ${subtypeClass}`}>
+        <HighlightedText text={message.text} npcs={npcs} players={players} groups={groups} />
+      </div>
+    );
+  }
+
   if (isPlayer) {
     const isOtherPlayer = message.userId && message.userId !== currentUserId;
+    const nameProps = isOtherPlayer && onNameTap ? {
+      onClick: (e) => handleNameTap(e, message.playerName),
+      style: { cursor: 'pointer' },
+    } : {};
 
     if (message.type === 'gif') {
       return (
@@ -309,7 +424,7 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
           )}
           <div className="chat-bubble-content">
             {message.playerName && (
-              <span className={`chat-bubble-name ${isOtherPlayer ? 'chat-bubble-name-other' : 'chat-bubble-name-player'}`}>
+              <span className={`chat-bubble-name ${isOtherPlayer ? 'chat-bubble-name-other' : 'chat-bubble-name-player'}`} {...nameProps}>
                 {message.playerName}
               </span>
             )}
@@ -342,7 +457,7 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
           )}
           <div className="chat-bubble-content">
             {message.playerName && (
-              <span className={`chat-bubble-name ${isOtherPlayer ? 'chat-bubble-name-other' : 'chat-bubble-name-player'}`}>
+              <span className={`chat-bubble-name ${isOtherPlayer ? 'chat-bubble-name-other' : 'chat-bubble-name-player'}`} {...nameProps}>
                 {message.playerName}
               </span>
             )}
@@ -356,7 +471,7 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
             />
             {message.text && (
               <p className="chat-bubble-text chat-bubble-caption">
-                <HighlightedText text={message.text} npcs={npcs} players={players} />
+                <HighlightedText text={message.text} npcs={npcs} players={players} groups={groups} />
               </p>
             )}
             {reactionPills}
@@ -375,16 +490,19 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
             src={message.playerAvatar}
             alt={message.playerName || 'Player'}
             className="chat-bubble-portrait chat-bubble-player-avatar"
+            onClick={(e) => { if (message.userId) { e.stopPropagation(); navigate(`/player/${message.userId}`); } }}
+            style={message.userId ? { cursor: 'pointer' } : undefined}
           />
         )}
         <div className="chat-bubble-content">
+          {copyButton}
           {message.playerName && (
-            <span className={`chat-bubble-name ${isOtherPlayer ? 'chat-bubble-name-other' : 'chat-bubble-name-player'}`}>
+            <span className={`chat-bubble-name ${isOtherPlayer ? 'chat-bubble-name-other' : 'chat-bubble-name-player'}`} {...nameProps}>
               {message.playerName}
             </span>
           )}
           <p className="chat-bubble-text">
-            <HighlightedText text={message.text} npcs={npcs} players={players} />
+            <HighlightedText text={message.text} npcs={npcs} players={players} groups={groups} />
           </p>
           {reactionPills}
         </div>
@@ -393,7 +511,7 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
   }
 
   return (
-    <div className="chat-bubble chat-bubble-npc" {...interactionProps}>
+    <div className={`chat-bubble chat-bubble-npc${message.npc === 'marcel' ? ' chat-bubble-marcel' : ''}`} {...interactionProps}>
       <NpcPortrait
         npcId={message.npc}
         emotion={message.emotion || 'idle'}
@@ -401,7 +519,13 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
         className="chat-bubble-portrait"
       />
       <div className="chat-bubble-content">
-        <span className="chat-bubble-name">{message.npcDisplayName || message.npc}</span>
+        {copyButton}
+        <span
+          className="chat-bubble-name"
+          {...(onNameTap ? { onClick: (e) => handleNameTap(e, message.npcDisplayName || message.npc), style: { cursor: 'pointer' } } : {})}
+        >
+          {message.npcDisplayName || message.npc}
+        </span>
         {isTyping ? (
           <div className="chat-typing-indicator">
             <span /><span /><span />
@@ -418,7 +542,7 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
             />
             {message.text && (
               <p className="chat-bubble-text chat-bubble-caption">
-                <HighlightedText text={message.text} npcs={npcs} players={players} />
+                <HighlightedText text={message.text} npcs={npcs} players={players} groups={groups} />
               </p>
             )}
             {reactionPills}
@@ -426,7 +550,7 @@ export default function ChatBubble({ message, npcs, players, currentUserId, onLo
         ) : (
           <>
             <p className="chat-bubble-text">
-              <HighlightedText text={message.text} npcs={npcs} players={players} />
+              <HighlightedText text={message.text} npcs={npcs} players={players} groups={groups} />
             </p>
             {reactionPills}
           </>

@@ -21,5 +21,33 @@
     "text": "Hey Acacia! What's up?",
     "emotion": "idle",
     "timestamp": "2026-02-12T00:46:50.389Z"
+  },
+  {
+    "id": "5a7e79a5-9f81-4e62-bd10-a625b8dd42ac",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "My throat hurts",
+    "timestamp": "2026-02-12T04:38:57.709Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "74e518ed-2611-4413-9d03-6725e7024e04",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Ugh, that sucks. Coming down with something or just been talking/singing too much? Either way, warm tea with honey is your friend right now.",
+    "emotion": "idle",
+    "timestamp": "2026-02-12T04:39:01.908Z",
+    "reactions": {
+      "🥺": [
+        "228241331296665600"
+      ]
+    }
   }
 ]

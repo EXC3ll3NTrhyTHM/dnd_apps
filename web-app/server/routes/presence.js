@@ -29,19 +29,25 @@ router.post('/join', authRequired, (req, res) => {
   }
   presence.join(locationId, req.user);
   let xpAwarded = 0;
+  let levelUp = null;
   try {
     const xp = require('../lib/xp');
+    const levelBefore = xp.getLevel(req.user.id, req.user.username);
     const before = xp.getXpRecord(req.user.id, req.user.username).total_xp;
     xp.awardLocationVisitXp(req.user.id, req.user.username, locationId);
     xp.awardDailyLoginXp(req.user.id, req.user.username);
     const after = xp.getXpRecord(req.user.id, req.user.username).total_xp;
     xpAwarded = after - before;
+    const levelAfter = xp.getLevel(req.user.id, req.user.username);
+    if (levelAfter > levelBefore) levelUp = { newLevel: levelAfter };
   } catch (e) { console.error('[xp]', e.message); }
 
   let newAchievements = [];
   try { newAchievements = require('../lib/achievements').checkAchievements(req.user.id, req.user.username, 'location_visited').newAchievements; } catch (e) { console.error('[achievements]', e.message); }
 
-  res.json({ success: true, xpAwarded, newAchievements });
+  const response = { success: true, xpAwarded, newAchievements };
+  if (levelUp) response.levelUp = levelUp;
+  res.json(response);
 });
 
 /**

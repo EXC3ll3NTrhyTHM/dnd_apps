@@ -1,138 +1,16 @@
 [
   {
-    "id": "3beca55e-5e0a-4d85-9ced-7d2b8e7354d8",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Marcel hey",
-    "timestamp": "2026-02-11T05:34:50.774Z"
-  },
-  {
-    "id": "d6fcc70e-151d-453b-af88-e13b141fc528",
-    "role": "npc",
-    "npc": "marcel",
-    "npcDisplayName": "Marcel",
-    "text": "Still here. You testing something or just lonely? 😏",
-    "emotion": "idle",
-    "timestamp": "2026-02-11T05:34:55.546Z"
-  },
-  {
-    "id": "24e54289-8fbf-4e4f-9d54-6e95189491a4",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Marcel test",
-    "timestamp": "2026-02-11T05:35:06.565Z"
-  },
-  {
-    "id": "e785286a-8566-42ad-be7a-932bc143a87a",
-    "role": "npc",
-    "npc": "marcel",
-    "npcDisplayName": "Marcel",
-    "text": "✓",
-    "emotion": "idle",
-    "timestamp": "2026-02-11T05:35:09.773Z"
-  },
-  {
-    "id": "e65f5dca-51aa-4fac-8b4a-fd6583c6da71",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Marcel say something",
-    "timestamp": "2026-02-11T06:44:50.113Z"
-  },
-  {
-    "id": "36403cc0-96b0-4f48-b131-f7da42efafbf",
-    "role": "npc",
-    "npc": "marcel",
-    "npcDisplayName": "Marcel",
-    "text": "Something. \n\n...Okay fine, you want actual conversation? I'm here, I'm functional, the cottage is cozy. Mira's hogging the spotlight over there. What do you actually want to talk about?",
-    "emotion": "idle",
-    "timestamp": "2026-02-11T06:44:54.910Z"
-  },
-  {
-    "id": "5d51790f-9620-4861-b90c-1c9a626d6986",
-    "role": "player",
-    "type": "gif",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "gifUrl": "https://media3.giphy.com/media/J4YVoJEYm5nXCZUbiU/200w.gif?cid=08b926b0bl95ffrqc1l4s56ecceg89pk13gw2l3z4qnx7dox&ep=v1_gifs_search&rid=200w.gif&ct=g",
-    "gifWidth": 200,
-    "gifHeight": 200,
-    "text": "Shane Ilya GIF by Movistar Plus+",
-    "timestamp": "2026-02-11T08:27:42.537Z"
-  },
-  {
-    "id": "4ceb4702-f9db-48c3-9e8d-cb02ccb5af3d",
+    "id": "5799132d-657d-482b-b4a1-204f21303c52",
     "role": "player",
     "type": "image",
     "userId": "228241331296665600",
     "playerName": "Acacia",
     "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "imageUrl": "/uploads/c62ae926-d74a-44e7-afcd-1d65adbd52d6.jpeg",
-    "imageWidth": 1170,
-    "imageHeight": 1422,
+    "imageUrl": "/uploads/969df87c-bc91-4259-9ddf-4884eb55d42a.jpeg",
+    "imageWidth": 3024,
+    "imageHeight": 4032,
     "text": "",
-    "timestamp": "2026-02-12T01:01:48.549Z",
-    "reactions": {
-      "❤️": [
-        "424061511833747467",
-        "228241331296665600"
-      ]
-    }
-  },
-  {
-    "id": "12ee742a-af1b-4723-9573-c0a8ddfcdbe7",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@The Architect",
-    "timestamp": "2026-02-12T01:02:37.769Z"
-  },
-  {
-    "id": "522f42aa-1603-43ae-825c-1b419b6b2421",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Acacia",
-    "timestamp": "2026-02-12T01:02:41.955Z"
-  },
-  {
-    "id": "70ae3fd5-f792-4b1f-b3f1-90e6100d7946",
-    "role": "player",
-    "userId": "228241331296665600",
-    "playerName": "Acacia",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "text": "@The Architect Hey poo",
-    "timestamp": "2026-02-12T01:03:12.611Z"
-  },
-  {
-    "id": "3c0e6d54-3e11-45a5-9290-004c5e318846",
-    "role": "player",
-    "userId": "228241331296665600",
-    "playerName": "Acacia",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "text": "Silly goose @The Architect",
-    "timestamp": "2026-02-12T01:13:53.834Z"
-  },
-  {
-    "id": "5832343e-751d-4e94-b404-c95bd2f6eed3",
-    "role": "player",
-    "type": "image",
-    "userId": "228241331296665600",
-    "playerName": "Acacia",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "imageUrl": "/uploads/8adaed5a-46ca-49d9-8ca3-e5cb49153ea3.jpg",
-    "imageWidth": 2316,
-    "imageHeight": 3088,
-    "text": "",
-    "timestamp": "2026-02-12T01:14:44.600Z",
+    "timestamp": "2026-02-12T04:44:42.475Z",
     "reactions": {
       "❤️": [
         "424061511833747467"
@@ -140,75 +18,493 @@
     }
   },
   {
-    "id": "d5ddba29-2114-45ee-b12a-19976e10858c",
+    "id": "18ed6c6f-d76f-4b02-a9fb-4dbfd0484622",
     "role": "player",
+    "type": "gif",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "gifUrl": "https://media3.giphy.com/media/8Og4UuBGsVhEEoSO0L/200w.gif?cid=08b926b0du8x06z9fqn49klewlepudd2mogupbq1nk3qfb2d&ep=v1_gifs_search&rid=200w.gif&ct=g",
+    "gifWidth": 200,
+    "gifHeight": 200,
+    "text": "Loving I Love You GIF",
+    "timestamp": "2026-02-12T04:44:58.033Z"
+  },
+  {
+    "id": "1d9b2527-824b-4818-822a-e48a65613465",
+    "role": "player",
+    "type": "gif",
     "userId": "424061511833747467",
     "playerName": "The Architect",
     "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Acacia Hi",
-    "timestamp": "2026-02-12T01:18:55.763Z"
+    "gifUrl": "https://media4.giphy.com/media/kWpSMeQ10Npy5w4UzL/200w.gif?cid=08b926b01j3a4xtdm66apbpa0dq57wevwav3roe8vol0m9ns&ep=v1_gifs_trending&rid=200w.gif&ct=g",
+    "gifWidth": 200,
+    "gifHeight": 200,
+    "text": "Happy Puerto Rico GIF by Apple Music",
+    "timestamp": "2026-02-12T04:45:19.654Z"
   },
   {
-    "id": "3d20dca0-da2d-4288-b28f-b6ea9272370d",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Acacia Hi",
-    "timestamp": "2026-02-12T01:29:35.369Z"
-  },
-  {
-    "id": "fe0c3e94-783d-48cf-9d4d-d4a68c481eeb",
+    "id": "51c1920a-95b4-4341-b0a7-31d440835246",
     "role": "player",
     "userId": "228241331296665600",
     "playerName": "Acacia",
     "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "text": "@The Architect Ughh",
-    "timestamp": "2026-02-12T01:33:15.773Z"
+    "text": "@Mira *winks at you*",
+    "timestamp": "2026-02-12T04:46:07.287Z"
   },
   {
-    "id": "d078c686-1f37-412a-897e-e12ce441dc33",
+    "id": "6314d55c-1bf5-43aa-980d-2ab7b857d170",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "*I catch the wink and raise an eyebrow, leaning casually against the wall* Oh, you know how to keep a girl on her toes, don't you? Setting the charm levels to maximum, are we?",
+    "emotion": "happy",
+    "timestamp": "2026-02-12T04:46:09.743Z",
+    "reactions": {
+      "🔥": [
+        "228241331296665600"
+      ]
+    }
+  },
+  {
+    "id": "677e7ca0-bafb-43bc-a8c9-805b79751ee6",
     "role": "player",
+    "type": "dice_roll",
     "userId": "228241331296665600",
     "playerName": "Acacia",
     "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "text": "@The Architect what do you want",
-    "timestamp": "2026-02-12T01:34:10.051Z"
+    "notation": "1d4",
+    "rolls": [
+      2
+    ],
+    "total": 2,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:46:48.169Z"
   },
   {
-    "id": "f980f851-52ab-4975-821e-011b55b3eb35",
+    "id": "9cad1cde-1ef9-417b-a59e-bef2dab56839",
     "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "1d20+1d100",
+    "rolls": [
+      7,
+      63
+    ],
+    "total": 70,
+    "kept": [
+      0,
+      1
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:46:58.450Z"
+  },
+  {
+    "id": "17d60638-8502-4cca-950e-2d840c2a1b8b",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "1d20+1d100",
+    "rolls": [
+      7,
+      53
+    ],
+    "total": 60,
+    "kept": [
+      0,
+      1
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:47:12.393Z"
+  },
+  {
+    "id": "40b053f7-3ee1-495a-bd0c-6961e292498d",
+    "role": "player",
+    "type": "dice_roll",
     "userId": "424061511833747467",
     "playerName": "The Architect",
     "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Acacia Hey girl",
-    "timestamp": "2026-02-12T01:34:56.075Z"
+    "notation": "1d20+1d100",
+    "rolls": [
+      8,
+      72
+    ],
+    "total": 80,
+    "kept": [
+      0,
+      1
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:47:31.640Z"
   },
   {
-    "id": "284ddbbe-cc69-4bee-9a1d-46695c4739b7",
+    "id": "52500066-6b1a-4988-8812-14f51488198f",
     "role": "player",
+    "type": "dice_roll",
     "userId": "228241331296665600",
     "playerName": "Acacia",
     "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "text": "Lol",
-    "timestamp": "2026-02-12T01:35:04.248Z"
+    "notation": "1d12+1d8",
+    "rolls": [
+      7,
+      8
+    ],
+    "total": 15,
+    "kept": [
+      0,
+      1
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:47:35.485Z"
   },
   {
-    "id": "6da0f10b-f14c-48d3-b6d7-613f505b2321",
+    "id": "1819f1a2-43ca-4e18-9c78-17e32598a0d8",
     "role": "player",
+    "type": "dice_roll",
     "userId": "424061511833747467",
     "playerName": "The Architect",
     "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "Wait can you not see me type?",
-    "timestamp": "2026-02-12T01:35:16.109Z"
+    "notation": "3d20",
+    "rolls": [
+      15,
+      17,
+      8
+    ],
+    "total": 40,
+    "kept": [
+      0,
+      1,
+      2
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:47:47.158Z"
   },
   {
-    "id": "e94647c5-37a0-4632-8e36-b9e73930b8f0",
+    "id": "edd43372-8f36-475e-b302-2759d2a00b13",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "4d6",
+    "rolls": [
+      1,
+      3,
+      4,
+      2
+    ],
+    "total": 10,
+    "kept": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:47:56.748Z"
+  },
+  {
+    "id": "baf1057d-ff08-4854-80f6-5aff9f786bae",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "1d20",
+    "rolls": [
+      2
+    ],
+    "total": 2,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:48:29.410Z"
+  },
+  {
+    "id": "acf5bc39-4ce4-40cb-8bd0-af6939c95e3b",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "1d20",
+    "rolls": [
+      5
+    ],
+    "total": 5,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:48:35.725Z"
+  },
+  {
+    "id": "a27cfbde-e5e6-4b26-9e45-9158b2a0c06e",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "1d20++1+1d20",
+    "rolls": [
+      12,
+      17
+    ],
+    "total": 30,
+    "kept": [
+      0,
+      1
+    ],
+    "modifier": 1,
+    "timestamp": "2026-02-12T04:48:50.144Z"
+  },
+  {
+    "id": "e537f4a6-8283-456f-8232-e4cc4d3cdc32",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "2d20kh1",
+    "rolls": [
+      15,
+      6
+    ],
+    "total": 15,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:49:05.376Z"
+  },
+  {
+    "id": "7da07b9d-039e-4490-b840-8965375aaa0b",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "5d20kh1",
+    "rolls": [
+      1,
+      10,
+      3,
+      3,
+      4
+    ],
+    "total": 10,
+    "kept": [
+      1
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:49:18.687Z"
+  },
+  {
+    "id": "5c57291e-7455-4d51-bd34-9aad38b9bfe4",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "4d20kh1",
+    "rolls": [
+      18,
+      15,
+      15,
+      16
+    ],
+    "total": 18,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:49:50.379Z"
+  },
+  {
+    "id": "9587736e-0a57-4f5e-a48c-3af93c76d3fc",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "4d20kh1",
+    "rolls": [
+      4,
+      1,
+      7,
+      6
+    ],
+    "total": 7,
+    "kept": [
+      2
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:50:06.579Z"
+  },
+  {
+    "id": "ddf797c3-a576-44ec-b0d1-1beb37356753",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "5d20kh1",
+    "rolls": [
+      13,
+      13,
+      15,
+      11,
+      16
+    ],
+    "total": 16,
+    "kept": [
+      4
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:50:20.873Z"
+  },
+  {
+    "id": "747396be-58c8-4553-a797-fc9f737c134c",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "5d20kh1",
+    "rolls": [
+      8,
+      8,
+      7,
+      10,
+      16
+    ],
+    "total": 16,
+    "kept": [
+      4
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:50:39.210Z"
+  },
+  {
+    "id": "856c831d-a3d5-46ae-8d85-051597a026d5",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "6d20kh1",
+    "rolls": [
+      5,
+      1,
+      7,
+      6,
+      9,
+      18
+    ],
+    "total": 18,
+    "kept": [
+      5
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:50:56.748Z"
+  },
+  {
+    "id": "6411c3a4-7b94-4a4c-a892-ce030cb5357b",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "6d20",
+    "rolls": [
+      20,
+      12,
+      12,
+      18,
+      17,
+      20
+    ],
+    "total": 99,
+    "kept": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T04:51:11.200Z"
+  },
+  {
+    "id": "7dda4b69-9fd6-44b8-9600-88216ea9a442",
     "role": "player",
     "userId": "228241331296665600",
     "playerName": "Acacia",
     "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "text": "Can ou seeme",
-    "timestamp": "2026-02-12T01:35:26.726Z"
+    "text": "@Mira I just level up!!",
+    "timestamp": "2026-02-12T04:52:04.636Z"
+  },
+  {
+    "id": "d024be9d-e998-4dc2-87af-aa557f2de608",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "*I grin, unable to contain my excitement* Well, aren't we just climbing the ladder of greatness? All those late-night practices are finally paying off! What new tricks do you have up your sleeve, Your Majesty?",
+    "emotion": "happy",
+    "timestamp": "2026-02-12T04:52:06.407Z"
+  },
+  {
+    "id": "ce4749ed-4c00-4d66-b809-b68d882d8c0c",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "🙂",
+    "timestamp": "2026-02-12T04:54:21.294Z"
+  },
+  {
+    "id": "70a7ee74-32c7-4b71-a82f-78dba340e477",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "😀",
+    "timestamp": "2026-02-12T04:54:30.220Z"
+  },
+  {
+    "id": "ea4256cc-56a1-4a10-a948-6feda05788c0",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "/Bold/",
+    "timestamp": "2026-02-12T04:55:16.458Z"
+  },
+  {
+    "id": "e0534b01-c5fe-4ad6-808a-b1b84fdd4bc8",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "\\bold\\",
+    "timestamp": "2026-02-12T04:55:24.137Z"
+  },
+  {
+    "id": "151febfc-24f3-431b-acf4-5e1d5ab20406",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "*Build*",
+    "timestamp": "2026-02-12T04:55:56.874Z"
   }
 ]

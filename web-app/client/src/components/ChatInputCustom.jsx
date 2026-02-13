@@ -3,6 +3,7 @@ import CustomKeyboard from './CustomKeyboard';
 import MentionPopup from './MentionPopup';
 import { prevGraphemeLength, nextGraphemeLength } from '../utils/grapheme';
 import { correctWord } from '../utils/spellcheck';
+import { bumpNpcFreq } from '../lib/npcFreq';
 
 /**
  * Apply autocorrect to the word before the cursor, preserving the original
@@ -84,9 +85,15 @@ export default function ChatInputCustom({
   playSound,
   scrollContainerRef,
   onDiceRoll,
+  onUseItem,
+  locationId,
+  isDM,
 }) {
-  const [text, setText] = useState('');
-  const [cursorPos, setCursorPos] = useState(0);
+  const [text, setText] = useState(() => {
+    if (!locationId) return '';
+    return localStorage.getItem(`dh_draft_${locationId}`) || '';
+  });
+  const [cursorPos, setCursorPos] = useState(() => text.length);
   const [kbOpen, setKbOpen] = useState(false);
   const [kbMode, setKbMode] = useState('keys');
   const [mentionQuery, setMentionQuery] = useState(null);
@@ -121,6 +128,23 @@ export default function ChatInputCustom({
   npcsRef.current = npcs;
   const playersRef = useRef(players);
   playersRef.current = players;
+  const groupsRef = useRef(groups);
+  groupsRef.current = groups;
+
+  // Persist draft to localStorage (debounced to avoid blocking on every keystroke)
+  const draftTimerRef = useRef(null);
+  useEffect(() => {
+    if (!locationId) return;
+    clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(() => {
+      if (text) {
+        localStorage.setItem(`dh_draft_${locationId}`, text);
+      } else {
+        localStorage.removeItem(`dh_draft_${locationId}`);
+      }
+    }, 500);
+    return () => clearTimeout(draftTimerRef.current);
+  }, [text, locationId]);
 
   // Back button: close keyboard instead of navigating away
   const kbOpenRef = useRef(false);
@@ -410,14 +434,6 @@ export default function ChatInputCustom({
   // Build combined mention items: @Everyone + groups + individual NPCs + players
   const allItems = useMemo(() => {
     const items = [];
-    if (npcs.length >= 2) {
-      items.push({
-        type: 'group',
-        id: 'everyone',
-        displayName: 'Everyone',
-        members: npcs.map(n => n.displayName),
-      });
-    }
     for (const [groupId, group] of Object.entries(groups)) {
       items.push({
         type: 'group',
@@ -478,6 +494,7 @@ export default function ChatInputCustom({
     recognitionRef.current?.stop();
     recognitionRef.current = null;
     setListening(false);
+    window.dispatchEvent(new CustomEvent('speech-recognition-change', { detail: false }));
   }, []);
 
   const startRecognitionSession = useCallback(() => {
@@ -527,6 +544,7 @@ export default function ChatInputCustom({
       listeningRef.current = false;
       setListening(false);
       recognitionRef.current = null;
+      window.dispatchEvent(new CustomEvent('speech-recognition-change', { detail: false }));
     };
 
     recognitionRef.current = recognition;
@@ -543,6 +561,7 @@ export default function ChatInputCustom({
     micFinalRef.current = '';
     setCursorPos(textRef.current.length);
     setListening(true);
+    window.dispatchEvent(new CustomEvent('speech-recognition-change', { detail: true }));
     startRecognitionSession();
   }, [listening, stopListening, startRecognitionSession]);
 
@@ -609,8 +628,8 @@ export default function ChatInputCustom({
       return;
     }
 
-    // If in extras, npcs, gifs, or dice mode, tapping input switches back to keys
-    if (kbModeRef.current === 'extras' || kbModeRef.current === 'npcs' || kbModeRef.current === 'gifs' || kbModeRef.current === 'dice') {
+    // If in extras, npcs, gifs, dice, or items mode, tapping input switches back to keys
+    if (['extras', 'npcs', 'gifs', 'dice', 'items', 'monsters'].includes(kbModeRef.current)) {
       setKbMode('keys');
     }
 
@@ -869,6 +888,14 @@ export default function ChatInputCustom({
         return;
       }
     }
+    for (const group of Object.values(groupsRef.current)) {
+      const mention = `@${group.displayName}`;
+      if (beforeCursor.endsWith(mention)) {
+        setText(prev => prev.slice(0, pos - mention.length) + prev.slice(pos));
+        setCursorPos(pos - mention.length);
+        return;
+      }
+    }
 
     const glen = prevGraphemeLength(currentText, pos);
     setText(prev => prev.slice(0, pos - glen) + prev.slice(pos));
@@ -923,7 +950,8 @@ export default function ChatInputCustom({
     setKbMode('keys');
     lastCorrectionRef.current = null;
     lastSwipeRef.current = null;
-  }, [disabled, onSend]);
+    if (locationId) localStorage.removeItem(`dh_draft_${locationId}`);
+  }, [disabled, onSend, locationId]);
 
   const handleGifSelect = useCallback((gif) => {
     setKbOpen(false);
@@ -936,6 +964,13 @@ export default function ChatInputCustom({
     setKbMode('keys');
     onDiceRoll?.(notation);
   }, [onDiceRoll]);
+
+  const handleUseItem = useCallback(async (itemId) => {
+    const result = await onUseItem?.(itemId);
+    setKbOpen(false);
+    setKbMode('keys');
+    return result;
+  }, [onUseItem]);
 
   const handleImagePick = useCallback(() => {
     fileInputRef.current?.click();
@@ -968,10 +1003,11 @@ export default function ChatInputCustom({
     const before = beforeCursor.slice(0, atIdx);
     let insertText;
     if (item.type === 'group') {
-      insertText = item.members.map(name => `@${name}`).join(' ') + ' ';
+      insertText = `@${item.displayName} `;
     } else {
       insertText = `@${item.displayName} `;
     }
+    if (item.type === 'npc' || item.type === 'player') bumpNpcFreq(item.id, locationId);
     setText(before + insertText + afterCursor);
     setCursorPos(before.length + insertText.length);
     setMentionQuery(null);
@@ -979,6 +1015,7 @@ export default function ChatInputCustom({
 
   // Insert NPC @mention from the npcs panel (stays in npcs mode for multi-tagging)
   const handleNpcMention = useCallback((npc) => {
+    bumpNpcFreq(npc.id, locationId);
     const mention = `@${npc.displayName} `;
     const prev = textRef.current;
     const pos = cursorPosRef.current;
@@ -996,6 +1033,7 @@ export default function ChatInputCustom({
 
   // Insert player @mention from the mention panel
   const handlePlayerMention = useCallback((player) => {
+    bumpNpcFreq(player.id, locationId);
     const mention = `@${player.characterName} `;
     const prev = textRef.current;
     const pos = cursorPosRef.current;
@@ -1011,9 +1049,9 @@ export default function ChatInputCustom({
     setCursorPos(newPos);
   }, []);
 
-  // Insert group @mentions (all members) from the npcs panel
+  // Insert group @mention as a single tag from the npcs panel
   const handleGroupMention = useCallback((group) => {
-    const mention = group.members.map(name => `@${name}`).join(' ') + ' ';
+    const mention = `@${group.displayName} `;
     const prev = textRef.current;
     const pos = cursorPosRef.current;
     const base = pos === prev.length && prev.length && !prev.endsWith(' ')
@@ -1031,13 +1069,6 @@ export default function ChatInputCustom({
   // Build mention groups for the npcs panel (@Everyone + custom groups)
   const mentionGroups = useMemo(() => {
     const items = [];
-    if (npcs.length >= 2) {
-      items.push({
-        id: 'everyone',
-        displayName: 'Everyone',
-        members: npcs.map(n => n.displayName),
-      });
-    }
     for (const [groupId, group] of Object.entries(groups)) {
       items.push({
         id: groupId,
@@ -1047,6 +1078,17 @@ export default function ChatInputCustom({
     }
     return items;
   }, [npcs, groups]);
+
+  // Pre-build @mention regex (only changes when NPC/player/group lists change)
+  const mentionRegex = useMemo(() => {
+    const allNames = [
+      ...npcs.map(n => n.displayName),
+      ...players.map(p => p.characterName),
+      ...Object.values(groups).map(g => g.displayName),
+    ].filter(Boolean).map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    if (!allNames.length) return null;
+    return new RegExp(`(@(?:${allNames.join('|')}))`, 'g');
+  }, [npcs, players, groups]);
 
   // ── Display HTML — full text with formatting, NO cursor (cursor is an overlay) ──
   const displayHtml = useMemo(() => {
@@ -1071,16 +1113,10 @@ export default function ChatInputCustom({
       html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    // @mention highlighting (NPCs + players)
-    const allNames = [
-      ...npcs.map(n => n.displayName),
-      ...players.map(p => p.characterName),
-    ].filter(Boolean).map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-    if (allNames.length) {
-      html = html.replace(
-        new RegExp(`(@(?:${allNames.join('|')}))`, 'g'),
-        '<span class="mention-highlight-inline">$1</span>'
-      );
+    // @mention highlighting
+    if (mentionRegex) {
+      mentionRegex.lastIndex = 0;
+      html = html.replace(mentionRegex, '<span class="mention-highlight-inline">$1</span>');
     }
 
     // *italic*
@@ -1090,7 +1126,7 @@ export default function ChatInputCustom({
     );
 
     return html;
-  }, [text, npcs, players, flashRange]);
+  }, [text, mentionRegex, flashRange]);
 
   const showPopup = mentionQuery !== null && filteredItems.length > 0;
 
@@ -1138,21 +1174,22 @@ export default function ChatInputCustom({
         <div className="cki-row">
           <button
             type="button"
-            className={`chat-plus-btn${kbMode === 'extras' || kbMode === 'npcs' || kbMode === 'gifs' || kbMode === 'dice' ? ' chat-plus-btn-active' : ''}`}
+            className={`chat-plus-btn${['extras', 'npcs', 'gifs', 'dice', 'items', 'monsters'].includes(kbMode) ? ' chat-plus-btn-active' : ''}`}
             onPointerDown={(e) => {
               e.preventDefault();
               if (!kbOpen) {
                 setKbOpen(true);
                 setKbMode('extras');
               } else {
-                setKbMode(kbMode === 'extras' || kbMode === 'npcs' || kbMode === 'gifs' || kbMode === 'dice' ? 'keys' : 'extras');
+                setKbMode(['extras', 'npcs', 'gifs', 'dice', 'items', 'monsters'].includes(kbMode) ? 'keys' : 'extras');
               }
             }}
             aria-label="Extras menu"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z" />
+              <path d="M3 6h18" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
             </svg>
           </button>
           <div
@@ -1273,6 +1310,9 @@ export default function ChatInputCustom({
         onSwipeWord={handleSwipeWord}
         onSwipeReplace={handleSwipeReplace}
         onDiceRoll={handleDiceRoll}
+        onUseItem={handleUseItem}
+        locationId={locationId}
+        isDM={isDM}
       />
       </div>
     </>

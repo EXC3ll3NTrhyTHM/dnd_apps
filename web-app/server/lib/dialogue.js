@@ -208,9 +208,22 @@ async function generateResponse(npcName, playerName, message, history = [], loca
 // NPC PICKER (room chat mode)
 // ============================================
 
-async function pickRespondingNpc(locationNpcs, message, recentHistory = []) {
+async function pickRespondingNpc(locationNpcs, message, recentHistory = [], groups = {}) {
   // Only NPCs explicitly @mentioned will respond
   const registry = loadNpcRegistry();
+  const msgLower = message.toLowerCase();
+
+  // Expand group @mentions into their member NPC IDs
+  const groupMentionedNpcs = new Set();
+  for (const [groupId, group] of Object.entries(groups || {})) {
+    const groupName = group.displayName || groupId;
+    if (msgLower.includes(`@${groupName.toLowerCase()}`)) {
+      for (const memberId of (group.members || [])) {
+        groupMentionedNpcs.add(memberId);
+      }
+    }
+  }
+
   const mentioned = locationNpcs.filter(npc => {
     const entry = registry[npc];
     if (!entry) return false;
@@ -218,9 +231,12 @@ async function pickRespondingNpc(locationNpcs, message, recentHistory = []) {
     // Skip NPCs handled by external systems (like Marcel/Clawdbot)
     if (entry.handledBy) return false;
 
+    // Check if NPC is in an @mentioned group
+    if (groupMentionedNpcs.has(npc)) return true;
+
     const names = [entry.displayName, entry.username, npc].filter(Boolean);
     return names.some(name =>
-      message.toLowerCase().includes(`@${name.toLowerCase()}`)
+      msgLower.includes(`@${name.toLowerCase()}`)
     );
   });
 

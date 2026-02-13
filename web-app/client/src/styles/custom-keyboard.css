@@ -226,12 +226,18 @@
 
 .cki-form {
   padding: 8px 12px;
+  padding-bottom: calc(8px + var(--safe-area-bottom));
   background-color: #181210;
   background-image: var(--tex-wood);
   background-size: 512px 512px;
   border-top: 2px solid var(--border-stitch);
   flex-shrink: 0;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* When keyboard is open, the keyboard board handles safe area — remove from input bar */
+.cki-form:has(~ .ck-container) {
+  padding-bottom: 8px;
 }
 
 .cki-row {
@@ -669,6 +675,96 @@
   animation: ck-mic-pulse 1.2s ease-in-out infinite;
 }
 
+/* ---- DM Spawn Button (extras panel) ---- */
+
+.ck-extras-btn-dm {
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #ef4444;
+}
+
+/* ---- Monster Spawn Panel ---- */
+
+.ck-monsters-panel {
+  padding: 8px 12px 12px;
+  height: 254px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.ck-monsters-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.ck-monsters-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ck-monsters-loading {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 24px 0;
+}
+
+.ck-monster-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, #2e2820, #1e1a14);
+  border: 1px solid #3a3020;
+  border-radius: 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s ease;
+}
+
+.ck-monster-btn:active {
+  background: linear-gradient(180deg, #3a3228, #28221a);
+}
+
+.ck-monster-btn:disabled {
+  opacity: 0.5;
+}
+
+.ck-monster-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.ck-monster-name {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+.ck-monster-stats {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.ck-monster-spawn-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
 /* ---- NPCs Panel (NPC grid for @mentioning) ---- */
 
 .ck-npcs-panel {
@@ -1013,6 +1109,8 @@
   font-weight: 500;
   pointer-events: none;
   opacity: 0;
+  transform: translate(-50%, -100%) scale(1);
+  transition: opacity 0.02s linear;
 }
 
 /* Small downward spike connecting to the key */
@@ -1113,8 +1211,11 @@
 .ck-swipe-suggestions {
   display: flex;
   gap: 6px;
-  padding: 4px 8px 8px;
+  padding: 0 8px 8px;
   justify-content: center;
+  height: 38px;
+  align-items: flex-end;
+  box-sizing: border-box;
 }
 
 .ck-swipe-suggestion {
@@ -1139,4 +1240,170 @@
   border-color: var(--color-gold-dim);
   color: var(--color-gold);
   font-weight: 600;
+}
+
+/* NPC quick-mention buttons in suggestion bar */
+.ck-swipe-npc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.08s ease;
+}
+
+.ck-swipe-npc:active {
+  border-color: var(--color-gold-dim);
+}
+
+.ck-swipe-npc-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---- Smoke Effect ---- */
+
+.fx-smoke-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 100%, rgba(180, 170, 155, 0.45), rgba(160, 150, 135, 0.2) 40%, transparent 70%);
+  transform: scale(0.3) translateY(40%);
+  opacity: 0;
+  animation: fx-smoke-drift 3s ease-out forwards;
+}
+
+.fx-smoke-2 {
+  background: radial-gradient(ellipse at 35% 100%, rgba(170, 160, 145, 0.35), rgba(150, 140, 125, 0.15) 45%, transparent 70%);
+  animation-delay: 0.3s;
+}
+
+.fx-smoke-3 {
+  background: radial-gradient(ellipse at 65% 100%, rgba(190, 180, 165, 0.3), rgba(160, 150, 135, 0.1) 40%, transparent 65%);
+  animation-delay: 0.6s;
+}
+
+@keyframes fx-smoke-drift {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(40%);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(0.8) translateY(10%);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2) translateY(-10%);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5) translateY(-30%);
+  }
+}
+
+/* ---- Items Panel ---- */
+
+.ck-items-panel {
+  padding: 8px 12px 12px;
+  height: 254px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.ck-items-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.ck-items-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scrollbar-width: none;
+}
+
+.ck-items-list::-webkit-scrollbar {
+  display: none;
+}
+
+.ck-items-loading {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 24px 0;
+}
+
+.ck-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, #2e2820, #1e1a14);
+  border: 1px solid #3a3020;
+  border-radius: 8px;
+}
+
+.ck-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ck-item-name {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ck-item-qty {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.ck-item-use-btn {
+  padding: 6px 16px;
+  background: linear-gradient(180deg, #3a6b2a, #2a4e1e);
+  border: 1px solid #4a8a3a;
+  border-radius: 6px;
+  color: #d4ecc8;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.08s ease;
+}
+
+.ck-item-use-btn:active {
+  background: linear-gradient(180deg, #4a8a3a, #3a6b2a);
+}
+
+.ck-item-use-btn:disabled {
+  opacity: 0.4;
 }

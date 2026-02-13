@@ -12,12 +12,13 @@ const path = require('path');
 const crypto = require('crypto');
 const { authRequired } = require('../middleware/auth');
 const { acquireLock, releaseLock } = require('../lib/locks');
+const { incrementLifetimeStat, getLevel } = require('../lib/xp');
+const { checkAchievements } = require('../lib/achievements');
+
+const { loadHistory, saveHistory } = require('../lib/chatHistory');
 
 const DATA_DIR = path.resolve(__dirname, '..', '..', 'data');
-const HISTORY_DIR = path.join(DATA_DIR, 'chat_history');
-const SHARED_DIR = path.join(HISTORY_DIR, 'shared');
 const PLAYERS_PATH = path.join(DATA_DIR, 'players.json');
-const MAX_HISTORY = 30;
 
 function loadPlayers() {
   try { return JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8')); }
@@ -27,30 +28,6 @@ function loadPlayers() {
 function getPlayerName(user) {
   const players = loadPlayers();
   return players[user.id]?.characterName || user.global_name || user.username;
-}
-
-function getHistoryPath(locationId) {
-  if (!fs.existsSync(SHARED_DIR)) {
-    fs.mkdirSync(SHARED_DIR, { recursive: true });
-  }
-  return path.join(SHARED_DIR, `${locationId}.json`);
-}
-
-function loadHistory(locationId) {
-  const histPath = getHistoryPath(locationId);
-  try {
-    return JSON.parse(fs.readFileSync(histPath, 'utf-8'));
-  } catch {
-    return [];
-  }
-}
-
-function saveHistory(locationId, history) {
-  const trimmed = history.slice(-MAX_HISTORY);
-  const histPath = getHistoryPath(locationId);
-  const tmpPath = histPath + '.tmp';
-  fs.writeFileSync(tmpPath, JSON.stringify(trimmed, null, 2));
-  fs.renameSync(tmpPath, histPath);
 }
 
 // ── Rate limiting: 3 second cooldown per user ──
@@ -253,9 +230,43 @@ router.post('/locations/:locationId/dice-roll', authRequired, async (req, res) =
   }
 
   // Award XP for rolling dice
-  try { require('../lib/xp').awardMessageXp(userId, req.user.username); } catch {}
+  let levelUp = null;
+  try {
+    const levelBefore = getLevel(userId, req.user.username);
+    require('../lib/xp').awardMessageXp(userId, req.user.username);
+    const levelAfter = getLevel(userId, req.user.username);
+    if (levelAfter > levelBefore) levelUp = { newLevel: levelAfter };
+  } catch {}
 
-  res.json({ message });
+  // Track dice rolls and check achievements
+  let newAchievements = [];
+  try {
+    incrementLifetimeStat(userId, req.user.username, 'dice_rolls', 1);
+
+    // Detect special rolls by walking groups against result rolls
+    let has_nat_20 = false;
+    let has_nat_1 = false;
+    let has_100 = false;
+    let rollIdx = 0;
+    for (const group of parsed.groups) {
+      for (let i = 0; i < group.qty; i++) {
+        const val = result.rolls[rollIdx];
+        if (group.sides === 20 && val === 20) has_nat_20 = true;
+        if (group.sides === 20 && val === 1) has_nat_1 = true;
+        if (group.sides === 100 && val === 100) has_100 = true;
+        rollIdx++;
+      }
+    }
+
+    const achResult = checkAchievements(userId, req.user.username, 'dice_rolled', {
+      has_nat_20, has_nat_1, has_100,
+    });
+    newAchievements = achResult.newAchievements;
+  } catch {}
+
+  const response = { message, newAchievements };
+  if (levelUp) response.levelUp = levelUp;
+  res.json(response);
 });
 
 module.exports = router;

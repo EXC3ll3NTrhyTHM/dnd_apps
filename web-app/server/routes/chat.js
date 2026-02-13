@@ -32,11 +32,10 @@ function isLocationLocked(location, userId) {
   return false;
 }
 
+const { loadHistory, saveHistory, getHistoryPage, SHARED_DIR, DM_HISTORY_DIR } = require('../lib/chatHistory');
+
 const DATA_DIR = path.resolve(__dirname, '..', '..', 'data');
-const HISTORY_DIR = path.join(DATA_DIR, 'chat_history');
-const SHARED_DIR = path.join(HISTORY_DIR, 'shared');
 const PLAYERS_PATH = path.join(DATA_DIR, 'players.json');
-const MAX_HISTORY = 30;
 const JOURNAL_INTERVAL = 8; // Write journal every N messages per NPC
 
 function loadPlayers() {
@@ -135,35 +134,6 @@ function checkRateLimit(userId) {
   return true;
 }
 
-// ============================================
-// CHAT HISTORY (file-based, shared per-location)
-// ============================================
-
-function getHistoryPath(locationId) {
-  if (!fs.existsSync(SHARED_DIR)) {
-    fs.mkdirSync(SHARED_DIR, { recursive: true });
-  }
-  return path.join(SHARED_DIR, `${locationId}.json`);
-}
-
-function loadHistory(locationId) {
-  const histPath = getHistoryPath(locationId);
-  try {
-    return JSON.parse(fs.readFileSync(histPath, 'utf-8'));
-  } catch {
-    return [];
-  }
-}
-
-function saveHistory(locationId, history) {
-  // Keep last MAX_HISTORY messages
-  const trimmed = history.slice(-MAX_HISTORY);
-  const histPath = getHistoryPath(locationId);
-  const tmpPath = histPath + '.tmp';
-  fs.writeFileSync(tmpPath, JSON.stringify(trimmed, null, 2));
-  fs.renameSync(tmpPath, histPath);
-}
-
 // Track message counts for journal writes per NPC (shared, not per-user)
 const messageCounters = new Map();
 
@@ -252,11 +222,13 @@ router.get('/locations', authRequired, (req, res) => {
 });
 
 /**
- * GET /api/chat/locations/:locationId/history
- * Returns shared chat history for a location
+ * GET /api/chat/locations/:locationId/history?before=<messageId>&limit=30
+ * Returns paginated chat history for a location.
+ * Omit `before` to get the latest messages.
  */
 router.get('/locations/:locationId/history', authRequired, (req, res) => {
   const { locationId } = req.params;
+  const { before, limit } = req.query;
   const locations = loadLocations();
 
   if (!locations[locationId]) {
@@ -267,8 +239,12 @@ router.get('/locations/:locationId/history', authRequired, (req, res) => {
     return res.status(403).json({ error: 'This location is currently locked' });
   }
 
-  const history = enrichHistory(loadHistory(locationId));
-  res.json({ history, locationId });
+  const page = getHistoryPage(locationId, { before, limit: limit ? parseInt(limit, 10) : undefined });
+  res.json({
+    messages: enrichHistory(page.messages),
+    hasMore: page.hasMore,
+    locationId,
+  });
 });
 
 /**
@@ -415,14 +391,23 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
       history.push(playerMsg);
       saveHistory(locationId, history);
 
-      try { require('../lib/xp').awardMessageXp(req.user.id, req.user.username); } catch (e) { console.error('[xp]', e.message); }
-      try { require('../lib/xp').incrementLifetimeStat(req.user.id, req.user.username, 'gifs_sent'); } catch (e) { console.error('[xp]', e.message); }
+      let levelUp = null;
+      try {
+        const xp = require('../lib/xp');
+        const levelBefore = xp.getLevel(req.user.id, req.user.username);
+        xp.awardMessageXp(req.user.id, req.user.username);
+        xp.incrementLifetimeStat(req.user.id, req.user.username, 'gifs_sent');
+        const levelAfter = xp.getLevel(req.user.id, req.user.username);
+        if (levelAfter > levelBefore) levelUp = { newLevel: levelAfter };
+      } catch (e) { console.error('[xp]', e.message); }
       notifyPlayerMentions(playerMsg.text, locationId, location.name, playerName, req.app, req.user.id);
 
       let newAchievements = [];
       try { newAchievements = require('../lib/achievements').checkAchievements(req.user.id, req.user.username, 'message_sent', { hour: new Date().getUTCHours() }).newAchievements; } catch (e) { console.error('[achievements]', e.message); }
 
-      return res.json({ playerMessage: playerMsg, responses: [], newAchievements });
+      const response = { playerMessage: playerMsg, responses: [], newAchievements };
+      if (levelUp) response.levelUp = levelUp;
+      return res.json(response);
     } catch (error) {
       console.error('[chat] GIF message error:', error.message);
       return res.status(500).json({ error: 'Failed to save GIF message' });
@@ -478,8 +463,8 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
     };
     history.push(playerMsg);
 
-    // Pick which NPC(s) should respond — only @mentioned NPCs
-    const respondingNpcs = await pickRespondingNpc(locationNpcs, message, history);
+    // Pick which NPC(s) should respond — only @mentioned NPCs (groups expand to members)
+    const respondingNpcs = await pickRespondingNpc(locationNpcs, message, history, location.groups);
 
     // Check for Marcel (Clawdbot) mention specifically
     const isMarcelMentioned = message.toLowerCase().includes('@marcel');
@@ -523,11 +508,20 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
     // No NPCs mentioned — just record the player message, no NPC responses
     if (respondingNpcs.length === 0) {
       saveHistory(locationId, history);
-      try { require('../lib/xp').awardMessageXp(req.user.id, req.user.username); } catch (e) { console.error('[xp]', e.message); }
+      let levelUp = null;
+      try {
+        const xp = require('../lib/xp');
+        const levelBefore = xp.getLevel(req.user.id, req.user.username);
+        xp.awardMessageXp(req.user.id, req.user.username);
+        const levelAfter = xp.getLevel(req.user.id, req.user.username);
+        if (levelAfter > levelBefore) levelUp = { newLevel: levelAfter };
+      } catch (e) { console.error('[xp]', e.message); }
       notifyPlayerMentions(playerMsg.text, locationId, location.name, playerName, req.app, req.user.id);
       let newAchievements = [];
       try { newAchievements = require('../lib/achievements').checkAchievements(req.user.id, req.user.username, 'message_sent', { hour: new Date().getUTCHours() }).newAchievements; } catch (e) { console.error('[achievements]', e.message); }
-      return res.json({ playerMessage: playerMsg, responses: [], marcelMentioned: isMarcelMentioned, newAchievements });
+      const response = { playerMessage: playerMsg, responses: [], marcelMentioned: isMarcelMentioned, newAchievements };
+      if (levelUp) response.levelUp = levelUp;
+      return res.json(response);
     }
 
     const registry = loadNpcRegistry();
@@ -573,7 +567,14 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
 
     saveHistory(locationId, history);
 
-    try { require('../lib/xp').awardMessageXp(req.user.id, req.user.username); } catch (e) { console.error('[xp]', e.message); }
+    let levelUp = null;
+    try {
+      const xp = require('../lib/xp');
+      const levelBefore = xp.getLevel(req.user.id, req.user.username);
+      xp.awardMessageXp(req.user.id, req.user.username);
+      const levelAfter = xp.getLevel(req.user.id, req.user.username);
+      if (levelAfter > levelBefore) levelUp = { newLevel: levelAfter };
+    } catch (e) { console.error('[xp]', e.message); }
 
     // Notify @mentions in the player message
     notifyPlayerMentions(playerMsg.text, locationId, location.name, playerName, req.app, req.user.id);
@@ -585,11 +586,9 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
     let newAchievements = [];
     try { newAchievements = require('../lib/achievements').checkAchievements(req.user.id, req.user.username, 'message_sent', { hour: new Date().getUTCHours() }).newAchievements; } catch (e) { console.error('[achievements]', e.message); }
 
-    res.json({
-      playerMessage: playerMsg,
-      responses,
-      newAchievements
-    });
+    const response = { playerMessage: playerMsg, responses, newAchievements };
+    if (levelUp) response.levelUp = levelUp;
+    res.json(response);
   } catch (error) {
     console.error('[chat] Room message error:', error.message);
     res.status(500).json({ error: 'Failed to generate response' });
@@ -678,7 +677,14 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
     history.push(npcMsg);
     saveHistory(locationId, history);
 
-    try { require('../lib/xp').awardMessageXp(req.user.id, req.user.username); } catch (e) { console.error('[xp]', e.message); }
+    let levelUp = null;
+    try {
+      const xp = require('../lib/xp');
+      const levelBefore = xp.getLevel(req.user.id, req.user.username);
+      xp.awardMessageXp(req.user.id, req.user.username);
+      const levelAfter = xp.getLevel(req.user.id, req.user.username);
+      if (levelAfter > levelBefore) levelUp = { newLevel: levelAfter };
+    } catch (e) { console.error('[xp]', e.message); }
 
     // Notify @mentions in the player message and NPC response
     notifyPlayerMentions(playerMsg.text, locationId, location.name, playerName, req.app, req.user.id);
@@ -698,11 +704,9 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
     let newAchievements = [];
     try { newAchievements = require('../lib/achievements').checkAchievements(req.user.id, req.user.username, 'message_sent', { hour: new Date().getUTCHours() }).newAchievements; } catch (e) { console.error('[achievements]', e.message); }
 
-    res.json({
-      playerMessage: playerMsg,
-      responses: [npcMsg],
-      newAchievements
-    });
+    const response = { playerMessage: playerMsg, responses: [npcMsg], newAchievements };
+    if (levelUp) response.levelUp = levelUp;
+    res.json(response);
   } catch (error) {
     console.error('[chat] 1-on-1 message error:', error.message);
     res.status(500).json({ error: 'Failed to generate response' });
@@ -747,16 +751,20 @@ router.post('/locations/:locationId/messages/:messageId/react', authRequired, as
 
     let xpAwarded = 0;
     let newAchievements = [];
+    let levelUp = null;
     const idx = message.reactions[emoji].indexOf(userId);
     if (idx === -1) {
       // Add reaction
       message.reactions[emoji].push(userId);
       try {
         const xp = require('../lib/xp');
+        const levelBefore = xp.getLevel(userId, req.user.username);
         const before = xp.getXpRecord(userId, req.user.username).total_xp;
         xp.awardReactionXp(userId, req.user.username);
         const after = xp.getXpRecord(userId, req.user.username).total_xp;
         xpAwarded = after - before;
+        const levelAfter = xp.getLevel(userId, req.user.username);
+        if (levelAfter > levelBefore) levelUp = { newLevel: levelAfter };
       } catch (e) { console.error('[xp]', e.message); }
       try { newAchievements = require('../lib/achievements').checkAchievements(userId, req.user.username, 'reaction_added').newAchievements; } catch (e) { console.error('[achievements]', e.message); }
     } else {
@@ -775,7 +783,9 @@ router.post('/locations/:locationId/messages/:messageId/react', authRequired, as
 
     saveHistory(locationId, history);
 
-    res.json({ reactions: message.reactions || {}, xpAwarded, newAchievements });
+    const response = { reactions: message.reactions || {}, xpAwarded, newAchievements };
+    if (levelUp) response.levelUp = levelUp;
+    res.json(response);
   } catch (error) {
     console.error('[chat] React error:', error.message);
     res.status(500).json({ error: 'Failed to toggle reaction' });
@@ -894,7 +904,7 @@ router.get('/unread', authRequired, (req, res) => {
     }
 
     // Check Marcel DM channels
-    const dmDir = path.join(HISTORY_DIR, 'marcel_dm');
+    const dmDir = DM_HISTORY_DIR;
     if (fs.existsSync(dmDir)) {
       const dmFiles = fs.readdirSync(dmDir).filter(f => f.endsWith('.json'));
       for (const file of dmFiles) {

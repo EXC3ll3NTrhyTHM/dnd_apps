@@ -15,10 +15,10 @@ import {
 } from './SceneBase';
 import '../../styles/location-scene.css';
 
-export default function DojoScene({ 
-  location, 
-  isAdmin, 
-  onNpcClick, 
+export default function DojoScene({
+  location,
+  isAdmin,
+  onNpcClick,
   onGatheringClick,
   onLocationUpdate,
   setToast 

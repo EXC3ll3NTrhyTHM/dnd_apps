@@ -7,7 +7,7 @@
 
 const express = require('express');
 const { authRequired } = require('../middleware/auth');
-const { loadCatalog, findItemInCatalog, getWallet, spendGold, addItemToInventory } = require('../lib/economy');
+const { loadCatalog, findItemInCatalog, getWallet, spendGold, addItemToInventory, getInventory, useItem } = require('../lib/economy');
 
 const router = express.Router();
 
@@ -80,6 +80,61 @@ router.post('/buy', authRequired, (req, res) => {
     inventory,
     xpAwarded,
     newAchievements
+  });
+});
+
+// Use a consumable item from inventory
+router.post('/use', authRequired, (req, res) => {
+  const { item_id, locationId } = req.body;
+
+  if (!item_id || !locationId) {
+    return res.status(400).json({ error: 'item_id and locationId are required' });
+  }
+
+  // Check the item exists in inventory
+  const inventory = getInventory(req.user.id);
+  const invEntry = inventory.items.find(i => i.item_id === item_id);
+  if (!invEntry || invEntry.quantity <= 0) {
+    return res.status(400).json({ error: 'Item not found in inventory' });
+  }
+
+  // Verify item is consumable via catalog
+  const catalogEntry = findItemInCatalog(item_id);
+  if (!catalogEntry || catalogEntry.item.type !== 'consumable') {
+    return res.status(400).json({ error: 'Item is not consumable' });
+  }
+
+  // Decrement quantity
+  const result = useItem(req.user.id, item_id);
+  if (result.error) {
+    return res.status(400).json({ error: result.error });
+  }
+
+  const use_message = catalogEntry.item.use_message || `*uses ${catalogEntry.item.name}*`;
+  const characterName = req.user.characterName || req.user.global_name || req.user.username;
+
+  // Broadcast to all WS clients
+  const wss = req.app.get('wss');
+  if (wss) {
+    const payload = JSON.stringify({
+      type: 'item_used',
+      item_id,
+      locationId,
+      userId: req.user.id,
+      username: req.user.username,
+      characterName,
+      use_message,
+      effect: 'smoke',
+    });
+    wss.clients.forEach(client => {
+      if (client.readyState === 1) client.send(payload);
+    });
+  }
+
+  res.json({
+    success: true,
+    use_message,
+    inventory: result.inventory,
   });
 });
 

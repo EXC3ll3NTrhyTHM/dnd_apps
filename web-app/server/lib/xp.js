@@ -29,15 +29,19 @@ const GOLD_TO_XP_RATIO = 0.5;
 
 const BASE_XP = 5000;
 const LEVEL_MULTIPLIER = 1.3;
-const MIN_LEVEL = 4;
+const MIN_LEVEL = 1;
 const MAX_LEVEL = 20;
+
+// Gentler XP requirements for early levels (1-3)
+const EARLY_LEVEL_XP = { 1: 500, 2: 1000, 3: 2000 };
 
 // Pre-compute level thresholds (cumulative XP needed for each level)
 const LEVEL_THRESHOLDS = [];
 (function buildThresholds() {
   let cumulative = 0;
   for (let lvl = MIN_LEVEL; lvl <= MAX_LEVEL; lvl++) {
-    const xpForThisLevel = Math.round(BASE_XP * Math.pow(LEVEL_MULTIPLIER, lvl - MIN_LEVEL));
+    const xpForThisLevel = EARLY_LEVEL_XP[lvl]
+      || Math.round(BASE_XP * Math.pow(LEVEL_MULTIPLIER, lvl - 4));
     cumulative += xpForThisLevel;
     LEVEL_THRESHOLDS.push({ level: lvl, cumulativeXp: cumulative, xpForLevel: xpForThisLevel });
   }
@@ -87,18 +91,46 @@ function ensureFreshDaily(record) {
   return record;
 }
 
+const LIFETIME_DEFAULTS = {
+  messages_sent: 0,
+  reactions_given: 0,
+  locations_visited: [],
+  gold_spent: 0,
+  tavern_purchases: 0,
+  shop_purchases: 0,
+  gifs_sent: 0,
+  images_sent: 0,
+  dice_rolls: 0,
+  profiles_viewed: 0,
+  stats_inspected: 0,
+  encounters_joined: 0,
+  encounters_won: 0,
+  monsters_killed: 0,
+  total_combat_damage: 0,
+  combat_crits: 0,
+  combat_fumbles: 0,
+  times_knocked_out: 0,
+  fish_caught: 0,
+  fish_escaped: 0,
+  fish_sold: 0,
+  fish_common_caught: 0,
+  fish_uncommon_caught: 0,
+  fish_rare_caught: 0,
+  fish_epic_caught: 0,
+  fish_legendary_caught: 0,
+  fishing_gold_earned: 0,
+};
+
 function ensureLifetime(record) {
   if (!record.lifetime) {
-    record.lifetime = {
-      messages_sent: 0,
-      reactions_given: 0,
-      locations_visited: [],
-      gold_spent: 0,
-      tavern_purchases: 0,
-      shop_purchases: 0,
-      gifs_sent: 0,
-      images_sent: 0,
-    };
+    record.lifetime = { ...LIFETIME_DEFAULTS };
+  } else {
+    // Backfill fields added after the record was created
+    for (const [key, val] of Object.entries(LIFETIME_DEFAULTS)) {
+      if (record.lifetime[key] === undefined) {
+        record.lifetime[key] = val;
+      }
+    }
   }
   return record;
 }
@@ -163,6 +195,11 @@ function getLevelFromXp(totalXp) {
     xpInCurrentLevel: totalXp - (lastThreshold.cumulativeXp - lastThreshold.xpForLevel),
     xpToNextLevel: 0
   };
+}
+
+function getLevel(userId, username) {
+  const record = getXpRecord(userId, username);
+  return getLevelFromXp(record.total_xp).level;
 }
 
 // ============================================
@@ -386,6 +423,7 @@ module.exports = {
   // Core
   getXpRecord,
   getLevelFromXp,
+  getLevel,
   ensureFreshDaily,
   ensureLifetime,
   incrementLifetimeStat,

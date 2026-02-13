@@ -9,12 +9,20 @@ const fs = require('fs');
 const path = require('path');
 
 const ACHIEVEMENTS_PATH = path.resolve(__dirname, '..', '..', 'data', 'achievements.json');
+const LOCATIONS_PATH = path.resolve(__dirname, '..', '..', 'data', 'locations.json');
 
-// All 6 location IDs for the cartographer achievement
-const ALL_LOCATIONS = [
-  'the_collective', 'dragons_hollow', 'the_barracks',
-  'the_veil', 'the_cottage', 'the_dojo'
-];
+function getAccessibleLocations(userId) {
+  let locations;
+  try { locations = JSON.parse(fs.readFileSync(LOCATIONS_PATH, 'utf-8')); }
+  catch { return []; }
+  return Object.entries(locations)
+    .filter(([, loc]) => {
+      if (loc.locked) return false;
+      if (Array.isArray(loc.lockedFor) && loc.lockedFor.includes(userId)) return false;
+      return true;
+    })
+    .map(([id]) => id);
+}
 
 // ============================================
 // ACHIEVEMENT DEFINITIONS
@@ -140,12 +148,15 @@ const ACHIEVEMENTS = {
   },
   cartographer: {
     name: 'Cartographer',
-    description: 'Visit every location',
+    description: 'Visit every location you have access to',
     icon: '\u{1F9ED}',
     xp: 100,
     gold: 50,
     hidden: false,
-    check: (lt) => ALL_LOCATIONS.every(loc => lt.locations_visited.includes(loc)),
+    check: (lt, ctx) => {
+      const accessible = getAccessibleLocations(ctx.userId);
+      return accessible.length > 0 && accessible.every(loc => lt.locations_visited.includes(loc));
+    },
   },
 
   // -- Tavern --
@@ -186,6 +197,248 @@ const ACHIEVEMENTS = {
     gold: 100,
     hidden: false,
     check: (lt, ctx) => ctx.level >= 15,
+  },
+
+  // -- Dice --
+  roll_initiative: {
+    name: 'Roll Initiative',
+    description: 'Roll dice for the first time',
+    icon: '\u{1F3B2}',
+    xp: 10,
+    gold: 0,
+    hidden: false,
+    check: (lt) => lt.dice_rolls >= 1,
+  },
+  dice_goblin: {
+    name: 'Dice Goblin',
+    description: 'Roll dice 50 times',
+    icon: '\u{1F3B2}',
+    xp: 50,
+    gold: 25,
+    hidden: false,
+    check: (lt) => lt.dice_rolls >= 50,
+  },
+  high_roller: {
+    name: 'High Roller',
+    description: 'Roll dice 200 times',
+    icon: '\u{1F3B2}',
+    xp: 100,
+    gold: 50,
+    hidden: false,
+    check: (lt) => lt.dice_rolls >= 200,
+  },
+  natural_twenty: {
+    name: 'Natural Twenty!',
+    description: 'Roll a natural 20',
+    icon: '\u{1F3AF}',
+    xp: 30,
+    gold: 15,
+    hidden: true,
+    check: (lt, ctx) => ctx.event === 'dice_rolled' && ctx.has_nat_20,
+  },
+  critical_fail: {
+    name: 'Critical Fail',
+    description: 'The dice gods frown upon you',
+    icon: '\u{1F480}',
+    xp: 15,
+    gold: 0,
+    hidden: true,
+    check: (lt, ctx) => ctx.event === 'dice_rolled' && ctx.has_nat_1,
+  },
+  jackpot: {
+    name: 'Jackpot!',
+    description: 'Fortune smiles on the bold',
+    icon: '\u{1F48E}',
+    xp: 50,
+    gold: 50,
+    hidden: true,
+    check: (lt, ctx) => ctx.event === 'dice_rolled' && ctx.has_100,
+  },
+
+  // -- Social --
+  curious_eye: {
+    name: 'Curious Eye',
+    description: "Check out another adventurer's profile",
+    icon: '\u{1F50D}',
+    xp: 10,
+    gold: 0,
+    hidden: false,
+    check: (lt) => lt.profiles_viewed >= 1,
+  },
+  know_thyself: {
+    name: 'Know Thyself',
+    description: 'Inspect a stat to learn what it does',
+    icon: '\u{1F4DA}',
+    xp: 10,
+    gold: 0,
+    hidden: false,
+    check: (lt) => lt.stats_inspected >= 1,
+  },
+
+  // -- Combat --
+  first_blood: {
+    name: 'First Blood',
+    description: 'Participate in your first combat encounter',
+    icon: '\u{2694}\u{FE0F}',
+    xp: 15,
+    gold: 0,
+    hidden: false,
+    check: (lt) => lt.encounters_joined >= 1,
+  },
+  monster_slayer: {
+    name: 'Monster Slayer',
+    description: 'Win 10 combat encounters',
+    icon: '\u{1F5E1}\u{FE0F}',
+    xp: 50,
+    gold: 25,
+    hidden: false,
+    check: (lt) => lt.encounters_won >= 10,
+  },
+  critical_strike: {
+    name: 'Critical Strike',
+    description: 'Land a critical hit in combat',
+    icon: '\u{1F4A5}',
+    xp: 25,
+    gold: 10,
+    hidden: true,
+    check: (lt) => lt.combat_crits >= 1,
+  },
+  untouchable: {
+    name: 'Untouchable',
+    description: 'Win an encounter without taking damage',
+    icon: '\u{1F6E1}\u{FE0F}',
+    xp: 30,
+    gold: 15,
+    hidden: true,
+    check: (lt, ctx) => ctx.untouchable === true,
+  },
+  dragon_slayer: {
+    name: 'Dragon Slayer',
+    description: 'Defeat a CR 5+ monster',
+    icon: '\u{1F409}',
+    xp: 100,
+    gold: 50,
+    hidden: true,
+    check: (lt, ctx) => ctx.monster_cr >= 5 && ctx.encounters_won,
+  },
+
+  // -- Fishing --
+  first_catch: {
+    name: 'First Catch',
+    description: 'Catch your first fish',
+    icon: '\ud83c\udfa3',
+    xp: 15,
+    gold: 5,
+    hidden: false,
+    check: (lt) => lt.fish_caught >= 1,
+  },
+  angler: {
+    name: 'Angler',
+    description: 'Catch 25 fish',
+    icon: '\ud83d\udc1f',
+    xp: 50,
+    gold: 25,
+    hidden: false,
+    check: (lt) => lt.fish_caught >= 25,
+  },
+  master_fisher: {
+    name: 'Master Fisher',
+    description: 'Catch 100 fish',
+    icon: '\ud83e\udddc',
+    xp: 150,
+    gold: 75,
+    hidden: false,
+    check: (lt) => lt.fish_caught >= 100,
+  },
+  rare_catch: {
+    name: 'Rare Catch',
+    description: 'Reel in a rare fish',
+    icon: '\ud83d\udc20',
+    xp: 30,
+    gold: 15,
+    hidden: true,
+    check: (lt) => lt.fish_rare_caught >= 1,
+  },
+  epic_catch: {
+    name: 'Epic Catch',
+    description: 'Reel in an epic fish',
+    icon: '\ud83d\udc7e',
+    xp: 75,
+    gold: 40,
+    hidden: true,
+    check: (lt) => lt.fish_epic_caught >= 1,
+  },
+  leviathan_hunter: {
+    name: 'Leviathan Hunter',
+    description: 'Catch a legendary fish',
+    icon: '\ud83d\udc09',
+    xp: 200,
+    gold: 100,
+    hidden: true,
+    check: (lt) => lt.fish_legendary_caught >= 1,
+  },
+  fish_merchant: {
+    name: 'Fish Merchant',
+    description: 'Earn 500 gold from selling fish',
+    icon: '\ud83d\udcb0',
+    xp: 50,
+    gold: 0,
+    hidden: false,
+    check: (lt) => lt.fishing_gold_earned >= 500,
+  },
+  the_one_that_got_away: {
+    name: 'The One That Got Away',
+    description: 'Let a fish escape',
+    icon: '\ud83d\udca8',
+    xp: 5,
+    gold: 0,
+    hidden: true,
+    check: (lt) => lt.fish_escaped >= 1,
+  },
+  butterfingers: {
+    name: 'Butterfingers',
+    description: 'Let 10 fish escape',
+    icon: '\ud83e\udee3',
+    xp: 15,
+    gold: 0,
+    hidden: true,
+    check: (lt) => lt.fish_escaped >= 10,
+  },
+  fish_monger: {
+    name: 'Fish Monger',
+    description: 'Sell 50 fish',
+    icon: '\ud83d\udeD2',
+    xp: 75,
+    gold: 50,
+    hidden: false,
+    check: (lt) => lt.fish_sold >= 50,
+  },
+  reel_deal: {
+    name: 'Reel Deal',
+    description: 'Earn 2,000 gold from selling fish',
+    icon: '\ud83d\udcb0',
+    xp: 100,
+    gold: 0,
+    hidden: false,
+    check: (lt) => lt.fishing_gold_earned >= 2000,
+  },
+  deep_sea_collector: {
+    name: 'Deep Sea Collector',
+    description: 'Catch 10 rare or better fish',
+    icon: '\ud83c\udf0a',
+    xp: 60,
+    gold: 30,
+    hidden: false,
+    check: (lt) => (lt.fish_rare_caught + lt.fish_epic_caught + lt.fish_legendary_caught) >= 10,
+  },
+  void_touched: {
+    name: 'Void Touched',
+    description: 'Catch 5 epic fish',
+    icon: '\ud83d\udd6e',
+    xp: 100,
+    gold: 50,
+    hidden: true,
+    check: (lt) => lt.fish_epic_caught >= 5,
   },
 
   // -- Hidden --
@@ -259,6 +512,7 @@ function checkAchievements(userId, username, event, ctx = {}) {
   const levelInfo = xp.getLevelFromXp(record.total_xp);
 
   const fullCtx = {
+    userId,
     event,
     level: levelInfo.level,
     hour: new Date().getUTCHours(),
@@ -311,17 +565,21 @@ function checkAchievements(userId, username, event, ctx = {}) {
 
 /**
  * Get all achievements for a user with unlock status.
- * Hidden locked achievements are masked.
+ * Hidden achievements are masked if the viewer hasn't unlocked them.
+ * @param {string} userId - The player whose achievements to retrieve
+ * @param {string} [viewerId] - The player viewing the profile (defaults to userId)
  */
-function getUserAchievements(userId) {
+function getUserAchievements(userId, viewerId) {
   const allUnlocked = loadAchievements();
   const userUnlocked = allUnlocked[userId] || {};
+  const viewerUnlocked = viewerId ? (allUnlocked[viewerId] || {}) : userUnlocked;
 
   const achievements = Object.entries(ACHIEVEMENTS).map(([id, def]) => {
     const unlockedAt = userUnlocked[id] || null;
-    const isLocked = !unlockedAt;
+    const viewerHas = !!viewerUnlocked[id];
 
-    if (def.hidden && isLocked) {
+    // Mask hidden achievements the viewer hasn't unlocked
+    if (def.hidden && !viewerHas) {
       return {
         id,
         name: '???',

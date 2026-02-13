@@ -1,0 +1,412 @@
+/* ============================================
+   COMBAT ENCOUNTER UI
+   ============================================ */
+
+/* ---- Encounter Banner ---- */
+
+.enc-banner {
+  background: linear-gradient(180deg, #1a1510 0%, #231c14 100%);
+  border-bottom: 2px solid var(--border-stitch);
+  padding: 10px 14px 8px;
+  flex-shrink: 0;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Monster name + round */
+.enc-monster-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.enc-monster-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ef4444;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.enc-round {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* HP bar */
+.enc-hp-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.enc-hp-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.enc-hp-bar-track {
+  flex: 1;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.enc-hp-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s ease, background-color 0.5s ease;
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.3);
+}
+
+.enc-hp-text {
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  min-width: 50px;
+  text-align: right;
+}
+
+.enc-ac-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* Participants strip */
+.enc-participants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.enc-participant {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.enc-participant.enc-ko {
+  opacity: 0.4;
+}
+
+.enc-participant-name {
+  color: var(--color-gold);
+  font-weight: 500;
+}
+
+.enc-participant-hp {
+  color: var(--text-secondary);
+}
+
+.enc-participant-ready {
+  color: #4ade80;
+  font-size: 0.65rem;
+}
+
+.enc-participant-ko {
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 0.6rem;
+}
+
+/* Action buttons */
+.enc-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  min-height: 38px;
+}
+
+.enc-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--font-display);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.enc-btn:active {
+  transform: scale(0.96);
+}
+
+.enc-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.enc-btn-attack {
+  background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+}
+
+.enc-btn-attack:active {
+  background: linear-gradient(180deg, #b91c1c 0%, #7f1d1d 100%);
+}
+
+.enc-btn-defend {
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+.enc-btn-defend:active {
+  background: linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 100%);
+}
+
+.enc-btn-flee {
+  background: linear-gradient(180deg, #78716c 0%, #57534e 100%);
+  color: #e7e5e4;
+  box-shadow: 0 2px 6px rgba(120, 113, 108, 0.2);
+}
+
+.enc-btn-flee:active {
+  background: linear-gradient(180deg, #57534e 0%, #44403c 100%);
+}
+
+.enc-btn-join {
+  background: linear-gradient(180deg, var(--color-gold) 0%, #b8860b 100%);
+  color: #1a1510;
+  max-width: 180px;
+  box-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+}
+
+.enc-btn-join:active {
+  background: linear-gradient(180deg, #b8860b 0%, #8b6914 100%);
+}
+
+.enc-status-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-style: italic;
+}
+
+.enc-crit-text {
+  color: #ffd700;
+  font-weight: 700;
+  font-style: normal;
+  animation: enc-pulse 0.5s ease-in-out 3;
+}
+
+.enc-fumble-text {
+  color: #ef4444;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.enc-btn-detail {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 400;
+  opacity: 0.7;
+  margin-top: 1px;
+}
+
+.enc-monster-status {
+  color: #c084fc;
+  font-weight: 500;
+  font-style: normal;
+  animation: enc-pulse 1.5s ease-in-out infinite;
+}
+
+/* Timer */
+.enc-timer {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  letter-spacing: 0.03em;
+}
+
+.enc-timer-urgent {
+  color: #ef4444;
+  font-weight: 600;
+  animation: enc-pulse 1s ease-in-out infinite;
+}
+
+@keyframes enc-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ---- Result Screen ---- */
+
+.enc-result-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: enc-fade-in 0.3s ease;
+}
+
+.enc-result-card {
+  background: linear-gradient(180deg, #1a1510 0%, #231c14 100%);
+  border: 2px solid var(--border-stitch);
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: center;
+  max-width: 340px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  animation: enc-scale-in 0.3s ease;
+}
+
+.enc-result-icon {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.enc-result-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  text-shadow: 0 2px 6px rgba(212, 168, 67, 0.3);
+  margin-bottom: 6px;
+}
+
+.enc-result-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  font-style: italic;
+}
+
+.enc-result-rewards {
+  margin-bottom: 16px;
+}
+
+.enc-reward-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 8px;
+}
+
+.enc-reward-row:last-child {
+  border-bottom: none;
+}
+
+.enc-reward-name {
+  color: var(--color-gold);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.enc-reward-values {
+  color: var(--text-primary);
+  font-size: 0.8rem;
+}
+
+.enc-reward-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.15);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.enc-result-dismiss {
+  padding: 10px 32px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(180deg, var(--color-gold) 0%, #b8860b 100%);
+  color: #1a1510;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: var(--font-display);
+  transition: transform 0.1s ease;
+}
+
+.enc-result-dismiss:active {
+  transform: scale(0.96);
+}
+
+/* ---- Combat Narration Messages ---- */
+
+.chat-bubble-encounter {
+  background: rgba(220, 38, 38, 0.08);
+  border-left: 3px solid #dc2626;
+  margin: 4px 12px;
+  padding: 6px 10px;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.chat-bubble-encounter.enc-round-header {
+  background: rgba(212, 168, 67, 0.08);
+  border-left-color: var(--color-gold);
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: var(--color-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-top: 8px;
+}
+
+.chat-bubble-encounter.enc-victory {
+  background: rgba(74, 222, 128, 0.08);
+  border-left-color: #4ade80;
+  font-weight: 600;
+  color: #4ade80;
+}
+
+.chat-bubble-encounter.enc-defeat {
+  background: rgba(239, 68, 68, 0.08);
+  border-left-color: #ef4444;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+/* Animations */
+@keyframes enc-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes enc-scale-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}

@@ -1,257 +1,442 @@
 [
   {
-    "id": "5a75679a-1b1f-4d3f-adb1-7115442ab664",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Marcel test",
-    "timestamp": "2026-02-11T05:36:47.997Z"
-  },
-  {
-    "id": "6e64f3b2-5327-47bf-b981-27c8601d6924",
+    "id": "b5f9248b-fd50-469f-9e55-3516f6a10452",
     "role": "npc",
-    "npc": "marcel",
-    "npcDisplayName": "Marcel",
-    "text": "Yep, I'm here. What do you need?",
-    "emotion": "idle",
-    "timestamp": "2026-02-11T05:36:51.862Z"
+    "npc": "kumo",
+    "npcDisplayName": "Kumo",
+    "text": "Hey there! Always good to see you around. What’s on your mind today?",
+    "emotion": "happy",
+    "timestamp": "2026-02-12T05:15:04.013Z"
   },
   {
-    "id": "1d0a1134-58b5-4000-be4f-c8b04d0b72c7",
-    "role": "player",
-    "type": "gif",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "gifUrl": "https://media1.giphy.com/media/iwAMRlO9c04FnU4XvI/200w.gif?cid=08b926b0239kl584mryy57d4vsda7rcydfgy2ugy83bdfi60&ep=v1_gifs_trending&rid=200w.gif&ct=g",
-    "gifWidth": 200,
-    "gifHeight": 200,
-    "text": "Hockey Wink GIF",
-    "timestamp": "2026-02-11T06:11:30.038Z",
-    "reactions": {
-      "🔥": [
-        "228241331296665600"
-      ]
-    }
-  },
-  {
-    "id": "83c5a7b1-9c25-41e1-9e49-2afd0b36783f",
+    "id": "5c91f9cb-f5cb-4f0a-9eec-2f4e5f87825f",
     "role": "player",
     "userId": "228241331296665600",
     "playerName": "Acacia",
     "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "text": "\"goalie now yes\" 😉",
-    "timestamp": "2026-02-11T06:16:43.973Z"
+    "text": "@Regulars Hi",
+    "timestamp": "2026-02-12T05:15:04.030Z"
   },
   {
-    "id": "7149e40e-031c-4b49-babe-605c635df904",
-    "role": "player",
-    "type": "gif",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "gifUrl": "https://media3.giphy.com/media/NxC8VtyxqhMtpLoEEN/200w.gif?cid=08b926b0239kl584mryy57d4vsda7rcydfgy2ugy83bdfi60&ep=v1_gifs_trending&rid=200w.gif&ct=g",
-    "gifWidth": 200,
-    "gifHeight": 200,
-    "text": "Kissing I Love You GIF by BEARISH",
-    "timestamp": "2026-02-11T06:18:15.495Z"
+    "id": "6d9e860b-a967-46de-a226-e6f95b8489a1",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Heyyy, Acacia! Always nice to see you, maaan. Got any plans for today?",
+    "emotion": "happy",
+    "timestamp": "2026-02-12T05:15:05.434Z"
   },
   {
-    "id": "e772623a-e76d-453a-814f-f79c7c190492",
+    "id": "249bc658-0169-4bb8-aa1d-40165ee2983a",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Hey there, your Majesty! You know I’ll always respond to a royal greeting. What’s going on?",
+    "emotion": "happy",
+    "timestamp": "2026-02-12T05:15:06.271Z"
+  },
+  {
+    "id": "7834e28b-8a7a-4d96-8ffb-fa9f5b73adca",
+    "role": "npc",
+    "npc": "nibby",
+    "npcDisplayName": "Nibby",
+    "text": "Yo, Acacia! How's it going? You up for some adventure or just chilling today?",
+    "emotion": "happy",
+    "timestamp": "2026-02-12T05:15:12.249Z"
+  },
+  {
+    "id": "fb20a317-e886-4e34-a2e3-7459a5946dcc",
+    "role": "npc",
+    "npc": "kumo",
+    "npcDisplayName": "Kumo",
+    "text": "Hello, Acacia! Always a pleasure. What brings you here today?",
+    "emotion": "happy",
+    "timestamp": "2026-02-12T05:15:13.641Z"
+  },
+  {
+    "id": "f0f99dae-fdc7-469c-ba15-0883ec27ffcf",
     "role": "player",
-    "type": "gif",
+    "type": "dice_roll",
     "userId": "228241331296665600",
     "playerName": "Acacia",
     "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "gifUrl": "https://media0.giphy.com/media/xFS0CSphZJmzePCVtK/200w.gif?cid=08b926b0bl95ffrqc1l4s56ecceg89pk13gw2l3z4qnx7dox&ep=v1_gifs_search&rid=200w.gif&ct=g",
-    "gifWidth": 200,
-    "gifHeight": 200,
-    "text": "Shane Ilya GIF by Movistar Plus+",
-    "timestamp": "2026-02-11T06:20:14.190Z"
+    "notation": "3d20kh1++1",
+    "rolls": [
+      10,
+      11,
+      20
+    ],
+    "total": 21,
+    "kept": [
+      2
+    ],
+    "modifier": 1,
+    "timestamp": "2026-02-12T05:16:21.403Z"
   },
   {
-    "id": "15ea28ad-4886-4d6a-a0b2-82b3d87ec272",
+    "id": "fb7295a7-b2c3-4ba8-b81a-4539dad4f415",
     "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "*pours drink on the floor*",
-    "timestamp": "2026-02-11T06:32:02.252Z"
-  },
-  {
-    "id": "311f1bd1-929c-45b1-ba92-3fcabf599d99",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Bonesy *shares drink with bonesy*",
-    "timestamp": "2026-02-11T06:38:42.706Z"
-  },
-  {
-    "id": "c40b7c74-d3f3-460e-aa0c-6202d4a3afbe",
-    "role": "npc",
-    "npc": "bonesy",
-    "npcDisplayName": "Bonesy",
-    "text": "Ayy, thanks for the drink, bro! *clinks the cups together* Here’s to good times and chill vibes! Cheers! 🍻",
-    "emotion": "happy",
-    "timestamp": "2026-02-11T06:38:47.511Z",
-    "reactions": {
-      "❤️": [
-        "424061511833747467"
-      ]
-    }
-  },
-  {
-    "id": "3c54fa1f-efe9-4852-bb1d-abbf220c20ec",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Bonesy *hands bonesy another drink*",
-    "timestamp": "2026-02-11T06:42:30.714Z"
-  },
-  {
-    "id": "cb59b93e-1a52-41e1-a367-750c8550c9e6",
-    "role": "npc",
-    "npc": "bonesy",
-    "npcDisplayName": "Bonesy",
-    "text": "Whoa, another one? You’re really keeping the vibes flowing, maaaan! I appreciate it! *takes a sip* Now this is what I’m talkin' about!",
-    "emotion": "happy",
-    "timestamp": "2026-02-11T06:42:32.777Z"
-  },
-  {
-    "id": "47b53c42-7e4a-4d24-9e5f-d1be9941af68",
-    "role": "player",
-    "type": "gif",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "gifUrl": "https://media2.giphy.com/media/q7kofYLObTVUk/200w.gif?cid=08b926b0fn0nxvvnrki1pbqu54y2nae76zr52imjv98i5dv8&ep=v1_gifs_search&rid=200w.gif&ct=g",
-    "gifWidth": 200,
-    "gifHeight": 84,
-    "text": "lord of the rings hobbit GIF",
-    "timestamp": "2026-02-11T07:00:22.549Z"
-  },
-  {
-    "id": "741f166a-9e1d-4155-aec7-81d77f62b42b",
-    "role": "player",
+    "type": "dice_roll",
     "userId": "228241331296665600",
     "playerName": "Acacia",
     "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
-    "text": "@Bonesy hey",
-    "timestamp": "2026-02-11T22:30:02.740Z"
+    "notation": "3d20",
+    "rolls": [
+      15,
+      3,
+      3
+    ],
+    "total": 21,
+    "kept": [
+      0,
+      1,
+      2
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T05:17:04.707Z"
   },
   {
-    "id": "4fdcbfae-0e3f-4b20-8494-106e7d99b6a2",
+    "id": "28f2e51f-91b5-406c-8e53-1f4c8ca01f9b",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "3d20kh1",
+    "rolls": [
+      4,
+      15,
+      5
+    ],
+    "total": 15,
+    "kept": [
+      1
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T05:17:25.835Z"
+  },
+  {
+    "id": "0b316815-d7ab-4d3d-96a5-773ff0598f22",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "1d20",
+    "rolls": [
+      14
+    ],
+    "total": 14,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T05:54:46.676Z"
+  },
+  {
+    "id": "8b78131d-4172-4f09-b172-02af564743d1",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "3d20",
+    "rolls": [
+      4,
+      4,
+      12
+    ],
+    "total": 20,
+    "kept": [
+      0,
+      1,
+      2
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T05:55:22.615Z"
+  },
+  {
+    "id": "0b1e2e34-a06a-429c-b71c-2ce3f53f4d5b",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "4d20",
+    "rolls": [
+      5,
+      3,
+      8,
+      14
+    ],
+    "total": 30,
+    "kept": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T05:55:39.929Z"
+  },
+  {
+    "id": "929abe62-8575-40cd-bd46-99f8ab36cff2",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "1d100",
+    "rolls": [
+      15
+    ],
+    "total": 15,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T05:58:02.623Z"
+  },
+  {
+    "id": "1e22a1ed-2502-4865-9ebe-bc903ef1ba21",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "notation": "1d100kh1++9",
+    "rolls": [
+      72
+    ],
+    "total": 81,
+    "kept": [
+      0
+    ],
+    "modifier": 9,
+    "timestamp": "2026-02-12T05:58:27.152Z"
+  },
+  {
+    "id": "e968a66f-6513-4d90-b7c0-896314c6fac7",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Bonesy Hey",
+    "timestamp": "2026-02-12T16:54:54.968Z"
+  },
+  {
+    "id": "c9185018-9fef-4045-b864-372e40ff09ba",
     "role": "npc",
     "npc": "bonesy",
     "npcDisplayName": "Bonesy",
-    "text": "Heyyy Acacia! What’s up, my friend? You want a drink or some snacks? I got the good stuff!",
+    "text": "Heyyy, Architect! What’s up, my dude? You got something cool on your mind?",
     "emotion": "happy",
-    "timestamp": "2026-02-11T22:30:05.798Z"
+    "timestamp": "2026-02-12T16:54:57.419Z"
   },
   {
-    "id": "3b0ffa44-310f-4ad1-b461-9c5cd16aa4a0",
-    "role": "player",
-    "type": "image",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "imageUrl": "/uploads/8e22b2f3-b592-40da-a597-58eff3ecd53b.png",
-    "imageWidth": 1024,
-    "imageHeight": 1536,
-    "text": "",
-    "timestamp": "2026-02-11T23:31:55.739Z",
-    "reactions": {
-      "🔥": [
-        "424061511833747467"
-      ]
-    }
-  },
-  {
-    "id": "3444cab2-d42c-464b-ad18-424c6f481dec",
-    "role": "player",
-    "type": "image",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "imageUrl": "/uploads/9b1b5a01-4afa-489d-b196-016ba6193476.png",
-    "imageWidth": 1024,
-    "imageHeight": 1536,
-    "text": "",
-    "timestamp": "2026-02-11T23:32:06.539Z"
-  },
-  {
-    "id": "4dee8c96-c373-4e62-8f54-782f70f9b5b0",
-    "role": "player",
-    "type": "image",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "imageUrl": "/uploads/ac19c0aa-c366-4e97-9ede-12ac2ec22fd1.png",
-    "imageWidth": 1536,
-    "imageHeight": 1024,
-    "text": "",
-    "timestamp": "2026-02-11T23:33:30.800Z"
-  },
-  {
-    "id": "99f70062-366d-4ad3-9d81-71554adc7683",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Bonesy hey",
-    "timestamp": "2026-02-11T23:47:03.173Z"
-  },
-  {
-    "id": "5c87359c-ad34-41ba-89ea-30929f951700",
-    "role": "npc",
-    "npc": "bonesy",
-    "npcDisplayName": "Bonesy",
-    "text": "Heyyy again! You know I'm always around, just vibin'. What’s on your mind, bro?",
-    "emotion": "idle",
-    "timestamp": "2026-02-11T23:47:04.721Z"
-  },
-  {
-    "id": "833bfa0e-392c-45f7-a9c8-f3f6fe6b51b2",
-    "role": "player",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "text": "@Bonesy hey",
-    "timestamp": "2026-02-11T23:49:43.855Z"
-  },
-  {
-    "id": "25c442fc-8e97-4bfc-ad9c-38a6c89bba86",
-    "role": "npc",
-    "npc": "bonesy",
-    "npcDisplayName": "Bonesy",
-    "text": "Yo, yo! I’m right here, man! You need something? Or just feelin' the vibe?",
-    "emotion": "idle",
-    "timestamp": "2026-02-11T23:49:45.003Z"
-  },
-  {
-    "id": "cd1c7038-c05b-452d-85b2-08aa78189504",
-    "role": "player",
-    "type": "image",
-    "userId": "424061511833747467",
-    "playerName": "The Architect",
-    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "imageUrl": "/uploads/0304d5a4-ac36-46a2-934c-19a7af2703e5.png",
-    "imageWidth": 1024,
-    "imageHeight": 1536,
-    "text": "",
-    "timestamp": "2026-02-12T01:00:51.737Z"
-  },
-  {
-    "id": "5c74a0d0-fb3a-4ba5-b1ee-dde1a6dbad88",
+    "id": "899169d7-06b0-4993-83fe-8acd35a01d52",
     "role": "player",
     "type": "dice_roll",
     "userId": "424061511833747467",
     "playerName": "The Architect",
     "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "notation": "1d4",
+    "notation": "5d20",
+    "rolls": [
+      10,
+      18,
+      6,
+      6,
+      15
+    ],
+    "total": 55,
+    "kept": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T16:55:07.938Z"
+  },
+  {
+    "id": "20e398d3-90fb-43b7-aac5-51dbbe6c6faa",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "notation": "1d20",
+    "rolls": [
+      20
+    ],
+    "total": 20,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T16:57:29.215Z"
+  },
+  {
+    "id": "073a0aed-77a4-479b-a7d8-9b5d36d0ef6e",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "notation": "1d100",
+    "rolls": [
+      49
+    ],
+    "total": 49,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T20:38:49.506Z"
+  },
+  {
+    "id": "9353fa41-ffe7-42da-a248-7e5c579f124f",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "notation": "5d6",
+    "rolls": [
+      3,
+      4,
+      2,
+      3,
+      4
+    ],
+    "total": 16,
+    "kept": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T20:39:04.062Z"
+  },
+  {
+    "id": "30c09e89-9043-4718-9916-fd6a63942c70",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "Test\n\nTest\n\nTesr",
+    "timestamp": "2026-02-12T20:57:31.589Z"
+  },
+  {
+    "id": "a63c69e1-3ad2-4f68-8c68-796ae2a78590",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "Twst\n\nTest \n\nTest",
+    "timestamp": "2026-02-12T21:00:32.464Z"
+  },
+  {
+    "id": "a27b4eea-278a-4d91-a1b4-0f30eb05d272",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "Ayyy\n\nAyyy\nAyyy",
+    "timestamp": "2026-02-12T21:06:04.344Z"
+  },
+  {
+    "id": "860e51fd-032a-4264-94cb-2aa310460317",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "#Big title",
+    "timestamp": "2026-02-12T21:06:27.378Z"
+  },
+  {
+    "id": "0695eb4c-0ca9-4eb6-9dde-c5b06153e2a8",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "#Big title",
+    "timestamp": "2026-02-12T21:07:41.057Z"
+  },
+  {
+    "id": "4df02b44-fbda-4c81-8606-6865c12e3bee",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "# Big title",
+    "timestamp": "2026-02-12T21:07:50.054Z"
+  },
+  {
+    "id": "93095bf1-9f8d-423f-98b5-1b49c6c614ad",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "## Title",
+    "timestamp": "2026-02-12T21:08:56.202Z"
+  },
+  {
+    "id": "d1151148-87ff-4e70-a2b4-2d8cfde18f33",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "### Title",
+    "timestamp": "2026-02-12T21:09:02.888Z"
+  },
+  {
+    "id": "287933f3-aaf6-46ca-9214-aa9fa43dcc14",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "#### Title",
+    "timestamp": "2026-02-12T21:09:08.494Z"
+  },
+  {
+    "id": "0c8a6eea-6305-4ba4-934d-104b3a178256",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "Text",
+    "timestamp": "2026-02-12T21:09:14.263Z"
+  },
+  {
+    "id": "184b82b0-4e78-49cc-a17c-6614890caa26",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "notation": "1d20",
+    "rolls": [
+      16
+    ],
+    "total": 16,
+    "kept": [
+      0
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-12T23:52:42.854Z"
+  },
+  {
+    "id": "cdbf9f80-7df5-4e57-aab5-1a9c260e24f9",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "notation": "1d6",
     "rolls": [
       2
     ],
@@ -260,34 +445,40 @@
       0
     ],
     "modifier": 0,
-    "timestamp": "2026-02-12T02:58:07.849Z"
+    "timestamp": "2026-02-12T23:52:54.351Z"
   },
   {
-    "id": "8a18d74c-061e-42e8-9bd6-9974ee673588",
+    "id": "ae812843-fefe-498e-9c0c-6556b654597a",
     "role": "player",
     "type": "dice_roll",
     "userId": "424061511833747467",
     "playerName": "The Architect",
     "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "notation": "1d4",
+    "notation": "4d20",
     "rolls": [
-      1
+      14,
+      4,
+      14,
+      9
     ],
-    "total": 1,
+    "total": 41,
     "kept": [
-      0
+      0,
+      1,
+      2,
+      3
     ],
     "modifier": 0,
-    "timestamp": "2026-02-12T03:01:18.054Z"
+    "timestamp": "2026-02-12T23:53:08.511Z"
   },
   {
-    "id": "84bb0b3a-e2aa-4443-8b04-ec3caeba58f6",
+    "id": "231e1ba3-a0f8-46c5-890f-6fb9bf3b53ff",
     "role": "player",
     "type": "dice_roll",
     "userId": "424061511833747467",
     "playerName": "The Architect",
     "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
-    "notation": "1d4",
+    "notation": "1d20",
     "rolls": [
       4
     ],
@@ -296,6 +487,6 @@
       0
     ],
     "modifier": 0,
-    "timestamp": "2026-02-12T03:04:23.745Z"
+    "timestamp": "2026-02-13T04:58:33.895Z"
   }
 ]

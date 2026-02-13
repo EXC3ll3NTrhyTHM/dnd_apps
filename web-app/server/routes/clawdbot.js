@@ -19,22 +19,10 @@ const { WebSocket } = require('ws');
 const { setNpcTyping } = require('../lib/typing');
 const { notifyPlayerMentions } = require('../lib/notifications');
 
-const DATA_DIR = path.resolve(__dirname, '..', '..', 'data');
-const HISTORY_DIR = path.join(DATA_DIR, 'chat_history', 'shared');
-const DM_HISTORY_DIR = path.join(DATA_DIR, 'chat_history', 'marcel_dm');
-const PLAYERS_PATH = path.join(DATA_DIR, 'players.json');
+const { loadHistory, saveHistory, resolveHistoryPath, DM_HISTORY_DIR } = require('../lib/chatHistory');
 
-// Resolve history file path — marcel_dm_* channels use a separate directory
-function resolveHistoryPath(channelId) {
-  const dmMatch = channelId.match(/^marcel_dm_(.+)$/);
-  if (dmMatch) {
-    if (!fs.existsSync(DM_HISTORY_DIR)) {
-      fs.mkdirSync(DM_HISTORY_DIR, { recursive: true });
-    }
-    return path.join(DM_HISTORY_DIR, `${dmMatch[1]}.json`);
-  }
-  return path.join(HISTORY_DIR, `${channelId}.json`);
-}
+const DATA_DIR = path.resolve(__dirname, '..', '..', 'data');
+const PLAYERS_PATH = path.join(DATA_DIR, 'players.json');
 
 // In-memory queue for messages mentioning Marcel
 // In a real app, this might be Redis or a database table
@@ -168,14 +156,8 @@ router.get('/channels', (req, res) => {
  */
 router.get('/channels/:id/messages', (req, res) => {
   const { id } = req.params;
-  const histPath = resolveHistoryPath(id);
-
-  try {
-    const history = JSON.parse(fs.readFileSync(histPath, 'utf-8'));
-    res.json({ history });
-  } catch {
-    res.json({ history: [] });
-  }
+  const history = loadHistory(id);
+  res.json({ history });
 });
 
 /**
@@ -188,13 +170,7 @@ router.post('/channels/:id/messages', (req, res) => {
 
   if (!text) return res.status(400).json({ error: 'Text is required' });
 
-  const histPath = resolveHistoryPath(id);
-  let history = [];
-  try {
-    history = JSON.parse(fs.readFileSync(histPath, 'utf-8'));
-  } catch {
-    // ignore
-  }
+  const history = loadHistory(id);
 
   const npcMsg = {
     id: crypto.randomUUID(),
@@ -207,7 +183,7 @@ router.post('/channels/:id/messages', (req, res) => {
   };
 
   history.push(npcMsg);
-  
+
   // Clear typing status for this NPC in the shared registry
   setNpcTyping(id, npcMsg.npc, npcMsg.npcDisplayName, false);
 
@@ -215,21 +191,18 @@ router.post('/channels/:id/messages', (req, res) => {
   if (wss) {
     wss.clients.forEach(client => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ 
-          type: 'typing', 
-          locationId: id, 
-          npc: npcMsg.npc, 
-          typing: false 
+        client.send(JSON.stringify({
+          type: 'typing',
+          locationId: id,
+          npc: npcMsg.npc,
+          typing: false
         }));
       }
     });
   }
-  
-  // Keep history trimmed (matches MAX_HISTORY in chat.js)
-  const trimmed = history.slice(-30);
-  
+
   try {
-    fs.writeFileSync(histPath, JSON.stringify(trimmed, null, 2));
+    saveHistory(id, history);
 
     // Notify @mentions in Marcel's message
     if (router.app) {
@@ -325,17 +298,13 @@ router.post('/channels/:id/upload', (req, res) => {
       timestamp: new Date().toISOString()
     };
 
-    const histPath = resolveHistoryPath(id);
-    let history = [];
-    try { history = JSON.parse(fs.readFileSync(histPath, 'utf-8')); }
-    catch { /* ignore */ }
+    const history = loadHistory(id);
 
     history.push(npcMsg);
     setNpcTyping(id, npcMsg.npc, npcMsg.npcDisplayName, false);
 
-    const trimmed = history.slice(-30);
     try {
-      fs.writeFileSync(histPath, JSON.stringify(trimmed, null, 2));
+      saveHistory(id, history);
     } catch (error) {
       return res.status(500).json({ error: 'Failed to save message' });
     }

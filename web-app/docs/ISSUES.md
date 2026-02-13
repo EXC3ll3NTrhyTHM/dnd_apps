@@ -7,7 +7,7 @@
 ## Blockers 🚧
 
 ### Clawdbot Integration
-- [ ] **Marcel/Clawdbot on the Web App** ❌ *Blocking migration*
+- [x] **Marcel/Clawdbot on the Web App** ❌ *Blocking migration*
   - Need Clawdbot present in web app like Discord
   - Respond when @mentioned (not monitoring everything)
   
@@ -35,12 +35,12 @@
 ## Bugs 🐛
 
 ### UI/Display
-- [ ] Rotate screen message displays during page reload/blank screen
+- [x] Rotate screen message displays during page reload/blank screen
 - [x] DM controls show for everybody (should be DM-only)
 
 ### Chat/Messaging
-- [ ] NPCs still respond when no @mention is added (should require mention)
-- [ ] **[iPhone]** @mention popup doesn't add mentions to keyboard
+- [x] NPCs still respond when no @mention is added (should require mention)
+- [x] **[iPhone]** @mention popup doesn't add mentions to keyboard
 
 ---
 
@@ -59,9 +59,9 @@
   - Player can customize their shortcuts
   - One tap access to frequent actions without menu diving
   
-- [ ] Add autocomplete to keyboard
+- [x] Add autocomplete to keyboard
 - [ ] Clicking player sprite should add their @tag to text input (not working)
-- [ ] Image sharing support ⚡ *Priority*
+- [x] Image sharing support ⚡ *Priority*
   - Plus icon opens drawer under keyboard
   - Multiple options in drawer
   - Could include NPC or player icon selector
@@ -79,7 +79,7 @@
     - Future: more patterns (⭐ for quests, 🎲 for dice, etc.)
 
 ### Dice Rolling
-- [ ] **3D Dice Roller** ⚡ *Priority - Tonight (2026-02-11)*
+- [x] **3D Dice Roller** ⚡ *Priority - Tonight (2026-02-11)*
   - **Core Requirements:**
     - Throw 3D physics-based dice onto the screen
     - Track what they land on and automatically add player's modifier
@@ -99,6 +99,162 @@
   - Demo: [fantasticdice.games](https://fantasticdice.games)
   - Full Roll20 dice spec with parser add-on
 
+### Combat Encounters
+- [ ] **PvE Combat Encounter System** — [Full Design Doc](./COMBAT_ENCOUNTER_SYSTEM.md)
+  - Monsters spawn at locations, players fight using real D&D stats
+  - Attack rolls (d20 + modifier vs AC), damage dice from equipped weapons
+  - Monster counterattacks, knockouts, victory/defeat
+  - Rewards split by damage contribution (XP + gold)
+  - Plays out in chat with narrator messages + 3D dice
+  - Phase 1: basic attack/defend/flee, 5 starter monsters
+  - Phase 2: initiative, weapon choice, monster abilities, random spawns
+  - Phase 3: spells, healing, status effects, boss fights, dungeons
+
+### Dice Games
+
+- [ ] **Tavern Gambling (High-Low)**
+  - Roll 1d100, guess if the next roll is higher or lower
+  - Streak multiplier — consecutive correct guesses = bigger gold payout
+  - NPCs could react/comment on wins and losses
+  - Ante gold to play, house takes a cut on losses
+  - Simple to build, uses existing dice + economy
+
+- [ ] **Duel**
+  - Two players each roll 1d20, highest wins
+  - Optional gold wager between participants
+  - NPCs could referee or heckle from the sidelines
+  - Challenge system: player sends duel request, opponent accepts
+  - Could add achievements (win streak, upset victory, etc.)
+
+- [ ] **Bounty Board**
+  - Daily dice challenge posted by an NPC (e.g., "Roll 3d6 and beat 15")
+  - New target/dice combo each day, auto-generated
+  - Bonus XP/gold reward for hitting the target
+  - Tiered rewards: meet target = base, exceed by 5+ = bonus
+  - Visible in tavern location, resets at midnight
+
+- [ ] **Liar's Dice**
+  - Each player rolls secretly, then takes turns bidding on total dice across all players
+  - Bluff or call — works great in chat format
+  - Rounds play out in chat messages with NPC dealer managing the game
+  - Wager gold to enter, winner takes the pot
+  - Classic tavern game, fits the theme perfectly
+
+- [ ] **Arm Wrestling** (Tap game)
+  - Real-time tapping contest between two players
+  - Both players tap as fast as possible — a tug-of-war bar shifts toward whoever taps faster
+  - Push the bar past the opponent's threshold to win the round
+  - Best of 3 rounds, optional gold wager
+  - Random "surge" moments where taps count double — rewards timing over pure speed
+  - Could add strength modifier once player stats exist (handicap the bar starting position)
+  - NPC bartender announces matches, crowd reacts
+  - Challenge/accept flow via chat, game opens as a full-screen overlay
+  - Achievements for win streaks, comeback victories, speed records
+
+- [ ] **Monster Hunt** (Location-wide event)
+  - NPC posts a monster with HP in a location
+  - Players take turns rolling damage dice to chip it down
+  - Whoever lands the killing blow gets a special reward
+  - All participants get XP based on damage dealt
+  - Could be scheduled events or random encounters
+  - Drives group engagement with minimal new UI — just NPC messages tracking HP
+
+- [ ] **Pit Fighter Arena** *(Requires player stats)*
+  - Simple turn-based combat between players
+  - Each player has HP, picks attack (d20 to hit, damage die based on weapon) or defend (+5 AC)
+  - Last one standing wins the pot
+  - Needs: player HP, AC, weapon/damage stats
+  - Could be 1v1 or free-for-all
+
+- [ ] **Heist** *(Requires player stats)*
+  - Cooperative dice game — players pick roles (lockpick, lookout, muscle)
+  - Each role has a skill check with different DCs
+  - Pass enough checks = split the loot, fail = lose your ante
+  - Needs: player skill modifiers / class abilities
+  - Great for group coordination and RP moments
+
+### Activities & Events
+
+- [ ] **Dragon Siege** (Location-wide cooperative event)
+  - A dragon (or other boss) attacks a location — DM-triggered or on a schedule
+  - All players present contribute actions over hours/days
+  - Actions: reinforce walls, heal NPCs, attack the dragon (dice rolls)
+  - Collective progress bar visible to everyone in the location
+  - Success = massive shared gold/XP reward for all participants
+  - Failure = location temporarily "damaged" (cosmetic: scorched theme, NPC dialogue changes)
+  - Contribution-based rewards — more actions = bigger individual payout
+  - NPCs react in real-time: panicking, rallying, calling for help
+
+- [ ] **Tavern Trivia Night** (PvP)
+  - NPC quizmaster asks D&D/fantasy/campaign lore trivia
+  - Timed answers — first correct answer in chat wins the round
+  - Points per round, gold/XP payout based on final standing
+  - Could be scheduled weekly events or triggered by DM
+  - Question categories: world lore, NPC knowledge, monster facts, campaign history
+  - Achievements for win streaks, perfect rounds, trivia master
+
+- [ ] **Foraging & Gathering**
+  - Each location has discoverable items (herbs, gems, artifacts, ingredients)
+  - "Search" action with a cooldown (e.g., once per hour per location)
+  - Roll-based: higher roll = rarer find, nat 1 = nothing, nat 20 = jackpot
+  - Different locations yield different resources (forest = herbs, mine = gems, ruins = artifacts)
+  - Sell findings to NPCs for gold or save for crafting/recipes
+  - Rare items could be ingredients for potions or quest objectives
+  - Achievements for completing collection sets
+
+- [ ] **Garden Plot**
+  - Buy seeds from the shop, plant them in your personal garden
+  - Crops grow over real time (hours/days depending on type)
+  - Different locations = different climates = different available crops
+  - Harvest for gold, rare ingredients, or shop items
+  - Watering/tending (daily action) speeds growth or improves yield
+  - Neglect too long = crops wither
+  - Rare seeds from foraging, quests, or special events
+  - Cosmetic garden view on player profile
+
+- [ ] **Pet Companion**
+  - Earn or buy a creature egg from the shop
+  - Egg hatches over real time (1-3 days)
+  - Species determined by which location you hatched it in (forest = wolf pup, cave = baby drake, tavern = imp, etc.)
+  - Feed it (spend gold) and interact daily — it grows through stages
+  - Pet shows on your profile and optionally next to your chat messages
+  - Cosmetic but sticky — names, accessories, evolution paths
+  - Achievements for raising pets, collecting different species
+  - Neglect penalties: pet gets sad (cosmetic), eventually runs away if abandoned too long
+
+### Arcade Mini-Games (Tap & Swipe)
+
+- [ ] **Tavern Brawl**
+  - Swipe to dodge incoming bottles, fists, chairs
+  - Tap to counter-attack when openings appear
+  - Survival mode — waves get increasingly chaotic
+  - Combo multiplier for consecutive dodges + counters
+  - NPCs cheer, heckle, and throw things from the sidelines
+  - Gold/XP reward based on how long you survive
+  - Leaderboard for longest brawl
+  - Achievements: first brawl, survive 60 seconds, 100-hit combo, etc.
+
+- [ ] **Arrow Defense**
+  - Enemies march toward your castle wall in waves
+  - Tap to shoot arrows at individual enemies
+  - Swipe to aim and launch catapults at clusters
+  - Different enemy types: goblins (fast/weak), orcs (slow/tanky), flying (require timing)
+  - Gold per wave survived, bonus for no enemies reaching the wall
+  - Upgrade catapult/bow between waves (spend earned gold)
+  - Endless mode for leaderboard, campaign mode with set levels
+  - Location-themed: defend whichever location you're currently in
+
+- [ ] **Fishing**
+  - Cast line with a swipe (distance/direction matters)
+  - Wait for a bite — tap when the bobber dips (timing window)
+  - Reel in: rapid tap or follow a swipe pattern to fight the fish
+  - Bigger fish = harder reel-in minigame
+  - Different fish at different locations (river vs lake vs ocean vs underground)
+  - Rare catches worth big gold, legendary fish for achievements
+  - Sell to NPCs or keep for collection/recipes
+  - Peaceful ambient mode — good contrast to combat games
+  - Cooldown or bait system (buy bait from shop) to gate sessions
+
 ### Mini-Games
 - [ ] **Class-Based Card Game**
   - Tavern mini-game between quests
@@ -112,7 +268,7 @@
   - Could bet gold, earn rewards, or just for fun
 
 ### Progression System
-- [ ] Daily and weekly quests for experience
+- [x] Daily and weekly quests for experience
   - Example: "Send 10 messages"
   - Rewards XP/gold for engagement
 
@@ -241,6 +397,14 @@
   - DM/admin sees pending requests and approves or denies
   - Keeps randos out, only approved players get in
   - Could show request reason: "I'm in Blake's Thursday game"
+
+### Player Stats Integration (D&D Beyond)
+- [ ] **Character Sheet on Profile Page**
+  - Condensed D&D stat block on each player's profile
+  - Six ability scores (STR/DEX/CON/INT/WIS/CHA) with modifiers
+  - Race, class + level, HP, AC, background
+  - Quick "who is this character" view for all players
+  - Should look nice and be fun to view and navigate
 
 ### DM Controls
 - [ ] **DM Steering Mode** - Queue and guide AI responses

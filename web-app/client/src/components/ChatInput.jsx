@@ -116,16 +116,6 @@ export default function ChatInput({ onSend, disabled, npcs = [], groups = {}, in
   const allItems = useMemo(() => {
     const items = [];
 
-    // @Everyone — always available if there are 2+ NPCs
-    if (npcs.length >= 2) {
-      items.push({
-        type: 'group',
-        id: 'everyone',
-        displayName: 'Everyone',
-        members: npcs.map(n => n.displayName)
-      });
-    }
-
     // Location groups
     for (const [groupId, group] of Object.entries(groups)) {
       items.push({

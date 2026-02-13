@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { useUiSounds } from './hooks/useUiSounds';
+import LevelUpOverlay from './components/LevelUpOverlay';
+import DmAwardEffect from './components/DmAwardEffect';
 import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import AuthCallback from './pages/AuthCallback';
@@ -10,6 +12,7 @@ import LocationChat from './pages/LocationChat';
 import Tavern from './pages/Tavern';
 import Shop from './pages/Shop';
 import Profile from './pages/Profile';
+import PlayerProfile from './pages/PlayerProfile';
 import Quests from './pages/Quests';
 import Leaderboard from './pages/Leaderboard';
 import Admin from './pages/Admin';
@@ -62,10 +65,12 @@ function MentionToast({ mention, onDismiss }) {
 }
 
 export default function App() {
-  const { user, loading } = useAuth();
+  const { user, loading, fetchMe } = useAuth();
   const location = useLocation();
   const playSound = useUiSounds();
   const [toast, setToast] = useState(null);
+  const [levelUp, setLevelUp] = useState(null);
+  const [dmAward, setDmAward] = useState(null);
   const wsRef = useRef(null);
   const toastTimer = useRef(null);
   const reconnectTimer = useRef(null);
@@ -111,6 +116,15 @@ export default function App() {
             setToast(msg);
             clearTimeout(toastTimer.current);
             toastTimer.current = setTimeout(() => setToast(null), 8000);
+          }
+          if (msg.type === 'level_up' && msg.userId === user.id) {
+            setLevelUp(prev => Math.max(prev || 0, msg.newLevel));
+          }
+          if (msg.type === 'dm_award' && msg.userId === user.id) {
+            fetchMe();
+            if (msg.awardType && msg.change) {
+              setDmAward({ awardType: msg.awardType, change: msg.change });
+            }
           }
         } catch {
           // ignore non-JSON
@@ -158,6 +172,21 @@ export default function App() {
   return (
     <>
       {toast && <MentionToast mention={toast} onDismiss={dismissToast} />}
+      {dmAward && (
+        <DmAwardEffect
+          key={`${dmAward.awardType}-${dmAward.change}-${Date.now()}`}
+          type={dmAward.awardType}
+          amount={dmAward.change}
+          onDone={() => setDmAward(null)}
+        />
+      )}
+      {levelUp && (
+        <LevelUpOverlay
+          key={levelUp}
+          level={levelUp}
+          onDismiss={() => setLevelUp(null)}
+        />
+      )}
       <Routes>
         <Route path="/" element={
           !loading && user ? <Navigate to="/map" replace /> : <Landing />
@@ -180,6 +209,7 @@ export default function App() {
           <Route path="/map" element={<Map />} />
           <Route path="/quests" element={<Quests />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/player/:playerId" element={<PlayerProfile />} />
           <Route path="/admin" element={<Admin />} />
           {/* Legacy routes redirect to new structure */}
           <Route path="/tavern" element={<Navigate to="/map" replace />} />
