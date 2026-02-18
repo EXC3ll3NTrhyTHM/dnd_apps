@@ -1084,6 +1084,4435 @@
         "source": "combat_encounter"
       },
       "timestamp": "2026-02-13T05:49:18.890Z"
+    },
+    {
+      "id": "tx_1770962779115_sozduo",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 164,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T06:06:19.115Z"
+    },
+    {
+      "id": "tx_1770962811227_vrn93d",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "tavern_purchase",
+      "amount": -30,
+      "balance_after": 134,
+      "metadata": {
+        "item_id": "drink_heros_toast",
+        "item_name": "The Hero's Toast",
+        "npc": "bigtam"
+      },
+      "timestamp": "2026-02-13T06:06:51.227Z"
+    },
+    {
+      "id": "tx_1770962847775_144jmj",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 50,
+      "balance_after": 184,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "cartographer"
+      },
+      "timestamp": "2026-02-13T06:07:27.775Z"
+    },
+    {
+      "id": "tx_1770962893044_4ivabs",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 179,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T06:08:13.044Z"
+    },
+    {
+      "id": "tx_1770962910793_psjauy",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 187,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "silver_trout"
+      },
+      "timestamp": "2026-02-13T06:08:30.793Z"
+    },
+    {
+      "id": "tx_1770962910803_zfp8gi",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "fishing_sale",
+      "amount": 8,
+      "balance_after": 187,
+      "metadata": {
+        "fish": "silver_trout",
+        "fish_name": "Silver Trout"
+      },
+      "timestamp": "2026-02-13T06:08:30.803Z"
+    },
+    {
+      "id": "tx_1770962975747_ayeief",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 207,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "gladiator"
+      },
+      "timestamp": "2026-02-13T06:09:35.747Z"
+    },
+    {
+      "id": "tx_1770963193378_byh0nj",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 182,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T06:13:13.378Z"
+    },
+    {
+      "id": "tx_1770995673993_xb9khw",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 190,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-13T15:14:33.993Z"
+    },
+    {
+      "id": "tx_1770995674034_5ajuse",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 200,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "finishing_blow"
+      },
+      "timestamp": "2026-02-13T15:14:34.034Z"
+    },
+    {
+      "id": "tx_1770996764101_rnl638",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 175,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T15:32:44.101Z"
+    },
+    {
+      "id": "tx_1770996765293_63y72c",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 170,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T15:32:45.293Z"
+    },
+    {
+      "id": "tx_1770998171321_wfgja0",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 175,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "mudcarp"
+      },
+      "timestamp": "2026-02-13T15:56:11.321Z"
+    },
+    {
+      "id": "tx_1770998171330_fvoz1r",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "fishing_sale",
+      "amount": 5,
+      "balance_after": 175,
+      "metadata": {
+        "fish": "mudcarp",
+        "fish_name": "Mudcarp"
+      },
+      "timestamp": "2026-02-13T15:56:11.330Z"
+    },
+    {
+      "id": "tx_1770998659549_sbwyba",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 150,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T16:04:19.549Z"
+    },
+    {
+      "id": "tx_1771001830715_yk9jtt",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 155,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-13T16:57:10.715Z"
+    },
+    {
+      "id": "tx_1771002544103_irpjvy",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 130,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T17:09:04.103Z"
+    },
+    {
+      "id": "tx_1771002544747_frw54d",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 105,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T17:09:04.747Z"
+    },
+    {
+      "id": "tx_1771002545195_8bo0sk",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 80,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T17:09:05.195Z"
+    },
+    {
+      "id": "tx_1771002546111_ra0ijo",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 75,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T17:09:06.111Z"
+    },
+    {
+      "id": "tx_1771002546781_18hr0x",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 70,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T17:09:06.781Z"
+    },
+    {
+      "id": "tx_1771002549342_k03w23",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 45,
+      "metadata": {
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T17:09:09.342Z"
+    },
+    {
+      "id": "tx_1771002549931_2uv0gx",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 20,
+      "metadata": {
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-13T17:09:09.931Z"
+    },
+    {
+      "id": "tx_1771002587009_lkmnss",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 35,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "ironjaw"
+      },
+      "timestamp": "2026-02-13T17:09:47.009Z"
+    },
+    {
+      "id": "tx_1771002587020_irzm2b",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "fishing_sale",
+      "amount": 15,
+      "balance_after": 35,
+      "metadata": {
+        "fish": "ironjaw",
+        "fish_name": "Ironjaw"
+      },
+      "timestamp": "2026-02-13T17:09:47.020Z"
+    },
+    {
+      "id": "tx_1771002601054_dker79",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 55,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "glowfin"
+      },
+      "timestamp": "2026-02-13T17:10:01.054Z"
+    },
+    {
+      "id": "tx_1771002601065_r42x43",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "fishing_sale",
+      "amount": 20,
+      "balance_after": 55,
+      "metadata": {
+        "fish": "glowfin",
+        "fish_name": "Glowfin"
+      },
+      "timestamp": "2026-02-13T17:10:01.065Z"
+    },
+    {
+      "id": "tx_1771002618144_05eps2",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 75,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "glowfin"
+      },
+      "timestamp": "2026-02-13T17:10:18.144Z"
+    },
+    {
+      "id": "tx_1771002618155_szs0zv",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "fishing_sale",
+      "amount": 20,
+      "balance_after": 75,
+      "metadata": {
+        "fish": "glowfin",
+        "fish_name": "Glowfin"
+      },
+      "timestamp": "2026-02-13T17:10:18.155Z"
+    },
+    {
+      "id": "tx_1771002636032_34nfk0",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 83,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "silver_trout"
+      },
+      "timestamp": "2026-02-13T17:10:36.032Z"
+    },
+    {
+      "id": "tx_1771002636042_ehyzz8",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "fishing_sale",
+      "amount": 8,
+      "balance_after": 83,
+      "metadata": {
+        "fish": "silver_trout",
+        "fish_name": "Silver Trout"
+      },
+      "timestamp": "2026-02-13T17:10:36.042Z"
+    },
+    {
+      "id": "tx_1771011948907_ovk9n9",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 93,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-13T19:45:48.907Z"
+    },
+    {
+      "id": "tx_1771011948953_0jlf7q",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 118,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "monster_slayer"
+      },
+      "timestamp": "2026-02-13T19:45:48.953Z"
+    },
+    {
+      "id": "tx_1771044136470_d851ji",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 126,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-14T04:42:16.470Z"
+    },
+    {
+      "id": "tx_1771044136536_pnfirh",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 35,
+      "balance_after": 161,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "serial_killer"
+      },
+      "timestamp": "2026-02-14T04:42:16.536Z"
+    },
+    {
+      "id": "tx_1771048890020_c0dq47",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 311,
+      "metadata": {
+        "quest_id": "lockbox_awakens",
+        "quest_name": "The Lockbox Awakens"
+      },
+      "timestamp": "2026-02-14T06:01:30.020Z"
+    },
+    {
+      "id": "tx_1771097359648_j6ue02",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "achievement_reward",
+      "amount": 50,
+      "balance_after": 425,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "cartographer"
+      },
+      "timestamp": "2026-02-14T19:29:19.648Z"
+    },
+    {
+      "id": "tx_1771097453651_57ypia",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 400,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-14T19:30:53.651Z"
+    },
+    {
+      "id": "tx_1771097498070_t9su2h",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 306,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-14T19:31:38.070Z"
+    },
+    {
+      "id": "tx_1771097498992_wi0knq",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 301,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-14T19:31:38.992Z"
+    },
+    {
+      "id": "tx_1771097499274_t6gwhu",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 296,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-14T19:31:39.274Z"
+    },
+    {
+      "id": "tx_1771097504638_ttg8w3",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 375,
+      "metadata": {
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-14T19:31:44.638Z"
+    },
+    {
+      "id": "tx_1771097508698_d0jc4n",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 370,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-14T19:31:48.698Z"
+    },
+    {
+      "id": "tx_1771097509252_x64br9",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 365,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-14T19:31:49.252Z"
+    },
+    {
+      "id": "tx_1771097534891_mzdtt1",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 301,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "mudcarp"
+      },
+      "timestamp": "2026-02-14T19:32:14.891Z"
+    },
+    {
+      "id": "tx_1771097534902_gdevt4",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "fishing_sale",
+      "amount": 5,
+      "balance_after": 301,
+      "metadata": {
+        "fish": "mudcarp",
+        "fish_name": "Mudcarp"
+      },
+      "timestamp": "2026-02-14T19:32:14.902Z"
+    },
+    {
+      "id": "tx_1771097537856_2cihow",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 370,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "first_catch"
+      },
+      "timestamp": "2026-02-14T19:32:17.856Z"
+    },
+    {
+      "id": "tx_1771097546907_77yk24",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 378,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "silver_trout"
+      },
+      "timestamp": "2026-02-14T19:32:26.907Z"
+    },
+    {
+      "id": "tx_1771097546917_0u9wom",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "fishing_sale",
+      "amount": 8,
+      "balance_after": 378,
+      "metadata": {
+        "fish": "silver_trout",
+        "fish_name": "Silver Trout"
+      },
+      "timestamp": "2026-02-14T19:32:26.917Z"
+    },
+    {
+      "id": "tx_1771097562826_l74b68",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 386,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "silver_trout"
+      },
+      "timestamp": "2026-02-14T19:32:42.826Z"
+    },
+    {
+      "id": "tx_1771097562836_k1ruqt",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "fishing_sale",
+      "amount": 8,
+      "balance_after": 386,
+      "metadata": {
+        "fish": "silver_trout",
+        "fish_name": "Silver Trout"
+      },
+      "timestamp": "2026-02-14T19:32:42.836Z"
+    },
+    {
+      "id": "tx_1771097566821_0638pz",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 321,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "glowfin"
+      },
+      "timestamp": "2026-02-14T19:32:46.821Z"
+    },
+    {
+      "id": "tx_1771097566833_lcsp6w",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "fishing_sale",
+      "amount": 20,
+      "balance_after": 321,
+      "metadata": {
+        "fish": "glowfin",
+        "fish_name": "Glowfin"
+      },
+      "timestamp": "2026-02-14T19:32:46.833Z"
+    },
+    {
+      "id": "tx_1771098581651_du6s9r",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 336,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "ironjaw"
+      },
+      "timestamp": "2026-02-14T19:49:41.651Z"
+    },
+    {
+      "id": "tx_1771098581662_ti89je",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "fishing_sale",
+      "amount": 15,
+      "balance_after": 336,
+      "metadata": {
+        "fish": "ironjaw",
+        "fish_name": "Ironjaw"
+      },
+      "timestamp": "2026-02-14T19:49:41.662Z"
+    },
+    {
+      "id": "tx_1771101028044_wpgu2o",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 341,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-14T20:30:28.044Z"
+    },
+    {
+      "id": "tx_1771103622713_q1teil",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 502,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "gladiator"
+      },
+      "timestamp": "2026-02-14T21:13:42.713Z"
+    },
+    {
+      "id": "tx_1771104065573_ww3gc3",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 477,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-14T21:21:05.573Z"
+    },
+    {
+      "id": "tx_1771104066529_xmq2p7",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 452,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-14T21:21:06.529Z"
+    },
+    {
+      "id": "tx_1771104067210_a6qvy1",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 427,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-14T21:21:07.210Z"
+    },
+    {
+      "id": "tx_1771104156440_wb5ey8",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 316,
+      "metadata": {
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-14T21:22:36.440Z"
+    },
+    {
+      "id": "tx_1771111994042_srscjc",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 25,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "marcels_pen_pal"
+      },
+      "timestamp": "2026-02-14T23:33:14.042Z"
+    },
+    {
+      "id": "tx_1771143138691_e2m4o1",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 40,
+      "balance_after": 356,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "veteran"
+      },
+      "timestamp": "2026-02-15T08:12:18.691Z"
+    },
+    {
+      "id": "tx_1771180858875_pjvg1e",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 33,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T18:40:58.875Z"
+    },
+    {
+      "id": "tx_1771180858930_tedhi8",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 48,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "untouchable"
+      },
+      "timestamp": "2026-02-15T18:40:58.930Z"
+    },
+    {
+      "id": "tx_1771180858947_ofzgnm",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 58,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "finishing_blow"
+      },
+      "timestamp": "2026-02-15T18:40:58.947Z"
+    },
+    {
+      "id": "tx_1771181600974_6nhcyq",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 364,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T18:53:20.974Z"
+    },
+    {
+      "id": "tx_1771181685328_8mk6pa",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 372,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T18:54:45.328Z"
+    },
+    {
+      "id": "tx_1771182665345_xrtv15",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 380,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T19:11:05.345Z"
+    },
+    {
+      "id": "tx_1771182665412_somvmg",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 390,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "critical_strike"
+      },
+      "timestamp": "2026-02-15T19:11:05.412Z"
+    },
+    {
+      "id": "tx_1771185476404_nl1kav",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 66,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T19:57:56.404Z"
+    },
+    {
+      "id": "tx_1771185983550_y8o6bd",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 398,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T20:06:23.550Z"
+    },
+    {
+      "id": "tx_1771186071530_yisl9g",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 406,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T20:07:51.530Z"
+    },
+    {
+      "id": "tx_1771186158166_v0d36b",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 414,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T20:09:18.166Z"
+    },
+    {
+      "id": "tx_1771186234420_1xiktq",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 419,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T20:10:34.420Z"
+    },
+    {
+      "id": "tx_1771186265956_3o5kyo",
+      "user_id": "228241331296665600",
+      "username": "Unknown",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 442,
+      "metadata": {
+        "source": "dm_award"
+      },
+      "timestamp": "2026-02-15T20:11:05.956Z"
+    },
+    {
+      "id": "tx_1771190360691_z0ibnc",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 74,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T21:19:20.691Z"
+    },
+    {
+      "id": "tx_1771190360777_ocgfmn",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 84,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "critical_strike"
+      },
+      "timestamp": "2026-02-15T21:19:20.777Z"
+    },
+    {
+      "id": "tx_1771190439936_f6w83k",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 92,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T21:20:39.936Z"
+    },
+    {
+      "id": "tx_1771190589219_jdixxp",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 100,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T21:23:09.219Z"
+    },
+    {
+      "id": "tx_1771190589291_a5chk6",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 120,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "gladiator"
+      },
+      "timestamp": "2026-02-15T21:23:09.291Z"
+    },
+    {
+      "id": "tx_1771190614665_auwy4j",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 128,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T21:23:34.665Z"
+    },
+    {
+      "id": "tx_1771195647279_14lmdz",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 427,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T22:47:27.279Z"
+    },
+    {
+      "id": "tx_1771195821670_x77c6s",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 435,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T22:50:21.671Z"
+    },
+    {
+      "id": "tx_1771196862964_ns9m2m",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "achievement_reward",
+      "amount": 50,
+      "balance_after": 178,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "cartographer"
+      },
+      "timestamp": "2026-02-15T23:07:42.965Z"
+    },
+    {
+      "id": "tx_1771197145966_he9hax",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 186,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T23:12:25.966Z"
+    },
+    {
+      "id": "tx_1771197826915_tqrdmm",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 194,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T23:23:46.915Z"
+    },
+    {
+      "id": "tx_1771197885042_lz05ht",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 443,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T23:24:45.042Z"
+    },
+    {
+      "id": "tx_1771198396639_k8gokq",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 4,
+      "balance_after": 198,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T23:33:16.639Z"
+    },
+    {
+      "id": "tx_1771198396691_a7f6wx",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 4,
+      "balance_after": 447,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T23:33:16.691Z"
+    },
+    {
+      "id": "tx_1771198665827_p0uzvf",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 452,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T23:37:45.827Z"
+    },
+    {
+      "id": "tx_1771198665898_n174oe",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 3,
+      "balance_after": 201,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T23:37:45.898Z"
+    },
+    {
+      "id": "tx_1771198665946_jy4ffb",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 226,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "monster_slayer"
+      },
+      "timestamp": "2026-02-15T23:37:45.946Z"
+    },
+    {
+      "id": "tx_1771199019288_ewiue2",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 3,
+      "balance_after": 229,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T23:43:39.288Z"
+    },
+    {
+      "id": "tx_1771199019343_ff34rl",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 457,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T23:43:39.343Z"
+    },
+    {
+      "id": "tx_1771199019506_1fxix4",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 50,
+      "balance_after": 507,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "arena_champion"
+      },
+      "timestamp": "2026-02-15T23:43:39.506Z"
+    },
+    {
+      "id": "tx_1771199088235_pibv6g",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 515,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T23:44:48.235Z"
+    },
+    {
+      "id": "tx_1771199163913_1wygy7",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 237,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T23:46:03.913Z"
+    },
+    {
+      "id": "tx_1771199487622_gxja75",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 245,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-15T23:51:27.622Z"
+    },
+    {
+      "id": "tx_1771199487687_pit7n8",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 35,
+      "balance_after": 280,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "serial_killer"
+      },
+      "timestamp": "2026-02-15T23:51:27.687Z"
+    },
+    {
+      "id": "tx_1771199487730_23rxpt",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 40,
+      "balance_after": 320,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "veteran"
+      },
+      "timestamp": "2026-02-15T23:51:27.730Z"
+    },
+    {
+      "id": "tx_1771202868434_6hwyui",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 523,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T00:47:48.434Z"
+    },
+    {
+      "id": "tx_1771203256268_sfj3bz",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 531,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T00:54:16.268Z"
+    },
+    {
+      "id": "tx_1771207514773_4gg2hy",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 328,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:05:14.773Z"
+    },
+    {
+      "id": "tx_1771207834106_8cuad3",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 539,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:10:34.106Z"
+    },
+    {
+      "id": "tx_1771207880902_qx453s",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 336,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:11:20.902Z"
+    },
+    {
+      "id": "tx_1771207930308_s82rm7",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 344,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:12:10.308Z"
+    },
+    {
+      "id": "tx_1771207977909_iolp7q",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 3,
+      "balance_after": 347,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:12:57.909Z"
+    },
+    {
+      "id": "tx_1771207977954_hig3xo",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 544,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:12:57.954Z"
+    },
+    {
+      "id": "tx_1771208074878_8soo8p",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 552,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:14:34.878Z"
+    },
+    {
+      "id": "tx_1771208151166_aizt3h",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 355,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:15:51.166Z"
+    },
+    {
+      "id": "tx_1771208291538_fbvntf",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 2,
+      "balance_after": 357,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:18:11.538Z"
+    },
+    {
+      "id": "tx_1771208291594_x40wh7",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 6,
+      "balance_after": 558,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:18:11.594Z"
+    },
+    {
+      "id": "tx_1771208331730_8riltm",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 365,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:18:51.730Z"
+    },
+    {
+      "id": "tx_1771208388704_igqtew",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 3,
+      "balance_after": 561,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:19:48.704Z"
+    },
+    {
+      "id": "tx_1771208388750_3r3t4y",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 370,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:19:48.750Z"
+    },
+    {
+      "id": "tx_1771208555751_ku34v5",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 378,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:22:35.751Z"
+    },
+    {
+      "id": "tx_1771208626324_bu3jli",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 386,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T02:23:46.324Z"
+    },
+    {
+      "id": "tx_1771221620611_boms36",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 569,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:00:20.611Z"
+    },
+    {
+      "id": "tx_1771223000829_i4rydj",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 394,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:23:20.829Z"
+    },
+    {
+      "id": "tx_1771223117547_zrpdln",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 402,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:25:17.547Z"
+    },
+    {
+      "id": "tx_1771223117617_jz5deg",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 50,
+      "balance_after": 452,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "arena_champion"
+      },
+      "timestamp": "2026-02-16T06:25:17.617Z"
+    },
+    {
+      "id": "tx_1771223414386_nbkswu",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 460,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:30:14.386Z"
+    },
+    {
+      "id": "tx_1771223688400_fye9xb",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 468,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:34:48.400Z"
+    },
+    {
+      "id": "tx_1771224060731_obfj44",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 577,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:41:00.731Z"
+    },
+    {
+      "id": "tx_1771224179942_p7982q",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 2,
+      "balance_after": 470,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:42:59.942Z"
+    },
+    {
+      "id": "tx_1771224180043_ua062d",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 6,
+      "balance_after": 583,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:43:00.043Z"
+    },
+    {
+      "id": "tx_1771224624171_szdcr5",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 591,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:50:24.171Z"
+    },
+    {
+      "id": "tx_1771224697920_3qum13",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 478,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:51:37.920Z"
+    },
+    {
+      "id": "tx_1771225012450_svep71",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 486,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:56:52.450Z"
+    },
+    {
+      "id": "tx_1771225148137_wmxhxy",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 3,
+      "balance_after": 594,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:59:08.137Z"
+    },
+    {
+      "id": "tx_1771225148189_xwjpom",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 491,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T06:59:08.189Z"
+    },
+    {
+      "id": "tx_1771225201197_klx8tx",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 602,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T07:00:01.197Z"
+    },
+    {
+      "id": "tx_1771225258945_fzbta6",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 499,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T07:00:58.945Z"
+    },
+    {
+      "id": "tx_1771225288039_7ly4t3",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 507,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T07:01:28.039Z"
+    },
+    {
+      "id": "tx_1771225624122_fbp4za",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 610,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T07:07:04.122Z"
+    },
+    {
+      "id": "tx_1771227218817_5q36t6",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 450,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T07:33:38.817Z"
+    },
+    {
+      "id": "tx_1771227218888_1dgqtz",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 460,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "finishing_blow"
+      },
+      "timestamp": "2026-02-16T07:33:38.888Z"
+    },
+    {
+      "id": "tx_1771227218907_uoxziv",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 465,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "goblin_slayer"
+      },
+      "timestamp": "2026-02-16T07:33:38.907Z"
+    },
+    {
+      "id": "tx_1771227404599_n4w25h",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 460,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T07:36:44.599Z"
+    },
+    {
+      "id": "tx_1771227686527_ldz0qq",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 615,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T07:41:26.527Z"
+    },
+    {
+      "id": "tx_1771227686599_o8qnzj",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 620,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "wolf_hunter"
+      },
+      "timestamp": "2026-02-16T07:41:26.599Z"
+    },
+    {
+      "id": "tx_1771227735017_pmozsf",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 625,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T07:42:15.017Z"
+    },
+    {
+      "id": "tx_1771227952532_lkpj4t",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 640,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "punching_bag"
+      },
+      "timestamp": "2026-02-16T07:45:52.532Z"
+    },
+    {
+      "id": "tx_1771228020250_bar15y",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 1,
+      "balance_after": 461,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T07:47:00.250Z"
+    },
+    {
+      "id": "tx_1771228020333_9ardax",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 4,
+      "balance_after": 644,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T07:47:00.333Z"
+    },
+    {
+      "id": "tx_1771228020393_du315g",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 466,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "wolf_hunter"
+      },
+      "timestamp": "2026-02-16T07:47:00.393Z"
+    },
+    {
+      "id": "tx_1771228212825_4v1xtr",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 3,
+      "balance_after": 647,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T07:50:12.825Z"
+    },
+    {
+      "id": "tx_1771228212890_gnxn5o",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 7,
+      "balance_after": 473,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T07:50:12.890Z"
+    },
+    {
+      "id": "tx_1771228212965_7qoz92",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 652,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "bone_breaker"
+      },
+      "timestamp": "2026-02-16T07:50:12.965Z"
+    },
+    {
+      "id": "tx_1771228212990_9buab8",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 478,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "bone_breaker"
+      },
+      "timestamp": "2026-02-16T07:50:12.990Z"
+    },
+    {
+      "id": "tx_1771229100606_lrp5j9",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 498,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "glowfin"
+      },
+      "timestamp": "2026-02-16T08:05:00.606Z"
+    },
+    {
+      "id": "tx_1771229100622_jjwu8i",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "fishing_sale",
+      "amount": 20,
+      "balance_after": 498,
+      "metadata": {
+        "fish": "glowfin",
+        "fish_name": "Glowfin"
+      },
+      "timestamp": "2026-02-16T08:05:00.622Z"
+    },
+    {
+      "id": "tx_1771229118688_w9tuo4",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 493,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:18.688Z"
+    },
+    {
+      "id": "tx_1771229118948_xo2j7v",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 488,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:18.948Z"
+    },
+    {
+      "id": "tx_1771229119204_jjncue",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 483,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:19.204Z"
+    },
+    {
+      "id": "tx_1771229119390_rzmbsl",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 478,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:19.390Z"
+    },
+    {
+      "id": "tx_1771229119567_ovomn7",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 473,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:19.567Z"
+    },
+    {
+      "id": "tx_1771229119749_b2j1zi",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 468,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:19.749Z"
+    },
+    {
+      "id": "tx_1771229119941_2dw7c9",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 463,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:19.941Z"
+    },
+    {
+      "id": "tx_1771229120277_pdhugr",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 458,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:20.277Z"
+    },
+    {
+      "id": "tx_1771229120440_kfza1m",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 453,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:20.440Z"
+    },
+    {
+      "id": "tx_1771229120600_1nhxem",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 448,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:20.600Z"
+    },
+    {
+      "id": "tx_1771229120784_4ebjxd",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 443,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:20.784Z"
+    },
+    {
+      "id": "tx_1771229120949_8thai3",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 438,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:20.949Z"
+    },
+    {
+      "id": "tx_1771229121116_ddid4w",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 433,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T08:05:21.116Z"
+    },
+    {
+      "id": "tx_1771229149007_n5k96o",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 438,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "mudcarp"
+      },
+      "timestamp": "2026-02-16T08:05:49.007Z"
+    },
+    {
+      "id": "tx_1771229149022_icnswv",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "fishing_sale",
+      "amount": 5,
+      "balance_after": 438,
+      "metadata": {
+        "fish": "mudcarp",
+        "fish_name": "Mudcarp"
+      },
+      "timestamp": "2026-02-16T08:05:49.022Z"
+    },
+    {
+      "id": "tx_1771229165693_ys5lyi",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 446,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "silver_trout"
+      },
+      "timestamp": "2026-02-16T08:06:05.693Z"
+    },
+    {
+      "id": "tx_1771229165709_whusde",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "fishing_sale",
+      "amount": 8,
+      "balance_after": 446,
+      "metadata": {
+        "fish": "silver_trout",
+        "fish_name": "Silver Trout"
+      },
+      "timestamp": "2026-02-16T08:06:05.709Z"
+    },
+    {
+      "id": "tx_1771229187986_58rfuk",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 461,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "ironjaw"
+      },
+      "timestamp": "2026-02-16T08:06:27.986Z"
+    },
+    {
+      "id": "tx_1771229188001_2ef1sm",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "fishing_sale",
+      "amount": 15,
+      "balance_after": 461,
+      "metadata": {
+        "fish": "ironjaw",
+        "fish_name": "Ironjaw"
+      },
+      "timestamp": "2026-02-16T08:06:28.001Z"
+    },
+    {
+      "id": "tx_1771229205756_qwm9m6",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 466,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "mudcarp"
+      },
+      "timestamp": "2026-02-16T08:06:45.756Z"
+    },
+    {
+      "id": "tx_1771229205776_b6dz27",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "fishing_sale",
+      "amount": 5,
+      "balance_after": 466,
+      "metadata": {
+        "fish": "mudcarp",
+        "fish_name": "Mudcarp"
+      },
+      "timestamp": "2026-02-16T08:06:45.776Z"
+    },
+    {
+      "id": "tx_1771229226701_cguivh",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 471,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "mudcarp"
+      },
+      "timestamp": "2026-02-16T08:07:06.701Z"
+    },
+    {
+      "id": "tx_1771229226716_57u9w0",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "fishing_sale",
+      "amount": 5,
+      "balance_after": 471,
+      "metadata": {
+        "fish": "mudcarp",
+        "fish_name": "Mudcarp"
+      },
+      "timestamp": "2026-02-16T08:07:06.716Z"
+    },
+    {
+      "id": "tx_1771229242162_okr2c2",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 476,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "mudcarp"
+      },
+      "timestamp": "2026-02-16T08:07:22.162Z"
+    },
+    {
+      "id": "tx_1771229242179_idbcy9",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "fishing_sale",
+      "amount": 5,
+      "balance_after": 476,
+      "metadata": {
+        "fish": "mudcarp",
+        "fish_name": "Mudcarp"
+      },
+      "timestamp": "2026-02-16T08:07:22.179Z"
+    },
+    {
+      "id": "tx_1771229260400_mjlum0",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 491,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "ironjaw"
+      },
+      "timestamp": "2026-02-16T08:07:40.400Z"
+    },
+    {
+      "id": "tx_1771229260417_pv4mw9",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "fishing_sale",
+      "amount": 15,
+      "balance_after": 491,
+      "metadata": {
+        "fish": "ironjaw",
+        "fish_name": "Ironjaw"
+      },
+      "timestamp": "2026-02-16T08:07:40.417Z"
+    },
+    {
+      "id": "tx_1771229278307_9j7e7a",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 499,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "silver_trout"
+      },
+      "timestamp": "2026-02-16T08:07:58.307Z"
+    },
+    {
+      "id": "tx_1771229278324_ifgmyw",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "fishing_sale",
+      "amount": 8,
+      "balance_after": 499,
+      "metadata": {
+        "fish": "silver_trout",
+        "fish_name": "Silver Trout"
+      },
+      "timestamp": "2026-02-16T08:07:58.324Z"
+    },
+    {
+      "id": "tx_1771229295122_zdvb1c",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 507,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "silver_trout"
+      },
+      "timestamp": "2026-02-16T08:08:15.122Z"
+    },
+    {
+      "id": "tx_1771229295139_23s097",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "fishing_sale",
+      "amount": 8,
+      "balance_after": 507,
+      "metadata": {
+        "fish": "silver_trout",
+        "fish_name": "Silver Trout"
+      },
+      "timestamp": "2026-02-16T08:08:15.139Z"
+    },
+    {
+      "id": "tx_1771240818835_wlk52n",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 662,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T11:20:18.835Z"
+    },
+    {
+      "id": "tx_1771240910284_06da1x",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 672,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T11:21:50.284Z"
+    },
+    {
+      "id": "tx_1771244550208_3c42kf",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 3,
+      "balance_after": 675,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T12:22:30.208Z"
+    },
+    {
+      "id": "tx_1771244550270_eft0nn",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 512,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T12:22:30.270Z"
+    },
+    {
+      "id": "tx_1771244550356_fgw38x",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 680,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "goblin_slayer"
+      },
+      "timestamp": "2026-02-16T12:22:30.356Z"
+    },
+    {
+      "id": "tx_1771244550388_2bo1io",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 517,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "goblin_slayer"
+      },
+      "timestamp": "2026-02-16T12:22:30.388Z"
+    },
+    {
+      "id": "tx_1771265619567_zeehhr",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 492,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T18:13:39.567Z"
+    },
+    {
+      "id": "tx_1771265875998_73nmqj",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 467,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T18:17:55.998Z"
+    },
+    {
+      "id": "tx_1771267469051_wt0o3w",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 442,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T18:44:29.051Z"
+    },
+    {
+      "id": "tx_1771267622940_arhp4h",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 417,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T18:47:02.940Z"
+    },
+    {
+      "id": "tx_1771267638866_4wcq33",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 392,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T18:47:18.866Z"
+    },
+    {
+      "id": "tx_1771267800521_48nofa",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 367,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T18:50:00.521Z"
+    },
+    {
+      "id": "tx_1771267818716_owfjyu",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 342,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T18:50:18.716Z"
+    },
+    {
+      "id": "tx_1771268004278_lzict9",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 317,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T18:53:24.280Z"
+    },
+    {
+      "id": "tx_1771268056680_ojsfka",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 292,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T18:54:16.680Z"
+    },
+    {
+      "id": "tx_1771268057342_wwue38",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 267,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T18:54:17.342Z"
+    },
+    {
+      "id": "tx_1771268057515_fy7se2",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 242,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T18:54:17.515Z"
+    },
+    {
+      "id": "tx_1771268494646_oh6md0",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 217,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T19:01:34.646Z"
+    },
+    {
+      "id": "tx_1771268495368_acrnst",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 192,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T19:01:35.368Z"
+    },
+    {
+      "id": "tx_1771268495572_wgb7ye",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 167,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T19:01:35.572Z"
+    },
+    {
+      "id": "tx_1771268495724_wme2p3",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 142,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T19:01:35.724Z"
+    },
+    {
+      "id": "tx_1771268495893_n9w3hy",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 117,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T19:01:35.894Z"
+    },
+    {
+      "id": "tx_1771268496029_lbt2hq",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 92,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T19:01:36.029Z"
+    },
+    {
+      "id": "tx_1771268496179_624e1y",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 67,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T19:01:36.179Z"
+    },
+    {
+      "id": "tx_1771268496321_0swzt9",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 42,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T19:01:36.321Z"
+    },
+    {
+      "id": "tx_1771273707843_e0444z",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 17,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T20:28:27.843Z"
+    },
+    {
+      "id": "tx_1771273787582_r9wdqf",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 655,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T20:29:47.582Z"
+    },
+    {
+      "id": "tx_1771273787975_pi445o",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 630,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T20:29:47.975Z"
+    },
+    {
+      "id": "tx_1771273821595_go9578",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 605,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T20:30:21.595Z"
+    },
+    {
+      "id": "tx_1771273984404_hp3c1j",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 580,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T20:33:04.404Z"
+    },
+    {
+      "id": "tx_1771273985031_iik114",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 555,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T20:33:05.031Z"
+    },
+    {
+      "id": "tx_1771273985507_j95vpj",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 530,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T20:33:05.507Z"
+    },
+    {
+      "id": "tx_1771274059523_5zkt55",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 505,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T20:34:19.523Z"
+    },
+    {
+      "id": "tx_1771274059700_rjcurr",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 480,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T20:34:19.700Z"
+    },
+    {
+      "id": "tx_1771274059873_mphezu",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 455,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T20:34:19.873Z"
+    },
+    {
+      "id": "tx_1771274060051_yujwby",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 430,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T20:34:20.051Z"
+    },
+    {
+      "id": "tx_1771276082528_t7lk3i",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 25,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T21:08:02.528Z"
+    },
+    {
+      "id": "tx_1771276296298_pksook",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 33,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T21:11:36.298Z"
+    },
+    {
+      "id": "tx_1771276591674_kwbrpd",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 435,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T21:16:31.674Z"
+    },
+    {
+      "id": "tx_1771276591735_57h5ex",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 38,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T21:16:31.735Z"
+    },
+    {
+      "id": "tx_1771276591812_ka9dva",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 43,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "bone_breaker"
+      },
+      "timestamp": "2026-02-16T21:16:31.812Z"
+    },
+    {
+      "id": "tx_1771276716493_ywdw5p",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 53,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T21:18:36.493Z"
+    },
+    {
+      "id": "tx_1771282453965_p71cec",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 482,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T22:54:13.965Z"
+    },
+    {
+      "id": "tx_1771282454127_7jxi6b",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 457,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T22:54:14.127Z"
+    },
+    {
+      "id": "tx_1771282454328_91qr3p",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 432,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T22:54:14.328Z"
+    },
+    {
+      "id": "tx_1771283070840_6g6tze",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 3,
+      "balance_after": 435,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T23:04:30.840Z"
+    },
+    {
+      "id": "tx_1771283070904_8j9t8y",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 2,
+      "balance_after": 437,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T23:04:30.904Z"
+    },
+    {
+      "id": "tx_1771283070987_eaponu",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 460,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "monster_slayer"
+      },
+      "timestamp": "2026-02-16T23:04:30.987Z"
+    },
+    {
+      "id": "tx_1771283433324_oerhjv",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 18,
+      "balance_after": 455,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T23:10:33.324Z"
+    },
+    {
+      "id": "tx_1771283433401_qrk3ud",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 7,
+      "balance_after": 467,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T23:10:33.401Z"
+    },
+    {
+      "id": "tx_1771283433466_if1fwb",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 30,
+      "balance_after": 485,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "crit_machine"
+      },
+      "timestamp": "2026-02-16T23:10:33.466Z"
+    },
+    {
+      "id": "tx_1771283433485_tgy57c",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 500,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "alpha_predator"
+      },
+      "timestamp": "2026-02-16T23:10:33.485Z"
+    },
+    {
+      "id": "tx_1771283433509_1iivdb",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 482,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "alpha_predator"
+      },
+      "timestamp": "2026-02-16T23:10:33.509Z"
+    },
+    {
+      "id": "tx_1771283760006_0gx83s",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 475,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T23:16:00.006Z"
+    },
+    {
+      "id": "tx_1771283771721_yh22op",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 450,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T23:16:11.721Z"
+    },
+    {
+      "id": "tx_1771283772713_jjw4ea",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 425,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T23:16:12.713Z"
+    },
+    {
+      "id": "tx_1771283772870_vhkppe",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 400,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-16T23:16:12.870Z"
+    },
+    {
+      "id": "tx_1771284584175_q52quz",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 408,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-16T23:29:44.175Z"
+    },
+    {
+      "id": "tx_1771287273347_vedzjk",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 358,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T00:14:33.347Z"
+    },
+    {
+      "id": "tx_1771287323113_aulwqi",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 3,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T00:15:23.113Z"
+    },
+    {
+      "id": "tx_1771288074798_7to8rb",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 378,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T00:27:54.798Z"
+    },
+    {
+      "id": "tx_1771288074879_4jdt7o",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 8,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T00:27:54.880Z"
+    },
+    {
+      "id": "tx_1771288074950_t3n2c3",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 23,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "alpha_predator"
+      },
+      "timestamp": "2026-02-17T00:27:54.950Z"
+    },
+    {
+      "id": "tx_1771288953693_lnigm0",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 11,
+      "balance_after": 389,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T00:42:33.693Z"
+    },
+    {
+      "id": "tx_1771288953756_xj26wu",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 14,
+      "balance_after": 37,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T00:42:33.756Z"
+    },
+    {
+      "id": "tx_1771289456418_wcv6ux",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 14,
+      "balance_after": 403,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T00:50:56.418Z"
+    },
+    {
+      "id": "tx_1771289456536_ba1m0n",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 11,
+      "balance_after": 48,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T00:50:56.536Z"
+    },
+    {
+      "id": "tx_1771292412278_crva7a",
+      "user_id": "1472286665417560167",
+      "username": "The mini Architect",
+      "type": "achievement_reward",
+      "amount": 2,
+      "balance_after": 50,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T01:40:12.278Z"
+    },
+    {
+      "id": "tx_1771292412345_ms4024",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 23,
+      "balance_after": 426,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T01:40:12.345Z"
+    },
+    {
+      "id": "tx_1771293459932_oqxi2n",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 55,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T01:57:39.932Z"
+    },
+    {
+      "id": "tx_1771293460057_7bvse8",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 446,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T01:57:40.057Z"
+    },
+    {
+      "id": "tx_1771294389423_4deod6",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 536,
+      "metadata": {
+        "quest_id": "lockbox_awakens",
+        "quest_name": "The Lockbox Awakens"
+      },
+      "timestamp": "2026-02-17T02:13:09.424Z"
+    },
+    {
+      "id": "tx_1771294389463_7nc7lj",
+      "user_id": "765978025937469481",
+      "username": "Aly",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 450,
+      "metadata": {
+        "quest_id": "lockbox_awakens",
+        "quest_name": "The Lockbox Awakens"
+      },
+      "timestamp": "2026-02-17T02:13:09.463Z"
+    },
+    {
+      "id": "tx_1771294389486_8ju8e8",
+      "user_id": "1374906408046166036",
+      "username": "Tyren",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 675,
+      "metadata": {
+        "quest_id": "lockbox_awakens",
+        "quest_name": "The Lockbox Awakens"
+      },
+      "timestamp": "2026-02-17T02:13:09.486Z"
+    },
+    {
+      "id": "tx_1771296136749_qkj0hx",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 60,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T02:42:16.749Z"
+    },
+    {
+      "id": "tx_1771296136859_059izl",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 466,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T02:42:16.859Z"
+    },
+    {
+      "id": "tx_1771297612064_l7on5u",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 11,
+      "balance_after": 71,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T03:06:52.064Z"
+    },
+    {
+      "id": "tx_1771297612124_4mixtc",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 14,
+      "balance_after": 480,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T03:06:52.124Z"
+    },
+    {
+      "id": "tx_1771298345610_fjx4nm",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 505,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T03:19:05.610Z"
+    },
+    {
+      "id": "tx_1771298833685_snley0",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 38,
+      "balance_after": 543,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T03:27:13.685Z"
+    },
+    {
+      "id": "tx_1771298833751_eeomd3",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 2,
+      "balance_after": 484,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T03:27:13.751Z"
+    },
+    {
+      "id": "tx_1771298833801_5un507",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 568,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "level_5"
+      },
+      "timestamp": "2026-02-17T03:27:13.801Z"
+    },
+    {
+      "id": "tx_1771298833817_1u4p47",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 588,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "giant_killer"
+      },
+      "timestamp": "2026-02-17T03:27:13.817Z"
+    },
+    {
+      "id": "tx_1771298833840_48plgu",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 504,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "giant_killer"
+      },
+      "timestamp": "2026-02-17T03:27:13.840Z"
+    },
+    {
+      "id": "tx_1771298913405_kwmjn2",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -500,
+      "balance_after": 88,
+      "metadata": {
+        "item_id": "dice_glitterparty",
+        "item_name": "Glitter Party Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T03:28:33.405Z"
+    },
+    {
+      "id": "tx_1771299026137_89pjia",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 454,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T03:30:26.137Z"
+    },
+    {
+      "id": "tx_1771299053560_ctayhr",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -200,
+      "balance_after": 254,
+      "metadata": {
+        "item_id": "dice_ice",
+        "item_name": "Frostbite Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T03:30:53.560Z"
+    },
+    {
+      "id": "tx_1771305765982_3ncq1t",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 12,
+      "balance_after": 100,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T05:22:45.982Z"
+    },
+    {
+      "id": "tx_1771305766064_lei4hs",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 13,
+      "balance_after": 84,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T05:22:46.064Z"
+    },
+    {
+      "id": "tx_1771307301467_scqbss",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 99,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "punching_bag"
+      },
+      "timestamp": "2026-02-17T05:48:21.468Z"
+    },
+    {
+      "id": "tx_1771309865782_8bngkb",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 125,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T06:31:05.782Z"
+    },
+    {
+      "id": "tx_1771311820525_xws58b",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 75,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T07:03:40.525Z"
+    },
+    {
+      "id": "tx_1771311827903_m20gu5",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 25,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T07:03:47.903Z"
+    },
+    {
+      "id": "tx_1771314307153_juxmjp",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 50,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T07:45:07.153Z"
+    },
+    {
+      "id": "tx_1771314535932_4do8f9",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 75,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T07:48:55.932Z"
+    },
+    {
+      "id": "tx_1771314772676_8xdyso",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 100,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T07:52:52.676Z"
+    },
+    {
+      "id": "tx_1771314858959_ily7cc",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 110,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T07:54:18.959Z"
+    },
+    {
+      "id": "tx_1771314928289_if1ywm",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 120,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T07:55:28.289Z"
+    },
+    {
+      "id": "tx_1771315039504_384b37",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 130,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T07:57:19.504Z"
+    },
+    {
+      "id": "tx_1771315353472_1x56o2",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 155,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T08:02:33.472Z"
+    },
+    {
+      "id": "tx_1771315366243_wb7smm",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 105,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T08:02:46.243Z"
+    },
+    {
+      "id": "tx_1771315367164_5bfh6g",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 55,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T08:02:47.164Z"
+    },
+    {
+      "id": "tx_1771315660224_4wnz2u",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 204,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T08:07:40.224Z"
+    },
+    {
+      "id": "tx_1771315662917_7qj0h5",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 154,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T08:07:42.917Z"
+    },
+    {
+      "id": "tx_1771316270023_yitd32",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 80,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T08:17:50.023Z"
+    },
+    {
+      "id": "tx_1771316270072_drnv47",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 169,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T08:17:50.072Z"
+    },
+    {
+      "id": "tx_1771317268951_jis3hr",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 230,
+      "metadata": {
+        "quest_id": "the_missing_watch",
+        "quest_name": "The Missing Watch"
+      },
+      "timestamp": "2026-02-17T08:34:28.951Z"
+    },
+    {
+      "id": "tx_1771317355068_6ju5vj",
+      "user_id": "228241331296665600",
+      "username": "Unknown",
+      "type": "achievement_reward",
+      "amount": 150,
+      "balance_after": 319,
+      "metadata": {
+        "source": "dm_award"
+      },
+      "timestamp": "2026-02-17T08:35:55.068Z"
+    },
+    {
+      "id": "tx_1771360652360_fh6iq3",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 255,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T20:37:32.360Z"
+    },
+    {
+      "id": "tx_1771360673187_nc85sm",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 205,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T20:37:53.187Z"
+    },
+    {
+      "id": "tx_1771360674188_rxhjrd",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 155,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-17T20:37:54.188Z"
+    },
+    {
+      "id": "tx_1771361045714_zs0wwh",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 40,
+      "balance_after": 195,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-17T20:44:05.714Z"
+    },
+    {
+      "id": "tx_1771372315258_cq7wnk",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 114,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "natural_twenty"
+      },
+      "timestamp": "2026-02-17T23:51:55.258Z"
+    },
+    {
+      "id": "tx_1771377500855_8tu568",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 327,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T01:18:20.855Z"
+    },
+    {
+      "id": "tx_1771377500942_o1wcib",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 337,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "critical_strike"
+      },
+      "timestamp": "2026-02-18T01:18:20.942Z"
+    },
+    {
+      "id": "tx_1771377659004_8mx9s9",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 342,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T01:20:59.004Z"
+    },
+    {
+      "id": "tx_1771377659070_a76s2m",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 35,
+      "balance_after": 377,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "serial_killer"
+      },
+      "timestamp": "2026-02-18T01:20:59.070Z"
+    },
+    {
+      "id": "tx_1771383817833_smyb6k",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 2,
+      "balance_after": 538,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:03:37.833Z"
+    },
+    {
+      "id": "tx_1771383817898_zgryrr",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 6,
+      "balance_after": 120,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:03:37.898Z"
+    },
+    {
+      "id": "tx_1771383817966_uvbgfh",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 543,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "goblin_slayer"
+      },
+      "timestamp": "2026-02-18T03:03:37.966Z"
+    },
+    {
+      "id": "tx_1771384017592_rhhb1b",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 3,
+      "balance_after": 123,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:06:57.592Z"
+    },
+    {
+      "id": "tx_1771384017693_ctvvz4",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 2,
+      "balance_after": 545,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:06:57.693Z"
+    },
+    {
+      "id": "tx_1771384017807_s2ywfr",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 128,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "wolf_hunter"
+      },
+      "timestamp": "2026-02-18T03:06:57.807Z"
+    },
+    {
+      "id": "tx_1771384017848_ps6ll3",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 555,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "critical_strike"
+      },
+      "timestamp": "2026-02-18T03:06:57.848Z"
+    },
+    {
+      "id": "tx_1771384017881_tckzyo",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 570,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "untouchable"
+      },
+      "timestamp": "2026-02-18T03:06:57.881Z"
+    },
+    {
+      "id": "tx_1771384017911_51oq8a",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 580,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "finishing_blow"
+      },
+      "timestamp": "2026-02-18T03:06:57.911Z"
+    },
+    {
+      "id": "tx_1771384017951_4dw8l2",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 585,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "wolf_hunter"
+      },
+      "timestamp": "2026-02-18T03:06:57.951Z"
+    },
+    {
+      "id": "tx_1771384241200_kttjkd",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 535,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-18T03:10:41.200Z"
+    },
+    {
+      "id": "tx_1771384242892_19wuta",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 485,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-18T03:10:42.892Z"
+    },
+    {
+      "id": "tx_1771384259003_o3ky0e",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 435,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-18T03:10:59.003Z"
+    },
+    {
+      "id": "tx_1771384304205_ttrbu4",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 385,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-18T03:11:44.205Z"
+    },
+    {
+      "id": "tx_1771384305078_rsne82",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 335,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-18T03:11:45.078Z"
+    },
+    {
+      "id": "tx_1771384313593_zywlsb",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 310,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-18T03:11:53.593Z"
+    },
+    {
+      "id": "tx_1771384957526_xz86cf",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 203,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:22:37.526Z"
+    },
+    {
+      "id": "tx_1771384957607_be6d67",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 2,
+      "balance_after": 130,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:22:37.607Z"
+    },
+    {
+      "id": "tx_1771385306822_uid6p3",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 4,
+      "balance_after": 314,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:28:26.822Z"
+    },
+    {
+      "id": "tx_1771385306896_kt5ouv",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 6,
+      "balance_after": 136,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:28:26.896Z"
+    },
+    {
+      "id": "tx_1771385306960_vp9uyr",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 319,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "bone_breaker"
+      },
+      "timestamp": "2026-02-18T03:28:26.960Z"
+    },
+    {
+      "id": "tx_1771385826355_851yen",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 14,
+      "balance_after": 150,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:37:06.355Z"
+    },
+    {
+      "id": "tx_1771385826431_0bj6cf",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 327,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:37:06.431Z"
+    },
+    {
+      "id": "tx_1771385826518_ydolpw",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 3,
+      "balance_after": 206,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:37:06.518Z"
+    },
+    {
+      "id": "tx_1771385826595_nilkd0",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 342,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "alpha_predator"
+      },
+      "timestamp": "2026-02-18T03:37:06.595Z"
+    },
+    {
+      "id": "tx_1771387117304_wxgqk5",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 13,
+      "balance_after": 390,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:58:37.304Z"
+    },
+    {
+      "id": "tx_1771387117381_ojr9s1",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 13,
+      "balance_after": 219,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T03:58:37.381Z"
+    },
+    {
+      "id": "tx_1771389950101_ct9khg",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 227,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T04:45:50.101Z"
+    },
+    {
+      "id": "tx_1771389950187_20m0gi",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 160,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T04:45:50.187Z"
+    },
+    {
+      "id": "tx_1771389950274_qkjrzx",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 7,
+      "balance_after": 397,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T04:45:50.274Z"
+    },
+    {
+      "id": "tx_1771391392077_2v3j9d",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 237,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T05:09:52.077Z"
+    },
+    {
+      "id": "tx_1771392308210_4vzi20",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 247,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T05:25:08.210Z"
+    },
+    {
+      "id": "tx_1771392448655_wue4j3",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 3,
+      "balance_after": 400,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T05:27:28.655Z"
+    },
+    {
+      "id": "tx_1771392448735_zs66r7",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 7,
+      "balance_after": 254,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T05:27:28.735Z"
+    },
+    {
+      "id": "tx_1771392873576_463gb2",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 9,
+      "balance_after": 169,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T05:34:33.576Z"
+    },
+    {
+      "id": "tx_1771392873667_zzt2be",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 264,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T05:34:33.667Z"
+    },
+    {
+      "id": "tx_1771392873736_be0493",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 6,
+      "balance_after": 406,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T05:34:33.736Z"
+    },
+    {
+      "id": "tx_1771393248833_0vhgts",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 6,
+      "balance_after": 412,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T05:40:48.833Z"
+    },
+    {
+      "id": "tx_1771393248892_k4sp4l",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 6,
+      "balance_after": 175,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T05:40:48.892Z"
+    },
+    {
+      "id": "tx_1771393248949_ik8bzb",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 27,
+      "balance_after": 291,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T05:40:48.949Z"
+    },
+    {
+      "id": "tx_1771393249024_sm0qkd",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 195,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "giant_killer"
+      },
+      "timestamp": "2026-02-18T05:40:49.024Z"
+    },
+    {
+      "id": "tx_1771395481000_8q7au2",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 4,
+      "balance_after": 416,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T06:18:01.000Z"
+    },
+    {
+      "id": "tx_1771395481059_x7dvmc",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 27,
+      "balance_after": 318,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T06:18:01.059Z"
+    },
+    {
+      "id": "tx_1771395481123_gd7zm1",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 203,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-18T06:18:01.123Z"
     }
   ]
 }

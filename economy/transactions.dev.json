@@ -220,6 +220,98 @@
         "quest_name": "The Uncontrolled Flame"
       },
       "timestamp": "2026-02-06T02:35:20.081Z"
+    },
+    {
+      "id": "tx_1770962811225_kcyori",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "tavern_purchase",
+      "amount": -30,
+      "balance_after": 965,
+      "metadata": {
+        "item_id": "drink_heros_toast",
+        "item_name": "The Hero's Toast",
+        "npc": "bigtam"
+      },
+      "timestamp": "2026-02-13T06:06:51.225Z"
+    },
+    {
+      "id": "tx_1771048501554_rb6fg7",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 1115,
+      "metadata": {
+        "quest_id": "lockbox_awakens",
+        "quest_name": "The Lockbox Awakens"
+      },
+      "timestamp": "2026-02-14T05:55:01.555Z"
+    },
+    {
+      "id": "tx_1771048890017_v7xgbi",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 1265,
+      "metadata": {
+        "quest_id": "lockbox_awakens",
+        "quest_name": "The Lockbox Awakens"
+      },
+      "timestamp": "2026-02-14T06:01:30.017Z"
+    },
+    {
+      "id": "tx_1771294389426_vq0ewn",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 350,
+      "metadata": {
+        "quest_id": "lockbox_awakens",
+        "quest_name": "The Lockbox Awakens"
+      },
+      "timestamp": "2026-02-17T02:13:09.426Z"
+    },
+    {
+      "id": "tx_1771294389459_43nknn",
+      "user_id": "765978025937469481",
+      "username": "Aly",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 350,
+      "metadata": {
+        "quest_id": "lockbox_awakens",
+        "quest_name": "The Lockbox Awakens"
+      },
+      "timestamp": "2026-02-17T02:13:09.460Z"
+    },
+    {
+      "id": "tx_1771294389482_8eo86j",
+      "user_id": "1374906408046166036",
+      "username": "Tyren",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 600,
+      "metadata": {
+        "quest_id": "lockbox_awakens",
+        "quest_name": "The Lockbox Awakens"
+      },
+      "timestamp": "2026-02-17T02:13:09.482Z"
+    },
+    {
+      "id": "tx_1771317268977_b58jfb",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "quest_reward",
+      "amount": 150,
+      "balance_after": 1415,
+      "metadata": {
+        "quest_id": "the_missing_watch",
+        "quest_name": "The Missing Watch"
+      },
+      "timestamp": "2026-02-17T08:34:28.977Z"
     }
   ]
 }

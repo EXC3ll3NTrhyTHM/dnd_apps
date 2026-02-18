@@ -103,6 +103,58 @@
       "reelDifficulty": 5,
       "reelTaps": 45,
       "weight": { "min": 15.0, "max": 35.0 }
+    },
+    {
+      "id": "old_boot",
+      "name": "Old Boot",
+      "rarity": "junk",
+      "goldValue": 1,
+      "xp": 2,
+      "icon": "\ud83e\udd7e",
+      "description": "A waterlogged boot. Someone lost this ages ago. Not exactly a trophy catch.",
+      "biteWindow": 2500,
+      "reelDifficulty": 1,
+      "reelTaps": 4,
+      "weight": { "min": 1.0, "max": 2.0 }
+    },
+    {
+      "id": "soggy_log",
+      "name": "Soggy Log",
+      "rarity": "junk",
+      "goldValue": 1,
+      "xp": 2,
+      "icon": "\ud83e\udeb5",
+      "description": "A chunk of rotting driftwood. Heavy, useless, and vaguely disappointing.",
+      "biteWindow": 2500,
+      "reelDifficulty": 1,
+      "reelTaps": 5,
+      "weight": { "min": 3.0, "max": 5.0 }
+    },
+    {
+      "id": "tangled_seaweed",
+      "name": "Tangled Seaweed",
+      "rarity": "junk",
+      "goldValue": 0,
+      "xp": 1,
+      "icon": "\ud83c\udf3f",
+      "description": "A slimy clump of pond weed. At least it didn't put up a fight.",
+      "biteWindow": 3000,
+      "reelDifficulty": 1,
+      "reelTaps": 3,
+      "weight": { "min": 0.5, "max": 0.5 }
+    },
+    {
+      "id": "rusty_bucket",
+      "name": "Rusty Bucket",
+      "rarity": "junk",
+      "goldValue": 2,
+      "xp": 3,
+      "icon": "\ud83e\udea3",
+      "description": "A corroded iron pail. Whoever tossed this in clearly wasn't fishing.",
+      "biteWindow": 2000,
+      "reelDifficulty": 1,
+      "reelTaps": 6,
+      "weight": { "min": 2.0, "max": 4.0 }
     }
   ],
   "baitWeights": {
@@ -110,7 +162,13 @@
     "enchanted_grub": { "common": 35, "uncommon": 30, "rare": 25, "epic": 8, "legendary": 2 },
     "abyssal_lure": { "common": 10, "uncommon": 20, "rare": 35, "epic": 25, "legendary": 10 }
   },
+  "junkChance": {
+    "basic_worm": 0.15,
+    "enchanted_grub": 0.10,
+    "abyssal_lure": 0.05
+  },
   "rarityColors": {
+    "junk": "#6b5b45",
     "common": "#a0a0a0",
     "uncommon": "#4ade80",
     "rare": "#60a5fa",

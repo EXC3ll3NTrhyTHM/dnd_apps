@@ -32,3 +32,9 @@
 [2026-02-12] Today was a bit embarrassing as I totally zoned out during a conversation about our adventures in the squirrel kingdom, led by the enigmatic King Nuttsworth. I facepalmed when reminded of my own escapades, and even got scolded by Nalyd to stay out of the woods, which I reluctantly agreed to for now.
 
 [2026-02-12] Today, I had a serious talk with Nalyd about patience and the dangers we face. He made it clear that planning and intelligence are essential if we want to survive, and although it frustrates me to wait, I promised to stick to the plan and be ready for action when the time comes.
+
+[2026-02-14] Today, we reminisced about my infamous fall into the wagon, and I tried to reclaim some hero points with a bit of charm. Aunt Aly put me on teaching duty at the dojo, followed by stealth training in the woods and maybe some rooftop hopping later—sounds like a perfect day for honing my skills!
+
+[2026-02-15] The whole dojo is buzzing. Uncle Nalyd and the Elites hit the Crimson Fang last night—those strangers Kumo warned us about. Turns out they were a ninja clan who came for some ancient scroll that Master Hayato hid here decades ago. Nalyd didn't just beat them. He CREATED a new technique mid-battle. Combined his Ignition form with lightning into something called the Embershock Strike. Obliterated their leader. Zero survivors. And Cal? Tyren's falcon summoned SIXTY raptors for a flyby salute. Sixty! The Canopy Kingdom squirrels fought alongside them too. I'm glad they kept me out of it—this was real war—but also... I wish I could have been there. One day, I'll fight beside them. Not as the kid they're protecting. As family.
+
+[2026-02-16] Today, Aly asked when my birthday is, and I tried to brush it off, but she wouldn’t let it go. I finally admitted it's in February, but honestly, who cares? I'd rather keep sharpening my daggers than celebrate.

@@ -81,12 +81,6 @@ router.post('/cast', authRequired, (req, res) => {
     ? (updatedInv.items.find(i => i.item_id === baitId)?.quantity || 0)
     : 0;
 
-  // Determine the catch server-side
-  const result = fishing.determineCatch(baitId);
-  if (!result) {
-    return res.status(400).json({ error: 'Invalid bait type' });
-  }
-
   // Check for best fishing rod in inventory
   const ROD_MULTIPLIERS = {
     dragonbone_rod: 3,
@@ -101,6 +95,12 @@ router.post('/cast', authRequired, (req, res) => {
       equippedRod = rodId;
       break; // already sorted best-first
     }
+  }
+
+  // Determine the catch server-side (rod passed for junk check)
+  const result = fishing.determineCatch(baitId, equippedRod);
+  if (!result) {
+    return res.status(400).json({ error: 'Invalid bait type' });
   }
 
   const adjustedReelTaps = Math.max(3, Math.ceil(result.fish.reelTaps / rodMultiplier));
@@ -194,7 +194,7 @@ router.post('/confirm', authRequired, (req, res) => {
   xp.incrementLifetimeStat(userId, username, `fish_${fish.rarity}_caught`);
 
   // Record in fishing stats
-  fishing.recordCatch(userId, username, fish.id, fish.rarity);
+  fishing.recordCatch(userId, username, fish.id, fish.rarity, weight);
 
   // Check achievements
   const { newAchievements } = checkAchievements(userId, username, 'fish_caught');
@@ -280,6 +280,15 @@ router.post('/sell', authRequired, (req, res) => {
 router.get('/catalog', (req, res) => {
   const catalog = fishing.loadFishCatalog();
   res.json(catalog);
+});
+
+// ============================================
+// GET /leaderboard — Biggest catch leaderboard
+// ============================================
+
+router.get('/leaderboard', (req, res) => {
+  const leaderboard = fishing.getBiggestCatchLeaderboard(5);
+  res.json({ leaderboard });
 });
 
 module.exports = router;

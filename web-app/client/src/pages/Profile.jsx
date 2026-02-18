@@ -28,6 +28,13 @@ export default function Profile() {
   const [locations, setLocations] = useState([]);
   const [muteExpanded, setMuteExpanded] = useState(false);
   const [achievementsExpanded, setAchievementsExpanded] = useState(false);
+  const [aliases, setAliases] = useState([]);
+  const [activeAlias, setActiveAlias] = useState(null);
+  const [aliasSwitching, setAliasSwitching] = useState(false);
+  const [sheetRefreshKey, setSheetRefreshKey] = useState(0);
+  const [ownedDice, setOwnedDice] = useState(['default']);
+  const [equippedDice, setEquippedDice] = useState('default');
+  const [diceEquipping, setDiceEquipping] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -56,6 +63,20 @@ export default function Profile() {
       const settings = await api('/api/notifications/settings');
       setMutedChannels(settings.mutedChannels || []);
     } catch { /* ignore */ }
+
+    // Load character aliases
+    try {
+      const aliasData = await api('/api/character-sheet/aliases');
+      setAliases(aliasData.aliases || []);
+      setActiveAlias(aliasData.active || null);
+    } catch { /* ignore */ }
+
+    // Load owned dice sets
+    try {
+      const diceData = await api('/api/dice/owned');
+      setOwnedDice(diceData.owned || ['default']);
+      setEquippedDice(diceData.equipped || 'default');
+    } catch { /* ignore */ }
   }
 
   async function loadLocationsForMute() {
@@ -77,6 +98,51 @@ export default function Profile() {
       setMutedChannels(result.mutedChannels);
     } catch { /* ignore */ }
   }
+
+  async function switchCharacter(targetUserId) {
+    setAliasSwitching(true);
+    try {
+      const result = await api('/api/character-sheet/switch', {
+        method: 'POST',
+        body: JSON.stringify({ targetUserId })
+      });
+      setActiveAlias(result.active || null);
+      setSheetRefreshKey(k => k + 1);
+    } catch (err) {
+      console.error('Failed to switch character:', err);
+    } finally {
+      setAliasSwitching(false);
+    }
+  }
+
+  async function equipDice(colorset) {
+    if (diceEquipping) return;
+    setDiceEquipping(colorset);
+    try {
+      await api('/api/dice/equip', {
+        method: 'POST',
+        body: JSON.stringify({ colorset })
+      });
+      setEquippedDice(colorset);
+    } catch (err) {
+      console.error('Failed to equip dice:', err);
+    } finally {
+      setDiceEquipping(null);
+    }
+  }
+
+  // Color preview map for dice sets
+  const DICE_COLORS = {
+    default: { bg: '#e7e5e4', border: '#a8a29e', label: 'Default' },
+    fire: { bg: '#f97316', border: '#ea580c', label: 'Ember' },
+    ice: { bg: '#38bdf8', border: '#0ea5e9', label: 'Frostbite' },
+    poison: { bg: '#4ade80', border: '#22c55e', label: 'Venom' },
+    bronze: { bg: '#d97706', border: '#b45309', label: 'Bronze' },
+    gold: { bg: '#fbbf24', border: '#f59e0b', label: 'Golden' },
+    breebaby: { bg: '#f0abfc', border: '#e879f9', label: 'Breebaby' },
+    glitterparty: { bg: '#c084fc', border: '#a855f7', label: 'Glitter Party' },
+    swrpg: { bg: '#1e1e2e', border: '#ef4444', label: 'Obsidian' },
+  };
 
   if (!user) return null;
 
@@ -147,7 +213,7 @@ export default function Profile() {
       <>
 
       {/* Character Sheet */}
-      <CharacterSheet userId={user.id} editable={true} />
+      <CharacterSheet userId={user.id} editable={true} refreshKey={sheetRefreshKey} />
 
       {/* Gold stats */}
       {wallet && (
@@ -259,6 +325,38 @@ export default function Profile() {
         )}
       </section>
 
+      {/* Dice Sets */}
+      {ownedDice.length > 1 && (
+        <section className="profile-section">
+          <h2 className="section-title">Dice Sets</h2>
+          <div className="dice-sets-grid">
+            {ownedDice.map(cs => {
+              const info = DICE_COLORS[cs] || { bg: '#78716c', border: '#57534e', label: cs };
+              const isEquipped = cs === equippedDice;
+              return (
+                <button
+                  key={cs}
+                  className={`dice-set-item ${isEquipped ? 'dice-set-item-equipped' : ''}`}
+                  onClick={() => !isEquipped && equipDice(cs)}
+                  disabled={diceEquipping === cs}
+                >
+                  <div
+                    className="dice-set-swatch"
+                    style={{
+                      background: info.bg,
+                      borderColor: info.border,
+                      boxShadow: isEquipped ? `0 0 12px ${info.bg}80` : 'none',
+                    }}
+                  />
+                  <span className="dice-set-label">{info.label}</span>
+                  {isEquipped && <span className="dice-set-badge">Equipped</span>}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* Leaderboard */}
       <section className="profile-section">
         <h2 className="section-title">Leaderboard</h2>
@@ -298,6 +396,23 @@ export default function Profile() {
               onChange={(e) => setAudioMuted(e.target.checked)}
             />
           </label>
+
+          {aliases.length > 0 && (
+            <div className="settings-row">
+              <span className="settings-label">Active Character</span>
+              <select
+                className="settings-select"
+                value={activeAlias || ''}
+                disabled={aliasSwitching}
+                onChange={(e) => switchCharacter(e.target.value || null)}
+              >
+                <option value="">None</option>
+                {aliases.map(a => (
+                  <option key={a.id} value={a.id}>{a.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <label className="settings-row">
             <span className="settings-label">

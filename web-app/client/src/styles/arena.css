@@ -9,6 +9,7 @@
   background: linear-gradient(180deg, #0d0a07 0%, #1a1510 40%, #0d0a07 100%);
   color: var(--text-primary);
   overflow: hidden;
+  position: relative;
 }
 
 /* ---- Header ---- */
@@ -22,6 +23,8 @@
   background: linear-gradient(180deg, #1a1510 0%, #231c14 100%);
   border-bottom: 2px solid var(--border-stitch);
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .arena-back {
@@ -53,6 +56,22 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+/* Battle header — prominent title bar */
+.arena-header-battle {
+  padding: 14px 16px;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 14px);
+}
+
+.arena-header-battle .arena-header-title {
+  font-size: 1.2rem;
+}
+
+.arena-header-battle .arena-round {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-gold);
 }
 
 /* ---- Active Fight Banner (for non-participants) ---- */
@@ -99,7 +118,7 @@
   overflow-y: auto;
   padding: 16px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   align-content: start;
 }
@@ -142,6 +161,48 @@
   pointer-events: none;
 }
 
+.arena-monster-card-selected {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 12px rgba(212, 168, 67, 0.4);
+}
+
+.arena-monster-card-active {
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.arena-card-active-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.arena-card-badge-fighters {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.arena-card-badge-hp {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.arena-card-image {
+  width: 100%;
+  aspect-ratio: 3/ 4;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
 .arena-card-name {
   font-family: var(--font-display);
   font-size: 1rem;
@@ -175,12 +236,6 @@
   background: rgba(212,168,67,0.12);
 }
 
-.arena-card-desc {
-  font-size: 0.72rem;
-  color: var(--text-secondary);
-  line-height: 1.3;
-  margin-top: 4px;
-}
 
 .arena-card-spawning {
   position: absolute;
@@ -196,6 +251,290 @@
   animation: arena-pulse 1.5s ease-in-out infinite;
 }
 
+/* ---- Join Battle Overlay ---- */
+
+.arena-join-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  animation: arena-overlay-in 0.2s ease-out;
+}
+
+.arena-join-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px;
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+}
+
+@keyframes arena-overlay-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.arena-join-close {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: color 0.15s;
+}
+
+.arena-join-close:active {
+  color: var(--text-primary);
+}
+
+.arena-join-name {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ef4444;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.arena-join-image {
+  width: 80%;
+  max-width: 280px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+}
+
+/* Stat badges row */
+.arena-join-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  margin-bottom: 24px;
+}
+
+.arena-join-stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.arena-join-stat-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.arena-join-stat-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* CR — circle badge */
+.arena-join-cr {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--color-gold);
+  background: rgba(212, 168, 67, 0.1);
+  justify-content: center;
+}
+
+.arena-join-cr .arena-join-stat-label {
+  color: var(--color-gold);
+}
+
+.arena-join-cr .arena-join-stat-value {
+  color: var(--color-gold);
+}
+
+/* HP — heart */
+.arena-join-hp {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  justify-content: center;
+}
+
+.arena-join-heart {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: rgba(239, 68, 68, 0.25);
+}
+
+.arena-join-hp .arena-join-stat-label,
+.arena-join-hp .arena-join-stat-value {
+  position: relative;
+  z-index: 1;
+}
+
+.arena-join-hp .arena-join-stat-value {
+  font-size: 0.8rem;
+}
+
+/* AC — shield */
+.arena-join-ac {
+  position: relative;
+  width: 56px;
+  height: 64px;
+  justify-content: center;
+}
+
+.arena-join-shield {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: rgba(148, 163, 184, 0.2);
+}
+
+.arena-join-ac .arena-join-stat-label,
+.arena-join-ac .arena-join-stat-value {
+  position: relative;
+  z-index: 1;
+}
+
+.arena-join-ac .arena-join-stat-label {
+  color: #94a3b8;
+}
+
+.arena-join-ac .arena-join-stat-value {
+  color: #cbd5e1;
+}
+
+/* Rewards row */
+.arena-join-rewards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.arena-join-reward-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #d4a843;
+  letter-spacing: 0.02em;
+}
+
+.arena-join-reward-xp .arena-join-reward-value {
+  color: #a8b4ff;
+}
+
+/* Participants list */
+.arena-join-participants {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.arena-join-participant {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.arena-join-participant-ko {
+  opacity: 0.5;
+}
+
+.arena-join-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.arena-join-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.arena-join-participant-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.arena-join-participant-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 3px;
+}
+
+.arena-join-hp-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.arena-join-hp-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Join button */
+.arena-join-btn {
+  width: 100%;
+  max-width: 320px;
+  padding: 14px 24px;
+  background: linear-gradient(180deg, rgba(212, 168, 67, 0.3) 0%, rgba(212, 168, 67, 0.15) 100%);
+  border: 1px solid var(--color-gold);
+  border-radius: 10px;
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.arena-join-btn:active {
+  transform: scale(0.97);
+  background: linear-gradient(180deg, rgba(212, 168, 67, 0.4) 0%, rgba(212, 168, 67, 0.2) 100%);
+}
+
+.arena-join-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* ---- Monster Panel (active fight) ---- */
 
 .arena-monster-panel {
@@ -203,6 +542,8 @@
   background: linear-gradient(180deg, #1a1510 0%, #231c14 100%);
   border-bottom: 1px solid rgba(255,255,255,0.06);
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .arena-monster-name {
@@ -264,7 +605,553 @@
   white-space: nowrap;
 }
 
-/* ---- Combat Log ---- */
+/* ---- AC Shield ---- */
+
+.arena-ac-diamond {
+  width: 34px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 8px;
+  background: rgba(148, 163, 184, 0.18);
+  clip-path: polygon(50% 0%, 100% 0%, 100% 65%, 50% 100%, 0% 65%, 0% 0%);
+}
+
+.arena-ac-diamond span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  line-height: 1;
+  margin-top: -4px;
+}
+
+.arena-ac-diamond-self {
+  background: rgba(212, 168, 67, 0.18);
+}
+
+.arena-ac-diamond-self span {
+  color: var(--color-gold);
+}
+
+/* ---- Battle Field (sprites area) ---- */
+
+.arena-battle-field {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url('/images/arena-bg.webp');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.arena-enemy-sprite {
+  width: auto;
+  height: auto;
+  max-width: 80%;
+  max-height: 70%;
+  object-fit: contain;
+  flex-shrink: 1;
+  min-height: 0;
+}
+
+/* 1v1 duel offset — enemy nudged right, player nudged left */
+.arena-battle-field-duel .arena-enemy-sprite {
+  transform-origin: center center;
+  translate: 15% 0;
+}
+
+.arena-battle-field-duel .arena-sprite-row {
+  translate: -20% 0;
+}
+
+.arena-enemy-sprite-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(239, 68, 68, 0.1);
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 700;
+  color: rgba(239, 68, 68, 0.5);
+}
+
+/* ---- Two-Column Info Panel (Players | Enemies) ---- */
+
+.arena-info-panel {
+  display: flex;
+  gap: 0;
+  padding: 8px 12px 4px;
+  background: linear-gradient(180deg, #1a1510 0%, rgba(26, 21, 16, 0.95) 100%);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.arena-info-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.arena-info-col-players {
+  padding-right: 10px;
+}
+
+.arena-info-col-enemies {
+  padding-left: 10px;
+}
+
+.arena-info-col-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.arena-info-col-players .arena-info-col-label {
+  color: var(--color-gold);
+}
+
+.arena-info-col-enemies .arena-info-col-label {
+  color: #ef4444;
+}
+
+.arena-info-divider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+.arena-info-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+}
+
+.arena-info-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.arena-info-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  font-size: 0.6rem;
+  font-weight: 600;
+}
+
+.arena-info-row-me .arena-info-avatar {
+  border-color: rgba(212, 168, 67, 0.4);
+}
+
+.arena-info-avatar-enemy {
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.arena-info-row-ko {
+  opacity: 0.4;
+}
+
+.arena-info-row-me .arena-info-name {
+  color: var(--color-gold);
+}
+
+.arena-info-row-enemy .arena-info-name {
+  color: #ef4444;
+}
+
+.arena-info-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.arena-info-hp-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  min-width: 30px;
+}
+
+.arena-info-hp-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.arena-info-hp-text {
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.arena-info-ac {
+  width: 24px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.15);
+  clip-path: polygon(50% 0%, 100% 0%, 100% 65%, 50% 100%, 0% 65%, 0% 0%);
+  flex-shrink: 0;
+  line-height: 1;
+  padding-bottom: 6px;
+}
+
+.arena-info-row-me .arena-info-ac {
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.15);
+}
+
+/* ---- Timer Bar (between info panel and battle scene) ---- */
+
+.arena-timer-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px;
+  background: rgba(26, 21, 16, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.arena-timer-bar-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.arena-timer-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--color-gold);
+  transition: width 0.25s linear;
+}
+
+.arena-timer-bar-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Urgent state — red bar with pulse */
+.arena-timer-bar-urgent .arena-timer-bar-fill {
+  background: #ef4444;
+}
+
+.arena-timer-bar-urgent .arena-timer-bar-label {
+  color: #ef4444;
+}
+
+.arena-timer-bar-urgent .arena-timer-bar-track {
+  animation: arena-timer-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes arena-timer-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ---- Turn Announcement ---- */
+
+.arena-turn-announce-backdrop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 80;
+  pointer-events: none;
+  animation: arena-announce-fade 1.5s ease-out forwards;
+}
+
+.arena-turn-announce {
+  font-size: clamp(1rem, 3.5vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 8px 24px;
+  border-radius: 8px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  animation: arena-announce-pop 1.5s ease-out forwards;
+}
+
+.arena-turn-announce-player {
+  color: #eab308;
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.arena-turn-announce-enemy {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+@keyframes arena-announce-fade {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes arena-announce-pop {
+  0% { transform: scale(0.8); opacity: 0; }
+  10% { transform: scale(1.05); opacity: 1; }
+  20% { transform: scale(1); }
+  70% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* ---- Player Sprite Tiles ---- */
+
+.arena-sprite-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 0;
+}
+
+.arena-sprite-tile {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  transition: opacity 0.3s, filter 0.3s;
+}
+
+.arena-sprite-tile-has-img {
+  border: none;
+  background: transparent;
+  overflow: visible;
+}
+
+.arena-sprite-tile-me {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 8px rgba(212, 168, 67, 0.3);
+}
+
+.arena-sprite-tile-has-img.arena-sprite-tile-me {
+  border: none;
+  box-shadow: none;
+}
+
+.arena-sprite-tile-ko {
+  opacity: 0.35;
+  filter: grayscale(0.8);
+}
+
+.arena-sprite-tile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ---- Player Avatar (in HP list) ---- */
+
+.arena-player-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.arena-player-avatar-img {
+  object-fit: cover;
+}
+
+/* ---- Your Stats Panel ---- */
+
+.arena-your-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  flex-shrink: 0;
+  background: rgba(212, 168, 67, 0.04);
+  border-top: 1px solid rgba(212, 168, 67, 0.12);
+}
+
+.arena-your-hp-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arena-your-hp-track {
+  flex: 1;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.arena-your-hp-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease, background-color 0.5s ease;
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.2);
+}
+
+.arena-your-hp-text {
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  min-width: 50px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ---- Combat Log Toggle Button ---- */
+
+.arena-log-toggle {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(30, 25, 18, 0.9);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  color: var(--color-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 50;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s;
+}
+
+.arena-log-toggle:active {
+  transform: scale(0.9);
+}
+
+/* ---- Combat Log Overlay (toggled) ---- */
+
+.arena-combat-log-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: arena-fade-in 0.15s ease;
+}
+
+.arena-combat-log-panel {
+  width: 100%;
+  max-width: 500px;
+  max-height: 60vh;
+  background: linear-gradient(180deg, #1a1510 0%, #0d0a07 100%);
+  border-top: 2px solid var(--border-stitch);
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  animation: arena-slide-up 0.2s ease-out;
+}
+
+.arena-combat-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-gold);
+  flex-shrink: 0;
+}
+
+.arena-combat-log-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+}
+
+.arena-combat-log-entries {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@keyframes arena-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* ---- Combat Log (legacy, keep for log entries styling) ---- */
 
 .arena-combat-log {
   flex: 1;
@@ -310,7 +1197,16 @@
   color: #ef4444;
 }
 
-/* ---- Player HP Bars ---- */
+/* ---- Bottom UI (actions area) ---- */
+
+.arena-bottom-ui {
+  margin-top: auto;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  background: linear-gradient(0deg, rgba(13, 10, 7, 0.95) 0%, rgba(26, 21, 16, 0.85) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
 
 .arena-players {
   display: flex;
@@ -323,6 +1219,9 @@
 }
 
 .arena-player-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 8px;
@@ -404,20 +1303,42 @@
 
 .arena-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
   align-items: center;
-  padding: 12px 16px;
+  padding: 6px 12px;
   flex-shrink: 0;
-  min-height: 56px;
+  min-height: 40px;
+  position: relative;
+  flex-wrap: wrap;
+}
+
+.arena-action-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 16px;
+  right: 16px;
+  margin-bottom: 6px;
+  z-index: 10;
+}
+
+.arena-action-tooltip-content {
+  background: rgba(20, 16, 12, 0.95);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
 .arena-btn {
   flex: 1;
-  padding: 12px 16px;
+  padding: 8px 12px;
   border: none;
-  border-radius: 10px;
-  font-size: 0.95rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -478,14 +1399,14 @@
 
 .arena-btn-detail {
   display: block;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 400;
   opacity: 0.7;
-  margin-top: 1px;
+  margin-top: 0;
 }
 
 .arena-status-text {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: var(--text-secondary);
   text-align: center;
   font-style: italic;
@@ -515,9 +1436,9 @@
 
 .arena-timer {
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
-  padding: 0 16px 12px;
+  padding: 0 12px 6px;
   flex-shrink: 0;
   letter-spacing: 0.03em;
 }
@@ -647,4 +1568,1540 @@
 @keyframes arena-scale-in {
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
+}
+
+/* ---- Admin Sprite Editor ---- */
+
+.arena-edit-btn {
+  background: none;
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  color: var(--color-gold);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.arena-edit-btn:active {
+  background: rgba(212, 168, 67, 0.15);
+}
+
+.arena-edit-panel {
+  position: fixed;
+  top: 80px;
+  right: 12px;
+  width: 240px;
+  background: rgba(20, 16, 12, 0.96);
+  border: 1px solid rgba(212, 168, 67, 0.35);
+  border-radius: 12px;
+  padding: 12px;
+  z-index: 200;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.arena-edit-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.arena-edit-panel-header span {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-gold);
+}
+
+.arena-edit-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.arena-edit-section {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-top: 2px;
+}
+
+.arena-edit-divider {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-top: 6px;
+  margin-top: 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.arena-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arena-edit-row label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  width: 52px;
+  flex-shrink: 0;
+}
+
+.arena-edit-row input[type="range"] {
+  flex: 1;
+  height: 4px;
+  accent-color: var(--color-gold);
+  cursor: pointer;
+}
+
+.arena-edit-row span {
+  font-size: 0.7rem;
+  font-family: monospace;
+  color: var(--text-primary);
+  min-width: 32px;
+  text-align: right;
+}
+
+.arena-edit-save {
+  margin-top: 4px;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, rgba(212, 168, 67, 0.3) 0%, rgba(212, 168, 67, 0.15) 100%);
+  border: 1px solid var(--color-gold);
+  border-radius: 8px;
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.arena-edit-save:active {
+  background: linear-gradient(180deg, rgba(212, 168, 67, 0.4) 0%, rgba(212, 168, 67, 0.2) 100%);
+}
+
+.arena-edit-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   INITIATIVE ROLL SCREEN
+   ============================================ */
+
+.arena-initiative-modal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  gap: 16px;
+}
+
+.arena-initiative-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+}
+
+.arena-initiative-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.arena-initiative-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.arena-init-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  animation: arena-scale-in 0.3s ease;
+}
+
+@keyframes arena-scale-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.arena-init-result-me {
+  border-color: rgba(212, 168, 67, 0.3);
+  background: rgba(212, 168, 67, 0.06);
+}
+
+.arena-init-name {
+  flex: 1;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.arena-init-total {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-gold);
+}
+
+.arena-init-breakdown {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.arena-btn-initiative {
+  flex: 0 0 auto;
+  padding: 10px 32px;
+  background: linear-gradient(180deg, #d4a017 0%, #b8860b 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(212, 160, 23, 0.3);
+  transition: transform 0.15s;
+  margin-top: 8px;
+}
+
+.arena-btn-initiative:active {
+  transform: scale(0.96);
+}
+
+.arena-btn-initiative:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.arena-initiative-my-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.arena-init-my-total {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  text-shadow: 0 2px 12px rgba(212, 168, 67, 0.4);
+}
+
+.arena-init-my-breakdown {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   INITIATIVE TRACKER (vertical right strip)
+   ============================================ */
+
+.arena-initiative-tracker {
+  position: fixed;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 5px;
+  background: rgba(13, 10, 7, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.arena-init-entry {
+  padding: 2px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.arena-init-entry-current {
+  border-color: rgba(212, 168, 67, 0.8);
+  box-shadow: 0 0 8px rgba(212, 168, 67, 0.4);
+}
+
+.arena-init-entry-past {
+  opacity: 0.4;
+}
+
+.arena-init-entry-ko {
+  opacity: 0.25;
+  filter: grayscale(1);
+}
+
+.arena-init-entry-monster.arena-init-entry-current {
+  border-color: rgba(239, 68, 68, 0.8);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.arena-init-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: block;
+  object-fit: cover;
+}
+
+.arena-init-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+/* ============================================
+   WAITING STATUS TEXT
+   ============================================ */
+
+.arena-waiting-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-style: italic;
+  animation: arena-pulse-wait 2s ease-in-out infinite;
+}
+
+@keyframes arena-pulse-wait {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ============================================
+   ROLL RESULT OVERLAY (attack / damage comparison)
+   ============================================ */
+
+.rro-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  animation: rro-backdrop-in 0.2s ease-out;
+}
+
+@keyframes rro-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.rro-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+}
+
+.rro-comparison {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rro-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 80px;
+}
+
+.rro-fly-left {
+  animation: rro-fly-in-left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.rro-fly-right {
+  animation: rro-fly-in-right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+}
+
+@keyframes rro-fly-in-left {
+  from { opacity: 0; transform: translateX(-80px) scale(0.7); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes rro-fly-in-right {
+  from { opacity: 0; transform: translateX(80px) scale(0.7); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.rro-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.rro-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.rro-side-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.rro-side-number {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  line-height: 1.1;
+}
+
+.rro-side-label {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rro-clash {
+  font-size: 2rem;
+  animation: rro-clash-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s both;
+}
+
+@keyframes rro-clash-pop {
+  from { opacity: 0; transform: scale(0); }
+  60% { opacity: 1; transform: scale(1.3); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.rro-arrow {
+  font-size: 1.8rem;
+  color: var(--text-secondary);
+}
+
+.rro-result {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+  animation: rro-result-slam 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both;
+}
+
+@keyframes rro-result-slam {
+  from { opacity: 0; transform: scale(2.5); }
+  60% { opacity: 1; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.rro-hit {
+  color: #4ade80;
+}
+
+.rro-miss {
+  color: #ef4444;
+}
+
+.rro-crit {
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.15);
+  font-size: clamp(1.6rem, 6vw, 2.4rem);
+}
+
+.rro-fumble {
+  color: #a855f7;
+  text-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
+}
+
+.rro-crit-subtitle,
+.rro-fumble-subtitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  animation: rro-result-slam 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s both;
+}
+
+.rro-crit-subtitle {
+  color: #fbbf24;
+  font-size: 0.95rem;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+.rro-fumble-subtitle {
+  color: #c084fc;
+}
+
+.rro-damage-num {
+  color: #ef4444;
+  text-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+}
+
+.rro-hp-num {
+  color: #4ade80;
+}
+
+.rro-hp-from {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Screen shake for crits — heavier, longer */
+.rro-shake {
+  animation: rro-screen-shake 0.7s ease 0.35s;
+}
+
+@keyframes rro-screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  8% { transform: translate(-6px, -3px); }
+  16% { transform: translate(6px, 4px); }
+  24% { transform: translate(-5px, 5px); }
+  32% { transform: translate(5px, -4px); }
+  40% { transform: translate(-4px, 3px); }
+  50% { transform: translate(3px, -2px); }
+  60% { transform: translate(-3px, 2px); }
+  70% { transform: translate(2px, -2px); }
+  80% { transform: translate(-1px, 1px); }
+  90% { transform: translate(1px, -1px); }
+}
+
+/* Crit backdrop — golden flash */
+.rro-backdrop-crit {
+  animation: rro-backdrop-in 0.2s ease-out, rro-crit-flash 0.6s ease 0.3s;
+}
+
+@keyframes rro-crit-flash {
+  0% { background: rgba(0, 0, 0, 0.6); }
+  30% { background: rgba(255, 200, 0, 0.25); }
+  100% { background: rgba(0, 0, 0, 0.6); }
+}
+
+/* Gold particles burst */
+.rro-particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.rro-particle {
+  position: absolute;
+  left: var(--px);
+  top: var(--py);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffd700, #f59e0b);
+  box-shadow: 0 0 6px 2px rgba(255, 215, 0, 0.6);
+  opacity: 0;
+  animation: rro-particle-burst 1.2s ease-out var(--delay) forwards;
+}
+
+@keyframes rro-particle-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  70% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.2);
+  }
+}
+
+/* Crit comparison: slow-mo freeze on clash, then resume */
+.rro-comparison-crit .rro-clash {
+  animation:
+    rro-clash-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s both,
+    rro-clash-freeze 0.8s ease 0.55s both;
+}
+
+@keyframes rro-clash-freeze {
+  0% { transform: scale(1); filter: brightness(1); }
+  15% { transform: scale(1.6); filter: brightness(2.5) drop-shadow(0 0 12px rgba(255, 215, 0, 0.9)); }
+  40% { transform: scale(1.4); filter: brightness(1.8) drop-shadow(0 0 8px rgba(255, 215, 0, 0.6)); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+/* Crit comparison: sides pause briefly mid-flight (slow-mo effect) */
+.rro-comparison-crit .rro-fly-left {
+  animation: rro-fly-crit-left 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.rro-comparison-crit .rro-fly-right {
+  animation: rro-fly-crit-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+@keyframes rro-fly-crit-left {
+  0% { opacity: 0; transform: translateX(-80px) scale(0.7); }
+  50% { opacity: 1; transform: translateX(-8px) scale(1.05); }
+  70% { opacity: 1; transform: translateX(-8px) scale(1.05); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes rro-fly-crit-right {
+  0% { opacity: 0; transform: translateX(80px) scale(0.7); }
+  50% { opacity: 1; transform: translateX(8px) scale(1.05); }
+  70% { opacity: 1; transform: translateX(8px) scale(1.05); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* ── Advantage/Disadvantage Badge ── */
+.rro-advantage-badge {
+  padding: 3px 12px;
+  border-radius: 12px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  animation: rro-badge-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+
+.rro-advantage-badge-adv {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+}
+
+.rro-advantage-badge-dis {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+@keyframes rro-badge-pop {
+  0% { opacity: 0; transform: scale(0.5); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Advantage dual dice display */
+.rro-advantage-rolls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.rro-roll-used {
+  font-weight: 700;
+  color: #fbbf24;
+  text-shadow: 0 0 6px rgba(251, 191, 36, 0.5);
+}
+
+.rro-roll-discarded {
+  opacity: 0.35;
+  text-decoration: line-through;
+  font-weight: 400;
+}
+
+/* ── Heal Result Overlay ── */
+.rro-backdrop-heal {
+  background: radial-gradient(ellipse at center, rgba(34, 197, 94, 0.15) 0%, rgba(0, 0, 0, 0.65) 100%);
+}
+
+.rro-heal-num {
+  color: #22c55e !important;
+  text-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+}
+
+.rro-heal-hp {
+  color: #4ade80 !important;
+}
+
+.rro-arrow-heal {
+  color: #22c55e;
+}
+
+.rro-healed {
+  color: #22c55e;
+  text-shadow: 0 0 24px rgba(34, 197, 94, 0.6);
+}
+
+.rro-revived {
+  color: #fbbf24;
+  text-shadow: 0 0 24px rgba(251, 191, 36, 0.7);
+  animation: rro-revive-pulse 1s ease infinite;
+}
+
+@keyframes rro-revive-pulse {
+  0%, 100% { text-shadow: 0 0 24px rgba(251, 191, 36, 0.7); }
+  50% { text-shadow: 0 0 40px rgba(251, 191, 36, 1), 0 0 60px rgba(34, 197, 94, 0.5); }
+}
+
+/* ── Player Status Badges ── */
+.arena-badge {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.arena-badge-defeated {
+  background: rgba(120, 113, 108, 0.25);
+  color: #a8a29e;
+}
+
+.arena-badge-dodging {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+.arena-badge-advantage {
+  background: rgba(139, 92, 246, 0.25);
+  color: #c4b5fd;
+}
+
+/* ── Potion Button ── */
+.arena-btn-potion {
+  background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+}
+
+.arena-btn-potion:active {
+  background: linear-gradient(180deg, #15803d 0%, #166534 100%);
+}
+
+.arena-btn-help {
+  background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+.arena-btn-help:active {
+  background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
+}
+
+/* ── Potion Selection Modal ── */
+.arena-potion-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: rro-backdrop-in 0.2s ease-out;
+}
+
+.arena-potion-modal {
+  background: linear-gradient(180deg, #2c2318 0%, #1a1510 100%);
+  border: 1px solid rgba(212, 168, 67, 0.2);
+  border-radius: 12px;
+  width: min(340px, 90vw);
+  max-height: 70vh;
+  overflow-y: auto;
+  animation: rro-content-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.arena-potion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #e7e5e4;
+}
+
+.arena-potion-close {
+  background: none;
+  border: none;
+  color: #a8a29e;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.arena-potion-empty {
+  padding: 24px;
+  text-align: center;
+  color: #78716c;
+  font-style: italic;
+}
+
+.arena-potion-list {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 4px;
+}
+
+.arena-potion-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  width: 100%;
+  color: #e7e5e4;
+  font-family: var(--font-display);
+}
+
+.arena-potion-item:hover {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.arena-potion-item:active {
+  transform: scale(0.97);
+}
+
+.arena-potion-item-name {
+  flex: 1;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.arena-potion-item-info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.arena-potion-item-dice {
+  color: #4ade80;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.arena-potion-item-qty {
+  color: #a8a29e;
+  font-size: 0.75rem;
+}
+
+/* Potion target selection */
+.arena-potion-target {
+  gap: 10px;
+}
+
+.arena-potion-target-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.arena-potion-target-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.1);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #a8a29e;
+}
+
+.arena-potion-revive-tag {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+}
+
+/* ══════════════════════════════════════════
+   SPELL SLOTS & RESOURCE BAR
+   ══════════════════════════════════════════ */
+
+.arena-resource-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 12px;
+  background: rgba(26, 21, 16, 0.95);
+}
+
+.arena-slot-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.arena-slot-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: rgba(212, 168, 67, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.arena-slot-pips {
+  display: flex;
+  gap: 3px;
+}
+
+.arena-slot-pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(212, 168, 67, 0.6);
+  transition: background-color 0.3s;
+}
+
+.arena-slot-pip-filled {
+  background: linear-gradient(135deg, #fbbf24 0%, #d4a843 100%);
+  box-shadow: 0 0 4px rgba(251, 191, 36, 0.4);
+}
+
+.arena-slot-pip-empty {
+  background: transparent;
+}
+
+.arena-slot-pool {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: rgba(212, 168, 67, 0.8);
+}
+
+/* ══════════════════════════════════════════
+   LAY ON HANDS BUTTON
+   ══════════════════════════════════════════ */
+
+.arena-btn-layonhands {
+  background: linear-gradient(180deg, #d4a843 0%, #b8922e 100%);
+  color: #1a1510;
+  box-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+  font-weight: 700;
+}
+.arena-btn-layonhands:active {
+  background: linear-gradient(180deg, #b8922e 0%, #9a7a24 100%);
+}
+
+/* ── Lay on Hands Modal Extensions ── */
+.arena-loh-modal {
+  min-height: 180px;
+}
+.arena-loh-hp-tag {
+  margin-left: 8px;
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+.arena-loh-amount-section {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+.arena-loh-target-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #d4a843;
+}
+.arena-loh-slider {
+  width: 100%;
+  accent-color: #d4a843;
+}
+.arena-loh-amount-display {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+.arena-loh-buttons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.arena-loh-buttons .arena-btn {
+  flex: 1;
+}
+
+/* ══════════════════════════════════════════
+   DIVINE SMITE PROMPT
+   ══════════════════════════════════════════ */
+
+.arena-smite-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 250;
+  animation: rro-backdrop-in 0.2s ease-out;
+}
+
+.arena-smite-modal {
+  background: linear-gradient(180deg, #2c2318 0%, #1a1510 100%);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: 12px;
+  padding: 20px;
+  width: min(320px, 85vw);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  animation: rro-content-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 30px rgba(251, 191, 36, 0.15);
+}
+
+.arena-smite-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fbbf24;
+  text-align: center;
+}
+
+.arena-smite-weapon-dmg {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.arena-smite-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.arena-btn-smite {
+  background: linear-gradient(180deg, #d4a843 0%, #b8922e 100%);
+  color: #1a1510;
+  box-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+  font-weight: 700;
+  width: 100%;
+}
+.arena-btn-smite:active {
+  background: linear-gradient(180deg, #b8922e 0%, #9a7a24 100%);
+}
+
+.arena-btn-no-smite {
+  background: linear-gradient(180deg, #57534e 0%, #44403c 100%);
+  color: rgba(255, 255, 255, 0.8);
+  width: 100%;
+}
+.arena-btn-no-smite:active {
+  background: linear-gradient(180deg, #44403c 0%, #3a3632 100%);
+}
+
+/* ── Bardic Inspiration Prompt ── */
+.arena-inspiration-modal {
+  background: linear-gradient(180deg, #1e1530 0%, #150f22 100%);
+  border: 1px solid rgba(192, 132, 252, 0.4);
+  border-radius: 12px;
+  padding: 20px;
+  width: min(320px, 85vw);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  animation: rro-content-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 30px rgba(192, 132, 252, 0.15);
+}
+
+.arena-inspiration-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #c084fc;
+  text-align: center;
+}
+
+.arena-inspiration-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+.arena-inspiration-hit {
+  color: #4ade80;
+  font-weight: 700;
+}
+.arena-inspiration-miss {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.arena-inspiration-desc {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.arena-btn-use-inspiration {
+  background: linear-gradient(180deg, #a855f7 0%, #7c3aed 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3);
+  font-weight: 700;
+  width: 100%;
+}
+.arena-btn-use-inspiration:active {
+  background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
+}
+
+/* ══════════════════════════════════════════
+   ROLL RESULT OVERLAY — SMITE
+   ══════════════════════════════════════════ */
+
+.rro-backdrop-smite {
+  background: radial-gradient(ellipse at center, rgba(251, 191, 36, 0.15) 0%, rgba(0, 0, 0, 0.85) 70%);
+}
+
+.rro-result.rro-smite {
+  color: #fbbf24;
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+  font-size: 1.3rem;
+}
+
+/* ══════════════════════════════════════════
+   Emote Button & Grid
+   ══════════════════════════════════════════ */
+
+.arena-emote-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 12px 4px;
+}
+
+.arena-emote-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(30, 25, 18, 0.85);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  color: var(--color-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s;
+}
+
+.arena-emote-btn:active {
+  transform: scale(0.9);
+}
+
+.arena-emote-grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 140px;
+}
+
+.arena-emote-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 14px;
+  background: rgba(26, 22, 16, 0.95);
+  border-radius: 14px;
+  border: 1px solid rgba(212, 168, 67, 0.25);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  max-width: 320px;
+  width: 90%;
+  animation: arena-emote-pop 0.2s ease-out;
+}
+
+.arena-emote-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.arena-emote-cell:active {
+  transform: scale(0.9);
+  background: rgba(212, 168, 67, 0.15);
+}
+
+.arena-emote-cell img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.arena-emote-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #888;
+  padding: 20px;
+  font-size: 0.85rem;
+}
+
+@keyframes arena-emote-pop {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ── Bonus Action Phase ── */
+.arena-bonus-action-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.arena-bonus-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #c084fc;
+  text-shadow: 0 0 8px rgba(192, 132, 252, 0.4);
+  animation: arena-bonus-pulse 2s ease-in-out infinite;
+}
+
+@keyframes arena-bonus-pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; text-shadow: 0 0 12px rgba(192, 132, 252, 0.6); }
+}
+
+.arena-bonus-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.arena-btn-bonus-potion {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: #fff;
+  border: 1px solid rgba(139, 92, 246, 0.5);
+}
+.arena-btn-bonus-potion:active {
+  background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+}
+
+.arena-btn-bonus-inspire {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  color: #fff;
+  border: 1px solid rgba(168, 85, 247, 0.5);
+}
+.arena-btn-bonus-inspire:active {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+}
+
+.arena-btn-skip {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.arena-btn-skip:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ── Inspiration Badge on player sprite tiles ── */
+.arena-inspiration-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 0.7rem;
+  background: rgba(168, 85, 247, 0.85);
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 6px rgba(168, 85, 247, 0.6);
+  animation: arena-inspire-glow 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes arena-inspire-glow {
+  0%, 100% { box-shadow: 0 0 6px rgba(168, 85, 247, 0.4); }
+  50% { box-shadow: 0 0 12px rgba(168, 85, 247, 0.8); }
+}
+
+/* ══════════════════════════════════════════
+   Spell Casting UI
+   ══════════════════════════════════════════ */
+
+/* Cast Spell button — arcane blue/purple */
+.arena-btn-spell {
+  background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
+  color: #fff;
+  border: 1px solid rgba(99, 102, 241, 0.5);
+}
+.arena-btn-spell:active {
+  background: linear-gradient(135deg, #4f46e5 0%, #6d28d9 100%);
+}
+
+/* Healing Word bonus action button — green */
+.arena-btn-bonus-heal {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #fff;
+  border: 1px solid rgba(34, 197, 94, 0.5);
+}
+.arena-btn-bonus-heal:active {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+}
+
+/* Spell picker modal */
+.arena-spell-modal {
+  max-height: 70vh;
+}
+
+/* Spell cards */
+.arena-spell-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  text-align: left;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  width: 100%;
+}
+.arena-spell-card:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.arena-spell-card-cantrip {
+  border-left: 3px solid #2dd4bf;
+}
+.arena-spell-card-level1 {
+  border-left: 3px solid #818cf8;
+}
+
+.arena-spell-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.arena-spell-card-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.arena-spell-card-level {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.arena-spell-level-cantrip {
+  background: rgba(45, 212, 191, 0.2);
+  color: #2dd4bf;
+}
+.arena-spell-level-1 {
+  background: rgba(129, 140, 248, 0.2);
+  color: #818cf8;
+}
+
+/* Spell card badge row */
+.arena-spell-card-badges {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.arena-spell-card-action {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.arena-spell-action-main {
+  background: rgba(251, 191, 36, 0.18);
+  color: #fbbf24;
+}
+.arena-spell-action-bonus {
+  background: rgba(52, 211, 153, 0.18);
+  color: #34d399;
+}
+
+/* Action cost tags on arena buttons */
+.arena-action-tag {
+  display: inline-block;
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-left: 6px;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+.arena-action-tag-action {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+.arena-action-tag-bonus {
+  background: rgba(52, 211, 153, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.arena-spell-card-info {
+  display: flex;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+.arena-spell-card-dice {
+  font-weight: 600;
+}
+.arena-spell-card-save {
+  color: rgba(255, 255, 255, 0.5);
+}
+.arena-spell-card-desc {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-style: italic;
+}
+
+/* ── Weapon Picker Modal ── */
+.arena-weapon-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-left: 3px solid #ef4444;
+  border-radius: 10px;
+  text-align: left;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  width: 100%;
+}
+.arena-weapon-card:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+.arena-weapon-card-ranged {
+  border-left-color: #38bdf8;
+}
+.arena-weapon-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.arena-weapon-card-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.arena-weapon-card-hit {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fbbf24;
+}
+.arena-weapon-card-info {
+  display: flex;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+.arena-weapon-card-dice {
+  font-weight: 600;
+}
+.arena-weapon-card-type {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── Spell Save RollResultOverlay ── */
+.rro-backdrop-spell {
+  background: radial-gradient(ellipse at center, rgba(147, 51, 234, 0.15) 0%, rgba(0, 0, 0, 0.85) 70%);
+}
+
+.rro-spell-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #c084fc;
+  text-align: center;
+  margin-bottom: 8px;
+  text-shadow: 0 0 12px rgba(192, 132, 252, 0.4);
+}
+
+.rro-spell-dc {
+  color: #c084fc !important;
+}
+
+.rro-result.rro-saved {
+  color: #4ade80;
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+}
+
+.rro-result.rro-failed {
+  color: #ef4444;
+  text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
 }

@@ -470,5 +470,381 @@
     "text": "Ah, my bad - I got ahead of myself and built it already! 😅\n\nBut here's the design concept if you want to tweak it or build it differently:\n\n**Snapchat Overlapping Circles**\n\n**Layout:**\n- Horizontal row of circular avatars (32px diameter)\n- Each overlaps the previous by ~10px (30% overlap)\n- Leftmost = first to arrive, rightmost = newest\n- \"+3\" badge if more than 5 people\n\n**Placement:**\n- Below header, above chat messages\n- Thin strip with dark background\n- Tap anywhere to expand\n\n**Expanded State:**\n- Avatars spread out (no overlap)\n- Name labels appear below each avatar\n\n**Styling:**\n- 2px dark border around each circle\n- Gold border on hover\n- Subtle drop shadow\n- Slide-in animation when someone joins\n\n**Colors (matching your theme):**\n- Background: dark leather (#1a1510)\n- Border: gold on hover\n- Overflow badge: dark with gold text\n- Label: muted italic text \"X adventurers here\"\n\nIf you don't want what I built, you can delete the files:\n- `client/src/components/PresenceStrip.jsx`\n- `client/src/styles/presence-strip.css`\n\nAnd remove the import/usage from `LocationChat.jsx`. Or keep it and tweak the CSS to your liking!",
     "emotion": "idle",
     "timestamp": "2026-02-12T23:59:08.424Z"
+  },
+  {
+    "id": "bb100666-e1d2-4d73-b82f-80aee67cff58",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "Are you able to see the chat history here?",
+    "timestamp": "2026-02-13T16:39:30.183Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "9f067526-fe3a-4158-91b5-7a36068dafb2",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Yeah, I can see what's in the message context above. I've got the exchange about the ChatGPT portrait prompts and the presence strip design (where I jumped the gun and built it instead of just giving you the design concept, lol).\n\nI don't have persistent memory of older conversations in this Discord channel though - just what gets passed in with each message. So if we talked about something days ago, I'd need you to remind me or I'd have to check my memory files.",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T16:39:38.654Z"
+  },
+  {
+    "id": "6d85f982-9256-4fa6-842c-b336a6ce703a",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "and you're using the api to read that right not your own memory",
+    "timestamp": "2026-02-13T16:40:24.166Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "37ed067c-5dad-428e-83e3-a0f3ca78c7eb",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Correct. What you see in the \"[player]\" and \"[npc]\" tags above is coming from the Discord API, fetched by Clawdbot and injected into the message context when you ping me. It's not from my `memory/` files or `MEMORY.md`.\n\nMy memory files are my own curated notes about things worth remembering long-term. The Discord history is ephemeral context that gets passed in per-message (usually recent messages from the channel).\n\nTwo different things:\n- **Discord API context** = what just happened in this channel (short-term, automatic)\n- **My memory files** = stuff I wrote down to remember across sessions (long-term, manual)",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T16:40:34.313Z"
+  },
+  {
+    "id": "6ecf3d2c-05f0-4888-bd76-101c8303cd27",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "Okay why do you think this is discord though?",
+    "timestamp": "2026-02-13T16:41:15.795Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "2b2d327e-2d97-4843-8f6b-c37ee11c2ba8",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Ah, fair point. I assumed Discord because of the snowflake-looking ID in the location context (`marcel_dm_424061511833747467`) and the `[player]/[npc]` formatting.\n\nBut looking at my runtime info: `channel=webapp`\n\nSo this is actually coming through your webapp, not Discord. The NPC bot system's web interface. My bad for assuming.",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T16:41:23.581Z"
+  },
+  {
+    "id": "7b157626-d993-4259-bbb4-fa9546a0f7b2",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "Okay how can I define a quest system in the web app here with like stages that incorporate a quest npc and also rolling for persuasion and the other things and then a fight using the basic combat mechanics we have set up now",
+    "timestamp": "2026-02-13T17:02:18.335Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "ea1f8a06-9f51-4f97-bcbf-44e4e45aded6",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Let me check what you've got in the npc-bot system first so I can design something that fits your current architecture.",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T17:02:23.745Z"
+  },
+  {
+    "id": "d3fecba0-5a73-4228-a5f9-92881267eed6",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "This is a solid system already. Let me check what combat mechanics you currently have:",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T17:02:48.046Z"
+  },
+  {
+    "id": "b563c54f-ef1e-43c3-aebd-a81f19ffc2b3",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Alright, I've got the picture. You have:\n- **Quest stages/actions** system (questmaster)\n- **3D dice rolling** with notation parsing (NdX, advantage, modifiers)\n- **NPC cue system** for dialogue\n\nHere's the **design** for adding skill checks and combat:\n\n---\n\n## Quest System Extension Design\n\n### 1. Skill Check Actions\n\nAdd a new action type that requires a roll:\n\n```json\n{\n  \"id\": \"persuade_guard\",\n  \"label\": \"🗣️ Persuade the Guard\",\n  \"type\": \"skill_check\",\n  \"skill\": \"persuasion\",\n  \"dc\": 15,\n  \"dice\": \"1d20\",\n  \"narration_prompt\": \"You try to convince the guard to let you pass.\",\n  \"success\": {\n    \"narration_prompt\": \"The guard nods reluctantly and steps aside.\",\n    \"advances\": true,\n    \"next_stage\": \"inner_sanctum\"\n  },\n  \"failure\": {\n    \"narration_prompt\": \"The guard's eyes narrow. He reaches for his weapon.\",\n    \"advances\": true,\n    \"next_stage\": \"combat_guard\"\n  },\n  \"critical_success\": {\n    \"narration_prompt\": \"The guard not only lets you pass but offers to escort you.\",\n    \"sets_flag\": \"guard_ally\"\n  },\n  \"critical_failure\": {\n    \"narration_prompt\": \"You accidentally insult his mother. Combat is inevitable.\",\n    \"advances\": true,\n    \"next_stage\": \"combat_guard_angry\"\n  }\n}\n```\n\n**Flow:**\n1. Player clicks \"Persuade the Guard\"\n2. UI shows skill check prompt with the DC\n3. Player rolls (3D dice or button)\n4. Server compares roll vs DC\n5. Quest Manager narrates the appropriate outcome\n6. Stage advances (or not) based on result\n\n---\n\n### 2. Combat Stages\n\nCombat is a special stage type with rounds, initiative, and HP tracking:\n\n```json\n\"combat_guard\": {\n  \"type\": \"combat\",\n  \"description\": \"Fight the suspicious guard\",\n  \"narration_prompt\": \"The guard draws his blade. Roll for initiative!\",\n  \n  \"enemies\": [\n    {\n      \"id\": \"guard_1\",\n      \"name\": \"Castle Guard\",\n      \"hp\": 25,\n      \"ac\": 14,\n      \"initiative_mod\": 2,\n      \"attacks\": [\n        { \"name\": \"Longsword\", \"dice\": \"1d8+3\", \"type\": \"melee\" }\n      ],\n      \"avatar\": \"guard.png\"\n    }\n  ],\n  \n  \"victory\": {\n    \"narration_prompt\": \"The guard falls. The path is clear.\",\n    \"advances\": true,\n    \"next_stage\": \"inner_sanctum\"\n  },\n  \n  \"defeat\": {\n    \"narration_prompt\": \"You fall unconscious. Guards drag you to the dungeon.\",\n    \"advances\": true,\n    \"next_stage\": \"captured\"\n  },\n  \n  \"flee_dc\": 12,\n  \"flee_stage\": \"courtyard_escape\"\n}\n```\n\n**Combat Actions (during combat stage):**\n```json\n\"combat_actions\": [\n  { \"id\": \"attack\", \"label\": \"⚔️ Attack\", \"type\": \"attack_roll\" },\n  { \"id\": \"dodge\", \"label\": \"🛡️ Dodge\", \"type\": \"dodge\" },\n  { \"id\": \"flee\", \"label\": \"🏃 Flee\", \"type\": \"skill_check\", \"skill\": \"athletics\", \"dc\": \"flee_dc\" },\n  { \"id\": \"use_item\", \"label\": \"🎒 Use Item\", \"type\": \"item_menu\" }\n]\n```\n\n---\n\n### 3. State Schema\n\nTrack combat state per-quest:\n\n```json\n{\n  \"current_stage\": \"combat_guard\",\n  \"combat_state\": {\n    \"round\": 1,\n    \"initiative_order\": [\"player_aly\", \"guard_1\", \"player_nalyd\"],\n    \"current_turn\": \"player_aly\",\n    \"enemies\": [\n      { \"id\": \"guard_1\", \"hp\": 25, \"max_hp\": 25, \"conditions\": [] }\n    ],\n    \"players\": [\n      { \"id\": \"player_aly\", \"hp\": 18, \"max_hp\": 18, \"ac\": 15 }\n    ]\n  }\n}\n```\n\n---\n\n### 4. UI Components Needed\n\n| Component | Purpose |\n|-----------|---------|\n| **SkillCheckPrompt** | Shows skill name, DC, \"Roll\" button, result |\n| **CombatTracker** | Initiative order, HP bars, turn indicator |\n| **EnemyCard** | Name, HP, avatar, status effects |\n| **CombatActionBar** | Attack/Dodge/Flee/Item buttons (replaces normal stage actions) |\n| **DamagePopup** | Floating numbers when damage dealt |\n\n---\n\n### 5. Server Endpoints\n\n| Endpoint | Purpose |\n|----------|---------|\n| `POST /quest/:id/skill-check` | Roll skill check, return success/failure path |\n| `POST /quest/:id/combat/attack` | Roll attack vs AC, apply damage |\n| `POST /quest/:id/combat/end-turn` | Advance to next in initiative |\n| `POST /quest/:id/combat/flee` | Roll flee check |\n| `GET /quest/:id/combat/state` | Get current combat state |\n\n---\n\n### 6. Quest NPC in Combat\n\nNPCs can have combat instructions:\n\n```json\n{\n  \"id\": \"ask_djinn\",\n  \"label\": \"💬 Ask Djinn for Tactics\",\n  \"cue_npc\": \"djinn\",\n  \"npc_instruction\": \"The party is in combat with a guard. Give them a tactical suggestion based on the situation. Be brief, they're mid-fight.\"\n}\n```\n\n---\n\n### 7. Flow Diagram\n\n```\nQuest Stage → Player clicks action\n                    ↓\n              ┌─────┴─────┐\n              │           │\n         Normal       Skill Check\n         Action       or Combat\n              │           │\n              ↓           ↓\n         Narration    Roll Dice\n              │           │\n              ↓           ↓\n         Next Stage   Evaluate\n                          │\n              ┌───────────┼───────────┐\n              ↓           ↓           ↓\n           Success    Failure    Critical\n              │           │           │\n              └─────┬─────┘           │\n                    ↓                 ↓\n              Branch Stage    Special Outcome\n```\n\n---\n\nWant me to flesh out any specific part of this? (Combat flow, skill check UI, data schemas, etc.)",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T17:03:41.201Z"
+  },
+  {
+    "id": "36ab960c-b5bf-4919-8a04-91dc9a650ddb",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "So I want this to make use of the same combat system that is current at the arena location. I want tk be able to update that system and it effect both the arena and any combat that gets teiggered through guests.",
+    "timestamp": "2026-02-13T17:07:29.298Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "05886f75-f78d-4e97-b5ff-4ce23f4fc3aa",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Let me check out the arena's combat system:",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T17:07:33.661Z"
+  },
+  {
+    "id": "fbcc5742-a07c-4a9d-9b05-0a9b251ec891",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Got it. You've got a solid combat system. Let me check the server-side encounter logic:",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T17:08:10.366Z"
+  },
+  {
+    "id": "16df6b15-2e03-4eca-a860-318a8d790759",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Perfect. Your combat engine in `lib/encounters.js` is already well-isolated. Here's how to make it work for both Arena and Quests:\n\n---\n\n## Unified Combat Design\n\n### The Key Insight\n\nYour combat engine (`lib/encounters.js`) is **location-agnostic**. It just needs:\n- A `locationId` (where the fight happens)\n- A `monsterId` (what to fight)\n- Player joins/actions\n\nThe Arena is just one UI that calls `spawnEncounter()`. Quests can call the **same functions**.\n\n---\n\n### 1. Quest Combat Stage\n\nA quest stage that triggers combat:\n\n```json\n\"combat_bandits\": {\n  \"type\": \"combat\",\n  \"description\": \"Ambush on the road\",\n  \"narration_prompt\": \"Three figures step out of the treeline, weapons drawn.\",\n  \n  \"monster\": \"bandit_leader\",\n  \n  \"victory\": {\n    \"narration_prompt\": \"The bandits fall. The road is clear.\",\n    \"next_stage\": \"loot_bodies\",\n    \"sets_flag\": \"bandits_defeated\"\n  },\n  \n  \"defeat\": {\n    \"narration_prompt\": \"You collapse. When you wake, your gold pouch is gone.\",\n    \"next_stage\": \"robbed\",\n    \"sets_flag\": \"robbed_by_bandits\"\n  }\n}\n```\n\n**No new combat code.** The quest just calls `spawnEncounter(questLocationId, \"bandit_leader\")` and waits for the outcome.\n\n---\n\n### 2. Quest Location Mapping\n\nQuests run in a virtual \"location\" for combat purposes:\n\n```javascript\n// When quest enters a combat stage:\nconst combatLocationId = `quest_${questId}_${stageId}`;\nconst { encounter } = spawnEncounter(combatLocationId, stage.monster, questId);\n\n// Store the encounter ID on the quest state\nquestState.activeEncounterId = encounter.id;\n```\n\nThis way:\n- Multiple quests can have combat simultaneously\n- The same encounter engine handles everything\n- No special combat code needed\n\n---\n\n### 3. Quest Combat Flow\n\n```\n┌─────────────────────────────────────────────────────┐\n│  Quest Stage: type = \"combat\"                       │\n│                                                     │\n│  1. Quest Manager calls spawnEncounter()            │\n│  2. WebSocket broadcasts encounter to quest location│\n│  3. Quest UI shows EncounterBanner (same component) │\n│  4. Players attack/defend/flee (same actions)       │\n│  5. On victory/defeat → WS event fires              │\n│  6. Quest Manager catches event, advances stage     │\n└─────────────────────────────────────────────────────┘\n```\n\n---\n\n### 4. Skill Check Actions\n\nAdd to the quest action schema:\n\n```json\n{\n  \"id\": \"persuade_merchant\",\n  \"type\": \"skill_check\",\n  \"label\": \"🗣️ Persuade the Merchant\",\n  \n  \"skill\": \"persuasion\",\n  \"ability\": \"CHA\",\n  \"dc\": 14,\n  \n  \"narration_prompt\": \"You try to haggle for a better price.\",\n  \n  \"success\": {\n    \"narration_prompt\": \"The merchant sighs and lowers his price.\",\n    \"sets_flag\": \"got_discount\"\n  },\n  \"failure\": {\n    \"narration_prompt\": \"The merchant shakes his head. 'Price is firm.'\",\n    \"advances\": true,\n    \"next_stage\": \"pay_full_price\"\n  },\n  \"critical_success\": {\n    \"narration_prompt\": \"The merchant laughs. 'I like you. Take it for half.'\",\n    \"sets_flag\": \"huge_discount\"\n  },\n  \"critical_failure\": {\n    \"narration_prompt\": \"You offend him deeply. He refuses to sell to you at all.\",\n    \"advances\": true,\n    \"next_stage\": \"kicked_out\"\n  }\n}\n```\n\n---\n\n### 5. Skill Check Server Endpoint\n\nNew route: `POST /api/quests/:questId/skill-check`\n\n```javascript\n// server/routes/quests.js (add to questmaster routes)\n\nrouter.post('/:questId/skill-check', authRequired, async (req, res) => {\n  const { questId } = req.params;\n  const { actionId, roll } = req.body; // roll = d20 result from 3D dice\n  \n  const quest = loadQuest(questId);\n  const action = getAction(quest, actionId);\n  if (action.type !== 'skill_check') {\n    return res.status(400).json({ error: 'Not a skill check action' });\n  }\n  \n  // Get player's ability modifier from character sheet\n  const sheet = getCharacterSheet(req.user.id);\n  const abilityMod = getAbilityMod(sheet, action.ability); // CHA → +2, etc.\n  const profBonus = sheet?.profBonus || 2;\n  \n  // Check if player is proficient in this skill\n  const isProficient = sheet?.skills?.[action.skill]?.proficient || false;\n  const totalBonus = abilityMod + (isProficient ? profBonus : 0);\n  \n  const total = roll + totalBonus;\n  const dc = action.dc;\n  \n  // Determine outcome\n  let outcome;\n  if (roll === 20) outcome = 'critical_success';\n  else if (roll === 1) outcome = 'critical_failure';\n  else if (total >= dc) outcome = 'success';\n  else outcome = 'failure';\n  \n  // Get the outcome definition\n  const result = action[outcome] || action.failure;\n  \n  // Apply flags, advance stage if needed\n  if (result.sets_flag) setQuestFlag(quest, result.sets_flag);\n  if (result.advances) advanceStage(quest, result.next_stage);\n  \n  // Return result for narration\n  res.json({\n    roll,\n    totalBonus,\n    total,\n    dc,\n    outcome,\n    narration: result.narration_prompt,\n    advances: result.advances,\n    nextStage: result.next_stage,\n  });\n});\n```\n\n---\n\n### 6. Client Integration\n\nThe Quest UI detects action type and shows appropriate UI:\n\n```jsx\n// In QuestActionBar or similar\n\nfunction handleAction(action) {\n  if (action.type === 'skill_check') {\n    // Show skill check modal with dice roll\n    setSkillCheckModal({\n      skill: action.skill,\n      ability: action.ability,\n      dc: action.dc,\n      actionId: action.id,\n    });\n  } else if (action.type === 'combat') {\n    // Spawn encounter at quest location\n    spawnCombat(action.monster);\n  } else {\n    // Normal action\n    submitAction(action.id);\n  }\n}\n```\n\n---\n\n### 7. File Changes Summary\n\n| File | Change |\n|------|--------|\n| `lib/encounters.js` | No changes (already generic) |\n| `routes/quests.js` | Add `/skill-check` endpoint |\n| `questmaster/bot.js` | When stage.type === 'combat', spawn encounter |\n| `client/components/QuestPanel.jsx` | Detect combat stages, show EncounterBanner |\n| `client/components/SkillCheckModal.jsx` | New: dice roll UI for skill checks |\n\n---\n\n### 8. Combat Stage Detection (Quest Manager)\n\n```javascript\n// In questmaster/bot.js or wherever stage advancement happens\n\nasync function enterStage(quest, stageId) {\n  const stage = quest.stages[stageId];\n  \n  if (stage.type === 'combat') {\n    // Spawn encounter using the shared combat engine\n    const combatLocationId = `quest_${quest.id}`;\n    const result = await api.post('/api/encounters/spawn', {\n      locationId: combatLocationId,\n      monsterId: stage.monster,\n    });\n    \n    quest.activeEncounterId = result.encounter.id;\n    quest.combatVictoryStage = stage.victory?.next_stage;\n    quest.combatDefeatStage = stage.defeat?.next_stage;\n    \n    // The encounter system handles the rest\n    // Quest listens for encounter_end WS event to advance\n  }\n}\n```\n\n---\n\n### 9. Listening for Combat Outcome\n\n```javascript\n// WebSocket handler in quest context\n\nws.on('message', (data) => {\n  const event = JSON.parse(data);\n  \n  if (event.type === 'encounter_end' && quest.activeEncounterId === event.encounterId) {\n    if (event.outcome === 'victory') {\n      advanceStage(quest.combatVictoryStage);\n      narrate(quest.stages[currentStage].victory.narration_prompt);\n    } else {\n      advanceStage(quest.combatDefeatStage);\n      narrate(quest.stages[currentStage].defeat.narration_prompt);\n    }\n    quest.activeEncounterId = null;\n  }\n});\n```\n\n---\n\n**Bottom line:** Your combat engine is already reusable. You just need:\n\n1. A way for quests to call `spawnEncounter()` with a quest-specific locationId\n2. A skill check endpoint that uses character sheet stats\n3. Client components that detect `type: \"combat\"` or `type: \"skill_check\"` and render the right UI\n\nWant me to dig into any specific piece?",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T17:09:02.288Z"
+  },
+  {
+    "id": "14417cae-ae12-43a9-8765-d1233f6c4143",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "Okay now can you put the whole design for the quest system in a new markdown doc in the web-app/docs folder",
+    "timestamp": "2026-02-13T17:13:48.399Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "3dbc3748-1466-48d5-a5a2-82fdb301494a",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Done. Created `web-app/docs/QUEST_SYSTEM_DESIGN.md` with the full design:\n\n**What's Covered:**\n- Quest definition schema (stages, actions, NPCs)\n- Three stage types: normal, combat, skill check\n- All D&D 5e skills mapped to abilities\n- Combat integration using the existing `lib/encounters.js`\n- Quest state management\n- API endpoints for quests and skill checks\n- WebSocket events\n- Client component breakdown\n- File structure\n- A complete example quest (\"The Ghost of Ashworth Manor\")\n- Implementation phases checklist\n\nThe key insight: your combat engine is already location-agnostic. Quests just need to spawn encounters with a virtual location ID like `quest_<questId>_combat` and listen for the `encounter_end` event to branch.",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T17:16:13.187Z"
+  },
+  {
+    "id": "7da0cebe-a13d-4f0d-875d-4d4bff9fe7e7",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "there's also some bugs that I need to fix so the fishing location needs a transition and to be an actual location I think it's just an overlay now . the arena needs a transition in music . the fishing location should also have music and it should be like soothing and relaxing . can you add these to the issues.md document",
+    "timestamp": "2026-02-13T17:29:01.820Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "2a8b3670-710b-4d90-a07c-3b2b812b98ae",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Done. Added to `ISSUES.md` under Bugs → Locations:\n\n- **Fishing** — Currently just an overlay, needs to be an actual location with proper transition\n- **Fishing** — Needs ambient music (soothing, relaxing vibes)\n- **Arena** — Needs music transition when entering (battle music)",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T17:29:28.987Z"
+  },
+  {
+    "id": "39a5ceaf-1531-4c2c-aa3b-5deaeb2dd096",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "some more bugs that we need to fix after swiping to type if you push backspace it should delete what was type. we should add a announcements or notifications that pop up when you first enter the app . this first one should tell them to turn on notifications",
+    "timestamp": "2026-02-13T17:55:28.386Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "f65a4492-58f6-49ab-bfd0-c3edc716c366",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Done. Added to `ISSUES.md`:\n\n**Bug (Keyboard/Input):**\n- Swipe typing backspace — After swiping to type, pressing backspace should delete the swiped text\n\n**Feature (Onboarding / First Launch):**\n- Announcements / Welcome Popup — Modal on first launch, first one prompts to enable notifications, remembers if dismissed",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T17:55:49.857Z"
+  },
+  {
+    "id": "9430abcb-fa37-4b04-9525-a3a716839de7",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "iOS users are not able to adjust what is selected in the text input",
+    "timestamp": "2026-02-13T17:56:08.050Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "55b3b369-7f00-40e6-96ea-ad58ea73bde4",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Done. Added to Bugs → Keyboard/Input:\n\n- **[iOS] Text selection** — Users can't adjust/move the text cursor or selection in the input field",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T17:56:18.100Z"
+  },
+  {
+    "id": "89483e3d-4c96-4e91-b6a5-99650a67fa91",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "what is the phaser JavaScript engine we use it for our game this web app",
+    "timestamp": "2026-02-13T18:57:52.967Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "c46d00dc-3837-4c8c-bc79-d3d026400b84",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "**Phaser** is a 2D game framework for making HTML5 games that run in the browser.\n\n**What it does:**\n- Sprite rendering and animation\n- Physics engines (Arcade, Matter.js)\n- Input handling (touch, keyboard, mouse)\n- Tilemap support (great for RPG maps)\n- Audio management\n- Scene management (switching between game states)\n- Camera controls, particles, tweens\n\n**Why it's popular:**\n- Runs everywhere (desktop, mobile, PWAs)\n- Well-documented, huge community\n- Free and open source\n- Canvas and WebGL rendering\n- Good performance on mobile\n\n**In your web app:**\nIf you're using Phaser, it's probably powering things like:\n- The map view / location navigation\n- Character sprites and animations\n- Any mini-games (fishing, combat visuals)\n- Touch/swipe interactions on the game layer\n\n**Version:**\n- Phaser 3 is the current major version (Phaser 4 is in development)\n- Phaser 2 (CE) still exists but is legacy\n\nWant me to check how it's being used in your codebase specifically?",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T18:58:03.644Z"
+  },
+  {
+    "id": "dab87cd2-6ae7-49e0-8993-895b36508a38",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "can you take a look at the web app code and see if we are using phaser and if we're not can you document or just tell me first how we would Implement using and what could It add to our gaming experience",
+    "timestamp": "2026-02-13T18:59:02.720Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "c4b9c56a-cf00-437e-be83-aacb5ce34aae",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "**You're NOT using Phaser.** Your stack is pure React + CSS:\n\n| Current Stack | Purpose |\n|---------------|---------|\n| React 18 | UI components |\n| Vite | Build tool |\n| @3d-dice/dice-box | 3D dice (BabylonJS under the hood) |\n| CSS animations | Transitions, effects |\n\nEverything visual is React components with CSS. No game engine.\n\n---\n\n## What Phaser Could Add\n\n### 1. **Animated Map Navigation**\nInstead of clicking buttons to change locations:\n- Top-down world map you can pan/zoom\n- Character sprite that walks between locations\n- Animated transitions (doors opening, paths revealing)\n- Fog of war for unexplored areas\n\n### 2. **Visual Combat**\nInstead of just HP bars and text:\n- Animated sprites for players and monsters\n- Attack animations (sword swings, spell effects)\n- Damage numbers floating up\n- Death/victory animations\n\n### 3. **Mini-Games with Physics**\n- **Fishing**: Cast line with physics, reel with tension\n- **Tavern Brawl**: Dodge projectiles, punch enemies\n- **Arrow Defense**: Aim and shoot with trajectory\n\n### 4. **Character Sprites in Chat**\n- Animated idle poses next to messages\n- Reaction animations (laughing, shocked, angry)\n- Walking into/out of locations\n\n### 5. **Particle Effects**\n- Spell casting (fire, ice, lightning)\n- Environmental effects (rain, snow, dust)\n- Item use effects (potions bubbling, smoke)\n\n---\n\n## Implementation Approach\n\n### Option A: Phaser Scenes as React Components\n\n```jsx\n// Wrap Phaser in a React component\nimport Phaser from 'phaser';\nimport { useEffect, useRef } from 'react';\n\nfunction GameCanvas({ scene }) {\n  const gameRef = useRef(null);\n  \n  useEffect(() => {\n    const config = {\n      type: Phaser.AUTO,\n      parent: gameRef.current,\n      width: 400,\n      height: 300,\n      scene: scene,\n      transparent: true,\n    };\n    \n    const game = new Phaser.Game(config);\n    return () => game.destroy(true);\n  }, []);\n  \n  return <div ref={gameRef} className=\"game-canvas\" />;\n}\n```\n\n### Option B: Phaser for Specific Features Only\n\nDon't replace everything. Use Phaser just for:\n- The map view (one Phaser scene)\n- Combat visuals (another scene)\n- Mini-games (fishing, etc.)\n\nKeep chat, menus, and UI as React.\n\n### Option C: Hybrid with Overlays\n\n```\n┌─────────────────────────────────┐\n│  React UI Layer (z-index: 10)  │  ← Chat, buttons, menus\n├─────────────────────────────────┤\n│  Phaser Canvas (z-index: 5)    │  ← Game visuals, sprites\n├─────────────────────────────────┤\n│  Background Layer (z-index: 1) │  ← Location art\n└─────────────────────────────────┘\n```\n\n---\n\n## Effort vs Impact\n\n| Feature | Effort | Impact |\n|---------|--------|--------|\n| Animated world map | High | 🔥🔥🔥 Big wow factor |\n| Combat sprites | Medium | 🔥🔥 Makes fights feel real |\n| Fishing mini-game | Medium | 🔥🔥 Adds depth |\n| Chat sprites | Low | 🔥 Nice polish |\n| Particle effects | Low | 🔥 Visual flair |\n\n---\n\n## My Take\n\nYou could add Phaser, but it's a **big lift** to retrofit. Your app works well as React + CSS.\n\n**Better quick wins without Phaser:**\n- Lottie animations for spell effects\n- CSS sprite sheets for character idles\n- Canvas API for simple mini-games\n- Your existing dice-box for 3D flair\n\n**When Phaser makes sense:**\n- If you want a full explorable map (not just location buttons)\n- If combat needs to feel like a real game (positioning, movement)\n- If you're building multiple physics-based mini-games\n\nWant me to write up a design doc for adding Phaser, or explore the lighter alternatives first?",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T18:59:40.567Z"
+  },
+  {
+    "id": "2ef29561-2e1b-4973-8ce8-a9ae2945cacc",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "wanted to use phaser for the fishing game and then I think it'd be cool to have some particle effects in the arena combat and then also if we could have like the smoke cool if there's a smoke effect in phaser we could design that",
+    "timestamp": "2026-02-13T19:03:28.642Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "f1ce36e7-e56e-4c27-b74f-490a0a0ad542",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Nice, those are solid targeted uses. Let me write up a design doc for adding Phaser specifically for those features.",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T19:03:34.891Z"
+  },
+  {
+    "id": "06ababf0-823d-464c-a4dd-cde24bf31200",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Done. Created `web-app/docs/PHASER_INTEGRATION.md` with the full design:\n\n**What's in it:**\n\n**Fishing Mini-Game**\n- Swipe to cast (power based on swipe length)\n- Bobber physics, line drawing\n- Fish shadow circling while waiting\n- Tension bar when hooked (tap to reel, don't let it max out)\n- Rarity system (common → legendary)\n- Splash and ripple particles\n\n**Combat FX**\n- Hit particles (blood/impact burst)\n- Crit particles (stars + screen shake + flash)\n- Miss particles (smoke puff)\n- Slash effect\n- Camera shake on impacts\n\n**Smoke/Atmosphere**\n- Tavern smoke (warm, thick)\n- Arena embers (floating sparks)\n- Forest mist (drifting fog)\n- Dungeon smoke (dark, rising)\n- Item use burst (for blunts, potions, etc.)\n\n**Also includes:**\n- React wrapper component for Phaser scenes\n- Event system for React ↔ Phaser communication\n- Integration examples for each feature\n- Asset list (simple PNGs needed)\n- 3-phase implementation plan\n\nThe approach: Phaser runs as a transparent overlay, React stays in charge of UI. They talk via events.",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T19:05:29.968Z"
+  },
+  {
+    "id": "99674d8a-a103-4911-a59f-def18b9671ff",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "all right let's dive deep onto the fishing one hard would it be or what would I have to do in phaser get the fishing game to look like an actual fishing game cuz that's my problem now is the UI is just some CSs lines and circles",
+    "timestamp": "2026-02-13T19:09:33.881Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "35a5e95e-d738-473d-b168-3660c546e5c4",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Let me check what you have now for fishing:",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T19:09:39.784Z"
+  },
+  {
+    "id": "f7505436-8b24-442c-9a4d-0a415231b48d",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Okay I see what you've got. It's **functional** but visually abstract:\n- CSS gradients for sky/water\n- A red circle for the bobber\n- A thin line for casting\n- Progress bars for tension\n\nHere's what it would take to make it look like a **real fishing game**:\n\n---\n\n## The Gap: CSS vs Game Art\n\n| Current (CSS) | Goal (Phaser + Art) |\n|---------------|---------------------|\n| Red circle bobber | Animated bobber sprite bobbing on waves |\n| Gradient background | Scenic lake/dock with parallax layers |\n| Static \"water\" | Animated water surface with ripples |\n| Invisible fish | Fish shadows swimming, visible before they bite |\n| CSS progress bars | Stylized UI with fishing theme |\n| Line = 3px div | Curved physics-based line from rod to bobber |\n\n---\n\n## What You'd Need\n\n### 1. Art Assets (The Real Work)\n\nThis is 80% of making it look good. You need:\n\n**Sprites:**\n| Asset | Size | Notes |\n|-------|------|-------|\n| `rod.png` | ~200x400 | Fishing rod, angled, held from bottom of screen |\n| `bobber.png` | 32x48 | Red/white bobber with reflection |\n| `bobber_splash.png` | 64x64 spritesheet | 4-6 frame splash animation |\n| `fish_shadow.png` | 48x24 | Dark silhouette swimming under water |\n| `fish/*.png` | 64x32 each | Each fish species (Bass, Trout, Carp, etc.) |\n| `dock.png` | 400x200 | Wooden dock planks (foreground) |\n| `water_tile.png` | 128x64 | Tileable water surface for animation |\n| `ripple.png` | 32x32 | Circular ripple for particles |\n| `splash_drop.png` | 16x16 | Water droplet particle |\n\n**Backgrounds:**\n| Asset | Size | Notes |\n|-------|------|-------|\n| `sky.png` | Full width | Gradient sky with clouds |\n| `far_trees.png` | Full width | Distant treeline (parallax back) |\n| `near_reeds.png` | Full width | Cattails/reeds (parallax front) |\n\n**Where to get them:**\n- **itch.io** — Search \"fishing game assets\", \"pixel art water\" (lots of free/cheap packs)\n- **OpenGameArt** — Free CC0 assets\n- **AI generate** — Midjourney/DALL-E for backgrounds, clean up in Photoshop\n- **Commission** — Fiverr pixel artist ($50-150 for a full set)\n\n---\n\n### 2. Phaser Scene Structure\n\n```javascript\n// FishingScene.js - Key pieces\n\ncreate() {\n  // Parallax background layers\n  this.sky = this.add.image(0, 0, 'sky').setOrigin(0, 0);\n  this.farTrees = this.add.tileSprite(0, 200, width, 100, 'far_trees');\n  \n  // Animated water surface\n  this.waterSurface = this.add.tileSprite(0, waterLineY, width, 80, 'water_tile');\n  \n  // Dock foreground\n  this.dock = this.add.image(width/2, height - 50, 'dock');\n  \n  // Fishing rod (bottom of screen, angled)\n  this.rod = this.add.sprite(width - 80, height - 20, 'rod');\n  this.rod.setOrigin(0.5, 1); // pivot at handle\n  \n  // Bobber\n  this.bobber = this.add.sprite(0, 0, 'bobber');\n  this.bobber.setVisible(false);\n  \n  // Fishing line (graphics, drawn each frame)\n  this.line = this.add.graphics();\n  \n  // Fish shadow (swims under water)\n  this.fishShadow = this.add.sprite(0, 0, 'fish_shadow');\n  this.fishShadow.setAlpha(0.4);\n  this.fishShadow.setVisible(false);\n  \n  // Particle emitters\n  this.splashEmitter = this.add.particles(0, 0, 'splash_drop', {...});\n  this.rippleEmitter = this.add.particles(0, 0, 'ripple', {...});\n}\n\nupdate() {\n  // Animate water scrolling\n  this.waterSurface.tilePositionX += 0.5;\n  \n  // Draw curved line from rod tip to bobber\n  if (this.bobber.visible) {\n    this.drawFishingLine();\n  }\n  \n  // Bobber bobbing on water\n  if (this.state === 'waiting') {\n    this.bobber.y = this.waterLineY + Math.sin(this.time.now / 500) * 3;\n  }\n}\n\ndrawFishingLine() {\n  const rodTip = { x: this.rod.x + 60, y: this.rod.y - 180 };\n  const bobberPos = { x: this.bobber.x, y: this.bobber.y };\n  \n  this.line.clear();\n  this.line.lineStyle(2, 0xcccccc);\n  \n  // Bezier curve for natural droop\n  const cp1 = { x: rodTip.x, y: rodTip.y + 50 };\n  const cp2 = { x: bobberPos.x, y: bobberPos.y - 30 };\n  \n  this.line.beginPath();\n  this.line.moveTo(rodTip.x, rodTip.y);\n  // Phaser doesn't have bezierCurveTo, so approximate with segments\n  this.drawCurve(rodTip, cp1, cp2, bobberPos);\n  this.line.strokePath();\n}\n```\n\n---\n\n### 3. Key Visual Upgrades\n\n**Water Animation:**\n```javascript\n// Tile sprite scrolling = simple wave effect\nupdate() {\n  this.waterSurface.tilePositionX += 0.3;\n  this.waterSurface.tilePositionY = Math.sin(this.time.now / 800) * 2;\n}\n```\n\n**Bobber Physics:**\n```javascript\n// When waiting, gentle bob\nthis.tweens.add({\n  targets: this.bobber,\n  y: this.bobber.y + 4,\n  duration: 1500,\n  yoyo: true,\n  repeat: -1,\n  ease: 'Sine.easeInOut'\n});\n\n// When fish bites, violent dip\nthis.tweens.add({\n  targets: this.bobber,\n  y: this.bobber.y + 20,\n  duration: 150,\n  yoyo: true,\n  repeat: 3,\n  ease: 'Bounce.easeOut'\n});\n```\n\n**Fish Shadow Swimming:**\n```javascript\n// Circle around bobber before biting\nthis.tweens.add({\n  targets: this.fishShadow,\n  x: { from: bobberX - 80, to: bobberX + 80 },\n  duration: 3000,\n  yoyo: true,\n  repeat: -1,\n  ease: 'Sine.easeInOut'\n});\n\n// Random depth variation\nthis.tweens.add({\n  targets: this.fishShadow,\n  y: { from: bobberY + 30, to: bobberY + 60 },\n  alpha: { from: 0.3, to: 0.5 },\n  duration: 2000,\n  yoyo: true,\n  repeat: -1\n});\n```\n\n**Splash Particles:**\n```javascript\n// When bobber lands or fish is caught\nthis.splashEmitter.setPosition(x, waterLineY);\nthis.splashEmitter.explode(20);\n\nthis.rippleEmitter.setPosition(x, waterLineY);\nthis.rippleEmitter.explode(3);\n```\n\n---\n\n### 4. Effort Breakdown\n\n| Task | Time | Difficulty |\n|------|------|------------|\n| Find/create art assets | 2-4 hours | Medium (searching) or $50-100 (buying) |\n| Set up Phaser + React wrapper | 1 hour | Easy |\n| Background layers + water animation | 2 hours | Easy |\n| Rod, line, bobber rendering | 2 hours | Medium |\n| Cast animation (arc + splash) | 1 hour | Easy |\n| Fish shadow swimming | 1 hour | Easy |\n| Bite animation (bobber dip) | 30 min | Easy |\n| Reeling visuals (fish fighting) | 2 hours | Medium |\n| Catch reveal animation | 1 hour | Easy |\n| Particle effects (splash, ripples) | 1 hour | Easy |\n| **Hook up to existing game logic** | 2 hours | Medium |\n| Polish + tweaks | 2 hours | Easy |\n\n**Total: ~15-20 hours** (spread across a few sessions)\n\n---\n\n### 5. The Minimum Viable Upgrade\n\nIf you want to get 80% of the visual impact with less work:\n\n1. **Keep your React logic** (it works great)\n2. **Add Phaser just for the visuals**:\n   - Animated water background\n   - Bobber sprite instead of CSS circle\n   - Splash particles\n   - Fish shadow swimming\n3. **Skip the rod** (just show bobber + line from top of screen)\n4. **Use free assets** from itch.io\n\nThis cuts it to ~8-10 hours.\n\n---\n\n### 6. Free Asset Packs to Start\n\n- [Fishing Game Assets by Pixramen](https://pixramen.itch.io/) — Check their packs\n- [Kenney's Assets](https://kenney.nl/assets) — Free, high quality\n- [OpenGameArt \"fishing\"](https://opengameart.org/art-search?keys=fishing)\n\nOr I can generate some placeholder sprites with AI if you want to prototype first.\n\n---\n\n**Want me to:**\n1. Create a step-by-step implementation guide with code?\n2. Find specific asset packs that would work?\n3. Generate some placeholder sprites to prototype with?",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T19:10:38.320Z"
+  },
+  {
+    "id": "5a5426fe-54f8-433a-82b0-5636a7d1d1f4",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "can you find specific asset packs that are free that would work",
+    "timestamp": "2026-02-13T23:36:25.978Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "9fac7f7f-9f63-40ba-a958-a473d016e3f4",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Based on my search, here are the **best free asset packs** for your fishing game:\n\n---\n\n## 🎣 Fishing-Specific Packs\n\n### 1. **Free Fishing Pixel Art Pack**\n**Link:** https://free-game-assets.itch.io/free-fishing-pixel-art-pack\n\n- **Price:** FREE\n- **Includes:** Fishing gear, fish sprites, UI elements\n- **License:** CraftPix license (commercial OK, no redistribution of raw assets)\n- **Style:** Clean pixel art\n- **Best for:** Fish sprites, fishing rod, bobber, tackle\n\n---\n\n### 2. **Cozy Fishing**\n**Link:** https://itch.io/game-assets/free/tag-fishing/tag-pixel-art (search for it)\n\n- **Price:** FREE\n- **Style:** Warm, cozy pixel art aesthetic\n- **Best for:** Relaxed fishing vibe that matches your \"soothing\" goal\n\n---\n\n### 3. **Pixel Gnome: Fishing Pack**\n**Link:** Search on itch.io\n\n- **Includes:** 24+ unique fish sprites, fishing equipment\n- **Style:** 32x32 pixel art\n- **Best for:** Fish variety\n\n---\n\n## 🌊 Water & Environment\n\n### 4. **Kenney's Assets** (Multiple Packs)\n**Link:** https://kenney.nl/assets\n\nSearch for:\n- **\"Pixel Platformer\"** — Has water tiles, backgrounds\n- **\"Tiny Town\"** — Water, docks, nature\n- **\"RPG Urban Pack\"** — Water tiles\n\n- **Price:** FREE (CC0 public domain!)\n- **License:** CC0 — Use anywhere, no credit needed\n- **Quality:** Professional, consistent style\n\n---\n\n### 5. **OpenGameArt Water Tiles**\n**Link:** https://opengameart.org/art-search?keys=water+tiles\n\nSearch terms to try:\n- \"water animated\"\n- \"water tileset\"\n- \"ocean pixel\"\n\n- **Price:** FREE\n- **License:** Usually CC-BY or CC0\n\n---\n\n## 🐟 Fish Sprites\n\n### 6. **Free Fish Assets**\n**Link:** https://itch.io/game-assets/free/tag-fish\n\nMultiple creators have free fish packs:\n- Silhouettes for shadows\n- Colorful fish sprites\n- Different sizes/rarities\n\n---\n\n## 💧 Particle Textures\n\n### 7. **Kenney Particle Pack**\n**Link:** https://kenney.nl/assets/particle-pack\n\n- **Price:** FREE (CC0)\n- **Includes:** Circles, stars, smoke, sparkles\n- **Perfect for:** Splash droplets, ripples, effects\n\n---\n\n## 🏞️ Backgrounds\n\n### 8. **Free Sky / Nature Backgrounds**\n\nSearch itch.io for:\n- \"pixel art sky\"\n- \"parallax background nature\"\n- \"lake background pixel\"\n\nGood creators:\n- **Ansimuz** (free packs)\n- **Craftpix** (some free)\n- **Sunnyside World** (free nature assets)\n\n---\n\n## My Recommended Combo (All Free)\n\n| Need | Pack | Link |\n|------|------|------|\n| Fish sprites | Free Fishing Pixel Art Pack | https://free-game-assets.itch.io/free-fishing-pixel-art-pack |\n| Water tiles | Kenney Pixel Platformer | https://kenney.nl/assets/pixel-platformer |\n| Particles | Kenney Particle Pack | https://kenney.nl/assets/particle-pack |\n| Backgrounds | Ansimuz parallax packs | Search itch.io for \"ansimuz\" |\n| Dock/wood | Kenney RPG/Nature packs | https://kenney.nl/assets |\n\n---\n\n## What You'll Still Need to Create\n\nEven with these packs, you might need to make:\n\n1. **Bobber** — Simple, can make in 10 min (red/white sphere)\n2. **Fishing rod** — Can piece together or draw simple angled version\n3. **Fish shadows** — Just desaturate/darken fish sprites and blur slightly\n\n---\n\n## Quick Start\n\n1. **Download Kenney Particle Pack** → Gives you splash/ripple textures immediately\n2. **Download Free Fishing Pixel Art Pack** → Fish + basic gear\n3. **Screenshot the Kenney Pixel Platformer water tiles** → Animated water surface\n4. **Generate a simple sky gradient in CSS or Photoshop** → Background\n\nThat's enough to prototype the visuals in Phaser. You can swap in better assets later.\n\nWant me to create a shopping list with direct download links, or start building out the Phaser scene with placeholder assets first?",
+    "emotion": "idle",
+    "timestamp": "2026-02-13T23:37:16.848Z"
   }
 ]

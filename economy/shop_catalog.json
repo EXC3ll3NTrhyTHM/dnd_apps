@@ -27,6 +27,29 @@
         { "id": "dragonbone_rod", "name": "Dragonbone Rod", "price": 25000, "type": "rod", "consumable": false, "one_time": true, "max_stack": 1, "description": "Carved from the spine of a wyrm. Each reel tap pulls 3\u00d7 harder. The finest rod in Okhan." }
       ]
     },
+    "potions": {
+      "display_name": "Potions",
+      "emoji": "\ud83e\uddea",
+      "items": [
+        { "id": "potion_healing", "name": "Potion of Healing", "price": 50, "type": "potion", "consumable": true, "one_time": false, "max_stack": 5, "heal_dice": "2d4+2", "description": "A small vial of red liquid that shimmers when agitated. Restores 2d4+2 HP." },
+        { "id": "potion_greater_healing", "name": "Potion of Greater Healing", "price": 100, "type": "potion", "consumable": true, "one_time": false, "max_stack": 5, "heal_dice": "4d4+4", "description": "A larger flask of deep crimson liquid. Restores 4d4+4 HP." },
+        { "id": "potion_superior_healing", "name": "Potion of Superior Healing", "price": 500, "type": "potion", "consumable": true, "one_time": false, "max_stack": 5, "heal_dice": "8d4+8", "description": "A crystal bottle of radiant scarlet elixir. Restores 8d4+8 HP." }
+      ]
+    },
+    "dice_sets": {
+      "display_name": "Dice Sets",
+      "emoji": "\ud83c\udfb2",
+      "items": [
+        { "id": "dice_fire", "name": "Ember Dice", "price": 200, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "fire", "description": "Dice forged in dragonfire. Warm orange glow with flickering embers." },
+        { "id": "dice_ice", "name": "Frostbite Dice", "price": 200, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "ice", "description": "Carved from enchanted ice. Cool blue with a crystalline shimmer." },
+        { "id": "dice_poison", "name": "Venom Dice", "price": 200, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "poison", "description": "Infused with basilisk venom. Sickly green with toxic swirls." },
+        { "id": "dice_bronze", "name": "Bronze Dice", "price": 300, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "bronze", "description": "Cast in ancient bronze. A warrior's classic." },
+        { "id": "dice_gold", "name": "Golden Dice", "price": 500, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "gold", "description": "Pure gold with polished faces. For those who spare no expense." },
+        { "id": "dice_breebaby", "name": "Breebaby Dice", "price": 500, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "breebaby", "description": "Pastel pink and purple swirls. Deceptively cute." },
+        { "id": "dice_glitterparty", "name": "Glitter Party Dice", "price": 500, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "glitterparty", "description": "A chaotic explosion of color and sparkle. Party time." },
+        { "id": "dice_swrpg", "name": "Obsidian Dice", "price": 750, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "swrpg", "description": "Dark as the void with crimson runes. For those who walk in shadow." }
+      ]
+    },
     "special": {
       "display_name": "Special",
       "emoji": "✨",

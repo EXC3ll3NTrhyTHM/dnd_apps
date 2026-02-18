@@ -17,11 +17,12 @@ const STAT_INFO = {
   PROF: { name: 'Proficiency Bonus', desc: 'Added to attacks, saves, and skill checks you\'re proficient in. Increases as you level up, reflecting your growing expertise.' },
 };
 
-export default function CharacterSheet({ userId, editable }) {
+export default function CharacterSheet({ userId, editable, refreshKey }) {
   const [sheet, setSheet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [backstoryExpanded, setBackstoryExpanded] = useState(false);
   const [notesExpanded, setNotesExpanded] = useState(false);
+  const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [selectedStat, setSelectedStat] = useState(null);
   const [achievementQueue, setAchievementQueue] = useState([]);
   const inspectReported = useRef(false);
@@ -51,11 +52,13 @@ export default function CharacterSheet({ userId, editable }) {
 
   useEffect(() => {
     if (!userId) { setLoading(false); return; }
-    api(`/api/character-sheet/${userId}`)
+    setLoading(true);
+    const url = refreshKey !== undefined ? '/api/character-sheet/me' : `/api/character-sheet/${userId}`;
+    api(url)
       .then(data => setSheet(data.characterSheet))
       .catch(() => setSheet(null))
       .finally(() => setLoading(false));
-  }, [userId]);
+  }, [userId, refreshKey]);
 
   if (loading || !sheet) return null;
 
@@ -220,6 +223,16 @@ export default function CharacterSheet({ userId, editable }) {
           </div>
         )}
       </div>
+
+      {/* Details toggle */}
+      <button
+        className="cs-details-toggle"
+        onClick={() => setDetailsExpanded(!detailsExpanded)}
+      >
+        {detailsExpanded ? 'Hide details \u25B2' : 'Show details \u25BC'}
+      </button>
+
+      {detailsExpanded && <>
 
       {/* Section 3: Physical Description */}
       {(physicalFields.length > 0 || isEditingPhysical) && (
@@ -457,6 +470,8 @@ export default function CharacterSheet({ userId, editable }) {
           </button>
         </div>
       )}
+
+      </>}
 
       {achievementQueue.length > 0 && (
         <AchievementToast

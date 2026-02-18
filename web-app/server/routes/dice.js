@@ -25,6 +25,12 @@ function loadPlayers() {
   catch { return {}; }
 }
 
+function savePlayers(data) {
+  const tmp = PLAYERS_PATH + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+  fs.renameSync(tmp, PLAYERS_PATH);
+}
+
 function getPlayerName(user) {
   const players = loadPlayers();
   return players[user.id]?.characterName || user.global_name || user.username;
@@ -267,6 +273,41 @@ router.post('/locations/:locationId/dice-roll', authRequired, async (req, res) =
   const response = { message, newAchievements };
   if (levelUp) response.levelUp = levelUp;
   res.json(response);
+});
+
+// ── Dice Cosmetics API ──
+
+/** GET /api/dice/equipped — return the player's equipped dice colorset */
+router.get('/equipped', authRequired, (req, res) => {
+  const players = loadPlayers();
+  const player = players[req.user.id] || {};
+  res.json({ colorset: player.equippedDice || 'default' });
+});
+
+/** GET /api/dice/owned — return the player's owned dice colorsets */
+router.get('/owned', authRequired, (req, res) => {
+  const players = loadPlayers();
+  const player = players[req.user.id] || {};
+  res.json({ owned: player.ownedDice || ['default'], equipped: player.equippedDice || 'default' });
+});
+
+/** POST /api/dice/equip — equip a dice colorset the player owns */
+router.post('/equip', authRequired, (req, res) => {
+  const { colorset } = req.body;
+  if (!colorset) return res.status(400).json({ error: 'colorset is required.' });
+
+  const players = loadPlayers();
+  if (!players[req.user.id]) players[req.user.id] = {};
+  const player = players[req.user.id];
+  const owned = player.ownedDice || ['default'];
+
+  if (!owned.includes(colorset)) {
+    return res.status(400).json({ error: 'You do not own that dice set.' });
+  }
+
+  player.equippedDice = colorset;
+  savePlayers(players);
+  res.json({ success: true, colorset });
 });
 
 module.exports = router;

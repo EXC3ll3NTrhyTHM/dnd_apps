@@ -506,5 +506,51 @@
     "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
     "text": "*Build*",
     "timestamp": "2026-02-12T04:55:56.874Z"
+  },
+  {
+    "id": "5744c4ba-25a5-4786-9e00-134fc09a548e",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "Hey @Mira  did you miss me",
+    "timestamp": "2026-02-16T07:38:16.521Z"
+  },
+  {
+    "id": "2c60d594-dff8-4d42-b952-2dc79590ae79",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "*I lean back against the wall, feigning nonchalance* Miss you? Of course not. I just found a suspicious lack of chaos around here without you. *smirks* You know I thrive on the chaos you bring, Songbird.",
+    "emotion": "happy",
+    "timestamp": "2026-02-16T07:38:18.830Z",
+    "reactions": {
+      "😂": [
+        "228241331296665600"
+      ]
+    }
+  },
+  {
+    "id": "ada0957c-ea6e-4a6a-8f96-17a64336b9dd",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "Yeah yeah i  know you missed me, Shadow @Mira",
+    "timestamp": "2026-02-16T07:38:59.782Z"
+  },
+  {
+    "id": "593b0e2a-ab6e-4aa0-9a7e-34ee014f91bd",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "*I roll my eyes playfully* Alright, you caught me. But let's keep that our little secret, shall we? I can't have everyone knowing how much I enjoy your company. *winks*",
+    "emotion": "happy",
+    "timestamp": "2026-02-16T07:39:06.167Z",
+    "reactions": {
+      "❤️": [
+        "228241331296665600"
+      ]
+    }
   }
 ]

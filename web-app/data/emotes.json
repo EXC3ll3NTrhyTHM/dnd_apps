@@ -1,0 +1,202 @@
+{
+  "categories": [
+    { "id": "reactions", "name": "Reactions" },
+    { "id": "combat", "name": "Combat" },
+    { "id": "social", "name": "Social" },
+    { "id": "dnd", "name": "D&D" },
+    { "id": "npc", "name": "NPCs" }
+  ],
+  "emotes": [
+    {
+      "id": "tears_of_joy",
+      "name": "Tears of Joy",
+      "category": "reactions",
+      "image": "tears_of_joy.webp",
+      "description": "laughs until they cry"
+    },
+    {
+      "id": "crying",
+      "name": "Crying",
+      "category": "reactions",
+      "image": "crying.webp",
+      "description": "bursts into tears"
+    },
+    {
+      "id": "steam_face",
+      "name": "Fuming",
+      "category": "reactions",
+      "image": "steam_face.webp",
+      "description": "fumes with anger"
+    },
+    {
+      "id": "mind_blown",
+      "name": "Mind Blown",
+      "category": "reactions",
+      "image": "mind_blown.webp",
+      "description": "has their mind blown"
+    },
+    {
+      "id": "screaming",
+      "name": "Screaming",
+      "category": "reactions",
+      "image": "screaming.webp",
+      "description": "screams in terror"
+    },
+    {
+      "id": "party_face",
+      "name": "Party!",
+      "category": "reactions",
+      "image": "party_face.webp",
+      "description": "celebrates with a party"
+    },
+    {
+      "id": "smirk",
+      "name": "Smirk",
+      "category": "reactions",
+      "image": "smirk.webp",
+      "description": "smirks knowingly"
+    },
+    {
+      "id": "eye_roll",
+      "name": "Eye Roll",
+      "category": "reactions",
+      "image": "eye_roll.webp",
+      "description": "rolls their eyes"
+    },
+    {
+      "id": "rofl",
+      "name": "ROFL",
+      "category": "reactions",
+      "image": "rofl.webp",
+      "description": "rolls on the floor laughing"
+    },
+    {
+      "id": "skull",
+      "name": "Dead",
+      "category": "combat",
+      "image": "skull.webp",
+      "description": "is dead inside"
+    },
+    {
+      "id": "fire",
+      "name": "Fire",
+      "category": "combat",
+      "image": "fire.webp",
+      "description": "is on fire!"
+    },
+    {
+      "id": "flexed_biceps",
+      "name": "Flex",
+      "category": "combat",
+      "image": "flexed_biceps.webp",
+      "description": "flexes mightily"
+    },
+    {
+      "id": "bullseye",
+      "name": "Bullseye",
+      "category": "combat",
+      "image": "bullseye.webp",
+      "description": "hits the bullseye!"
+    },
+    {
+      "id": "trophy",
+      "name": "Trophy",
+      "category": "combat",
+      "image": "trophy.webp",
+      "description": "claims victory!"
+    },
+    {
+      "id": "crossed_swords",
+      "name": "Swords",
+      "category": "combat",
+      "image": "crossed_swords.webp",
+      "description": "crosses swords"
+    },
+    {
+      "id": "dragon",
+      "name": "Dragon",
+      "category": "combat",
+      "image": "dragon.webp",
+      "description": "summons a dragon!"
+    },
+    {
+      "id": "gem",
+      "name": "Gem",
+      "category": "combat",
+      "image": "gem.webp",
+      "description": "shows off a shiny gem"
+    },
+    {
+      "id": "thumbs_up_noto",
+      "name": "Thumbs Up",
+      "category": "social",
+      "image": "thumbs_up_noto.webp",
+      "description": "gives a thumbs up"
+    },
+    {
+      "id": "thumbs_down",
+      "name": "Thumbs Down",
+      "category": "social",
+      "image": "thumbs_down.webp",
+      "description": "gives a thumbs down"
+    },
+    {
+      "id": "clapping",
+      "name": "Clapping",
+      "category": "social",
+      "image": "clapping.webp",
+      "description": "gives a round of applause"
+    },
+    {
+      "id": "salute",
+      "name": "Salute",
+      "category": "social",
+      "image": "salute.webp",
+      "description": "salutes respectfully"
+    },
+    {
+      "id": "heart",
+      "name": "Heart",
+      "category": "social",
+      "image": "heart.webp",
+      "description": "sends love"
+    },
+    {
+      "id": "nat20",
+      "name": "Nat 20!",
+      "category": "dnd",
+      "image": "nat20.svg",
+      "description": "celebrates a natural 20!"
+    },
+    {
+      "id": "fumble",
+      "name": "Fumble",
+      "category": "dnd",
+      "image": "fumble.svg",
+      "description": "fumbles spectacularly"
+    },
+    {
+      "id": "rage",
+      "name": "Rage",
+      "category": "dnd",
+      "image": "rage.svg",
+      "description": "seethes with rage"
+    },
+    {
+      "id": "ember_laugh",
+      "name": "Ember Laughs",
+      "category": "npc",
+      "character": "Ember",
+      "image": "ember_laugh.svg",
+      "description": "cackles with fiery glee"
+    },
+    {
+      "id": "bonesy_rattle",
+      "name": "Bonesy Rattles",
+      "category": "npc",
+      "character": "Bonesy",
+      "image": "bonesy_rattle.svg",
+      "description": "rattles bones in frustration"
+    }
+  ]
+}

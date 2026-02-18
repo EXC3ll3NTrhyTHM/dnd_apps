@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Fumble - cracked d20 falling apart -->
+  <g>
+    <animateTransform attributeName="transform" type="rotate" values="0,60,58;-15,60,58;0,60,58" dur="2s" repeatCount="indefinite"/>
+    <!-- D20 shape - broken/cracked -->
+    <polygon points="60,20 90,40 82,78 38,78 30,40" fill="#4a4a4a" stroke="#666" stroke-width="2"/>
+    <!-- Crack lines -->
+    <path d="M50,35 L55,50 L48,65 L42,78" stroke="#222" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M70,30 L65,48 L72,60 L78,72" stroke="#222" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M45,52 L68,48" stroke="#222" stroke-width="1.5" fill="none"/>
+    <!-- Inner facets (darker, damaged) -->
+    <polygon points="60,20 90,40 65,48" fill="#555" stroke="#666" stroke-width="1" opacity="0.5"/>
+    <polygon points="60,20 30,40 55,50" fill="#3a3a3a" stroke="#666" stroke-width="1" opacity="0.4"/>
+    <!-- "1" text -->
+    <text x="60" y="63" text-anchor="middle" font-size="24" font-weight="900" fill="#dc2626" font-family="sans-serif">1</text>
+  </g>
+  <!-- Falling debris pieces -->
+  <rect x="25" y="82" width="6" height="6" rx="1" fill="#555" transform="rotate(20,28,85)">
+    <animate attributeName="y" values="78;105" dur="1.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0" dur="1.5s" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="rotate" values="20,28,85;180,28,105" dur="1.5s" repeatCount="indefinite" additive="sum"/>
+  </rect>
+  <rect x="85" y="80" width="5" height="5" rx="1" fill="#4a4a4a" transform="rotate(-15,87,82)">
+    <animate attributeName="y" values="76;108" dur="1.3s" repeatCount="indefinite" begin="0.3s"/>
+    <animate attributeName="opacity" values="0.7;0" dur="1.3s" repeatCount="indefinite" begin="0.3s"/>
+  </rect>
+  <!-- Sad dust cloud -->
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0.4;0" dur="2s" repeatCount="indefinite"/>
+    <ellipse cx="60" cy="95" rx="30" ry="6" fill="#888"/>
+  </g>
+</svg>

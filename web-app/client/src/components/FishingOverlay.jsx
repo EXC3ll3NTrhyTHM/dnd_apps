@@ -3,6 +3,7 @@ import { api } from '../hooks/useApi';
 import '../styles/fishing.css';
 
 const RARITY_COLORS = {
+  junk: '#6b5b45',
   common: '#a0a0a0',
   uncommon: '#4ade80',
   rare: '#60a5fa',
@@ -11,6 +12,7 @@ const RARITY_COLORS = {
 };
 
 const RARITY_LABELS = {
+  junk: 'Junk',
   common: 'Common',
   uncommon: 'Uncommon',
   rare: 'Rare',
@@ -35,6 +37,7 @@ export default function FishingOverlay({ onClose }) {
   const [selectedBait, setSelectedBait] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [leaderboard, setLeaderboard] = useState([]);
 
   // Cast state
   const [castToken, setCastToken] = useState(null);
@@ -77,9 +80,13 @@ export default function FishingOverlay({ onClose }) {
   async function loadInventory() {
     try {
       setLoading(true);
-      const data = await api('/api/inventory');
-      const items = data.inventory?.items || data.items || [];
+      const [invData, lbData] = await Promise.all([
+        api('/api/inventory'),
+        api('/api/fishing/leaderboard').catch(() => ({ leaderboard: [] })),
+      ]);
+      const items = invData.inventory?.items || invData.items || [];
       setInventory(items);
+      setLeaderboard(lbData.leaderboard || []);
 
       // Auto-select first bait found
       const firstBait = items.find(i => BAIT_IDS.includes(i.item_id) && i.quantity > 0);
@@ -365,6 +372,26 @@ export default function FishingOverlay({ onClose }) {
                 Cast Line
               </button>
             </>
+          )}
+
+          {/* Biggest Catch Leaderboard */}
+          {!loading && leaderboard.length > 0 && (
+            <div className="fishing-leaderboard">
+              <p className="fishing-label">{'\ud83c\udfc6'} Biggest Catches</p>
+              <div className="fishing-lb-list">
+                {leaderboard.map((entry, i) => (
+                  <div key={i} className={`fishing-lb-entry ${i === 0 ? 'fishing-lb-first' : ''}`}>
+                    <span className="fishing-lb-rank">#{i + 1}</span>
+                    <span className="fishing-lb-icon">{entry.icon}</span>
+                    <div className="fishing-lb-info">
+                      <span className="fishing-lb-user">{entry.username}</span>
+                      <span className={`fishing-lb-fish rarity-text-${entry.rarity}`}>{entry.fish}</span>
+                    </div>
+                    <span className="fishing-lb-weight">{entry.weight} lbs</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}

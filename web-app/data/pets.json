@@ -1,0 +1,62 @@
+{
+  "228241331296665600": {
+    "username": "badbeachpeach",
+    "petType": "cat",
+    "petName": null,
+    "location": "the_cottage",
+    "placement": {
+      "x": 78,
+      "y": 83,
+      "scale": 1,
+      "hitboxHeight": 50
+    },
+    "level": 1,
+    "xp": 0,
+    "lastFed": "2026-02-13T00:00:00.000Z",
+    "lastPlayed": "2026-02-13T00:00:00.000Z",
+    "createdAt": "2026-02-13T00:00:00.000Z",
+    "totalFeeds": 0,
+    "totalPlays": 0,
+    "totalInteractions": 0
+  },
+  "1374906408046166036": {
+    "username": "tyren",
+    "petType": "black_falcon",
+    "petName": null,
+    "location": "the_barracks",
+    "placement": {
+      "x": 79,
+      "y": 24,
+      "scale": 0.65,
+      "hitboxWidth": 65,
+      "hitboxHeight": 60
+    },
+    "level": 1,
+    "xp": 0,
+    "lastFed": "2026-02-13T00:00:00.000Z",
+    "lastPlayed": "2026-02-13T00:00:00.000Z",
+    "createdAt": "2026-02-13T00:00:00.000Z",
+    "totalFeeds": 0,
+    "totalPlays": 0,
+    "totalInteractions": 0
+  },
+  "765978025937469481": {
+    "username": "aly",
+    "petType": "dragon_egg",
+    "petName": null,
+    "location": "the_veil",
+    "placement": {
+      "x": 35,
+      "y": 8,
+      "scale": 0.3
+    },
+    "level": 1,
+    "xp": 0,
+    "lastFed": "2026-02-13T00:00:00.000Z",
+    "lastPlayed": "2026-02-13T00:00:00.000Z",
+    "createdAt": "2026-02-13T00:00:00.000Z",
+    "totalFeeds": 0,
+    "totalPlays": 0,
+    "totalInteractions": 0
+  }
+}

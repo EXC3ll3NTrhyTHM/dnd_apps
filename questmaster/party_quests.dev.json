@@ -1,123 +1,19 @@
 {
   "quests": [
     {
-      "id": "good_vibes_spot",
-      "name": "The Good Vibes Spot",
-      "description": "Bonesy knows about a chill spot with... unusual properties",
-      "location": "Deep in the woods, off the main trail",
-      "given_by": "bonesy",
-      "status": "available",
-      "current_stage": null,
+      "id": "the_eye_of_the_storm",
+      "name": "The Eye of the Storm",
+      "description": "A violent storm rolls into Okhan. Lightning strikes the same spot three times. Ember felt something pulling her to find Aly.",
+      "location": "Woods outside Okhan, hidden cave beneath lightning-struck clearing",
+      "given_by": "ember",
+      "status": "in_progress",
+      "current_stage": "the_call",
       "stages_completed": [],
-      "started_at": null,
-      "added_at": "2026-01-30T04:27:23.859Z",
+      "started_at": "2026-02-14T17:21:49.766Z",
+      "added_at": "2026-02-14T17:21:46.056Z",
       "notes": [],
-      "board_message_id": "1466650988265078878"
-    },
-    {
-      "id": "the_rooftop_kingdom",
-      "name": "The Rooftop Kingdom",
-      "description": "Ithrae discovered a hidden community of orphans living on the market district rooftops. She needs Aly to see it before someone else finds them first.",
-      "location": "Market district rooftops, Okhan",
-      "given_by": "ithrae",
-      "status": "in_progress",
-      "current_stage": "the_decision",
-      "stages_completed": [
-        "the_view_from_above",
-        "the_little_architect",
-        "first_contact",
-        "gone",
-        "the_empty_roof",
-        "patience",
-        "the_bridge"
-      ],
-      "flags": [
-        "path_b",
-        "decision_recruit",
-        "path_a",
-        "path_a",
-        "decision_recruit",
-        "path_b",
-        "path_a",
-        "decision_recruit",
-        "path_b"
-      ],
-      "started_at": "2026-02-03T14:42:00.157Z",
-      "added_at": "2026-02-03T04:16:00.000Z",
-      "notes": [],
-      "board_message_id": "1468101250498166844",
-      "channel_id": "1468255209154154507",
-      "completed_at": "2026-02-03T14:39:52.281Z"
-    },
-    {
-      "id": "the_missing_watch",
-      "name": "The Missing Watch",
-      "description": "One of Jonah's best Shield officers hasn't reported in for two days. Something's wrong.",
-      "location": "Lower residential district, old storage cellars near the docks",
-      "given_by": "jonah",
-      "status": "available",
-      "current_stage": null,
-      "stages_completed": [],
-      "started_at": null,
-      "added_at": "2026-02-01T03:49:26.832Z",
-      "notes": [],
-      "board_message_id": "1467366214572577043"
-    },
-    {
-      "id": "the_man_at_the_gate",
-      "name": "The Man at the Gate",
-      "description": "A stranger arrives at the dojo claiming to be Djinn's father. The past Djinn buried comes knocking.",
-      "location": "Dojo of the Four Elements / Okhan",
-      "given_by": "djinn",
-      "status": "in_progress",
-      "current_stage": "djinn_confrontation",
-      "stages_completed": [
-        "the_arrival"
-      ],
-      "started_at": "2026-02-04T03:48:20.138Z",
-      "added_at": "2026-02-04T00:26:59.708Z",
-      "notes": [],
-      "board_message_id": "1468402427018346671",
-      "channel_id": "1468453098862284800",
-      "flags": [],
-      "completed_at": "2026-02-04T03:16:03.315Z"
-    },
-    {
-      "id": "the_uncontrolled_flame",
-      "name": "The Uncontrolled Flame",
-      "description": "Ximena touched Ignition without the spiritual foundation to sustain it. The fire is consuming her from the inside. Nalyd must guide her through a crisis that can't be solved with fists.",
-      "location": "Dojo of the Four Elements / The Crucible",
-      "given_by": "djinn",
-      "status": "in_progress",
-      "current_stage": "the_plan",
-      "stages_completed": [
-        "the_report",
-        "the_truth",
-        "the_breaking_point"
-      ],
-      "started_at": "2026-02-05T01:31:39.245Z",
-      "added_at": "2026-02-05T00:55:04.413Z",
-      "notes": [],
-      "board_message_id": "1468771884526211102",
-      "channel_id": "1468781086560616458",
-      "flags": [
-        "observed_first"
-      ]
-    },
-    {
-      "id": "lockbox_awakens",
-      "name": "The Lockbox Awakens",
-      "description": "The night after the interrogation, whoever sleeps near the lockbox receives disturbing visions. A soul trapped within reaches out, desperate to communicate.",
-      "location": null,
-      "given_by": "questmaster",
-      "status": "in_progress",
-      "current_stage": "nightmare_begins",
-      "stages_completed": [],
-      "started_at": "2026-02-10T01:22:59.815Z",
-      "added_at": "2026-02-10T01:11:27.817Z",
-      "notes": [],
-      "board_message_id": "1470587944388657287",
-      "channel_id": "1470590847744741418"
+      "board_message_id": "1472281683200835626",
+      "channel_id": "1472281699382595645"
     }
   ],
   "completed": [],

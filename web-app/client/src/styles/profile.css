@@ -392,6 +392,17 @@
   background: var(--color-gold);
 }
 
+.settings-select {
+  background: var(--bg-dark, #1a1510);
+  color: var(--text-primary, #d4c8a0);
+  border: 1px solid var(--border-color, #3a2e1e);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
 /* Settings hints */
 .settings-hint {
   font-size: 0.7rem;
@@ -599,4 +610,65 @@
 .btn-logout {
   width: 100%;
   margin-top: 8px;
+}
+
+/* ── Dice Sets Grid ── */
+.dice-sets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+}
+
+.dice-set-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--font-display);
+  color: #e7e5e4;
+}
+
+.dice-set-item:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.12);
+}
+
+.dice-set-item:active {
+  transform: scale(0.96);
+}
+
+.dice-set-item-equipped {
+  border-color: rgba(212, 168, 67, 0.4);
+  background: rgba(212, 168, 67, 0.08);
+}
+
+.dice-set-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 2px solid;
+  transition: box-shadow 0.2s ease;
+}
+
+.dice-set-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.dice-set-badge {
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-gold);
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(212, 168, 67, 0.15);
 }

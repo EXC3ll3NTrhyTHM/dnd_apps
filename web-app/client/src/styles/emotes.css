@@ -1,0 +1,206 @@
+/* ============================================
+   Emote Popup Overlay — Clash Royale-style
+   floating animated emotes
+   ============================================ */
+
+.emote-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.emote-popup {
+  position: absolute;
+  top: 35%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+  animation: emote-spring-float 3s ease-out forwards;
+}
+
+.emote-popup img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.6));
+}
+
+.emote-popup-name {
+  font-size: 0.65rem;
+  color: #f5c842;
+  font-weight: 700;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  margin-top: 4px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================
+   Emote Picker Sheet — emoji-mart overlay
+   ============================================ */
+
+.emote-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.emote-picker-sheet {
+  width: 100%;
+  max-width: 400px;
+  max-height: 55vh;
+  background: #1a1a2e;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: emote-picker-slide-up 0.25s ease-out;
+}
+
+.emote-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #f5c842;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.emote-picker-close {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.emote-picker-loading {
+  padding: 40px;
+  text-align: center;
+  color: #888;
+  font-size: 0.85rem;
+}
+
+/* Category tabs */
+.emote-picker-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  overflow-x: auto;
+  /* smooth scroll on mobile */
+}
+
+.emote-picker-tab {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #aaa;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.emote-picker-tab.active {
+  background: rgba(245, 200, 66, 0.15);
+  border-color: rgba(245, 200, 66, 0.3);
+  color: #f5c842;
+}
+
+/* Emote grid */
+.emote-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  padding: 12px;
+  overflow-y: auto;
+  /* smooth scroll on mobile */
+  flex: 1;
+}
+
+.emote-picker-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.emote-picker-cell:active {
+  transform: scale(0.92);
+  background: rgba(245, 200, 66, 0.1);
+  border-color: rgba(245, 200, 66, 0.2);
+}
+
+.emote-picker-cell img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.emote-picker-label {
+  font-size: 0.6rem;
+  color: #888;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes emote-picker-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Spring pop-in → gentle float up → fade out */
+@keyframes emote-spring-float {
+  0% {
+    transform: translateX(-50%) scale(0) translateY(0);
+    opacity: 0;
+  }
+  8% {
+    transform: translateX(-50%) scale(1.35) translateY(0);
+    opacity: 1;
+  }
+  16% {
+    transform: translateX(-50%) scale(0.85) translateY(0);
+    opacity: 1;
+  }
+  22% {
+    transform: translateX(-50%) scale(1.08) translateY(0);
+    opacity: 1;
+  }
+  28% {
+    transform: translateX(-50%) scale(1.0) translateY(0);
+    opacity: 1;
+  }
+  70% {
+    transform: translateX(-50%) scale(1.0) translateY(-40px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) scale(0.9) translateY(-70px);
+    opacity: 0;
+  }
+}

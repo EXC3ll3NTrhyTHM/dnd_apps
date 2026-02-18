@@ -1,31 +1,68 @@
 {
   "424061511833747467": {
     "username": "excellentrhythm",
-    "total_caught": 7,
+    "total_caught": 17,
     "total_escaped": 3,
-    "total_sold": 1,
-    "gold_earned": 20,
+    "total_sold": 10,
+    "gold_earned": 136,
     "catches": {
-      "ironjaw": 1,
-      "mudcarp": 1,
-      "silver_trout": 2,
+      "ironjaw": 3,
+      "mudcarp": 3,
+      "silver_trout": 4,
       "ember_bass": 2,
-      "glowfin": 1
+      "glowfin": 4,
+      "shadow_eel": 1
     },
-    "last_catch": "2026-02-13T05:33:31.840Z"
+    "last_catch": "2026-02-14T21:23:09.380Z",
+    "biggest_catch": {
+      "fishId": "ember_bass",
+      "name": "Ember Bass",
+      "rarity": "rare",
+      "weight": 7.3,
+      "icon": "🔥",
+      "date": "2026-02-13T05:33:31.840Z"
+    }
   },
   "228241331296665600": {
     "username": "badbeachpeach",
-    "total_caught": 4,
-    "total_escaped": 0,
-    "total_sold": 3,
-    "gold_earned": 28,
+    "total_caught": 14,
+    "total_escaped": 1,
+    "total_sold": 13,
+    "gold_earned": 122,
     "catches": {
-      "mudcarp": 1,
+      "mudcarp": 5,
       "ember_bass": 1,
-      "silver_trout": 1,
-      "ironjaw": 1
+      "silver_trout": 4,
+      "ironjaw": 3,
+      "glowfin": 1
     },
-    "last_catch": "2026-02-13T05:06:01.268Z"
+    "last_catch": "2026-02-16T08:08:10.995Z",
+    "biggest_catch": {
+      "fishId": "ember_bass",
+      "name": "Ember Bass",
+      "rarity": "rare",
+      "weight": 5.8,
+      "icon": "🔥",
+      "date": "2026-02-13T05:06:01.268Z"
+    }
+  },
+  "1073385140669128725": {
+    "username": "smok3y8754",
+    "total_caught": 2,
+    "total_escaped": 1,
+    "total_sold": 2,
+    "gold_earned": 16,
+    "catches": {
+      "silver_trout": 2
+    },
+    "last_catch": "2026-02-14T19:32:38.586Z",
+    "biggest_catch": {
+      "fishId": "silver_trout",
+      "name": "Silver Trout",
+      "rarity": "common",
+      "weight": 2.9,
+      "icon": "🦈",
+      "date": "2026-02-14T19:32:17.840Z"
+    }
   }
 }

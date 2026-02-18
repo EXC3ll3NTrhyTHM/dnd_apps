@@ -5,11 +5,13 @@
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../hooks/useApi';
 import {
-  NpcSprite,
+  SceneEntities,
   SceneHeader,
   GatheringSpot,
   EditPanel,
-  useSceneEditor
+  useSceneEditor,
+  buildPetPlacements,
+  splitPlacements
 } from './SceneBase';
 import '../../styles/location-scene.css';
 
@@ -19,31 +21,49 @@ export default function CottageScene({
   onNpcClick,
   onGatheringClick,
   onLocationUpdate,
-  setToast
+  setToast,
+  pets,
+  currentUserId,
+  onPetClick,
+  refreshPets
 }) {
   const navigate = useNavigate();
   const { scene } = location;
 
   const editor = useSceneEditor(scene.npcPlacements);
+
+  const basePlacements = { ...scene.npcPlacements, ...buildPetPlacements(pets) };
   const placements = editor.editMode && editor.editPlacements
     ? editor.editPlacements
-    : scene.npcPlacements;
+    : basePlacements;
 
   const handleSave = async () => {
     if (!editor.editPlacements) return;
     editor.setSaving(true);
 
+    const { npcPlacements, petPlacements } = splitPlacements(editor.editPlacements);
+
     try {
-      await api(`/api/admin/locations/${location.id}/scene`, {
-        method: 'PUT',
-        body: JSON.stringify({ npcPlacements: editor.editPlacements })
-      });
+      const saves = [
+        api(`/api/admin/locations/${location.id}/scene`, {
+          method: 'PUT',
+          body: JSON.stringify({ npcPlacements })
+        })
+      ];
+      if (Object.keys(petPlacements).length > 0) {
+        saves.push(api('/api/admin/pets/placements', {
+          method: 'PUT',
+          body: JSON.stringify({ placements: petPlacements })
+        }));
+      }
+      await Promise.all(saves);
 
       setToast?.({ type: 'success', message: 'Placements saved!' });
       onLocationUpdate?.({
         ...location,
-        scene: { ...scene, npcPlacements: editor.editPlacements }
+        scene: { ...scene, npcPlacements }
       });
+      refreshPets?.();
     } catch (err) {
       setToast?.({ type: 'error', message: 'Failed to save: ' + (err.data?.error || err.message) });
     } finally {
@@ -85,7 +105,7 @@ export default function CottageScene({
         editMode={editor.editMode}
         saving={editor.saving}
         onSave={handleSave}
-        onEditToggle={() => editor.enterEditMode(scene.npcPlacements)}
+        onEditToggle={() => editor.enterEditMode(basePlacements)}
         isAdmin={isAdmin}
       />
 
@@ -96,27 +116,18 @@ export default function CottageScene({
         ))}
       </div>
 
-      {/* NPC Sprites */}
-      <div className="scene-npcs">
-        {Object.entries(placements).map(([npcId, placement]) => {
-          const npc = location.npcs.find(n => n.id === npcId);
-          const displayName = npc?.displayName || npcId.charAt(0).toUpperCase() + npcId.slice(1);
-
-          return (
-            <NpcSprite
-              key={npcId}
-              npcId={npcId}
-              placement={placement}
-              displayName={displayName}
-              editMode={editor.editMode}
-              isSelected={editor.editSelectedNpc === npcId}
-              particleConfig={scene.particles}
-              onSelect={handleNpcSelect}
-              onDragStart={editor.handleDragStart}
-            />
-          );
-        })}
-      </div>
+      {/* NPC + Pet Sprites */}
+      <SceneEntities
+        location={location}
+        pets={pets}
+        placements={placements}
+        particleConfig={scene.particles}
+        editMode={editor.editMode}
+        editSelectedNpc={editor.editSelectedNpc}
+        onSelect={handleNpcSelect}
+        onDragStart={editor.handleDragStart}
+        onPetClick={onPetClick}
+      />
 
       {/* Gathering Spot - hidden in edit mode */}
       {!editor.editMode && (

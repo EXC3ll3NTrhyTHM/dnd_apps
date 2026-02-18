@@ -23,6 +23,10 @@ import LevelUpOverlay from '../components/LevelUpOverlay';
 import PresenceStrip from '../components/PresenceStrip';
 import Arena from './Arena';
 const DiceOverlay = lazy(() => import('../components/DiceOverlay'));
+const PetOverlay = lazy(() => import('../components/PetOverlay'));
+const BluntSmokeOverlay = lazy(() => import('../components/BluntSmokeOverlay'));
+import EmotePopup from '../components/EmotePopup';
+import EmotePickerSheet from '../components/EmotePickerSheet';
 import SceneAudio from './scenes/SceneAudio';
 import { getSceneComponent } from './scenes';
 import { useUiSounds } from '../hooks/useUiSounds';
@@ -62,6 +66,7 @@ export default function LocationChat() {
   const [xpFloat, setXpFloat] = useState(null);
   const [achievementQueue, setAchievementQueue] = useState([]);
   const [diceRoll, setDiceRoll] = useState(null);
+  const [myDiceColorset, setMyDiceColorset] = useState('white');
   const [levelUp, setLevelUp] = useState(null);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -70,6 +75,12 @@ export default function LocationChat() {
     return stored !== 'false';
   });
   const [presence, setPresence] = useState([]);
+  const [locationPets, setLocationPets] = useState([]);
+  const [petOverlay, setPetOverlay] = useState(null); // null | { readOnly, userId }
+  const [showBluntSmoke, setShowBluntSmoke] = useState(false);
+  const [activeEmotes, setActiveEmotes] = useState([]);
+  const [emotePickerOpen, setEmotePickerOpen] = useState(false);
+  const emoteCooldownRef = useRef(false);
 
   const showXpFloat = (amount) => {
     if (amount > 0) setXpFloat({ amount, key: Date.now() });
@@ -120,7 +131,10 @@ export default function LocationChat() {
       console.log(`[LocationChat] Connecting to WS: ${wsUrl}`);
       ws = new WebSocket(wsUrl);
 
-      ws.onopen = () => console.log('[LocationChat] WS Connected');
+      ws.onopen = () => {
+        console.log('[LocationChat] WS Connected');
+        ws.send(JSON.stringify({ type: 'identify', userId: user?.id, currentLocation: locationId }));
+      };
 
       ws.onmessage = (event) => {
         try {
@@ -161,6 +175,10 @@ export default function LocationChat() {
             }
           }
 
+          if (payload.type === 'presence_update') {
+            setPresence(payload.users || []);
+          }
+
           // Item used — smoke effect + action message from other players
           if (payload.type === 'item_used' && payload.userId !== user?.id) {
             triggerEffect(payload.effect || 'smoke');
@@ -170,6 +188,28 @@ export default function LocationChat() {
               timestamp: new Date().toISOString(),
             };
             setMessages(prev => [...prev, actionMsg]);
+          }
+
+          // Emote — floating animated popup from other players
+          if (payload.type === 'emote' && payload.userId !== user?.id) {
+            setActiveEmotes(prev => [...prev, {
+              key: Date.now() + Math.random(),
+              image: payload.emoteImage,
+              characterName: payload.characterName,
+              left: 20 + Math.random() * 60,
+            }]);
+            const actionMsg = {
+              role: 'system',
+              text: `*${payload.characterName} ${payload.emoteDescription}*`,
+              timestamp: new Date().toISOString(),
+            };
+            setMessages(prev => [...prev, actionMsg]);
+          }
+
+          if (payload.type === 'pet_update') {
+            api(`/api/pets/location/${locationId}`).then(data => {
+              setLocationPets(data.pets || []);
+            }).catch(() => {});
           }
         } catch (err) {
           console.error('[LocationChat] WS message error:', err);
@@ -782,7 +822,12 @@ export default function LocationChat() {
         body: JSON.stringify({ item_id: itemId, locationId })
       });
       if (data.success) {
-        triggerEffect('smoke');
+        // Use Three.js smoke for blunts, CSS smoke for other items
+        if (itemId === 'blunt' || itemId.includes('blunt')) {
+          setShowBluntSmoke(true);
+        } else {
+          triggerEffect('smoke');
+        }
         const characterName = user?.characterName || user?.global_name || user?.username || 'You';
         const actionMsg = {
           role: 'system',
@@ -798,10 +843,50 @@ export default function LocationChat() {
     }
   }, [locationId, user, triggerEffect]);
 
+  // Emote send handler
+  const handleEmoteSelect = useCallback(async (emoteId) => {
+    if (emoteCooldownRef.current) return;
+    emoteCooldownRef.current = true;
+    setTimeout(() => { emoteCooldownRef.current = false; }, 5000);
+    try {
+      const data = await api('/api/emotes/send', {
+        method: 'POST',
+        body: JSON.stringify({ emoteId, locationId })
+      });
+      if (data.success) {
+        const characterName = user?.characterName || user?.global_name || user?.username || 'You';
+        setActiveEmotes(prev => [...prev, {
+          key: Date.now(),
+          image: data.emoteImage,
+          characterName,
+          left: 20 + Math.random() * 60,
+        }]);
+        const actionMsg = {
+          role: 'system',
+          text: `*${characterName} ${data.emoteDescription}*`,
+          timestamp: new Date().toISOString(),
+        };
+        setMessages(prev => [...prev, actionMsg]);
+      }
+    } catch (err) {
+      if (err.data?.error) setToast({ type: 'error', message: err.data.error });
+    }
+  }, [locationId, user]);
+
+  // Fetch equipped dice colorset on mount
+  useEffect(() => {
+    api('/api/dice/equipped')
+      .then(data => {
+        const cs = data.colorset || 'default';
+        setMyDiceColorset(cs === 'default' ? 'white' : cs);
+      })
+      .catch(() => {});
+  }, []);
+
   // Dice roll handler — show 3D dice first, then POST results after they settle
   const handleDiceRoll = useCallback((notation) => {
-    setDiceRoll({ notation, diceColor: '#F97316' });
-  }, []);
+    setDiceRoll({ notation, colorset: myDiceColorset });
+  }, [myDiceColorset]);
 
   const handleDiceResult = useCallback(async (rolls) => {
     // Regular dice roll — POST to server
@@ -926,9 +1011,6 @@ export default function LocationChat() {
         refreshWallet(result.wallet);
       }
 
-      setMenuOpen(null);
-      setMenuData(null);
-
       const purchaseMsg = {
         role: 'player',
         text: menuOpen === 'tavern'
@@ -976,6 +1058,29 @@ export default function LocationChat() {
     setLocation(updatedLocation);
   };
 
+  // Fetch pets at location
+  const refreshPets = useCallback(() => {
+    api(`/api/pets/location/${locationId}`).then(data => {
+      setLocationPets(data.pets || []);
+    }).catch(() => {});
+  }, [locationId]);
+
+  useEffect(() => {
+    if (!locationId) return;
+    refreshPets();
+    const interval = setInterval(refreshPets, 30000);
+    return () => clearInterval(interval);
+  }, [locationId]);
+
+  const handlePetClick = useCallback((petUserId) => {
+    const isArchitect = user?.id === '424061511833747467';
+    if (petUserId === user?.id || isArchitect) {
+      setPetOverlay({ readOnly: false, userId: petUserId !== user?.id ? petUserId : null });
+    } else {
+      setPetOverlay({ readOnly: true, userId: petUserId });
+    }
+  }, [user]);
+
   if (loading) {
     return (
       <div className="loading-screen">
@@ -1009,6 +1114,10 @@ export default function LocationChat() {
           onGatheringClick={handleGatheringClick}
           onLocationUpdate={handleLocationUpdate}
           setToast={setToast}
+          pets={locationPets}
+          currentUserId={user?.id}
+          onPetClick={handlePetClick}
+          refreshPets={refreshPets}
         />
       ) : (
         /* Chat View */
@@ -1112,6 +1221,7 @@ export default function LocationChat() {
               scrollContainerRef={chatAreaRef}
               onDiceRoll={handleDiceRoll}
               onUseItem={handleUseItem}
+              onOpenEmotes={() => setEmotePickerOpen(true)}
               locationId={locationId}
             />
           ) : (
@@ -1183,8 +1293,40 @@ export default function LocationChat() {
         </div>
       )}
 
+      {/* Pet overlay */}
+      {petOverlay && (
+        <Suspense fallback={null}>
+          <PetOverlay
+            onClose={() => setPetOverlay(null)}
+            readOnly={petOverlay.readOnly}
+            userId={petOverlay.userId}
+          />
+        </Suspense>
+      )}
+
+      {/* Emote floating popups */}
+      <EmotePopup
+        emotes={activeEmotes}
+        onDismiss={(key) => setActiveEmotes(prev => prev.filter(e => e.key !== key))}
+      />
+
+      {/* Emote picker sheet (emoji-mart) */}
+      {emotePickerOpen && (
+        <EmotePickerSheet
+          onSelect={handleEmoteSelect}
+          onClose={() => setEmotePickerOpen(false)}
+        />
+      )}
+
       {/* Effects overlay — renders above custom keyboard */}
       <EffectsOverlay effect={effect} onDone={clearEffect} />
+
+      {/* Three.js Blunt Smoke Overlay */}
+      {showBluntSmoke && (
+        <Suspense fallback={null}>
+          <BluntSmokeOverlay onDone={() => setShowBluntSmoke(false)} />
+        </Suspense>
+      )}
 
       {/* 3D Dice Overlay */}
       {diceRoll && diceOverlayEnabled && (
@@ -1192,7 +1334,8 @@ export default function LocationChat() {
           <DiceOverlay
             key={diceRoll.key || 0}
             notation={diceRoll.notation}
-            themeColor={diceRoll.diceColor || '#F97316'}
+            colorset={diceRoll.colorset || 'white'}
+            material={diceRoll.material || 'plastic'}
             onResult={handleDiceResult}
             onDone={handleDiceDone}
           />

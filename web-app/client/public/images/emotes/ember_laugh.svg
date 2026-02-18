@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Ember Laughs - fiery dragon/lizard face cackling -->
+  <defs>
+    <radialGradient id="emberGrad" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </radialGradient>
+  </defs>
+  <!-- Bouncing laugh -->
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0,0;0,-4;0,0;0,-2;0,0" dur="0.6s" repeatCount="indefinite"/>
+    <!-- Head shape - rounded reptilian -->
+    <ellipse cx="60" cy="55" rx="38" ry="35" fill="url(#emberGrad)"/>
+    <!-- Horns -->
+    <path d="M30,30 Q25,10 35,18" stroke="#c2410c" stroke-width="3" fill="#ea580c" stroke-linecap="round"/>
+    <path d="M90,30 Q95,10 85,18" stroke="#c2410c" stroke-width="3" fill="#ea580c" stroke-linecap="round"/>
+    <!-- Eyes - mischievous slits -->
+    <ellipse cx="44" cy="48" rx="8" ry="6" fill="#fef3c7"/>
+    <ellipse cx="76" cy="48" rx="8" ry="6" fill="#fef3c7"/>
+    <ellipse cx="44" cy="48" rx="3" ry="6" fill="#1a1a1a"/>
+    <ellipse cx="76" cy="48" rx="3" ry="6" fill="#1a1a1a"/>
+    <!-- Laughing mouth - wide open -->
+    <path d="M38,65 Q48,80 60,80 Q72,80 82,65" fill="#7f1d1d"/>
+    <path d="M38,65 Q48,62 60,62 Q72,62 82,65" fill="#991b1b"/>
+    <!-- Teeth -->
+    <path d="M42,65 L45,70 L48,65" fill="#fef3c7"/>
+    <path d="M54,64 L56,68 L58,64" fill="#fef3c7"/>
+    <path d="M62,64 L64,68 L66,64" fill="#fef3c7"/>
+    <path d="M72,65 L75,70 L78,65" fill="#fef3c7"/>
+  </g>
+  <!-- Fire breath particles from mouth -->
+  <g>
+    <circle cx="50" cy="88" r="4" fill="#f97316" opacity="0.7">
+      <animate attributeName="cy" values="82;100" dur="0.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.8;0" dur="0.8s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="3;6;2" dur="0.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="60" cy="90" r="3" fill="#fbbf24" opacity="0.6">
+      <animate attributeName="cy" values="84;105" dur="0.7s" repeatCount="indefinite" begin="0.2s"/>
+      <animate attributeName="opacity" values="0.7;0" dur="0.7s" repeatCount="indefinite" begin="0.2s"/>
+      <animate attributeName="r" values="2;5;1" dur="0.7s" repeatCount="indefinite" begin="0.2s"/>
+    </circle>
+    <circle cx="70" cy="86" r="3.5" fill="#ef4444" opacity="0.6">
+      <animate attributeName="cy" values="82;102" dur="0.9s" repeatCount="indefinite" begin="0.4s"/>
+      <animate attributeName="opacity" values="0.6;0" dur="0.9s" repeatCount="indefinite" begin="0.4s"/>
+      <animate attributeName="r" values="2;4;1" dur="0.9s" repeatCount="indefinite" begin="0.4s"/>
+    </circle>
+  </g>
+</svg>

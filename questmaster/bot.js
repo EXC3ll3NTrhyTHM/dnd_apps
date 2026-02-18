@@ -879,7 +879,7 @@ function listAvailableQuests() {
 // NARRATION
 // ============================================
 
-async function generateNarration(context, instruction, npcNames = []) {
+async function generateNarration(context, instruction, npcNames = [], negativePrompts = []) {
   const config = loadConfig();
   
   console.log('[QuestMaster] Generating scene narration...');
@@ -908,12 +908,12 @@ Rules:
 - Narrate in second person ("You walk into the forest...")
 - Set atmosphere and describe surroundings
 - Don't make decisions for the players
-- End with what the players see/hear/can do next
+- NEVER end with a question like "What will you do?" or "What do you do next?" — just describe the scene and stop. The player knows they can act.
 - Use *asterisks* for emphasis on key details
 - Don't use quotation marks around your narration (except for the player character's own words)
 - NEVER ask players to roll dice or make skill checks - there is no dice rolling in this game
 - NEVER reference meta-game terms like "path A", "path B", "branch point", or any behind-the-scenes quest structure. Narrate purely in-world.
-- If the prompt is already rich and detailed, deliver it nearly verbatim with light atmospheric polish${npcDialogRule}
+- If the prompt is already rich and detailed, deliver it nearly verbatim with light atmospheric polish — BUT strip out any quoted NPC dialogue. NPC dialogue in the prompt is reference material only; those NPCs will speak for themselves separately.${npcDialogRule}${negativePrompts.length > 0 ? `\n\nRESTRICTIONS — Do NOT do any of the following:\n${negativePrompts.map(p => `- ${p}`).join('\n')}` : ''}
 
 THIS IS DISCORD. Keep it short. 3-5 sentences max for scene narration. No flowery padding.`
         },
@@ -1389,12 +1389,28 @@ function getActiveQuestForChannel(channelId) {
 // DISCORD EVENTS
 // ============================================
 
-discord.once('ready', () => {
+discord.once('ready', async () => {
   console.log('[QuestMaster] Logged in as', discord.user.tag);
 
   // Start watching for quest signals from NPC bots
   console.log('[QuestMaster] Starting quest signal watcher');
   startQuestSignalWatcher();
+
+  // Restore chat mode sessions for in-progress chat_mode quests
+  try {
+    const data = loadPartyQuests();
+    const inProgressQuests = data.quests.filter(q => q.status === 'in_progress' && q.channel_id);
+    
+    for (const quest of inProgressQuests) {
+      const definition = findQuestDefinition(quest.id);
+      if (definition && definition.chat_mode === true) {
+        chatMode.startChatMode(quest.channel_id, quest.id, definition, quest);
+        console.log(`[QuestMaster] Restored chat mode session for quest ${quest.id} in channel ${quest.channel_id}`);
+      }
+    }
+  } catch (err) {
+    console.error('[QuestMaster] Error restoring chat mode sessions:', err.message);
+  }
 
   console.log('[QuestMaster] Quest Manager is ready!');
 });
@@ -1589,7 +1605,8 @@ discord.on('interactionCreate', async (interaction) => {
             narration = await generateNarration(
               `Quest: ${result.definition.name}. ${result.definition.description}. Given by: ${result.definition._source_npc}.`,
               stageInfo.narration_prompt,
-              stageNpcNames
+              stageNpcNames,
+              stageInfo.negative_prompts
             );
           } else {
             narration = await generateNarration(
@@ -1905,7 +1922,8 @@ discord.on('interactionCreate', async (interaction) => {
                   const stageNarration = await generateNarration(
                     `Quest: ${currentQuest.definition.name}. ${currentQuest.definition.description}`,
                     newStageInfo.narration_prompt,
-                    newStageNpcNames
+                    newStageNpcNames,
+                    newStageInfo.negative_prompts
                   );
                   const components = createStageButtons(currentQuest.definition, newStageName);
                   const newStageHasCues = stageHasCues(newStageInfo);
@@ -2013,7 +2031,8 @@ discord.on('interactionCreate', async (interaction) => {
                       const stageNarration = await generateNarration(
                         `Quest: ${currentQuest.definition.name}. ${currentQuest.definition.description}`,
                         newStageInfo.narration_prompt,
-                        newStageNpcNames
+                        newStageNpcNames,
+                        newStageInfo.negative_prompts
                       );
                       const components = createStageButtons(currentQuest.definition, newStageName);
                       const newStageHasCues = stageHasCues(newStageInfo);
@@ -2114,7 +2133,8 @@ discord.on('interactionCreate', async (interaction) => {
               const stageNarration = await generateNarration(
                 `Quest: ${currentQuest.definition.name}. ${currentQuest.definition.description}`,
                 newStageInfo.narration_prompt,
-                newStageNpcNames
+                newStageNpcNames,
+                newStageInfo.negative_prompts
               );
               stageTransitionContent = `📍 **${newStageName.charAt(0).toUpperCase() + newStageName.slice(1)}**\n\n${stageNarration}`;
             }
@@ -2353,24 +2373,37 @@ discord.on('messageCreate', async (message) => {
         await message.channel.send(`📖 ${result.narration}`);
       }
       
-      // Send image if requested
+      // Send image if requested — but skip if the stage transition will send the same image
       if (result.send_image && chatSession.definition.images) {
         const imagePath = chatSession.definition.images[result.send_image];
         if (imagePath) {
-          const fullPath = resolveQuestImage(chatSession.definition._source_npc, imagePath);
-          if (fullPath) {
-            await message.channel.send({ files: [fullPath] });
+          let stageWillSendSameImage = false;
+          if (result.advance_stage) {
+            const nextStage = getStageInfo(chatSession.definition, result.advance_stage);
+            if (nextStage?.image === imagePath) stageWillSendSameImage = true;
+          }
+          if (!stageWillSendSameImage) {
+            const fullPath = resolveQuestImage(chatSession.definition._source_npc, imagePath);
+            if (fullPath) {
+              await message.channel.send({ files: [fullPath] });
+            }
           }
         }
       }
       
-      // Cue NPC if requested
+      // Cue NPC if requested — but enforce stage-level chat_npcs whitelist
       if (result.cue_npc) {
         const npcName = result.cue_npc.toLowerCase();
-        
-        if (isQuestNpc(npcName, chatSession.definition)) {
+        const currentStageInfo = getStageInfo(chatSession.definition, chatSession.quest.current_stage);
+        const allowedNpcs = currentStageInfo?.chat_npcs;
+        // If chat_npcs is defined, only allow listed NPCs. If undefined, allow all (backwards compat).
+        const npcAllowed = !allowedNpcs || allowedNpcs.map(n => n.toLowerCase()).includes(npcName);
+
+        if (!npcAllowed) {
+          console.log(`[ChatMode] Blocked AI cue for "${npcName}" — not in chat_npcs for stage "${chatSession.quest.current_stage}"`);
+        } else if (isQuestNpc(npcName, chatSession.definition)) {
           // Quest NPC - generate dialogue via webhook
-          const stageInfo = getStageInfo(chatSession.definition, chatSession.quest.current_stage);
+          const stageInfo = currentStageInfo;
           const dialogueContext = `Quest: ${chatSession.definition.name}. Stage: ${stageInfo?.description || chatSession.quest.current_stage}. Player just said: "${message.content}"`;
           
           const dialogue = await generateQuestNpcDialogue(
@@ -2414,7 +2447,8 @@ discord.on('messageCreate', async (message) => {
           const stageNarration = await generateNarration(
             `Quest: ${chatSession.definition.name}. ${chatSession.definition.description}`,
             newStageInfo.narration_prompt,
-            getStageCueNpcNames(newStageInfo)
+            getStageCueNpcNames(newStageInfo),
+            newStageInfo.negative_prompts
           );
           
           const stageMsg = { content: `📍 **${result.advance_stage.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}**\n\n${stageNarration}` };
@@ -2424,10 +2458,18 @@ discord.on('messageCreate', async (message) => {
           
           // Handle stage-level NPC cues
           await handleStageCues(message.channel, newStageInfo, chatSession.definition, result.advance_stage, null);
+
+          // Check if the new stage completes the quest
+          if (newStageInfo?.completes_quest) {
+            await completeQuest(chatSession.questId);
+            chatMode.endChatMode(message.channel.id);
+            await message.channel.send(`✅ **Quest Complete!** *${chatSession.definition.name}* has been resolved.`);
+            return;
+          }
         }
       }
-      
-      // Complete quest if requested
+
+      // Complete quest if AI explicitly requests it
       if (result.quest_complete) {
         await completeQuest(chatSession.questId);
         chatMode.endChatMode(message.channel.id);

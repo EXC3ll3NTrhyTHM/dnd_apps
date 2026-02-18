@@ -75,19 +75,20 @@ router.post('/state', authRequired, (req, res) => {
   }
 
   const { phase } = req.body;
+  const current = loadState();
 
-  if (typeof phase !== 'number' || phase < 0 || phase > 3) {
-    return res.status(400).json({ error: 'Phase must be a number between 0 and 3' });
+  if (phase !== undefined) {
+    if (typeof phase !== 'number' || phase < 0 || phase > 3) {
+      return res.status(400).json({ error: 'Phase must be a number between 0 and 3' });
+    }
+    current.phase = Math.round(phase * 100) / 100;
   }
 
-  const state = {
-    phase: Math.round(phase * 100) / 100, // 2 decimal places
-    updated_at: new Date().toISOString(),
-    updated_by: req.user.id
-  };
+  current.updated_at = new Date().toISOString();
+  current.updated_by = req.user.id;
 
-  saveState(state);
-  res.json(state);
+  saveState(current);
+  res.json(current);
 });
 
 /**

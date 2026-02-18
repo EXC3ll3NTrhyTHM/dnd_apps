@@ -1,0 +1,346 @@
+/* ============================================
+   PET OVERLAY
+   ============================================ */
+
+.pet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, #1a150e 0%, #2a1f14 30%, #1e1810 70%, #0e0b07 100%);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+.pet-overlay-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+  padding: 16px 20px;
+  gap: 16px;
+}
+
+/* ---- Close button ---- */
+
+.pet-close-btn {
+  position: absolute;
+  top: calc(12px + var(--safe-area-top, 0px));
+  right: 12px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: fixed;
+}
+
+/* ---- Pet sprite ---- */
+
+.pet-sprite-container {
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pet-sprite-large {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 16px rgba(212, 168, 67, 0.15));
+  animation: pet-idle 3s ease-in-out infinite;
+}
+
+.pet-sprite-emoji-fallback {
+  font-size: 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pet-idle 3s ease-in-out infinite;
+}
+
+@keyframes pet-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ---- Pet info ---- */
+
+.pet-info {
+  text-align: center;
+  width: 100%;
+}
+
+.pet-name {
+  color: var(--color-gold, #d4a843);
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pet-name-edit-icon {
+  font-size: 0.8rem;
+  opacity: 0.4;
+}
+
+.pet-type-label {
+  color: var(--text-secondary, #a09078);
+  font-size: 0.85rem;
+  margin: 4px 0 0;
+}
+
+.pet-owner-label {
+  color: var(--text-muted, #6a5d4d);
+  font-size: 0.75rem;
+  margin: 4px 0 0;
+  font-style: italic;
+}
+
+/* ---- Name edit ---- */
+
+.pet-name-edit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.pet-name-input {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-color, #3a2e1e);
+  border-radius: 8px;
+  color: var(--text-primary, #d4c8a0);
+  font-size: 1.1rem;
+  padding: 8px 12px;
+  text-align: center;
+  width: 80%;
+  font-family: inherit;
+}
+
+.pet-name-input:focus {
+  outline: none;
+  border-color: var(--color-gold, #d4a843);
+}
+
+.pet-name-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ---- Stat bars ---- */
+
+.pet-stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pet-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pet-stat-label {
+  width: 52px;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #a09078);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.pet-stat-bar {
+  flex: 1;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pet-stat-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s ease, background-color 0.5s ease;
+}
+
+.pet-stat-xp {
+  background-color: var(--color-gold, #d4a843) !important;
+}
+
+.pet-stat-value {
+  width: 56px;
+  font-size: 0.7rem;
+  color: var(--text-muted, #6a5d4d);
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.pet-stat-max {
+  color: var(--color-gold, #d4a843);
+  font-weight: 600;
+  width: auto;
+  margin-left: auto;
+}
+
+/* ---- Action buttons ---- */
+
+.pet-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.pet-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.pet-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.pet-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pet-btn-feed {
+  background: linear-gradient(135deg, #2d6a30 0%, #1a4a1d 100%);
+  color: #b8e6ba;
+}
+
+.pet-btn-play {
+  background: linear-gradient(135deg, #3a4a8a 0%, #252e5a 100%);
+  color: #b8c8f0;
+}
+
+.pet-btn-small {
+  flex: 0;
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  background: linear-gradient(135deg, #4a3a1a 0%, #2a2010 100%);
+  color: var(--color-gold, #d4a843);
+}
+
+.pet-btn-muted {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted, #6a5d4d);
+}
+
+/* ---- Level up ---- */
+
+.pet-level-up {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  animation: pet-level-fade-in 0.3s ease;
+  cursor: pointer;
+}
+
+.pet-level-up-text {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-gold, #d4a843);
+  text-shadow: 0 0 30px rgba(212, 168, 67, 0.5);
+  animation: pet-level-pop 0.5s ease;
+}
+
+.pet-level-up-level {
+  font-size: 1.2rem;
+  color: #fff;
+  margin-top: 8px;
+}
+
+.pet-level-up-stage {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #a09078);
+  margin-top: 4px;
+}
+
+@keyframes pet-level-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pet-level-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ---- Action feedback ---- */
+
+.pet-feedback {
+  position: absolute;
+  top: 30%;
+  z-index: 15;
+  font-size: 1.8rem;
+  font-weight: 800;
+  pointer-events: none;
+  animation: pet-feedback-float 1.5s ease forwards;
+}
+
+.pet-feedback-fed {
+  color: #4ade80;
+}
+
+.pet-feedback-played {
+  color: #60a5fa;
+}
+
+@keyframes pet-feedback-float {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  60% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+  100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
+}
+
+/* ---- No pet / error ---- */
+
+.pet-no-pet {
+  color: var(--text-muted, #6a5d4d);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.pet-error {
+  color: var(--color-danger, #e74c3c);
+  font-size: 0.8rem;
+  text-align: center;
+}

@@ -618,6 +618,33 @@
   color: var(--color-gold);
 }
 
+/* ---- Emote Button (in input bar, next to emoji) ---- */
+
+.chat-emote-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border-stitch);
+  border-radius: 4px;
+  background: linear-gradient(180deg, #3a3228, #2a241c);
+  color: var(--color-gold-dim, #b89a4a);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.chat-emote-btn:active {
+  background: rgba(212, 168, 67, 0.12);
+  transform: scale(0.93);
+}
+
 /* ---- Extras Panel (action menu) ---- */
 
 .ck-extras-panel {

@@ -3,7 +3,26 @@
   "name": "The Lockbox Awakens",
   "description": "The night after the interrogation, whoever sleeps near the lockbox receives disturbing visions. A soul trapped within reaches out, desperate to communicate.",
   "chat_mode": true,
+  "world_context": "IMPORTANT: The Weaver is a MALE villain. Always use he/him/his pronouns when referring to The Weaver. He is a man who collects souls through blood magic.\n\nSETTING: Stages nightmare_begins through the_request take place INSIDE A DREAM VISION. The player is asleep and trapped in a supernatural nightmare connected to the lockbox. They are NOT awake. They do NOT see dawn, sunlight, or their physical surroundings. The setting is dark, cold, surreal — flickering stone walls, oppressive shadows, a void. The player ONLY wakes up in the 'waking' stage. NEVER describe the player as awake or in the real world before that stage.",
   "reward_gold": 150,
+  
+  "key_npcs": {
+    "aldric": {
+      "name": "Aldric",
+      "race": "Human (Spirit)",
+      "personality": "Desperate, fragmented, haunted. A man who has been trapped alone in darkness for years, clinging to the last threads of his humanity. Speaks with urgency but also deep weariness.",
+      "voice": "Speaks in broken fragments that fade in and out. His voice echoes and layers over itself, as if coming from very far away. Pauses mid-sentence when his form flickers. Desperate but not aggressive - pleading, warning, afraid.",
+      "description": "A translucent man, flickering like a dying candle. His edges blur and reform with each heartbeat. Eyes hold desperate relief — he has not been seen in years. Reaches with transparent hands. He does NOT know the players and they do NOT know him."
+    },
+    "the_weaver": {
+      "name": "The Weaver",
+      "race": "Human (Male)",
+      "pronouns": "he/him",
+      "personality": "A sinister male figure who collects souls through blood oaths. Cold, calculating, patient. He speaks little but his presence is oppressive.",
+      "voice": "When referenced, always use male pronouns: he, him, his. The Weaver is a man.",
+      "description": "A shadowy male figure who operates from beneath the old mill. He binds desperate souls with blood magic, collecting them for a dark resurrection ritual. Always referred to as 'he' - The Weaver is male."
+    }
+  },
   
   "images": {
     "lockbox_glowing": "lockbox_glowing.png",
@@ -14,44 +33,84 @@
   "stages": {
     "nightmare_begins": {
       "description": "Aly (or whoever has the lockbox) falls into a disturbing dream. Cold seeps into their bones. They're not alone.",
-      "narration_prompt": "The dream comes unbidden. One moment you're drifting in peaceful darkness, the next — cold. Bone-deep cold that doesn't belong. You're standing in a place that isn't quite real. Stone walls flicker like bad memories. And something is watching you from the shadows. Something that desperately wants to be seen.",
+      "narration_prompt": "The dream comes unbidden. One moment you're drifting in peaceful darkness, the next — cold. Bone-deep cold that doesn't belong. You're standing in a place that isn't quite real. Stone walls flicker like bad memories. And something is watching you from the shadows. Something that desperately wants to be seen.\n\nThe presence pulls at you — a feeling more than a shape, hovering just at the edge of the dark. You could call out to it, move toward it, or try to reach into the shadows.",
       "image": "lockbox_glowing.png",
+      "negative_prompts": [
+        "Do NOT cue any NPC — Aldric has NOT appeared yet and must not speak or be named in this stage",
+        "Do NOT mention Aldric, The Weaver, the mill, blood magic, or souls",
+        "Do NOT describe the presence as a man, a spirit, or anything identifiable — it is just a shape in the dark",
+        "Do NOT let the player wake up or leave the dream"
+      ],
+      "chat_npcs": [],
       "advance_conditions": "Player engages with the presence, calls out, or moves toward the figure in the shadows",
       "next_stage": "aldric_appears"
     },
     
     "aldric_appears": {
       "description": "Aldric's form materializes — a translucent man, flickering like a dying candle. He speaks in fragments.",
-      "narration_prompt": "The shadows coalesce. A figure emerges — not walking, but simply *becoming*. A man, translucent, his edges blurring and reforming with each heartbeat. His eyes find yours with desperate recognition.\n\nHis voice echoes, layered, as if speaking from very far away:\n\n> **\"You... you can see me. Finally. Please — my name is Aldric. I've been... so long... trapped in the dark...\"**\n\nHis form flickers violently, then stabilizes.\n\n> **\"The box. I'm in the box. Years now. I don't... I lose track. Please, don't leave. I need to warn you.\"**",
+      "narration_prompt": "The shadows coalesce. A figure emerges — not walking, but simply *becoming*. A man, translucent, his edges blurring and reforming with each heartbeat. His eyes find yours with desperate relief — the look of someone who hasn't been seen in a very long time. His form flickers violently, then stabilizes. He opens his mouth to speak.",
       "image": "aldric_apparition.png",
-      "advance_conditions": "Player asks about The Weaver, the mill, why he's trapped, or what the warning is",
+      "stage_cue_npc": "aldric",
+      "stage_npc_instruction": "Aldric speaks for the first time. He is overwhelmed with relief that someone can finally see him. He introduces himself — his name is Aldric. He's been trapped in the dark, in the box, for years. He's lost track of time. He begs the player not to leave. He says he needs to warn them about something — but he doesn't say what yet. He leaves a clear opening for the player to ask what the warning is, who trapped him, or what happened to him. Speak in broken, fragmented sentences that fade in and out. He does NOT know the players.",
+      "negative_prompts": [
+        "Do NOT mention The Weaver by name — Aldric has not revealed that yet",
+        "Do NOT mention the mill, blood magic, soul collecting, resurrection, oaths, or darkness being 'alive'",
+        "Do NOT have Aldric explain why he's trapped or who did it — he only hints that he has a warning",
+        "Do NOT let Aldric speak clearly or coherently — his voice is fragmented and fading",
+        "Do NOT describe the player as awake or in the real world — this is still a dream vision"
+      ],
+      "chat_npcs": ["aldric"],
+      "advance_conditions": "Player shows interest in learning more — asks about the warning, who trapped Aldric, what happened to him, what the danger is, asks any follow-up question, or expresses willingness to help. Any engagement beyond a simple greeting should advance.",
       "next_stage": "the_warning"
     },
     
     "the_warning": {
       "description": "Aldric shares what he knows about The Weaver and the danger they face.",
-      "narration_prompt": "Aldric's form stabilizes slightly, as if your attention gives him strength. But fear flickers across his translucent features.\n\n> **\"The Weaver... yes. He's the one who put me here. I was... I was one of his first. Proof that it works.\"**\n\nHis voice drops to a whisper.\n\n> **\"He's collecting souls. The blood oaths — they're not just loyalty. They're chains. When those people die, their souls go to him. He's building something. A congregation of the dead.\"**\n\nAldric's eyes go distant, haunted.\n\n> **\"And there's someone he wants to bring back. I've felt it — echoes of rage, of vengeance. Someone who died angry. The Weaver is trying to resurrect them. I don't know who. But if he succeeds...\"**\n\nHe trails off, shuddering.",
-      "advance_conditions": "Player asks how to stop The Weaver, how to free Aldric, or where to find him",
+      "narration_prompt": "You are still deep in the dream. The dark void presses in around you. Aldric's form stabilizes slightly, as if your attention gives him strength. But fear flickers across his translucent features. He gathers himself to speak — what he has to say clearly terrifies him.",
+      "stage_cue_npc": "aldric",
+      "stage_npc_instruction": "Aldric reveals what he knows about The Weaver. The Weaver is the one who trapped him — Aldric was one of his first victims, proof that the soul-trapping works. The Weaver is collecting souls through blood oaths — the oaths aren't just loyalty, they're chains. When those people die, their souls go to The Weaver. He's building a congregation of the dead. And there's someone The Weaver wants to bring back — someone the players used to know. Aldric has felt echoes of rage and vengeance. Someone who died angry. He doesn't know who. He trails off, shuddering, unable to finish the thought. Speak in fragmented, terrified whispers. End by hinting that he knows where The Weaver can be found — say something like 'I know where he works... if you're willing to hear it.' Do NOT ask the player questions. Aldric has the information — he is telling them, not asking them.",
+      "negative_prompts": [
+        "Do NOT reveal the mill location or the ritual chamber — that comes in the next stage",
+        "Do NOT name who The Weaver is trying to resurrect — Aldric genuinely does not know",
+        "Do NOT suggest the players can simply open the lockbox to free Aldric",
+        "Do NOT have Aldric speak calmly — he is terrified and struggling to hold form",
+        "Do NOT describe the player as awake, in daylight, or in the real world — this is still a dream vision",
+        "Do NOT have Aldric ask the player questions — he is the one with information, he tells them things"
+      ],
+      "chat_npcs": ["aldric"],
+      "advance_conditions": "Player asks how to help, how to stop The Weaver, how to free Aldric, where to find the enemy, what to do next, or expresses any willingness to act. Any question about next steps or taking action should advance.",
       "next_stage": "the_request"
     },
     
     "the_request": {
       "description": "Aldric makes his request — and gives a warning about his own fate.",
-      "narration_prompt": "Aldric's form flickers violently. The connection is weakening. He reaches toward you with transparent hands, urgent.\n\n> **\"The mill — the old mill past the orchards. There's a ritual chamber beneath it. That's where he works. That's where you have to go.\"**\n\nHis voice cracks with desperation.\n\n> **\"Please. Stop him. Before he finishes. Before—\"**\n\nHe hesitates, something painful crossing his face.\n\n> **\"And if you can't... if it takes too long... you might have to destroy the box. Destroy me.\"**\n\nTears would fall if he could still cry.\n\n> **\"I can feel myself forgetting. Who I was. What kindness felt like. The longer I'm trapped, the more I become... something else. A spirit that forgets its humanity becomes a monster. I don't want to hurt anyone. Please. Promise me you'll—\"**\n\nHis voice cuts out. His form scatters like smoke in wind. The vision fractures.",
-      "advance_conditions": "The vision breaks and the player experiences waking up",
+      "narration_prompt": "The dream is fracturing. The dark walls around you crack and splinter. Aldric's form flickers violently — the connection is weakening. He reaches toward you with transparent hands, urgent. He has one last thing to say before the vision breaks.",
+      "stage_cue_npc": "aldric",
+      "stage_npc_instruction": "Aldric is desperate — the connection is failing. He tells them the location: the old mill past the orchards, there's a ritual chamber beneath it. That's where The Weaver works. He begs them to stop The Weaver before he finishes. Then he hesitates, pain crossing his face. He admits that if they can't stop The Weaver in time, they might have to destroy the box — destroy him. He can feel himself forgetting who he was, what kindness felt like. The longer he's trapped, the more he becomes something else. A spirit that forgets its humanity becomes a monster. He doesn't want to hurt anyone. He begs them to promise — but his voice cuts out mid-sentence. He MUST be cut off mid-plea. Do NOT finish his final sentence. End abruptly.",
+      "negative_prompts": [
+        "Do NOT let the player prevent the vision from breaking — Aldric's connection is severed no matter what",
+        "Do NOT have Aldric finish his final sentence — he is cut off mid-plea",
+        "Do NOT reveal any information beyond what the stage_npc_instruction contains",
+        "Do NOT push players toward immediate action — the scene ends with shock and loss, not a rallying cry",
+        "Do NOT introduce any new NPCs or plot elements not in this quest definition",
+        "Do NOT let the player continue talking to Aldric — the vision is breaking apart",
+        "Do NOT describe the player as awake or in the real world — the dream is shattering but they have NOT woken yet"
+      ],
+      "chat_npcs": [],
+      "advance_conditions": "ADVANCE IMMEDIATELY on the very next player message after this stage loads. The vision shatters regardless of what the player says or does. Do not wait for specific player actions — Aldric's connection is severed and the dream ends.",
       "next_stage": "waking"
     },
     
     "waking": {
       "description": "The dreamer wakes, gasping. The lockbox is ice cold. This was real.",
       "narration_prompt": "You wake gasping, drenched in cold sweat. Your hand flies to your chest — your heart is racing.\n\nThe lockbox sits where you left it, but when you touch it, the metal is *ice cold*. Frost patterns have formed on its surface, slowly melting in the warm air.\n\nThis was no ordinary dream.\n\nAldric is real. The danger is real. And somewhere beneath an old mill, The Weaver continues his work.\n\nDawn light creeps through the window. The frost on the lockbox has melted, leaving only damp metal and unanswered questions. The clock is ticking — for the city, and for the tortured soul trapped in that box.",
-      "advance_conditions": "Player acknowledges the experience or indicates they're ready to continue",
-      "next_stage": "quest_complete"
-    },
-    
-    "quest_complete": {
-      "description": "The vision ends. The party now knows about Aldric and the stakes.",
-      "narration_prompt": "The weight of what you've learned settles over you. A name: Aldric. A location: the old mill. A threat: resurrection. And a terrible choice that may have to be made.\n\nThe Collective needs to know about this.",
+      "negative_prompts": [
+        "Do NOT have Aldric speak or appear again — the vision is completely over",
+        "Do NOT downplay the experience as 'just a dream' — the frost on the lockbox proves it was real",
+        "Do NOT suggest a plan of attack, give directions to the mill, or push toward immediate action — let the players sit with this",
+        "Do NOT create urgency or a ticking clock — the players need time to gather themselves and decide what to do"
+      ],
+      "chat_npcs": [],
       "completes_quest": true
     }
   }

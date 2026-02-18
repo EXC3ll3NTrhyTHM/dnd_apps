@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Crying - sad face with streaming tears -->
+  <!-- Face -->
+  <circle cx="60" cy="55" r="40" fill="#fbbf24"/>
+  <circle cx="60" cy="55" r="40" fill="url(#cryGrad)"/>
+  <defs>
+    <radialGradient id="cryGrad" cx="50%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#fcd34d"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </radialGradient>
+  </defs>
+  <!-- Sad eyebrows -->
+  <line x1="36" y1="40" x2="50" y2="36" stroke="#92400e" stroke-width="3" stroke-linecap="round"/>
+  <line x1="84" y1="40" x2="70" y2="36" stroke="#92400e" stroke-width="3" stroke-linecap="round"/>
+  <!-- Closed sad eyes (curved lines) -->
+  <path d="M40,50 Q46,56 52,50" stroke="#92400e" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M68,50 Q74,56 80,50" stroke="#92400e" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Sad mouth -->
+  <path d="M44,72 Q52,64 60,64 Q68,64 76,72" stroke="#92400e" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Left tear stream -->
+  <g>
+    <ellipse cx="42" cy="58" rx="3" ry="5" fill="#60a5fa" opacity="0.8">
+      <animate attributeName="cy" values="58;90;58" dur="1s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="44" cy="70" rx="2.5" ry="4" fill="#60a5fa" opacity="0.6">
+      <animate attributeName="cy" values="62;95;62" dur="1s" repeatCount="indefinite" begin="0.4s"/>
+      <animate attributeName="opacity" values="0.6;0.1;0.6" dur="1s" repeatCount="indefinite" begin="0.4s"/>
+    </ellipse>
+  </g>
+  <!-- Right tear stream -->
+  <g>
+    <ellipse cx="78" cy="58" rx="3" ry="5" fill="#60a5fa" opacity="0.8">
+      <animate attributeName="cy" values="58;90;58" dur="1.1s" repeatCount="indefinite" begin="0.2s"/>
+      <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.1s" repeatCount="indefinite" begin="0.2s"/>
+    </ellipse>
+    <ellipse cx="76" cy="70" rx="2.5" ry="4" fill="#60a5fa" opacity="0.6">
+      <animate attributeName="cy" values="62;95;62" dur="0.9s" repeatCount="indefinite" begin="0.5s"/>
+      <animate attributeName="opacity" values="0.6;0.1;0.6" dur="0.9s" repeatCount="indefinite" begin="0.5s"/>
+    </ellipse>
+  </g>
+  <!-- Wobble -->
+  <animateTransform attributeName="transform" type="rotate" values="-2,60,55;2,60,55;-2,60,55" dur="1.5s" repeatCount="indefinite"/>
+</svg>

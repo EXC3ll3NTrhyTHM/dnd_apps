@@ -67,6 +67,17 @@ const LOCATION_THEMES = {
       '/sounds/collective/throne-room-v2.mp3',
     ],
   },
+  the_arena: {
+    inkColor: '#0c0507',
+    accentColor: '#ef4444',
+    particles: 'confetti',
+    subtitle: 'Prove Your Worth',
+    bgImage: '/images/scenes/arena_exterior.webp',
+    sound: '/sounds/arena/crowd_roar.mp3?v=3',
+    soundVolume: 0.3,
+    soundFadeIn: 600,
+    soundFadeOut: 800,
+  },
   the_cottage: {
     inkColor: '#0a0c07',
     accentColor: '#7aab5e',
@@ -133,16 +144,57 @@ export default function LocationTransition({ locationId, locationName, onComplet
     }
     if (entries.length === 0) return;
 
+    const fadeIn = theme.soundFadeIn || 0;
+    const fadeOut = theme.soundFadeOut || 0;
+    const FADE_STEP = 30; // ms per volume tick
+
     entries.forEach(({ src, volume, delay }) => {
       const audio = new Audio();
-      audio.volume = volume;
+      const startVol = fadeIn > 0 ? 0 : volume;
+      audio.volume = startVol;
+
+      const startPlayback = () => {
+        audio.play().catch(() => {});
+
+        // Fade in
+        if (fadeIn > 0) {
+          const steps = Math.ceil(fadeIn / FADE_STEP);
+          const increment = volume / steps;
+          let step = 0;
+          const fadeInInterval = setInterval(() => {
+            step++;
+            audio.volume = Math.min(volume, increment * step);
+            if (step >= steps) clearInterval(fadeInInterval);
+          }, FADE_STEP);
+          timersRef.current.push(fadeInInterval);
+        }
+
+        // Fade out — schedule based on clip duration
+        if (fadeOut > 0) {
+          audio.addEventListener('durationchange', () => {
+            const fadeOutStart = Math.max(0, (audio.duration * 1000) - fadeOut);
+            const t = setTimeout(() => {
+              const steps = Math.ceil(fadeOut / FADE_STEP);
+              const decrement = audio.volume / steps;
+              let currentVol = audio.volume;
+              const fadeOutInterval = setInterval(() => {
+                currentVol = Math.max(0, currentVol - decrement);
+                audio.volume = currentVol;
+                if (currentVol <= 0) clearInterval(fadeOutInterval);
+              }, FADE_STEP);
+              timersRef.current.push(fadeOutInterval);
+            }, fadeOutStart);
+            timersRef.current.push(t);
+          }, { once: true });
+        }
+      };
 
       audio.addEventListener('canplaythrough', () => {
         if (delay > 0) {
-          const t = setTimeout(() => audio.play().catch(() => {}), delay);
+          const t = setTimeout(startPlayback, delay);
           timersRef.current.push(t);
         } else {
-          audio.play().catch(() => {});
+          startPlayback();
         }
       }, { once: true });
 
@@ -201,9 +253,33 @@ export default function LocationTransition({ locationId, locationName, onComplet
     // Initialize particles
     const w = window.innerWidth;
     const h = window.innerHeight;
-    const count = theme.particles === 'embers' ? 40 : theme.particles === 'sparks' ? 35 : 25;
+    const CONFETTI_COLORS = [
+      '#ef4444', '#f97316', '#eab308', '#22c55e',
+      '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff',
+    ];
+    const count = theme.particles === 'confetti' ? 60
+      : theme.particles === 'embers' ? 40
+      : theme.particles === 'sparks' ? 35 : 25;
 
     particlesRef.current = Array.from({ length: count }, () => {
+      if (theme.particles === 'confetti') {
+        return {
+          x: Math.random() * w,
+          y: Math.random() * -h,  // start above screen, staggered
+          width: Math.random() * 10 + 8,
+          height: Math.random() * 6 + 4,
+          speedY: Math.random() * 2 + 1.5,
+          wobbleSpeed: Math.random() * 0.06 + 0.03,
+          wobbleAmp: Math.random() * 40 + 20,
+          rotation: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 0.12,
+          flipPhase: Math.random() * Math.PI * 2,
+          flipSpeed: Math.random() * 0.08 + 0.04,
+          life: Math.random() * Math.PI * 2,
+          color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+          opacity: Math.random() * 0.3 + 0.7,
+        };
+      }
       if (theme.particles === 'sparks') {
         // Sparks: fast arcing particles from random strike points
         const originX = Math.random() * w;
@@ -256,7 +332,20 @@ export default function LocationTransition({ locationId, locationName, onComplet
       ctx.clearRect(0, 0, w, h);
 
       for (const p of particlesRef.current) {
-        if (theme.particles === 'sparks') {
+        if (theme.particles === 'confetti') {
+          // Confetti: flutter down with wobble and tumble
+          p.life += p.wobbleSpeed;
+          p.x += Math.sin(p.life) * p.wobbleAmp * 0.02;
+          p.y += p.speedY;
+          p.rotation += p.rotSpeed;
+          p.flipPhase += p.flipSpeed;
+
+          // Respawn above when fallen below
+          if (p.y > h + 20) {
+            p.y = -10;
+            p.x = Math.random() * w;
+          }
+        } else if (theme.particles === 'sparks') {
           // Sparks: gravity-affected arcing motion
           p.x += p.speedX;
           p.speedY += p.gravity;
@@ -285,6 +374,21 @@ export default function LocationTransition({ locationId, locationName, onComplet
             p.opacity = Math.random() * 0.8 + 0.2;
             p.life = Math.random();
           }
+        }
+
+        if (theme.particles === 'confetti') {
+          // Flat rectangular confetti pieces with 3D tumble
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+          // Simulate 3D flip by scaling width with sin
+          const scaleX = Math.cos(p.flipPhase);
+          ctx.scale(scaleX, 1);
+          ctx.globalAlpha = p.opacity;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.width / 2, -p.height / 2, p.width, p.height);
+          ctx.restore();
+          continue;
         }
 
         ctx.beginPath();

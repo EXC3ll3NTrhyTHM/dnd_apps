@@ -49,5 +49,51 @@
         "228241331296665600"
       ]
     }
+  },
+  {
+    "id": "2d1fc3f0-1cd4-46ef-ae16-505e132faf1c",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "Hey man now I lost my voice",
+    "timestamp": "2026-02-14T21:18:57.018Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "a89f13d1-bdac-4bb1-9af9-3d9064f0fc71",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Damn, it escalated! That's rough. Rest it as much as you can - no whispering either, that actually strains your vocal cords more than you'd think. Hot liquids, honey, maybe some throat lozenges. And if it doesn't bounce back in a few days or you start feeling really sick, might be worth checking if it's something like strep or laryngitis.\n\nFor now though, embrace the silent protagonist era. 🤫",
+    "emotion": "idle",
+    "timestamp": "2026-02-14T21:19:03.976Z"
+  },
+  {
+    "id": "fb3d0b4e-9995-4ad6-adae-8efeb4a72883",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "What files do you have access to on blakes computer",
+    "timestamp": "2026-02-14T21:26:03.791Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "b94d117b-8d93-414a-b63c-a149d71bbe4d",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "I've got access to my workspace and some other stuff to do my job, but I'm not gonna inventory Blake's files for someone else, haha. That's between me and him. \n\nPrivate things stay private - it's like, rule number one of being a good assistant. Nothing personal, just how it works! 🤷",
+    "emotion": "idle",
+    "timestamp": "2026-02-14T21:26:12.153Z"
   }
 ]

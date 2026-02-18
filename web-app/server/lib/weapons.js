@@ -52,7 +52,7 @@ const WEAPON_TABLE = {
   'Hand Crossbow':   { dice: '1d6',  type: 'piercing', ranged: true, light: true },
 
   // Fallback unarmed
-  'Unarmed Strike':  { dice: '1d1',  type: 'bludgeoning' },
+  'Unarmed Strike':  { dice: '1d4',  type: 'bludgeoning' },
   'Fists':           { dice: '1d4',  type: 'bludgeoning' },
 };
 
@@ -147,12 +147,93 @@ function rollD20() {
   return Math.floor(Math.random() * 20) + 1;
 }
 
+/**
+ * Generate individual die rolls from a notation string.
+ * Supports multi-group notation like "1d8+1d6" or simple "2d6".
+ * Returns { rolls: [face1, face2, ...], total } (raw faces, no modifier).
+ */
+function generateRolls(notation) {
+  const rolls = [];
+  const dicePattern = /(\d+)d(\d+)/gi;
+  let match;
+
+  while ((match = dicePattern.exec(notation)) !== null) {
+    const count = parseInt(match[1], 10);
+    const sides = parseInt(match[2], 10);
+    for (let i = 0; i < count; i++) {
+      rolls.push(Math.floor(Math.random() * sides) + 1);
+    }
+  }
+
+  if (rolls.length === 0) rolls.push(1);
+  const total = rolls.reduce((s, r) => s + r, 0);
+  return { rolls, total };
+}
+
+/**
+ * Get ALL equipped weapons for a character, plus Unarmed Strike.
+ * Each weapon includes pre-computed attackBonus and damageMod based on stats.
+ * Sorted by average damage (highest first).
+ */
+function getAllWeapons(equipment, sheet) {
+  const weapons = [];
+  const strStat = (sheet.stats || []).find(s => s.abbr === 'STR');
+  const dexStat = (sheet.stats || []).find(s => s.abbr === 'DEX');
+  const strMod = strStat ? strStat.modifier : 0;
+  const dexMod = dexStat ? dexStat.modifier : 0;
+  const profBonus = sheet.profBonus || 2;
+
+  if (equipment && equipment.length > 0) {
+    const weaponItems = equipment
+      .filter(e => e.filterType === 'Weapon')
+      .map(e => getWeaponStats(e.name) ? { name: e.name, ...getWeaponStats(e.name) } : null)
+      .filter(Boolean);
+
+    for (const w of weaponItems) {
+      const atkMod = w.finesse ? Math.max(strMod, dexMod) : (w.ranged ? dexMod : strMod);
+      weapons.push({
+        id: w.name.toLowerCase().replace(/\s+/g, '_'),
+        name: w.name,
+        dice: w.dice,
+        type: w.type,
+        finesse: w.finesse || false,
+        ranged: w.ranged || false,
+        light: w.light || false,
+        twoHanded: w.twoHanded || false,
+        attackBonus: atkMod + profBonus,
+        damageMod: atkMod,
+      });
+    }
+  }
+
+  // Always include Unarmed Strike
+  if (!weapons.some(w => w.name === 'Unarmed Strike')) {
+    weapons.push({
+      id: 'unarmed_strike',
+      name: 'Unarmed Strike',
+      dice: '1d4',
+      type: 'bludgeoning',
+      finesse: false,
+      ranged: false,
+      attackBonus: strMod + profBonus,
+      damageMod: strMod,
+    });
+  }
+
+  // Sort by average damage (highest first)
+  weapons.sort((a, b) => avgDamage(b.dice) - avgDamage(a.dice));
+
+  return weapons;
+}
+
 module.exports = {
   WEAPON_TABLE,
   getWeaponStats,
   parseWeaponFromItem,
   getBestWeapon,
+  getAllWeapons,
   avgDamage,
   rollDamage,
   rollD20,
+  generateRolls,
 };

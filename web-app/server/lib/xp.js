@@ -110,15 +110,28 @@ const LIFETIME_DEFAULTS = {
   combat_crits: 0,
   combat_fumbles: 0,
   times_knocked_out: 0,
+  potions_used: 0,
   fish_caught: 0,
   fish_escaped: 0,
   fish_sold: 0,
+  fish_junk_caught: 0,
   fish_common_caught: 0,
   fish_uncommon_caught: 0,
   fish_rare_caught: 0,
   fish_epic_caught: 0,
   fish_legendary_caught: 0,
   fishing_gold_earned: 0,
+  defeated_goblin: 0,
+  defeated_wolf: 0,
+  defeated_skeleton: 0,
+  defeated_dire_wolf: 0,
+  defeated_ogre: 0,
+  defeated_owlbear: 0,
+  defeated_troll: 0,
+  pet_feeds: 0,
+  pet_plays: 0,
+  pet_interactions: 0,
+  pet_names_given: 0,
 };
 
 function ensureLifetime(record) {
@@ -394,6 +407,8 @@ function convertGoldToXp(userId, username, goldBalance) {
 // LEADERBOARD
 // ============================================
 
+const LEADERBOARD_EXCLUDED = ['424061511833747467', '1472286665417560167'];
+
 function getXpLeaderboard(limit = 10) {
   const xpData = loadXpData();
   let players = {};
@@ -401,6 +416,7 @@ function getXpLeaderboard(limit = 10) {
   catch { /* ignore */ }
 
   return Object.values(xpData)
+    .filter(r => !LEADERBOARD_EXCLUDED.includes(r.user_id))
     .sort((a, b) => b.total_xp - a.total_xp)
     .slice(0, limit)
     .map((record, i) => {

@@ -42,9 +42,26 @@
 - [x] NPCs still respond when no @mention is added (should require mention)
 - [x] **[iPhone]** @mention popup doesn't add mentions to keyboard
 
+### Keyboard/Input
+- [ ] **Swipe typing backspace** — After swiping to type, pressing backspace should delete the swiped text (currently doesn't work as expected)
+- [ ] **[iOS] Text selection** — Users can't adjust/move the text cursor or selection in the input field
+
+### Locations
+- [ ] **Fishing** — Currently just an overlay, needs to be an actual location with proper transition
+- [ ] **Fishing** — Needs ambient music (soothing, relaxing vibes)
+- [ ] **Arena** — Needs music transition when entering (battle music)
+
 ---
 
 ## Feature Requests ✨
+
+### Onboarding / First Launch
+- [ ] **Announcements / Welcome Popup**
+  - Modal that appears on first app launch (or after updates)
+  - First announcement: prompt user to enable notifications
+  - Could show recent updates, tips, or DM messages
+  - Dismissable, remembers if user has seen it
+  - Maybe a "What's New" section for returning players
 
 ### Chat/Input
 - [x] **Message Reactions** ⚡ *Priority - Tonight*

@@ -65,6 +65,65 @@
   line-height: 1;
 }
 
+/* ── Advantage / Disadvantage display ── */
+.dice-result-adv-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 2px 10px;
+  border-radius: 4px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.dice-result-adv-badge.dice-adv {
+  background: rgba(34, 197, 94, 0.35);
+  color: #4ade80;
+}
+.dice-result-adv-badge.dice-dis {
+  background: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+
+.dice-result-adv-rolls {
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.dice-roll-used {
+  color: #fff;
+}
+.dice-roll-discarded {
+  color: rgba(255, 255, 255, 0.35);
+  text-decoration: line-through;
+}
+.dice-roll-sep {
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+}
+
+/* ── Rolling label — shows during the roll before result ── */
+.dice-rolling-label {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+  letter-spacing: 0.04em;
+  text-align: center;
+  white-space: nowrap;
+  animation: dice-label-fade-in 0.3s ease-out;
+}
+
+@keyframes dice-label-fade-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 @keyframes dice-result-pop {
   0% {
     opacity: 0;

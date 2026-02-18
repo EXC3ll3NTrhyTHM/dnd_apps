@@ -8,7 +8,7 @@
 
 const express = require('express');
 const { authRequired } = require('../middleware/auth');
-const { getCharacterSheet, updateCharacterSheet } = require('../lib/characterSheets');
+const { getCharacterSheet, updateCharacterSheet, getAvailableAliases, getActiveAlias, setActiveAlias } = require('../lib/characterSheets');
 const { incrementLifetimeStat } = require('../lib/xp');
 const { checkAchievements } = require('../lib/achievements');
 
@@ -20,7 +20,31 @@ const ALLOWED_PHYSICAL_KEYS = ['age', 'gender', 'hair', 'eyes', 'skin', 'height'
 
 const router = express.Router();
 
-// GET /me — own character sheet
+// GET /aliases — available characters to switch to
+router.get('/aliases', authRequired, (req, res) => {
+  const aliases = getAvailableAliases(req.user.id);
+  const active = getActiveAlias(req.user.id);
+  res.json({ aliases, active });
+});
+
+// POST /switch — switch active character
+router.post('/switch', authRequired, (req, res) => {
+  const { targetUserId } = req.body || {};
+  const aliases = getAvailableAliases(req.user.id);
+  if (aliases.length === 0) {
+    return res.status(403).json({ error: 'No aliases available' });
+  }
+
+  const success = setActiveAlias(req.user.id, targetUserId || null);
+  if (!success) {
+    return res.status(400).json({ error: 'Invalid target character' });
+  }
+
+  const sheet = getCharacterSheet(req.user.id);
+  res.json({ characterSheet: sheet, active: targetUserId || null });
+});
+
+// GET /me — own character sheet (uses alias if set)
 router.get('/me', authRequired, (req, res) => {
   const sheet = getCharacterSheet(req.user.id);
   res.json({ characterSheet: sheet });

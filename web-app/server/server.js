@@ -37,6 +37,8 @@ const playersRoutes = require('./routes/players');
 const characterSheetRoutes = require('./routes/characterSheet');
 const encounterRoutes = require('./routes/encounters');
 const fishingRoutes = require('./routes/fishing');
+const petRoutes = require('./routes/pets');
+const emoteRoutes = require('./routes/emotes');
 
 const app = express();
 const server = http.createServer(app);
@@ -52,6 +54,7 @@ wss.on('connection', (ws, req) => {
       if (msg.type === 'identify') {
         ws.userId = msg.userId || null;
         ws.currentLocation = msg.currentLocation || null;
+        console.log(`[wss] Client identified: userId=${ws.userId}, location=${ws.currentLocation}`);
       } else if (msg.type === 'updateLocation') {
         ws.currentLocation = msg.currentLocation || null;
       }
@@ -114,6 +117,7 @@ app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/chat', uploadRoutes);
 app.use('/api/chat', diceRoutes);
+app.use('/api/dice', diceRoutes);
 clawdbotRoutes.app = app;
 app.use('/api/clawdbot', clawdbotRoutes);
 app.use('/api/campaign', campaignRoutes);
@@ -127,6 +131,8 @@ app.use('/api/players', playersRoutes);
 app.use('/api/character-sheet', characterSheetRoutes);
 app.use('/api/encounters', encounterRoutes);
 app.use('/api/fishing', fishingRoutes);
+app.use('/api/pets', petRoutes);
+app.use('/api/emotes', emoteRoutes);
 
 // Start encounter timeout checker
 encounterRoutes.startTimeoutChecker(app);

@@ -48,11 +48,26 @@ function saveFishingStats(data) {
 /**
  * Weighted random rarity selection, then random fish of that rarity,
  * then random weight within the fish's range.
+ * If equippedRod is 'iron_rod', roll for junk first.
  */
-function determineCatch(baitId) {
+function determineCatch(baitId, equippedRod) {
   const catalog = loadFishCatalog();
   const weights = catalog.baitWeights[baitId];
   if (!weights) return null;
+
+  // Junk roll — iron_rod only
+  if (equippedRod === 'iron_rod' && catalog.junkChance) {
+    const junkPct = catalog.junkChance[baitId] || 0;
+    if (junkPct > 0 && Math.random() < junkPct) {
+      const junkItems = catalog.fish.filter(f => f.rarity === 'junk');
+      if (junkItems.length > 0) {
+        const junk = junkItems[Math.floor(Math.random() * junkItems.length)];
+        const rolledWeight = +(junk.weight.min + Math.random() * (junk.weight.max - junk.weight.min)).toFixed(1);
+        const biteDelay = 2000 + Math.floor(Math.random() * 6000);
+        return { fish: junk, rolledWeight, biteDelay };
+      }
+    }
+  }
 
   // Weighted random rarity pick
   const rarities = Object.entries(weights);
@@ -91,7 +106,7 @@ function determineCatch(baitId) {
 // STATS TRACKING
 // ============================================
 
-function recordCatch(userId, username, fishId, rarity) {
+function recordCatch(userId, username, fishId, rarity, weight) {
   const stats = loadFishingStats();
   if (!stats[userId]) {
     stats[userId] = {
@@ -101,6 +116,7 @@ function recordCatch(userId, username, fishId, rarity) {
       total_sold: 0,
       gold_earned: 0,
       catches: {},
+      biggest_catch: null,
     };
   }
 
@@ -110,8 +126,42 @@ function recordCatch(userId, username, fishId, rarity) {
   s.catches[fishId] = (s.catches[fishId] || 0) + 1;
   s.last_catch = new Date().toISOString();
 
+  // Track biggest catch by weight (junk doesn't count)
+  if (rarity !== 'junk' && (!s.biggest_catch || weight > s.biggest_catch.weight)) {
+    const catalog = loadFishCatalog();
+    const fish = catalog.fish.find(f => f.id === fishId);
+    s.biggest_catch = {
+      fishId,
+      name: fish?.name || fishId,
+      rarity,
+      weight,
+      icon: fish?.icon || '',
+      date: new Date().toISOString(),
+    };
+  }
+
   saveFishingStats(stats);
   return s;
+}
+
+function getBiggestCatchLeaderboard(limit = 5) {
+  const stats = loadFishingStats();
+  const playersPath = path.resolve(__dirname, '..', '..', 'data', 'players.json');
+  let players = {};
+  try { players = JSON.parse(fs.readFileSync(playersPath, 'utf-8')); } catch {}
+
+  return Object.entries(stats)
+    .filter(([, s]) => s.biggest_catch)
+    .map(([userId, s]) => ({
+      userId,
+      username: players[userId]?.characterName || s.username,
+      fish: s.biggest_catch.name,
+      rarity: s.biggest_catch.rarity,
+      weight: s.biggest_catch.weight,
+      icon: s.biggest_catch.icon,
+    }))
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, limit);
 }
 
 function recordEscape(userId, username) {
@@ -161,4 +211,5 @@ module.exports = {
   recordCatch,
   recordEscape,
   recordSale,
+  getBiggestCatchLeaderboard,
 };

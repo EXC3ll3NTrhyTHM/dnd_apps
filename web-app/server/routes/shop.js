@@ -6,8 +6,21 @@
  */
 
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const { authRequired } = require('../middleware/auth');
 const { loadCatalog, findItemInCatalog, getWallet, spendGold, addItemToInventory, getInventory, useItem } = require('../lib/economy');
+
+const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
+function loadPlayers() {
+  try { return JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8')); }
+  catch { return {}; }
+}
+function savePlayers(data) {
+  const tmp = PLAYERS_PATH + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+  fs.renameSync(tmp, PLAYERS_PATH);
+}
 
 const router = express.Router();
 
@@ -53,6 +66,24 @@ router.post('/buy', authRequired, (req, res) => {
 
   // Add item to inventory
   const inventory = addItemToInventory(req.user.id, item);
+
+  // Handle dice_set purchases: add colorset to player's ownedDice
+  if (item.type === 'dice_set' && item.colorset) {
+    try {
+      const players = loadPlayers();
+      if (!players[req.user.id]) players[req.user.id] = {};
+      const p = players[req.user.id];
+      if (!p.ownedDice) p.ownedDice = ['default'];
+      if (!p.ownedDice.includes(item.colorset)) {
+        p.ownedDice.push(item.colorset);
+      }
+      // Auto-equip if this is their first non-default set
+      if (!p.equippedDice || p.equippedDice === 'default') {
+        p.equippedDice = item.colorset;
+      }
+      savePlayers(players);
+    } catch (e) { console.error('[dice_set purchase]', e.message); }
+  }
 
   let xpAwarded = 0;
   try {

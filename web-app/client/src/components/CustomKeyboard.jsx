@@ -73,6 +73,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
   onSwipeWord, onSwipeReplace,
   onDiceRoll,
   onUseItem,
+  onOpenEmotes,
   locationId,
 }) {
   const [shifted, setShifted] = useState(false);
@@ -124,7 +125,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
 
   // Keep callback refs current so the delegation handler stays stable
   const refs = useRef({});
-  refs.current = { onKey, onBackspace, onSubmit, onClose, onPaste, onLeft, onRight, playSound, disabled, onModeChange, onNpcMention, onGroupMention, onPlayerMention, onToggleMic, onGifSelect, onImagePick, onSwipeWord, onSwipeReplace, onUseItem };
+  refs.current = { onKey, onBackspace, onSubmit, onClose, onPaste, onLeft, onRight, playSound, disabled, onModeChange, onNpcMention, onGroupMention, onPlayerMention, onToggleMic, onGifSelect, onImagePick, onSwipeWord, onSwipeReplace, onUseItem, onOpenEmotes };
 
   const shiftedRef = useRef(false);
   const symbolsRef = useRef(false);
@@ -967,6 +968,9 @@ const CustomKeyboard = memo(function CustomKeyboard({
       api('/api/inventory')
         .then(data => setItemsList((data.items || []).filter(i => i.type === 'consumable' && i.quantity > 0)))
         .catch(() => setItemsList([]));
+    } else if (action === 'open-emotes') {
+      playKeyTap();
+      refs.current.onOpenEmotes?.();
     } else if (action === 'use-item') {
       playKeyTap();
       const itemId = btn.dataset.itemId;

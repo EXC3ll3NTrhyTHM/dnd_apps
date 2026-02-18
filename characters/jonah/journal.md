@@ -28,3 +28,5 @@
 [2026-02-08] Today, I received orders from Tyren to escort the recruits back to their post, emphasizing the importance of their training. During our debriefing, I noted a looming threat with the Weaver's recruiting and the mimic incident, stressing to Tyren the necessity of keeping our young recruits vigilant against the growing shadows.
 
 [2026-02-09] Today, Tyren emphasized the importance of forgetting the Veil and preparing for an interrogation of our prisoner regarding the cottage robbery and its ties to the Iron Howl Legion. I coordinated with the officers to ensure they would support Tyren and the Dojo in silence, ready to observe and assist as needed.
+
+[2026-02-17] Today, I rallied the team and set our plan into motion to search for Harlen. I could feel the tension in the air as we prepared to split up, reminding everyone of our code and the importance of trust among us. Our path ahead is uncertain, but I am ready to face the shadows with the hammer at my side.

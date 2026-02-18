@@ -1,33 +1,34 @@
 import { useRef, useCallback } from 'react';
 import { useAudioMuted } from './useAudioSettings';
+import { preloadDiceSounds } from '../lib/diceAudio';
 
 const UI_SOUNDS = {
-  messageSent:  '/sounds/ui/message-sent.wav',
-  npcResponse:  '/sounds/ui/npc-response.wav',
-  buttonTap:    '/sounds/ui/button-tap.wav',
-  navTap:       '/sounds/ui/nav-tap.wav',
-  purchase:     '/sounds/ui/purchase.wav',
-  mapMarker:    '/sounds/ui/map-marker.wav',
-  menuOpen:     '/sounds/ui/menu-open.wav',
-  menuClose:    '/sounds/ui/menu-close.wav',
+  messageSent: '/sounds/ui/message-sent.wav',
+  npcResponse: '/sounds/ui/npc-response.wav',
+  buttonTap: '/sounds/ui/button-tap.wav',
+  navTap: '/sounds/ui/nav-tap.wav',
+  purchase: '/sounds/ui/purchase.wav',
+  mapMarker: '/sounds/ui/map-marker.wav',
+  menuOpen: '/sounds/ui/menu-open.wav',
+  menuClose: '/sounds/ui/menu-close.wav',
 };
 
 const VOLUMES = {
-  messageSent:  0.4,
-  npcResponse:  0.35,
-  buttonTap:    0.3,
-  navTap:       0.3,
-  purchase:     0.5,
-  mapMarker:    0.35,
-  menuOpen:     0.3,
-  menuClose:    0.25,
+  messageSent: 0.4,
+  npcResponse: 0.35,
+  buttonTap: 0.3,
+  navTap: 0.3,
+  purchase: 0.5,
+  mapMarker: 0.35,
+  menuOpen: 0.3,
+  menuClose: 0.25,
 };
 
 // Web Audio API — pre-decoded buffers for instant playback
 let _ctx = null;
 const _buffers = {};
 
-function ensureContext() {
+export function ensureContext() {
   if (!_ctx) {
     _ctx = new (window.AudioContext || window.webkitAudioContext)();
   }
@@ -43,7 +44,7 @@ function preloadAll() {
       .then(r => r.arrayBuffer())
       .then(buf => ctx.decodeAudioData(buf))
       .then(decoded => { _buffers[key] = decoded; })
-      .catch(() => {});
+      .catch(() => { });
   }
 }
 
@@ -53,11 +54,29 @@ function initOnInteraction() {
   if (_preloaded) return;
   _preloaded = true;
   preloadAll();
+  preloadDiceSounds(); // Start loading dice sounds immediately
+  // Also unlock HTML5 Audio (new Audio()) for libraries like dice-box-threejs.
+  // iOS Safari requires a user gesture to start any audio; playing a silent
+  // data-URI buffer "unlocks" the HTML5 Audio path for the rest of the session.
+  try {
+    const a = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
+    a.volume = 0;
+    a.play().then(() => a.pause()).catch(() => { });
+  } catch { }
   window.removeEventListener('pointerdown', initOnInteraction);
   window.removeEventListener('touchstart', initOnInteraction);
 }
 window.addEventListener('pointerdown', initOnInteraction, { once: true });
 window.addEventListener('touchstart', initOnInteraction, { once: true });
+
+/**
+ * Explicitly unlock all audio systems (AudioContext + HTML5 Audio).
+ * Called from the iOS audio consent overlay on the user's intentional tap.
+ */
+export function unlockAllAudio() {
+  ensureContext();
+  initOnInteraction();
+}
 
 export function useUiSounds() {
   const muted = useAudioMuted();

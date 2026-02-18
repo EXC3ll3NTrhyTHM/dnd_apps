@@ -56,8 +56,17 @@ let colorIndex = 0;
 for (const name of npcBots) {
   processes.push({
     name: name.toUpperCase().padEnd(10),
-    cmd: 'node',
-    args: ['bot.js', name],
+    cmd: 'nodemon',
+    args: [
+      '--watch', 'bot.js',
+      '--watch', 'presence.js',
+      '--watch', `characters/${name}`,
+      '--ignore', `characters/${name}/quest_state.json`,
+      '--ignore', `characters/${name}/journal.md`,
+      '--ignore', `characters/${name}/quest_cue.json`,
+      '--ignore', `characters/${name}/backups`,
+      'bot.js', name,
+    ],
     cwd: ROOT,
     color: COLORS[colorIndex++ % COLORS.length],
   });
@@ -69,8 +78,16 @@ for (const env of ['dev', 'prod']) {
   if (fs.existsSync(qmEnvPath)) {
     processes.push({
       name: `QM-${env.toUpperCase()}`.padEnd(10),
-      cmd: 'node',
-      args: ['bot.js', env],
+      cmd: 'nodemon',
+      args: [
+        '--watch', 'bot.js',
+        '--watch', `config.${env}.json`,
+        '--watch', path.join(ROOT, 'characters'),
+        '--ext', 'js,json',
+        '--ignore', 'quest_signals',
+        '--ignore', `party_quests.${env}.json`,
+        'bot.js', env,
+      ],
       cwd: path.join(ROOT, 'questmaster'),
       color: COLORS[colorIndex++ % COLORS.length],
     });
@@ -83,8 +100,13 @@ for (const env of ['dev', 'prod']) {
   if (fs.existsSync(skEnvPath)) {
     processes.push({
       name: `SK-${env.toUpperCase()}`.padEnd(10),
-      cmd: 'node',
-      args: ['bot.js', env],
+      cmd: 'nodemon',
+      args: [
+        '--watch', 'bot.js',
+        '--watch', `config.${env}.json`,
+        '--ignore', 'currency_signals',
+        'bot.js', env,
+      ],
       cwd: path.join(ROOT, 'shopkeeper'),
       color: COLORS[colorIndex++ % COLORS.length],
     });

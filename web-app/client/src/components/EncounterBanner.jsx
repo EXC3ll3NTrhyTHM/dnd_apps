@@ -424,30 +424,78 @@ export function useEncounterEvents(locationId, userId) {
   const [resultScreen, setResultScreen] = useState(null);
   const [narrations, setNarrations] = useState([]);
   const [monsterRollRequest, setMonsterRollRequest] = useState(null);
+  // monsterId → { encounterId, participantCount, currentHp, maxHp }
+  const [encounterMap, setEncounterMap] = useState({});
+  // Initiative tracking
+  const [initiativeResults, setInitiativeResults] = useState({});
+  const [currentTurn, setCurrentTurn] = useState(null);
+
+  // Use a ref to read encounter.id inside the event handler without adding it as a dependency
+  const encounterRef = useRef(null);
+  encounterRef.current = encounter;
+
+  const initEncounterMap = useCallback((encounters) => {
+    const map = {};
+    for (const enc of encounters) {
+      if (enc?.monster?.id) {
+        map[enc.monster.id] = {
+          encounterId: enc.id,
+          participantCount: Object.keys(enc.participants || {}).length,
+          currentHp: enc.monster.currentHp,
+          maxHp: enc.monster.maxHp,
+        };
+      }
+    }
+    setEncounterMap(map);
+  }, []);
+
+  // Helper to update encounterMap from a payload that includes encounter state
+  const updateMapFromEncounter = useCallback((enc) => {
+    if (!enc?.monster?.id) return;
+    setEncounterMap(prev => ({
+      ...prev,
+      [enc.monster.id]: {
+        encounterId: enc.id,
+        participantCount: Object.keys(enc.participants || {}).length,
+        currentHp: enc.monster.currentHp,
+        maxHp: enc.monster.maxHp,
+      },
+    }));
+  }, []);
 
   const handleEncounterEvent = useCallback((payload) => {
     if (payload.locationId !== locationId) return;
 
+    const myEncId = encounterRef.current?.id;
+    const isMyEncounter = payload.encounterId && payload.encounterId === myEncId;
+
     switch (payload.type) {
       case 'encounter_spawn':
-        setEncounter(payload.encounter);
-        setResultScreen(null);
-        setMonsterRollRequest(null);
-        setNarrations([{
-          id: `enc_spawn_${Date.now()}`,
-          role: 'system',
-          type: 'encounter',
-          subtype: 'spawn',
-          text: payload.encounter.monster?.description
-            ? `**A ${payload.encounter.monster.name} appears!** ${payload.encounter.monster.description}`
-            : `**A wild ${payload.encounter.monster?.name} appears!**`,
-          timestamp: new Date().toISOString(),
-        }]);
+        // Update the encounter map — don't auto-join
+        updateMapFromEncounter(payload.encounter);
         break;
 
       case 'encounter_join':
-        setEncounter(payload.encounter);
-        if (payload.userId !== userId) {
+        updateMapFromEncounter(payload.encounter);
+        // If this user just joined, set as my encounter
+        if (payload.userId === userId) {
+          setEncounter(payload.encounter);
+          setResultScreen(null);
+          setMonsterRollRequest(null);
+          setInitiativeResults({});
+          setCurrentTurn(null);
+          setNarrations([{
+            id: `enc_spawn_${Date.now()}`,
+            role: 'system',
+            type: 'encounter',
+            subtype: 'spawn',
+            text: payload.encounter.monster?.description
+              ? `**A ${payload.encounter.monster.name} appears!** ${payload.encounter.monster.description}`
+              : `**A wild ${payload.encounter.monster?.name} appears!**`,
+            timestamp: new Date().toISOString(),
+          }]);
+        } else if (isMyEncounter) {
+          setEncounter(payload.encounter);
           setNarrations(prev => [...prev, {
             id: `enc_join_${payload.userId}_${Date.now()}`,
             role: 'system',
@@ -456,14 +504,117 @@ export function useEncounterEvents(locationId, userId) {
             text: `**${payload.playerName}** joins the fight!`,
             timestamp: new Date().toISOString(),
           }]);
+          // Add initiative result if included in the join broadcast
+          if (payload.initiativeResult) {
+            setInitiativeResults(prev => ({
+              ...prev,
+              [payload.userId]: {
+                name: payload.playerName,
+                ...payload.initiativeResult,
+              },
+            }));
+          }
         }
         break;
 
       case 'encounter_action':
-        setEncounter(payload.encounter);
+        if (isMyEncounter) setEncounter(payload.encounter);
+        break;
+
+      case 'encounter_initiative_roll':
+        if (isMyEncounter) {
+          setInitiativeResults(prev => ({
+            ...prev,
+            [payload.userId]: {
+              name: payload.playerName,
+              ...payload.initiativeResult,
+            },
+          }));
+          setNarrations(prev => [...prev, {
+            id: `enc_init_${payload.userId}_${Date.now()}`,
+            role: 'system', type: 'encounter', subtype: 'initiative',
+            text: `**${payload.playerName}** rolls initiative: **${payload.initiativeResult.total}** (${payload.initiativeResult.roll} + ${payload.initiativeResult.modifier})`,
+            timestamp: new Date().toISOString(),
+          }]);
+        }
+        break;
+
+      case 'encounter_initiative_complete':
+        updateMapFromEncounter(payload.encounter);
+        if (isMyEncounter || (payload.encounter &&
+            Object.keys(payload.encounter.participants || {}).includes(userId))) {
+          setEncounter(payload.encounter);
+          // Sync ref immediately so the next WS event (e.g. monster_roll_needed)
+          // can check isMyEncounter before React re-renders
+          encounterRef.current = payload.encounter;
+          const orderText = payload.initiativeOrder
+            .map((e, i) => `${i + 1}. **${e.name}** (${e.total})`)
+            .join('\n');
+          setNarrations(prev => [...prev, {
+            id: `enc_init_order_${Date.now()}`,
+            role: 'system', type: 'encounter', subtype: 'round_header',
+            text: `**[Initiative Order]**\n${orderText}`,
+            timestamp: new Date().toISOString(),
+          }]);
+          // Set first turn
+          if (payload.initiativeOrder?.length > 0) {
+            const firstEntry = payload.encounter?.initiativeOrder?.[payload.encounter?.currentTurnIndex || 0];
+            setCurrentTurn(firstEntry || payload.initiativeOrder[0]);
+          }
+        }
+        break;
+
+      case 'encounter_initiative_update':
+        updateMapFromEncounter(payload.encounter);
+        if (isMyEncounter) {
+          setEncounter(payload.encounter);
+        }
+        break;
+
+      case 'encounter_turn_start':
+        if (isMyEncounter) {
+          setEncounter(payload.encounter);
+          setCurrentTurn(payload.currentTurn);
+        }
+        break;
+
+      case 'encounter_turn_result':
+        updateMapFromEncounter(payload.encounter);
+        if (isMyEncounter) {
+          if (payload.encounter) setEncounter(payload.encounter);
+          if (payload.result) {
+            setNarrations(prev => [...prev, {
+              id: `enc_turn_${Date.now()}`,
+              role: 'system', type: 'encounter', subtype: 'combat',
+              text: payload.result.text,
+              timestamp: new Date().toISOString(),
+            }]);
+          }
+        }
+        break;
+
+      case 'encounter_bonus_phase':
+        if (isMyEncounter) {
+          if (payload.encounter) setEncounter(payload.encounter);
+        }
+        break;
+
+      case 'encounter_bonus_result':
+        if (isMyEncounter) {
+          if (payload.encounter) setEncounter(payload.encounter);
+          if (payload.result) {
+            setNarrations(prev => [...prev, {
+              id: `enc_bonus_${Date.now()}`,
+              role: 'system', type: 'encounter', subtype: 'combat',
+              text: payload.result.text,
+              timestamp: new Date().toISOString(),
+            }]);
+          }
+        }
         break;
 
       case 'encounter_round': {
+        if (!isMyEncounter) break;
         const msgs = (payload.results || []).map((r, i) => ({
           id: `enc_round_${payload.round}_${i}_${Date.now()}`,
           role: 'system',
@@ -484,17 +635,25 @@ export function useEncounterEvents(locationId, userId) {
       }
 
       case 'encounter_monster_roll_needed':
-        // Store the roll request — EncounterBanner will pick it up
-        setMonsterRollRequest({
-          encounterId: payload.encounterId,
-          rollerId: payload.rollerId,
-          attacks: payload.attacks,
-          monsterName: payload.monsterName,
-        });
+        if (isMyEncounter) {
+          if (payload.encounter) setEncounter(payload.encounter);
+          setMonsterRollRequest({
+            encounterId: payload.encounterId,
+            rollerId: payload.rollerId,
+            attacks: payload.attacks,
+            monsterName: payload.monsterName,
+          });
+        }
         break;
 
       case 'encounter_monster_turn': {
-        setEncounter(payload.encounter);
+        updateMapFromEncounter(payload.encounter);
+        if (!isMyEncounter) break;
+        // Only update encounter if payload has one — on defeat the server
+        // deletes the encounter before broadcasting, sending null here.
+        // Keeping the old state preserves encounterRef.id so encounter_end
+        // can match isMyEncounter and show the defeat screen.
+        if (payload.encounter) setEncounter(payload.encounter);
         setMonsterRollRequest(null);
         const monsterMsgs = (payload.attacks || []).map((a, i) => ({
           id: `enc_monster_${i}_${Date.now()}`,
@@ -516,19 +675,51 @@ export function useEncounterEvents(locationId, userId) {
       }
 
       case 'encounter_new_round':
-        setEncounter(payload.encounter);
-        setMonsterRollRequest(null);
+        updateMapFromEncounter(payload.encounter);
+        if (isMyEncounter) {
+          setEncounter(payload.encounter);
+          setMonsterRollRequest(null);
+        }
         break;
 
-      case 'encounter_end':
-        setEncounter(null);
+      case 'encounter_end': {
+        // Remove from encounter map
+        const monsterId = payload.encounter?.monster?.id;
+        if (monsterId) {
+          setEncounterMap(prev => {
+            const next = { ...prev };
+            delete next[monsterId];
+            return next;
+          });
+        } else if (payload.encounterId) {
+          // Find by encounterId if no monster data in payload
+          setEncounterMap(prev => {
+            const next = { ...prev };
+            for (const [mid, entry] of Object.entries(next)) {
+              if (entry.encounterId === payload.encounterId) {
+                delete next[mid];
+                break;
+              }
+            }
+            return next;
+          });
+        }
+
+        if (!isMyEncounter) break;
         setMonsterRollRequest(null);
+        setInitiativeResults({});
+        setCurrentTurn(null);
+        // Keep encounter alive for victory/defeat so the battle screen
+        // stays visible while dice animations finish. Clear on dismiss.
+        const hasResultScreen = payload.outcome === 'victory' || payload.outcome === 'defeat';
+        if (!hasResultScreen) setEncounter(null);
         if (payload.outcome === 'victory') {
           setResultScreen({
             type: 'victory',
             rewards: payload.rewards,
             deathText: payload.deathText,
             monsterName: payload.monsterName,
+            achievements: payload.achievements,
           });
           setNarrations(prev => [...prev, {
             id: `enc_victory_${Date.now()}`,
@@ -571,11 +762,13 @@ export function useEncounterEvents(locationId, userId) {
           }]);
         }
         break;
+      }
     }
-  }, [locationId, userId]);
+  }, [locationId, userId, updateMapFromEncounter]);
 
   const clearResult = useCallback(() => {
     setResultScreen(null);
+    setEncounter(null);
   }, []);
 
   const clearMonsterRollRequest = useCallback(() => {
@@ -584,8 +777,11 @@ export function useEncounterEvents(locationId, userId) {
 
   return {
     encounter, setEncounter,
+    encounterMap, initEncounterMap,
     resultScreen, clearResult,
     narrations, handleEncounterEvent,
     monsterRollRequest, clearMonsterRollRequest,
+    initiativeResults, setInitiativeResults,
+    currentTurn, setCurrentTurn,
   };
 }

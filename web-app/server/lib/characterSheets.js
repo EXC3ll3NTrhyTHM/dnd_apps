@@ -12,6 +12,7 @@ const path = require('path');
 
 const STAT_DIR = path.join(__dirname, '..', '..', 'players_stat');
 const OVERRIDES_FILE = path.join(__dirname, '..', '..', 'data', 'character_overrides.json');
+const ALIASES_FILE = path.join(__dirname, '..', '..', 'data', 'character_aliases.json');
 
 // Discord user ID → filename in players_stat/
 const CHARACTER_MAP = {
@@ -21,6 +22,31 @@ const CHARACTER_MAP = {
   '1073385140669128725': 'nalyd.json',
   '228241331296665600': 'acacia.json'
 };
+
+// Users who can switch between other characters' sheets
+// Maps Discord user ID → array of user IDs they can impersonate
+const ALIAS_ALLOWED = {
+  '1472286665417560167': [
+    { id: '1073385140669128725', name: 'Nalyd' },
+    { id: '1374906408046166036', name: 'Tyren' },
+    { id: '765978025937469481', name: 'Aly' },
+    { id: '228241331296665600', name: 'Acacia' }
+  ]
+};
+
+// Active alias storage: { discordUserId: targetUserId }
+let aliasesCache = {};
+
+function loadAliases() {
+  try {
+    const content = fs.readFileSync(ALIASES_FILE, 'utf8');
+    aliasesCache = JSON.parse(content);
+  } catch {
+    aliasesCache = {};
+  }
+}
+
+loadAliases();
 
 const STAT_NAMES = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
 const STAT_FULL_NAMES = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
@@ -133,6 +159,42 @@ function parseSheet(raw) {
   const totalLevel = classes.reduce((sum, c) => sum + c.level, 0);
   const profBonus = calcProfBonus(totalLevel);
 
+  // Spellcasting data (generic — works for any class with spellRules)
+  let spellcasting = null;
+  for (const cls of (d.classes || [])) {
+    const spellRules = cls.definition?.spellRules;
+    const spellAbilityId = cls.definition?.spellCastingAbilityId;
+    if (spellRules && spellAbilityId && spellRules.levelSpellSlots) {
+      const slotsAtLevel = spellRules.levelSpellSlots[cls.level] || [];
+      if (slotsAtLevel.some(s => s > 0)) {
+        const abilityStat = stats.find(s => s.id === spellAbilityId);
+        const abilityMod = abilityStat ? abilityStat.modifier : 0;
+        spellcasting = {
+          className: cls.definition.name,
+          abilityId: spellAbilityId,
+          abilityName: abilityStat?.name || 'Unknown',
+          abilityModifier: abilityMod,
+          spellSaveDC: 8 + profBonus + abilityMod,
+          spellAttackBonus: profBonus + abilityMod,
+          slots: slotsAtLevel
+            .map((count, idx) => ({ level: idx + 1, total: count }))
+            .filter(s => s.total > 0),
+        };
+        break;
+      }
+    }
+  }
+
+  // Class features available at current level
+  const classFeatures = [];
+  for (const cls of (d.classes || [])) {
+    for (const feat of (cls.definition?.classFeatures || [])) {
+      if (feat.requiredLevel <= cls.level) {
+        classFeatures.push(feat.name);
+      }
+    }
+  }
+
   // DEX mod for AC calc
   const dexStat = stats.find(s => s.id === 2);
   const dexMod = dexStat ? dexStat.modifier : 0;
@@ -184,7 +246,9 @@ function parseSheet(raw) {
     backstory: notes.backstory || null,
     enemies: notes.enemies || null,
     organizations: notes.organizations || null,
-    equipment: equippedItems
+    equipment: equippedItems,
+    spellcasting,
+    classFeatures,
   };
 }
 
@@ -264,11 +328,47 @@ for (const [discordId, filename] of Object.entries(CHARACTER_MAP)) {
 
 /**
  * Get a character sheet for a Discord user ID.
+ * If the user has an active alias, returns that character's sheet instead.
  * Returns the condensed sheet object (with overrides merged) or null.
  */
 function getCharacterSheet(discordUserId) {
-  const base = sheetsCache[discordUserId] || null;
-  return applyOverrides(base, discordUserId);
+  // Check if user has an active alias
+  const aliasTarget = aliasesCache[discordUserId];
+  const resolvedId = aliasTarget || discordUserId;
+  const base = sheetsCache[resolvedId] || null;
+  return applyOverrides(base, resolvedId);
+}
+
+/**
+ * Get available aliases for a user. Returns array of { id, name } or empty array.
+ */
+function getAvailableAliases(discordUserId) {
+  return ALIAS_ALLOWED[discordUserId] || [];
+}
+
+/**
+ * Get the currently active alias for a user. Returns target user ID or null.
+ */
+function getActiveAlias(discordUserId) {
+  return aliasesCache[discordUserId] || null;
+}
+
+/**
+ * Set the active alias for a user. targetUserId must be in their allowed list, or null to clear.
+ */
+function setActiveAlias(discordUserId, targetUserId) {
+  const allowed = ALIAS_ALLOWED[discordUserId];
+  if (!allowed) return false;
+
+  if (targetUserId === null) {
+    delete aliasesCache[discordUserId];
+  } else {
+    if (!allowed.find(a => a.id === targetUserId)) return false;
+    aliasesCache[discordUserId] = targetUserId;
+  }
+
+  atomicWrite(ALIASES_FILE, aliasesCache);
+  return true;
 }
 
 /**
@@ -306,4 +406,4 @@ function updateCharacterSheet(discordUserId, updates) {
   return getCharacterSheet(discordUserId);
 }
 
-module.exports = { getCharacterSheet, updateCharacterSheet };
+module.exports = { getCharacterSheet, updateCharacterSheet, getAvailableAliases, getActiveAlias, setActiveAlias };

@@ -7,8 +7,25 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const { WebSocket } = require('ws');
 const { authRequired, authOptional } = require('../middleware/auth');
 const presence = require('../lib/presence');
+
+function broadcastPresence(req, locationId) {
+  const wss = req.app.get('wss');
+  if (!wss) return;
+  const all = presence.getAll();
+  const users = all[locationId] || [];
+  const payload = JSON.stringify({ type: 'presence_update', locationId, users });
+  let sent = 0;
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN && client.currentLocation === locationId) {
+      client.send(payload);
+      sent++;
+    }
+  });
+  console.log(`[presence] Broadcast to ${sent}/${wss.clients.size} WS clients at ${locationId}, ${users.length} users`);
+}
 
 /**
  * GET /api/presence
@@ -28,6 +45,7 @@ router.post('/join', authRequired, (req, res) => {
     return res.status(400).json({ error: 'locationId required' });
   }
   presence.join(locationId, req.user);
+  console.log(`[presence] ${req.user.username} joined ${locationId}. Current users:`, JSON.stringify(presence.getAll()[locationId]?.map(u => u.username)));
   let xpAwarded = 0;
   let levelUp = null;
   try {
@@ -48,6 +66,7 @@ router.post('/join', authRequired, (req, res) => {
   const response = { success: true, xpAwarded, newAchievements };
   if (levelUp) response.levelUp = levelUp;
   res.json(response);
+  broadcastPresence(req, locationId);
 });
 
 /**
@@ -59,7 +78,7 @@ router.post('/heartbeat', authRequired, (req, res) => {
   if (!locationId) {
     return res.status(400).json({ error: 'locationId required' });
   }
-  presence.heartbeat(locationId, req.user.id);
+  presence.heartbeat(locationId, req.user);
   res.json({ success: true });
 });
 
@@ -85,8 +104,9 @@ router.post('/leave', authOptional, (req, res) => {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  presence.leave(null, userId);
+  const leftLocations = presence.leave(null, userId);
   res.json({ success: true });
+  leftLocations.forEach(locId => broadcastPresence(req, locId));
 });
 
 module.exports = router;

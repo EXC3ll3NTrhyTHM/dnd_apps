@@ -96,6 +96,12 @@
     "playerName": "Acacia",
     "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
     "text": "I like all the updates, architect!",
-    "timestamp": "2026-02-12T00:18:09.888Z"
+    "timestamp": "2026-02-12T00:18:09.888Z",
+    "reactions": {
+      "❤️": [
+        "1472286665417560167",
+        "424061511833747467"
+      ]
+    }
   }
 ]

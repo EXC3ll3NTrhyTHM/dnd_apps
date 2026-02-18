@@ -4,7 +4,7 @@
   "time_window_start": 14,
   "time_window_end": 20,
   "min_messages_since_spoke": 5,
-  "last_post": "2026-02-12T22:06:20.055Z",
+  "last_post": "2026-02-17T20:20:23.892Z",
   "prompts": [
     "You're fidgeting with your bow and accidentally say a thought out loud",
     "You remember a question you meant to ask the group days ago",
@@ -15,6 +15,10 @@
     "You're practicing a move and want someone to watch",
     "You have a random observation about one of the party members",
     "You're restless and complain about having nothing to do",
-    "You wonder out loud about something mysterious or weird you noticed lately"
+    "You mention excitedly that you're expecting big improvements coming to Okhan",
+    "You've been hearing rumors about new fishing spots and wonder if the fish are getting bigger and stranger",
+    "You mention that the arena has been buzzing with activity and you think the fights are about to get even more intense",
+    "You brag about something you accomplished recently and wonder if anyone keeps track of great deeds around here",
+    "You find some dice and start rolling them, marveling at how satisfying it feels to let fate decide things"
   ]
 }

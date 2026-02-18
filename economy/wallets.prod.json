@@ -1,35 +1,35 @@
 {
   "424061511833747467": {
     "user_id": "424061511833747467",
-    "username": "excellentrhythm",
-    "balance": 189,
-    "lifetime_earned": 1724,
-    "lifetime_spent": 1535,
-    "last_updated": "2026-02-13T05:41:37.005Z"
+    "username": "The Architect",
+    "balance": 318,
+    "lifetime_earned": 3368,
+    "lifetime_spent": 3050,
+    "last_updated": "2026-02-18T06:18:01.054Z"
   },
   "1374906408046166036": {
     "user_id": "1374906408046166036",
     "username": "Tyren",
-    "balance": 525,
-    "lifetime_earned": 625,
+    "balance": 675,
+    "lifetime_earned": 775,
     "lifetime_spent": 100,
-    "last_updated": "2026-02-11T21:09:00.000Z"
+    "last_updated": "2026-02-17T02:13:09.476Z"
   },
   "1073385140669128725": {
     "user_id": "1073385140669128725",
     "username": "Nalyd",
-    "balance": 375,
-    "lifetime_earned": 375,
-    "lifetime_spent": 0,
-    "last_updated": "2026-02-11T21:09:00.000Z"
+    "balance": 342,
+    "lifetime_earned": 677,
+    "lifetime_spent": 335,
+    "last_updated": "2026-02-18T03:37:06.589Z"
   },
   "765978025937469481": {
     "user_id": "765978025937469481",
     "username": "Aly",
-    "balance": 300,
-    "lifetime_earned": 300,
+    "balance": 450,
+    "lifetime_earned": 450,
     "lifetime_spent": 0,
-    "last_updated": "2026-02-08T02:42:00.000Z"
+    "last_updated": "2026-02-17T02:13:09.451Z"
   },
   "765984341595521024": {
     "user_id": "765984341595521024",
@@ -41,10 +41,18 @@
   },
   "228241331296665600": {
     "user_id": "228241331296665600",
-    "username": "badbeachpeach",
-    "balance": 482,
-    "lifetime_earned": 577,
-    "lifetime_spent": 95,
-    "last_updated": "2026-02-13T05:49:18.887Z"
+    "username": "Acacia",
+    "balance": 416,
+    "lifetime_earned": 1081,
+    "lifetime_spent": 665,
+    "last_updated": "2026-02-18T06:18:00.993Z"
+  },
+  "1472286665417560167": {
+    "user_id": "1472286665417560167",
+    "username": "Acacia",
+    "balance": 203,
+    "lifetime_earned": 753,
+    "lifetime_spent": 550,
+    "last_updated": "2026-02-18T06:18:01.117Z"
   }
 }

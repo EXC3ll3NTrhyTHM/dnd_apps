@@ -193,6 +193,47 @@
     "npcDisplayName": "Djinn Zenatsu",
     "text": "Hello again. Good to see you. Is there something on your mind?",
     "emotion": "idle",
-    "timestamp": "2026-02-12T01:58:09.689Z"
+    "timestamp": "2026-02-12T01:58:09.689Z",
+    "reactions": {
+      "❤️": [
+        "1073385140669128725"
+      ]
+    }
+  },
+  {
+    "id": "e3886d16-a28d-46e7-bba2-c9f09ddecfd5",
+    "role": "player",
+    "userId": "1073385140669128725",
+    "playerName": "Nalyd",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/1073385140669128725/51ac15ff7014507f61f37b076668f847.png",
+    "text": "@Ximena Reyes Yo",
+    "timestamp": "2026-02-14T19:23:32.965Z"
+  },
+  {
+    "id": "844b9c1e-52e9-4e39-9419-d2f9eed0f917",
+    "role": "npc",
+    "npc": "ximena",
+    "npcDisplayName": "Ximena Reyes",
+    "text": "Yo, Nalyd! What’s on your mind? Ready to feel the heat in our next sparring session?🔥",
+    "emotion": "happy",
+    "timestamp": "2026-02-14T19:23:36.110Z"
+  },
+  {
+    "id": "66ac1c1c-e2ed-4a8d-b5a4-2c838b5e7f91",
+    "role": "player",
+    "type": "gif",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "gifUrl": "https://media2.giphy.com/media/ScBR92Mm5fhQc/200w.gif?cid=08b926b08e11xruib8h6l735ju0c71cymvlfhj2hi5aeb2t9&ep=v1_gifs_search&rid=200w.gif&ct=g",
+    "gifWidth": 200,
+    "gifHeight": 358,
+    "text": "yee GIF",
+    "timestamp": "2026-02-14T19:24:30.906Z",
+    "reactions": {
+      "😂": [
+        "1073385140669128725"
+      ]
+    }
   }
 ]

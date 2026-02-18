@@ -4,6 +4,7 @@ import { useAuth } from './hooks/useAuth';
 import { useUiSounds } from './hooks/useUiSounds';
 import LevelUpOverlay from './components/LevelUpOverlay';
 import DmAwardEffect from './components/DmAwardEffect';
+import AudioConsentOverlay from './components/AudioConsentOverlay';
 import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import AuthCallback from './pages/AuthCallback';
@@ -171,6 +172,7 @@ export default function App() {
 
   return (
     <>
+      <AudioConsentOverlay />
       {toast && <MentionToast mention={toast} onDismiss={dismissToast} />}
       {dmAward && (
         <DmAwardEffect

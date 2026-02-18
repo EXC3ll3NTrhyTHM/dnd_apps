@@ -28,6 +28,27 @@
         "type": "fish",
         "quantity": 2,
         "acquired_at": "2026-02-13T03:45:27.178Z"
+      },
+      {
+        "item_id": "shadow_eel",
+        "name": "Shadow Eel",
+        "type": "fish",
+        "quantity": 1,
+        "acquired_at": "2026-02-14T21:23:09.347Z"
+      },
+      {
+        "item_id": "dice_glitterparty",
+        "name": "Glitter Party Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-02-17T03:28:33.408Z"
+      },
+      {
+        "item_id": "potion_healing",
+        "name": "Potion of Healing",
+        "type": "potion",
+        "quantity": 1,
+        "acquired_at": "2026-02-17T08:02:46.247Z"
       }
     ],
     "badges": [],
@@ -49,7 +70,15 @@
     "quests_unlocked": []
   },
   "1073385140669128725": {
-    "items": [],
+    "items": [
+      {
+        "item_id": "potion_healing",
+        "name": "Potion of Healing",
+        "type": "potion",
+        "quantity": 4,
+        "acquired_at": "2026-02-18T03:10:41.205Z"
+      }
+    ],
     "badges": [],
     "roles_purchased": [],
     "quests_unlocked": []
@@ -72,18 +101,53 @@
   "228241331296665600": {
     "items": [
       {
-        "item_id": "enchanted_grub",
-        "name": "Enchanted Grub",
-        "type": "bait",
-        "quantity": 1,
-        "acquired_at": "2026-02-13T05:03:52.799Z"
-      },
-      {
         "item_id": "ember_bass",
         "name": "Ember Bass",
         "type": "fish",
         "quantity": 1,
         "acquired_at": "2026-02-13T05:05:10.488Z"
+      },
+      {
+        "item_id": "item_blunt",
+        "name": "Blunt",
+        "type": "consumable",
+        "quantity": 4,
+        "acquired_at": "2026-02-14T21:21:05.576Z"
+      },
+      {
+        "item_id": "basic_worm",
+        "name": "Basic Worm",
+        "type": "bait",
+        "quantity": 4,
+        "acquired_at": "2026-02-16T08:05:18.692Z"
+      },
+      {
+        "item_id": "potion_healing",
+        "name": "Potion of Healing",
+        "type": "potion",
+        "quantity": 2,
+        "acquired_at": "2026-02-17T03:30:26.140Z"
+      },
+      {
+        "item_id": "dice_ice",
+        "name": "Frostbite Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-02-17T03:30:53.563Z"
+      }
+    ],
+    "badges": [],
+    "roles_purchased": [],
+    "quests_unlocked": []
+  },
+  "1472286665417560167": {
+    "items": [
+      {
+        "item_id": "item_blunt",
+        "name": "Blunt",
+        "type": "consumable",
+        "quantity": 1,
+        "acquired_at": "2026-02-16T19:01:34.650Z"
       }
     ],
     "badges": [],

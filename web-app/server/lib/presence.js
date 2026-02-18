@@ -85,23 +85,34 @@ function join(locationId, user) {
 }
 
 function leave(locationId, userId) {
+  const leftLocations = [];
   if (locationId) {
     const loc = locations.get(locationId);
-    if (loc) loc.delete(userId);
+    if (loc && loc.has(userId)) {
+      loc.delete(userId);
+      leftLocations.push(locationId);
+    }
   } else {
     // Remove from all locations
-    for (const users of locations.values()) {
-      users.delete(userId);
+    for (const [locId, users] of locations) {
+      if (users.has(userId)) {
+        users.delete(userId);
+        leftLocations.push(locId);
+      }
     }
   }
+  return leftLocations;
 }
 
-function heartbeat(locationId, userId) {
+function heartbeat(locationId, user) {
+  if (!locations.has(locationId)) locations.set(locationId, new Map());
   const loc = locations.get(locationId);
-  if (loc?.has(userId)) {
-    loc.get(userId).lastSeen = Date.now();
-    // Persist lastSeen update (debounced)
-    _queuePersist(userId, locationId);
+  if (loc.has(user.id || user)) {
+    loc.get(user.id || user).lastSeen = Date.now();
+    _queuePersist(user.id || user, locationId);
+  } else if (user.id) {
+    // User was dropped (e.g. stale leave arrived late) — re-add them
+    join(locationId, user);
   }
 }
 

@@ -2,33 +2,33 @@
   "424061511833747467": {
     "user_id": "424061511833747467",
     "username": "The Architect",
-    "balance": 995,
-    "lifetime_earned": 1050,
-    "lifetime_spent": 55,
-    "last_updated": "2026-02-06T02:35:20.004Z"
+    "balance": 1415,
+    "lifetime_earned": 1500,
+    "lifetime_spent": 85,
+    "last_updated": "2026-02-17T08:34:28.961Z"
   },
   "1374906408046166036": {
     "user_id": "1374906408046166036",
     "username": "Tyren",
-    "balance": 450,
-    "lifetime_earned": 450,
+    "balance": 600,
+    "lifetime_earned": 600,
     "lifetime_spent": 0,
-    "last_updated": "2026-02-06T02:35:19.973Z"
+    "last_updated": "2026-02-17T02:13:09.465Z"
   },
   "765978025937469481": {
     "user_id": "765978025937469481",
     "username": "Aly",
-    "balance": 200,
-    "lifetime_earned": 200,
+    "balance": 350,
+    "lifetime_earned": 350,
     "lifetime_spent": 0,
-    "last_updated": "2026-02-06T02:35:20.065Z"
+    "last_updated": "2026-02-17T02:13:09.443Z"
   },
   "1073385140669128725": {
     "user_id": "1073385140669128725",
     "username": "Nalyd",
-    "balance": 200,
-    "lifetime_earned": 200,
+    "balance": 350,
+    "lifetime_earned": 350,
     "lifetime_spent": 0,
-    "last_updated": "2026-02-06T02:35:20.029Z"
+    "last_updated": "2026-02-17T02:13:09.418Z"
   }
 }

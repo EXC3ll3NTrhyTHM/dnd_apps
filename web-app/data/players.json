@@ -4,42 +4,66 @@
     "avatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
     "displayName": "excellentrhythm",
     "lastReadTimestamps": {
-      "dragons_hollow": "2026-02-13T05:42:30.845Z",
-      "the_barracks": "2026-02-12T01:18:41.514Z",
-      "the_veil": "2026-02-13T02:29:46.238Z",
-      "the_collective": "2026-02-12T04:31:52.163Z",
-      "the_dojo": "2026-02-12T02:00:41.739Z",
-      "the_cottage": "2026-02-12T04:58:55.847Z",
-      "marcel_dm_424061511833747467": "2026-02-13T05:02:55.753Z",
-      "marcel_dm_228241331296665600": "2026-02-13T00:04:40.160Z"
+      "dragons_hollow": "2026-02-18T05:04:03.291Z",
+      "the_barracks": "2026-02-16T07:35:02.471Z",
+      "the_veil": "2026-02-16T07:35:10.663Z",
+      "the_collective": "2026-02-16T07:35:16.728Z",
+      "the_dojo": "2026-02-16T07:36:19.522Z",
+      "the_cottage": "2026-02-16T08:01:10.855Z",
+      "marcel_dm_424061511833747467": "2026-02-14T21:26:50.046Z",
+      "marcel_dm_228241331296665600": "2026-02-18T02:30:01.606Z",
+      "marcel_dm_765978025937469481": "2026-02-13T19:44:42.005Z"
     },
     "pushDesired": true,
-    "lastSeen": "2026-02-13T05:52:29.631Z",
-    "lastLocation": "the_arena"
+    "lastSeen": "2026-02-18T06:41:06.939Z",
+    "lastLocation": "the_arena",
+    "sprite": "the_architect_sprite.webp",
+    "ownedDice": [
+      "default",
+      "glitterparty"
+    ],
+    "equippedDice": "glitterparty"
   },
   "228241331296665600": {
     "characterName": "Acacia",
     "avatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
     "displayName": "badbeachpeach",
     "lastReadTimestamps": {
-      "the_cottage": "2026-02-12T05:12:06.010Z",
-      "the_dojo": "2026-02-12T04:41:08.722Z",
-      "the_collective": "2026-02-12T05:59:59.525Z",
-      "the_veil": "2026-02-12T04:42:11.027Z",
-      "dragons_hollow": "2026-02-13T05:04:17.959Z",
-      "marcel_dm_228241331296665600": "2026-02-13T00:03:17.301Z"
+      "the_cottage": "2026-02-16T08:08:31.316Z",
+      "the_dojo": "2026-02-16T07:35:20.635Z",
+      "the_collective": "2026-02-16T07:35:10.827Z",
+      "the_veil": "2026-02-16T07:35:00.150Z",
+      "dragons_hollow": "2026-02-17T08:07:47.428Z",
+      "marcel_dm_228241331296665600": "2026-02-14T21:26:34.985Z"
     },
     "mutedChannels": [
       "the_veil",
       "the_dojo",
       "dragons_hollow"
     ],
-    "lastSeen": "2026-02-13T05:51:49.050Z",
-    "lastLocation": "the_arena"
+    "lastSeen": "2026-02-18T06:41:04.695Z",
+    "lastLocation": "the_arena",
+    "sprite": "acacia_sprite.webp",
+    "pushDesired": true,
+    "ownedDice": [
+      "default",
+      "ice"
+    ],
+    "equippedDice": "ice"
   },
   "1073385140669128725": {
     "characterName": "Nalyd",
-    "avatar": "https://cdn.discordapp.com/avatars/1073385140669128725/51ac15ff7014507f61f37b076668f847.png"
+    "avatar": "https://cdn.discordapp.com/avatars/1073385140669128725/51ac15ff7014507f61f37b076668f847.png",
+    "sprite": "nalyd_sprite.webp?v=20260217",
+    "lastSeen": "2026-02-18T03:37:19.748Z",
+    "lastLocation": "the_arena",
+    "lastReadTimestamps": {
+      "the_dojo": "2026-02-14T19:33:34.810Z",
+      "the_barracks": "2026-02-14T19:28:44.597Z",
+      "the_collective": "2026-02-14T19:29:02.620Z",
+      "dragons_hollow": "2026-02-18T03:19:38.857Z"
+    },
+    "displayName": "Smok3y"
   },
   "765978025937469481": {
     "characterName": "Aly",
@@ -47,6 +71,29 @@
   },
   "1374906408046166036": {
     "characterName": "Tyren",
-    "avatar": "https://cdn.discordapp.com/embed/avatars/0.png"
+    "avatar": "https://cdn.discordapp.com/avatars/1374906408046166036/899cd122ccd4a669215553a19055800b.png",
+    "sprite": "tyren_sprite.webp",
+    "lastReadTimestamps": {
+      "the_barracks": "2026-02-16T12:40:29.217Z"
+    },
+    "lastSeen": "2026-02-16T12:40:29.068Z",
+    "lastLocation": "the_barracks"
+  },
+  "1472286665417560167": {
+    "avatar": "https://cdn.discordapp.com/embed/avatars/5.png",
+    "lastSeen": "2026-02-18T06:40:57.552Z",
+    "lastLocation": "the_arena",
+    "lastReadTimestamps": {
+      "dragons_hollow": "2026-02-17T23:57:49.853Z",
+      "the_dojo": "2026-02-14T23:31:42.779Z",
+      "marcel_dm_1472286665417560167": "2026-02-17T01:10:55.439Z",
+      "the_barracks": "2026-02-15T08:05:02.591Z",
+      "the_veil": "2026-02-15T08:21:22.929Z",
+      "the_cottage": "2026-02-16T21:42:54.690Z",
+      "the_collective": "2026-02-15T23:08:08.406Z"
+    },
+    "displayName": "The mini Architect",
+    "sprite": "tyren_sprite.webp",
+    "pushDesired": true
   }
 }

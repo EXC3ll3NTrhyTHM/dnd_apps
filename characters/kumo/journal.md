@@ -49,3 +49,5 @@
 [2026-02-12] Tonight, we gathered for a hearty meal filled with laughter and camaraderie. As we raised our cups in a toast to friendship and the dojo, I felt a deep sense of contentment, knowing I would keep watch alongside Nalyd and Tyren as the night unfolded.
 
 [2026-02-12] I assured Nalyd that the gate is secure, but I sensed the presence of our mysterious foes lurking nearby. We exchanged a few words about their strength, and I felt a surge of camaraderie as I declared our readiness to stand united against any challenge they might pose.
+
+[2026-02-14] I spoke with Aly today about her younglings. She described how they’ve formed a family among themselves, and Wren, in particular, stands out as a fierce spirit. I feel a deep sense of pride for them, eager to witness their growth and the strength of their bonds.

@@ -68,6 +68,11 @@ function buildChatContext(definition, quest) {
   let context = `# QUEST: ${definition.name}\n\n`;
   context += `## Description\n${definition.description}\n\n`;
   
+  // Add world context (important rules about NPCs, pronouns, etc.)
+  if (definition.world_context) {
+    context += `## CRITICAL WORLD RULES\n${definition.world_context}\n\n`;
+  }
+  
   // Add key NPCs
   if (definition.key_npcs) {
     context += `## NPCs Present\n`;
@@ -106,6 +111,24 @@ function buildChatContext(definition, quest) {
       context += `Advance to next stage when: ${stage.advance_conditions}\n`;
       if (stage.next_stage) {
         context += `Next stage: ${stage.next_stage}\n`;
+      }
+      context += `\n`;
+    }
+
+    // Add chat NPC whitelist
+    if (stage.chat_npcs) {
+      if (stage.chat_npcs.length === 0) {
+        context += `### NPC Cueing\nNo NPCs may be cued in this stage. Do NOT set cue_npc.\n\n`;
+      } else {
+        context += `### NPC Cueing\nOnly these NPCs may be cued: ${stage.chat_npcs.join(', ')}. Do NOT cue any other NPC.\n\n`;
+      }
+    }
+
+    // Add negative prompts (things to avoid)
+    if (stage.negative_prompts && stage.negative_prompts.length > 0) {
+      context += `### RESTRICTIONS — Do NOT do any of the following:\n`;
+      for (const restriction of stage.negative_prompts) {
+        context += `- ${restriction}\n`;
       }
       context += `\n`;
     }
@@ -151,8 +174,10 @@ Respond with a JSON object (no markdown, just raw JSON):
 ## Rules
 - Keep narration SHORT (2-4 sentences max for Discord)
 - Use second person ("You see...", "The prisoner flinches...")
-- If an NPC should respond, set cue_npc and provide npc_instruction
-- Only advance_stage when the conditions are clearly met
+- NEVER end narration with a question like "What will you do?" or "What do you do next?" — just describe the scene and stop
+- NEVER include NPC dialogue in the "narration" field. ALL NPC speech MUST go through cue_npc + npc_instruction. The narration should only describe the scene, atmosphere, and what the player sees. If the scene prompt contains NPC dialogue, use it as the npc_instruction and cue that NPC — do not narrate their words yourself.
+- If an NPC should respond, set cue_npc and provide npc_instruction with what they should say
+- Advance the stage when the player's intent reasonably matches the advance conditions — don't require exact wording. If the player is asking related questions, showing interest, or trying to engage with the topic mentioned in the conditions, that counts. Err on the side of advancing rather than stalling.
 - Only set quest_complete when the quest is truly finished
 - Don't make decisions for players
 - Stay strictly within the quest document - no outside knowledge`;

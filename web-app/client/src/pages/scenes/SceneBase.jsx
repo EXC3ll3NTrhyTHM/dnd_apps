@@ -30,16 +30,20 @@ export function ParticleLayer({ config, className = '' }) {
 }
 
 // NPC Sprite component with hitbox
-export function NpcSprite({ 
-  npcId, 
-  placement, 
-  displayName, 
-  editMode, 
+export function NpcSprite({
+  npcId,
+  placement,
+  displayName,
+  editMode,
   isSelected,
   particleConfig,
   onSelect,
-  onDragStart 
+  onDragStart,
+  spriteUrl,
+  fallbackEmoji,
 }) {
+  const imgSrc = spriteUrl || `/images/sprites/${npcId}.webp`;
+
   return (
     <div
       className={`scene-npc ${editMode ? 'edit-mode' : ''} ${isSelected ? 'edit-selected' : ''} ${placement.flipX ? 'flipped' : ''}`}
@@ -58,20 +62,29 @@ export function NpcSprite({
       {/* Layer 1: Sprite image */}
       <img
         className="npc-sprite"
-        src={`/images/sprites/${npcId}.webp`}
+        src={imgSrc}
         alt={displayName}
         draggable={false}
+        onError={fallbackEmoji ? (e) => {
+          e.target.style.display = 'none';
+          e.target.nextSibling.style.display = 'flex';
+        } : undefined}
       />
-      
+      {fallbackEmoji && (
+        <span className="pet-scene-emoji" style={{ display: 'none' }}>
+          {fallbackEmoji}
+        </span>
+      )}
+
       {/* Layer 2: Particle effects */}
       <ParticleLayer config={particleConfig} />
-      
+
       {/* Layer 3: Clickable hitbox */}
-      <div 
+      <div
         className={`npc-hitbox ${editMode ? 'edit-visible' : ''}`}
         onClick={() => onSelect?.(npcId)}
       />
-      
+
       <div className="scene-npc-label">{displayName}</div>
       {editMode && (
         <div className="scene-npc-coords">
@@ -227,6 +240,88 @@ export function EditPanel({
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+// Build pet entries as placement keys (pet:<userId>) for merging into the editor
+export function buildPetPlacements(pets) {
+  const result = {};
+  for (const { userId, pet } of (pets || [])) {
+    result[`pet:${userId}`] = pet.placement || { x: 50, y: 15, scale: 0.35 };
+  }
+  return result;
+}
+
+// Split combined placements back into NPC placements and pet placements
+export function splitPlacements(combined) {
+  const npcPlacements = {};
+  const petPlacements = {};
+  for (const [key, val] of Object.entries(combined)) {
+    if (key.startsWith('pet:')) {
+      petPlacements[key.slice(4)] = val;
+    } else {
+      npcPlacements[key] = val;
+    }
+  }
+  return { npcPlacements, petPlacements };
+}
+
+// Unified NPC + Pet renderer for scenes
+export function SceneEntities({
+  location, pets, placements, particleConfig,
+  editMode, editSelectedNpc, onSelect, onDragStart,
+  onPetClick
+}) {
+  // Build pet lookup by their placement key
+  const petLookup = useMemo(() => {
+    const lookup = {};
+    for (const { userId, pet, username } of (pets || [])) {
+      lookup[`pet:${userId}`] = { pet, username, userId };
+    }
+    return lookup;
+  }, [pets]);
+
+  return (
+    <div className="scene-npcs">
+      {Object.entries(placements).map(([id, placement]) => {
+        const petInfo = petLookup[id];
+
+        if (petInfo) {
+          const { pet, username, userId } = petInfo;
+          return (
+            <NpcSprite
+              key={id}
+              npcId={id}
+              placement={placement}
+              displayName={pet.petName || 'Unnamed'}
+              spriteUrl={`/images/sprites/pets/pet_${pet.petType}_${pet.stage}.webp`}
+              fallbackEmoji={pet.typeIcon}
+              editMode={editMode}
+              isSelected={editSelectedNpc === id}
+              onSelect={editMode ? onSelect : () => onPetClick?.(userId)}
+              onDragStart={onDragStart}
+            />
+          );
+        }
+
+        const npc = location.npcs.find(n => n.id === id);
+        const displayName = npc?.displayName || id.charAt(0).toUpperCase() + id.slice(1);
+
+        return (
+          <NpcSprite
+            key={id}
+            npcId={id}
+            placement={placement}
+            displayName={displayName}
+            editMode={editMode}
+            isSelected={editSelectedNpc === id}
+            particleConfig={particleConfig}
+            onSelect={onSelect}
+            onDragStart={onDragStart}
+          />
+        );
+      })}
     </div>
   );
 }

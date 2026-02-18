@@ -53,12 +53,12 @@
         "off_the_path",
         "the_cellar"
       ],
-      "started_at": "2026-02-01T03:50:13.222Z",
+      "started_at": "2026-02-17T08:19:35.144Z",
       "added_at": "2026-02-01T03:49:26.833Z",
       "notes": [],
       "board_message_id": "1467366214585159798",
-      "channel_id": "1467366409599455285",
-      "completed_at": "2026-02-01T04:06:08.085Z"
+      "channel_id": "1473232402120708180",
+      "completed_at": "2026-02-17T08:34:28.162Z"
     },
     {
       "id": "the_rooftop_kingdom",
@@ -144,13 +144,20 @@
       "description": "The night after the interrogation, whoever sleeps near the lockbox receives disturbing visions. A soul trapped within reaches out, desperate to communicate.",
       "location": null,
       "given_by": "questmaster",
-      "status": "available",
-      "current_stage": null,
-      "stages_completed": [],
-      "started_at": null,
+      "status": "completed",
+      "current_stage": "waking",
+      "stages_completed": [
+        "nightmare_begins",
+        "aldric_appears",
+        "the_warning",
+        "the_request"
+      ],
+      "started_at": "2026-02-17T01:58:57.252Z",
       "added_at": "2026-02-10T01:23:48.174Z",
       "notes": [],
-      "board_message_id": "1470591050400923710"
+      "board_message_id": "1470591050400923710",
+      "channel_id": "1473136615017943306",
+      "completed_at": "2026-02-17T02:13:08.774Z"
     },
     {
       "id": "dragon_rebirth",
@@ -158,20 +165,30 @@
       "description": "Aly's spiritual weapon has been changing. The bone dust from her bow, infused with her magic over years, has begun to resonate with something ancient. A familiar presence stirs, reaching across death itself.",
       "location": null,
       "given_by": "questmaster",
-      "status": "in_progress",
-      "current_stage": "the_rebirth",
-      "stages_completed": [
-        "the_stirring",
-        "first_contact",
-        "the_explanation",
-        "the_requirements",
-        "the_ritual"
-      ],
-      "started_at": "2026-02-10T01:48:22.713Z",
+      "status": "available",
+      "current_stage": null,
+      "stages_completed": [],
+      "started_at": null,
       "added_at": "2026-02-10T01:45:44.678Z",
       "notes": [],
       "board_message_id": "1470596571950223403",
-      "channel_id": "1470597237032751217"
+      "channel_id": null
+    },
+    {
+      "id": "the_eye_of_the_storm",
+      "name": "The Eye of the Storm",
+      "description": "A violent storm rolls into Okhan. Lightning strikes the same spot three times. Ember felt something pulling her to find Aly.",
+      "location": "Woods outside Okhan, hidden cave beneath lightning-struck clearing",
+      "given_by": "ember",
+      "status": "available",
+      "current_stage": null,
+      "stages_completed": [],
+      "started_at": null,
+      "added_at": "2026-02-14T17:04:00.000Z",
+      "notes": [],
+      "board_message_id": null,
+      "channel_id": null,
+      "flags": []
     }
   ],
   "completed": [],

@@ -2,6 +2,9 @@
   {
     "id": "goblin",
     "name": "Goblin",
+    "creatureType": "humanoid",
+    "image": "goblin.webp",
+    "sprite": "goblin_sprite.webp",
     "description": "A small, wiry creature with green skin and beady red eyes",
     "cr": 0.25,
     "ac": 15,
@@ -30,11 +33,26 @@
       "{target} sidesteps the Goblin's clumsy swing.",
       "The Goblin's blade whistles past {target} harmlessly.",
       "{target} ducks under the Goblin's wild attack."
-    ]
+    ],
+    "spriteScale": 0.45,
+    "spriteOffsetX": -4,
+    "spriteOffsetY": 248,
+    "initiativeBonus": 2,
+    "savingThrows": {
+      "STR": 0,
+      "DEX": 2,
+      "CON": 0,
+      "INT": -1,
+      "WIS": -1,
+      "CHA": -1
+    }
   },
   {
     "id": "wolf",
     "name": "Wolf",
+    "creatureType": "beast",
+    "image": "wolf.webp",
+    "sprite": "wolf_sprite.webp",
     "description": "A lean grey wolf with bared fangs and hungry eyes",
     "cr": 0.25,
     "ac": 13,
@@ -63,11 +81,26 @@
       "{target} dodges as the Wolf snaps at empty air.",
       "The Wolf's jaws clamp shut inches from {target}.",
       "{target} shoves the Wolf aside before it can bite."
-    ]
+    ],
+    "initiativeBonus": 2,
+    "spriteScale": 0.65,
+    "spriteOffsetX": 0,
+    "spriteOffsetY": 236,
+    "savingThrows": {
+      "STR": 1,
+      "DEX": 2,
+      "CON": 1,
+      "INT": -4,
+      "WIS": 1,
+      "CHA": -2
+    }
   },
   {
     "id": "skeleton",
     "name": "Skeleton",
+    "creatureType": "undead",
+    "image": "skeleton.webp",
+    "sprite": "skeleton_sprite.webp",
     "description": "An animated pile of bones held together by dark magic, wielding a chipped shortsword",
     "cr": 0.25,
     "ac": 13,
@@ -96,11 +129,26 @@
       "{target} parries the Skeleton's clumsy thrust.",
       "The Skeleton's blade scrapes harmlessly off {target}'s guard.",
       "{target} steps aside as the Skeleton swings wide."
-    ]
+    ],
+    "initiativeBonus": 0,
+    "spriteScale": 0.55,
+    "spriteOffsetX": 0,
+    "spriteOffsetY": 242,
+    "savingThrows": {
+      "STR": 0,
+      "DEX": 2,
+      "CON": 1,
+      "INT": -2,
+      "WIS": -1,
+      "CHA": -3
+    }
   },
   {
     "id": "dire_wolf",
     "name": "Dire Wolf",
+    "creatureType": "beast",
+    "image": "dire_wolf.webp",
+    "sprite": "dire_wolf_sprite.webp",
     "description": "A massive grey wolf the size of a horse, with glowing amber eyes",
     "cr": 1,
     "ac": 14,
@@ -129,11 +177,26 @@
       "{target} rolls aside as the wolf snaps at empty air.",
       "The wolf's jaws clamp shut inches from {target}.",
       "{target} braces and deflects the massive beast's charge."
-    ]
+    ],
+    "initiativeBonus": 2,
+    "spriteScale": 0.75,
+    "spriteOffsetX": 8,
+    "spriteOffsetY": 226,
+    "savingThrows": {
+      "STR": 3,
+      "DEX": 2,
+      "CON": 1,
+      "INT": -4,
+      "WIS": 1,
+      "CHA": -2
+    }
   },
   {
     "id": "ogre",
     "name": "Ogre",
+    "creatureType": "giant",
+    "image": "ogre.webp",
+    "sprite": "ogre_sprite.webp",
     "description": "A hulking brute standing ten feet tall, reeking of swamp and swinging a massive greatclub",
     "cr": 2,
     "ac": 11,
@@ -162,11 +225,26 @@
       "{target} dives clear as the greatclub craters the ground.",
       "The Ogre's swing goes wide, smashing into nothing.",
       "{target} barely rolls out of the way of the crushing blow."
-    ]
+    ],
+    "initiativeBonus": -1,
+    "spriteScale": 0.75,
+    "spriteOffsetX": 0,
+    "spriteOffsetY": 202,
+    "savingThrows": {
+      "STR": 4,
+      "DEX": -1,
+      "CON": 3,
+      "INT": -3,
+      "WIS": -2,
+      "CHA": -3
+    }
   },
   {
     "id": "owlbear",
     "name": "Owlbear",
+    "creatureType": "monstrosity",
+    "image": "owlbear.webp",
+    "sprite": "owlbear_sprite.webp",
     "description": "A fearsome hybrid beast with the body of a bear and the head of an owl, shrieking with fury",
     "cr": 3,
     "ac": 13,
@@ -195,11 +273,26 @@
       "{target} ducks under the Owlbear's swiping claws.",
       "The Owlbear's talons rake the air above {target}'s head.",
       "{target} jumps back as the Owlbear's claws miss by inches."
-    ]
+    ],
+    "initiativeBonus": 1,
+    "spriteScale": 0.7,
+    "spriteOffsetX": 0,
+    "spriteOffsetY": 220,
+    "savingThrows": {
+      "STR": 5,
+      "DEX": 1,
+      "CON": 3,
+      "INT": -4,
+      "WIS": 1,
+      "CHA": -2
+    }
   },
   {
     "id": "troll",
     "name": "Troll",
+    "creatureType": "giant",
+    "image": "troll.webp",
+    "sprite": "troll_sprite.webp",
     "description": "A lanky, green-skinned horror with long arms ending in razor-sharp claws",
     "cr": 5,
     "ac": 15,
@@ -228,6 +321,18 @@
       "{target} leaps back from the Troll's sweeping claws.",
       "The Troll's claws slash through empty air where {target} just stood.",
       "{target} deflects the Troll's strike just in time."
-    ]
+    ],
+    "initiativeBonus": 1,
+    "spriteScale": 0.7,
+    "spriteOffsetX": 0,
+    "spriteOffsetY": 220,
+    "savingThrows": {
+      "STR": 4,
+      "DEX": 1,
+      "CON": 3,
+      "INT": -2,
+      "WIS": -1,
+      "CHA": -2
+    }
   }
 ]

@@ -6,3 +6,5 @@
 [2026-02-08] Today, I shared updates on the younglings with Aly; they’re mischievous but thriving, though they could use more shelter supplies. I also learned about a mimic in disguise, which unsettles me, and I vowed to be cautious while scouting the woods for any whispers of danger.
 
 [2026-02-10] Today, I promised Aly I would scout ahead of the younglings, ensuring their adventure remained a secret delight. I noticed some suspicious figures in the northern slums; I’ll have to keep a watchful eye on them while the children explore freely.
+
+[2026-02-16] Today, I shared delightful news about the younglings with Aly, who asked how they and Wren were faring. We decided to gather supplies for the rooftop kingdom, and I couldn't contain my excitement at the thought of teaching the younglings stealth games while I helped with the food and blankets.
