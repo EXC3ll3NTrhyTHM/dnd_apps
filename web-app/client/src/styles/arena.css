@@ -1464,7 +1464,26 @@
   animation: arena-fade-in 0.3s ease;
 }
 
+/* Victory background image */
+.arena-result-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+/* Victory confetti canvas */
+.arena-victory-confetti {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
 .arena-result-card {
+  z-index: 2;
   background: linear-gradient(180deg, #1a1510 0%, #231c14 100%);
   border: 2px solid var(--border-stitch);
   border-radius: 16px;
@@ -2304,6 +2323,46 @@
   color: #c4b5fd;
 }
 
+/* ── Condition Badges ── */
+.arena-badge-condition {
+  font-size: 0.6rem;
+  text-transform: none;
+}
+.arena-badge-stunned {
+  background: rgba(234, 179, 8, 0.25);
+  color: #fde047;
+}
+.arena-badge-frightened {
+  background: rgba(168, 85, 247, 0.25);
+  color: #c084fc;
+}
+.arena-badge-poisoned {
+  background: rgba(34, 197, 94, 0.25);
+  color: #86efac;
+}
+.arena-badge-burning {
+  background: rgba(249, 115, 22, 0.25);
+  color: #fdba74;
+  animation: condition-pulse 1.5s ease-in-out infinite;
+}
+.arena-badge-blinded {
+  background: rgba(100, 100, 100, 0.3);
+  color: #a1a1aa;
+}
+.arena-badge-restrained {
+  background: rgba(180, 120, 60, 0.25);
+  color: #d4a574;
+}
+.arena-badge-mockery {
+  background: rgba(236, 72, 153, 0.25);
+  color: #f9a8d4;
+}
+
+@keyframes condition-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
 /* ── Potion Button ── */
 .arena-btn-potion {
   background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
@@ -2708,6 +2767,20 @@
 .rro-result.rro-smite {
   color: #fbbf24;
   text-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+  font-size: 1.3rem;
+}
+
+/* ══════════════════════════════════════════
+   ROLL RESULT OVERLAY — SNEAK ATTACK
+   ══════════════════════════════════════════ */
+
+.rro-backdrop-sneak {
+  background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.15) 0%, rgba(0, 0, 0, 0.85) 70%);
+}
+
+.rro-result.rro-sneak-attack {
+  color: #10b981;
+  text-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
   font-size: 1.3rem;
 }
 

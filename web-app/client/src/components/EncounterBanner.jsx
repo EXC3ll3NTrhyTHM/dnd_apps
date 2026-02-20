@@ -663,6 +663,21 @@ export function useEncounterEvents(locationId, userId) {
           text: a.text,
           timestamp: new Date().toISOString(),
         }));
+        // Narrate monster condition expiry (e.g., "Mocked effect has worn off")
+        const condMsgs = [];
+        const mfx = payload.monsterConditionEffects;
+        if (mfx) {
+          for (const rem of (mfx.removed || [])) {
+            condMsgs.push({
+              id: `enc_mcond_rem_${rem.id}_${Date.now()}`,
+              role: 'system',
+              type: 'encounter',
+              subtype: 'combat',
+              text: `The **${rem.name}** effect on the monster has worn off.`,
+              timestamp: new Date().toISOString(),
+            });
+          }
+        }
         setNarrations(prev => [...prev, {
           id: `enc_monster_header_${Date.now()}`,
           role: 'system',
@@ -670,7 +685,7 @@ export function useEncounterEvents(locationId, userId) {
           subtype: 'round_header',
           text: `**[Combat] Monster Strikes Back**`,
           timestamp: new Date().toISOString(),
-        }, ...monsterMsgs]);
+        }, ...monsterMsgs, ...condMsgs]);
         break;
       }
 
@@ -679,6 +694,49 @@ export function useEncounterEvents(locationId, userId) {
         if (isMyEncounter) {
           setEncounter(payload.encounter);
           setMonsterRollRequest(null);
+        }
+        break;
+
+      case 'encounter_turn_skip':
+        if (isMyEncounter) {
+          if (payload.encounter) setEncounter(payload.encounter);
+          addNarration({
+            id: `enc_skip_${Date.now()}`,
+            role: 'system',
+            type: 'encounter',
+            subtype: 'combat',
+            text: `**${payload.name}** is **${payload.reason}** and cannot act!`,
+            timestamp: new Date().toISOString(),
+          });
+        }
+        break;
+
+      case 'encounter_condition_tick':
+        if (isMyEncounter) {
+          if (payload.encounter) setEncounter(payload.encounter);
+          const fx = payload.conditionEffects;
+          if (fx) {
+            for (const dot of (fx.dotEffects || [])) {
+              addNarration({
+                id: `enc_dot_${dot.id}_${Date.now()}`,
+                role: 'system',
+                type: 'encounter',
+                subtype: 'combat',
+                text: `**${dot.name}** deals **${dot.damage} ${dot.type} damage!**`,
+                timestamp: new Date().toISOString(),
+              });
+            }
+            for (const rem of (fx.removed || [])) {
+              addNarration({
+                id: `enc_cond_rem_${rem.id}_${Date.now()}`,
+                role: 'system',
+                type: 'encounter',
+                subtype: 'combat',
+                text: `The **${rem.name}** effect has worn off.`,
+                timestamp: new Date().toISOString(),
+              });
+            }
+          }
         }
         break;
 

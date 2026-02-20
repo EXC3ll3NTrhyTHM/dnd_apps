@@ -148,12 +148,29 @@ function SpellSaveResult({ data, onDismiss }) {
 }
 
 function DamageResult({ data, onDismiss }) {
-  const { damage, isCrit, monsterHp, newHp, attacker, defender, smiteDamage } = data;
+  const { damage, isCrit, monsterHp, newHp, attacker, defender, smiteDamage, sneakAttackDamage } = data;
   const hasSmite = smiteDamage > 0;
-  const weaponDmg = hasSmite ? damage - smiteDamage : damage;
+  const hasSneakAttack = sneakAttackDamage > 0;
+  const bonusDmg = (smiteDamage || 0) + (sneakAttackDamage || 0);
+  const weaponDmg = bonusDmg > 0 ? damage - bonusDmg : damage;
+
+  // Build breakdown label
+  let breakdownLabel = 'damage';
+  if (hasSmite && hasSneakAttack) {
+    breakdownLabel = `${weaponDmg} + ${smiteDamage} radiant + ${sneakAttackDamage} sneak`;
+  } else if (hasSmite) {
+    breakdownLabel = `${weaponDmg} + ${smiteDamage} radiant`;
+  } else if (hasSneakAttack) {
+    breakdownLabel = `${weaponDmg} + ${sneakAttackDamage} sneak`;
+  }
+
+  // Result banner text and style
+  const bannerClass = hasSmite ? 'rro-smite' : hasSneakAttack ? 'rro-sneak-attack' : isCrit ? 'rro-crit' : 'rro-hit';
+  const bannerText = hasSmite ? 'DIVINE SMITE!' : hasSneakAttack ? 'SNEAK ATTACK!' : isCrit ? 'CRITICAL DAMAGE!' : `${damage} DAMAGE`;
+  const backdropClass = hasSmite ? 'rro-backdrop-smite' : hasSneakAttack ? 'rro-backdrop-sneak' : '';
 
   return (
-    <div className={`rro-backdrop ${hasSmite ? 'rro-backdrop-smite' : ''}`} onClick={onDismiss}>
+    <div className={`rro-backdrop ${backdropClass}`} onClick={onDismiss}>
       <div className="rro-content">
         <div className="rro-comparison">
           <div className="rro-side rro-fly-left">
@@ -161,7 +178,7 @@ function DamageResult({ data, onDismiss }) {
             <div className="rro-side-name">{attacker?.name}</div>
             <div className="rro-side-number rro-damage-num">{'\u2694\uFE0F'} {damage}</div>
             <div className="rro-side-label">
-              {hasSmite ? `${weaponDmg} + ${smiteDamage} radiant` : 'damage'}
+              {breakdownLabel}
             </div>
           </div>
           <div className="rro-clash rro-arrow">{'\u2192'}</div>
@@ -172,8 +189,8 @@ function DamageResult({ data, onDismiss }) {
             <div className="rro-side-label rro-hp-from">{monsterHp} {'\u2192'} {newHp}</div>
           </div>
         </div>
-        <div className={`rro-result ${hasSmite ? 'rro-smite' : isCrit ? 'rro-crit' : 'rro-hit'}`}>
-          {hasSmite ? 'DIVINE SMITE!' : isCrit ? 'CRITICAL DAMAGE!' : `${damage} DAMAGE`}
+        <div className={`rro-result ${bannerClass}`}>
+          {bannerText}
         </div>
       </div>
     </div>

@@ -30,23 +30,37 @@ function logStats(action, detail) {
 }
 
 // Helper: aggressively clean up materials/textures from the scene
-function disposeSceneMaterials() {
-  if (!_box || !_box.scene) return;
+function disposeMaterial(material) {
+  if (!material || typeof material.dispose !== 'function') return;
+  ['map', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'envMap', 'lightMap', 'aoMap'].forEach(key => {
+    if (material[key] && typeof material[key].dispose === 'function') {
+      material[key].dispose();
+    }
+  });
+  material.dispose();
+}
+
+function disposeSceneMaterials(box) {
+  const target = box || _box;
+  if (!target || !target.scene) return;
   try {
-    _box.scene.traverse((node) => {
+    let disposedCount = 0;
+    target.scene.traverse((node) => {
       if (node.isMesh) {
         if (node.material) {
-          // Dispose textures map, bumpMap, normalMap, etc.
-          ['map', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap'].forEach(key => {
-            if (node.material[key]) node.material[key].dispose();
-          });
-          node.material.dispose();
+          if (Array.isArray(node.material)) {
+            node.material.forEach(disposeMaterial);
+            disposedCount += node.material.length;
+          } else {
+            disposeMaterial(node.material);
+            disposedCount++;
+          }
         }
         if (node.geometry) node.geometry.dispose();
       }
     });
-    // Optional: force renderer to clear
-    // _box.renderer.renderLists.dispose();
+    console.log(`[DiceBox] Disposed ${disposedCount} materials from scene`);
+    try { target.renderer?.renderLists?.dispose(); } catch {}
   } catch (e) {
     console.warn('[DiceBox] Cleanup error:', e);
   }
@@ -60,21 +74,14 @@ async function acquireBox(containerId, config) {
   _onRollComplete = onRollComplete;
   _onContextLost = onContextLost;
 
+  let deadBox = null;
+
   // ── Hard Reset Check (iOS Memory Leak Protection) ──
   // If we've rolled many times, the library might have leaked textures or physics bodies.
-  if (_box && _stats.rolls >= 9) {
-    console.warn('[DiceBox] Executing periodic hard reset to free resources...');
-    try {
-      const gl = _box.renderer?.getContext();
-      if (gl) {
-        const ext = gl.getExtension('WEBGL_losing_context');
-        if (ext) ext.loseContext();
-      }
-      _box.renderer?.dispose();
-    } catch (e) {
-      console.warn('[DiceBox] Disposal error:', e);
-    }
-    _box = null;
+  if (_box && _stats.rolls >= 25) {
+    console.warn('[DiceBox] Executing periodic hard reset (seamless)...');
+    deadBox = _box; // Keep it alive momentarily to avoid flash
+    _box = null;    // Clear global so we force new creation
     _stats.rolls = 0;
     _currentConfig = { colorset: null, material: null };
   }
@@ -111,7 +118,16 @@ async function acquireBox(containerId, config) {
       // critical: We must do this while the dice are still in the scene (from previous roll)
       console.log('[DiceBox] Disposing old materials/textures...');
       disposeSceneMaterials();
+      // Dispose the library's cached materials (textures still bound to GPU)
+      // before clearing the reference map — prevents ghost textures on next roll.
+      if (_box?.DiceFactory?.materials_cache) {
+        Object.values(_box.DiceFactory.materials_cache).forEach(mat => {
+          disposeMaterial(mat);
+        });
+        _box.DiceFactory.materials_cache = {};
+      }
       try { _box.clearDice(); } catch (e) { console.warn('Clear error', e); }
+      try { _box.renderer?.renderLists?.dispose(); } catch {}
 
       const update = {};
       if (boxConfig.theme_colorset) update.theme_colorset = boxConfig.theme_colorset;
@@ -148,6 +164,15 @@ async function acquireBox(containerId, config) {
 
   // ── First-time creation with Safety Timeout ──
   _initPromise = (async () => {
+    // If resetting seamlessly, attach the old canvas to the new container temporarily
+    if (deadBox) {
+      try {
+        const container = document.getElementById(containerId);
+        const oldCanvas = deadBox.renderer?.domElement;
+        if (container && oldCanvas) container.appendChild(oldCanvas);
+      } catch (e) { console.warn('Seamless transition error (ignoring):', e); }
+    }
+
     try {
       // Race creation against a 5s timeout to prevent hanging the app on mobile
       const boxPromise = new Promise(async (resolve, reject) => {
@@ -167,6 +192,18 @@ async function acquireBox(containerId, config) {
       );
 
       const box = await Promise.race([boxPromise, timeoutPromise]);
+
+      // If we did a seamless reset, now kill the old box
+      if (deadBox) {
+        console.log('[DiceBox] New box ready. Disposing old box.');
+        try {
+          disposeSceneMaterials(deadBox);
+          deadBox.renderer?.dispose();
+          const oldCanvas = deadBox.renderer?.domElement;
+          if (oldCanvas && oldCanvas.parentNode) oldCanvas.parentNode.removeChild(oldCanvas);
+        } catch (e) { console.warn('Disposal error:', e); }
+        deadBox = null;
+      }
 
       box.eventCollide = handleDiceCollide;
 

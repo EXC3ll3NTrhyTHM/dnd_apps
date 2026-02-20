@@ -313,7 +313,7 @@ router.post('/:encounterId/initiative', authRequired, (req, res) => {
  */
 router.post('/:encounterId/action', authRequired, (req, res) => {
   const userId = req.user.id;
-  const { action, attackRoll, attackRoll2, damageTotal, potionId, targetId, healRoll, helpTargetId, smiteData, inspirationData, healAmount, spellId, saveRoll, weaponId } = req.body;
+  const { action, attackRoll, attackRoll2, damageTotal, potionId, targetId, healRoll, helpTargetId, smiteData, sneakAttackData, inspirationData, healAmount, spellId, saveRoll, weaponId } = req.body;
 
   if (!action) {
     return res.status(400).json({ error: 'action is required.' });
@@ -329,6 +329,7 @@ router.post('/:encounterId/action', authRequired, (req, res) => {
   if (typeof healRoll === 'number') rollData.healRoll = healRoll;
   if (helpTargetId) rollData.helpTargetId = helpTargetId;
   if (smiteData) rollData.smiteData = smiteData;
+  if (sneakAttackData) rollData.sneakAttackData = sneakAttackData;
   if (inspirationData) rollData.inspirationData = inspirationData;
   if (typeof healAmount === 'number') rollData.healAmount = healAmount;
   if (spellId) rollData.spellId = spellId;
@@ -596,6 +597,7 @@ router.post('/:encounterId/monster-rolls', authRequired, (req, res) => {
       locationId,
       encounterId: req.params.encounterId,
       attacks: result.results,
+      monsterConditionEffects: result.monsterConditionEffects || null,
       encounter: encounter ? getPublicState(encounter) : null,
     });
   }
@@ -799,7 +801,43 @@ function handleTurnAdvance(req, encounter, turnResult) {
     return;
   }
 
+  if (turnResult.type === 'turn_skipped') {
+    // Player is stunned/incapacitated — broadcast skip and auto-advance
+    broadcastToLocation(req, locationId, {
+      type: 'encounter_turn_skip',
+      locationId,
+      encounterId: encounter.id,
+      name: turnResult.name,
+      reason: turnResult.reason,
+      conditionEffects: turnResult.conditionEffects || null,
+      encounter: getPublicState(encounter),
+    });
+    // Auto-advance to next turn after a brief delay so clients can show the skip
+    setTimeout(() => {
+      const nextResult = advanceTurn(encounter);
+      handleTurnAdvance(req, encounter, nextResult);
+    }, 1500);
+    return;
+  }
+
   if (turnResult.type === 'next_turn') {
+    // Broadcast player condition effects (DoT damage, expired conditions) if any
+    if (turnResult.conditionEffects) {
+      const effects = turnResult.conditionEffects;
+      if (effects.dotEffects.length > 0 || effects.removed.length > 0) {
+        broadcastToLocation(req, locationId, {
+          type: 'encounter_condition_tick',
+          locationId,
+          encounterId: encounter.id,
+          entry: turnResult.entry,
+          conditionEffects: effects,
+          encounter: getPublicState(encounter),
+        });
+      }
+    }
+    // Note: Monster condition effects are broadcast via encounter_monster_turn
+    // (ticked after monster attacks in resolveMonsterWithRolls)
+
     if (turnResult.entry.type === 'monster') {
       handleMonsterTurn(req, encounter);
     } else {

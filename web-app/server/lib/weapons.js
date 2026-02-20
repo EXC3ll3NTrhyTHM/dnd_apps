@@ -38,7 +38,7 @@ const WEAPON_TABLE = {
   'Maul':            { dice: '2d6',  type: 'bludgeoning', twoHanded: true },
   'Morningstar':     { dice: '1d8',  type: 'piercing' },
   'Pike':            { dice: '1d10', type: 'piercing', twoHanded: true, reach: true },
-  'Rapier':          { dice: '1d8',  type: 'piercing', finesse: true },
+  'Rapier':          { dice: '1d8',  type: 'piercing', finesse: true, light: true, vex: true },
   'Scimitar':        { dice: '1d6',  type: 'slashing', finesse: true, light: true },
   'Shortsword':      { dice: '1d6',  type: 'piercing', finesse: true, light: true },
   'Trident':         { dice: '1d6',  type: 'piercing', thrown: true, versatile: '1d8' },
@@ -200,6 +200,7 @@ function getAllWeapons(equipment, sheet) {
         ranged: w.ranged || false,
         light: w.light || false,
         twoHanded: w.twoHanded || false,
+        vex: w.vex || false,
         attackBonus: atkMod + profBonus,
         damageMod: atkMod,
       });

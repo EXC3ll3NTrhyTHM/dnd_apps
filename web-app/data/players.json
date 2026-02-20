@@ -4,44 +4,45 @@
     "avatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
     "displayName": "excellentrhythm",
     "lastReadTimestamps": {
-      "dragons_hollow": "2026-02-18T05:04:03.291Z",
+      "dragons_hollow": "2026-02-19T14:29:55.415Z",
       "the_barracks": "2026-02-16T07:35:02.471Z",
       "the_veil": "2026-02-16T07:35:10.663Z",
       "the_collective": "2026-02-16T07:35:16.728Z",
       "the_dojo": "2026-02-16T07:36:19.522Z",
-      "the_cottage": "2026-02-16T08:01:10.855Z",
-      "marcel_dm_424061511833747467": "2026-02-14T21:26:50.046Z",
+      "the_cottage": "2026-02-19T14:29:14.452Z",
+      "marcel_dm_424061511833747467": "2026-02-19T15:17:47.325Z",
       "marcel_dm_228241331296665600": "2026-02-18T02:30:01.606Z",
       "marcel_dm_765978025937469481": "2026-02-13T19:44:42.005Z"
     },
     "pushDesired": true,
-    "lastSeen": "2026-02-18T06:41:06.939Z",
+    "lastSeen": "2026-02-20T01:22:16.825Z",
     "lastLocation": "the_arena",
     "sprite": "the_architect_sprite.webp",
     "ownedDice": [
       "default",
-      "glitterparty"
+      "glitterparty",
+      "poison"
     ],
-    "equippedDice": "glitterparty"
+    "equippedDice": "poison"
   },
   "228241331296665600": {
     "characterName": "Acacia",
     "avatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
     "displayName": "badbeachpeach",
     "lastReadTimestamps": {
-      "the_cottage": "2026-02-16T08:08:31.316Z",
-      "the_dojo": "2026-02-16T07:35:20.635Z",
-      "the_collective": "2026-02-16T07:35:10.827Z",
-      "the_veil": "2026-02-16T07:35:00.150Z",
-      "dragons_hollow": "2026-02-17T08:07:47.428Z",
-      "marcel_dm_228241331296665600": "2026-02-14T21:26:34.985Z"
+      "the_cottage": "2026-02-19T06:54:44.185Z",
+      "the_dojo": "2026-02-19T06:35:29.862Z",
+      "the_collective": "2026-02-19T06:35:37.099Z",
+      "the_veil": "2026-02-19T06:35:44.372Z",
+      "dragons_hollow": "2026-02-19T06:50:53.621Z",
+      "marcel_dm_228241331296665600": "2026-02-19T06:47:25.182Z"
     },
     "mutedChannels": [
       "the_veil",
       "the_dojo",
       "dragons_hollow"
     ],
-    "lastSeen": "2026-02-18T06:41:04.695Z",
+    "lastSeen": "2026-02-19T07:06:04.930Z",
     "lastLocation": "the_arena",
     "sprite": "acacia_sprite.webp",
     "pushDesired": true,
@@ -81,10 +82,10 @@
   },
   "1472286665417560167": {
     "avatar": "https://cdn.discordapp.com/embed/avatars/5.png",
-    "lastSeen": "2026-02-18T06:40:57.552Z",
-    "lastLocation": "the_arena",
+    "lastSeen": "2026-02-19T06:32:15.157Z",
+    "lastLocation": "dragons_hollow",
     "lastReadTimestamps": {
-      "dragons_hollow": "2026-02-17T23:57:49.853Z",
+      "dragons_hollow": "2026-02-19T06:32:17.470Z",
       "the_dojo": "2026-02-14T23:31:42.779Z",
       "marcel_dm_1472286665417560167": "2026-02-17T01:10:55.439Z",
       "the_barracks": "2026-02-15T08:05:02.591Z",

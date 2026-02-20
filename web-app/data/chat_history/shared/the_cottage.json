@@ -552,5 +552,59 @@
         "228241331296665600"
       ]
     }
+  },
+  {
+    "id": "ca3ffd5d-2c0e-47d8-aa96-bd4d3d5711e8",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "@Mira Hello Shadow, how are you today?",
+    "timestamp": "2026-02-19T06:51:35.313Z"
+  },
+  {
+    "id": "d34fb4ae-9885-4303-aebf-4df6b7d7f024",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "*I stretch a bit, trying to look relaxed* Oh, you know, just living the dream. Keeping an eye on mischief and making sure the queen stays out of trouble. How about you, Your Majesty? Ready to shake things up?",
+    "emotion": "idle",
+    "timestamp": "2026-02-19T06:51:37.435Z"
+  },
+  {
+    "id": "fe8fa345-26c8-459c-8a26-84af6dce3e03",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "@Mira what did you do today?",
+    "timestamp": "2026-02-19T06:52:01.849Z"
+  },
+  {
+    "id": "0f235b62-8cd0-45c2-b8fd-9a73a3824a57",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "*I smirk, crossing my arms* Just your usual — a little eavesdropping, a dash of mischief, and plotting my next grand performance. You know, just a day in the life of your favorite shadow. What about you? Any royal adventures?",
+    "emotion": "happy",
+    "timestamp": "2026-02-19T06:52:03.877Z"
+  },
+  {
+    "id": "a8731f2d-1eeb-4711-b840-bbfd3af13cdd",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "what did you hear today while eavesdropping? @Mira I stopped by the Colosseum and fought an ogre this evening",
+    "timestamp": "2026-02-19T06:54:24.736Z"
+  },
+  {
+    "id": "d7ba7841-a006-4171-a815-7e2d9ea3164a",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "*My eyes widen in playful disbelief* An ogre? Just another day, huh? I overheard some merchants grumbling about the Gilded Chain and their latest schemes. You know how they love to twist the knife. But seriously, Ace, you're fighting ogres now? What's next, dragons?",
+    "emotion": "surprised",
+    "timestamp": "2026-02-19T06:54:28.023Z"
   }
 ]

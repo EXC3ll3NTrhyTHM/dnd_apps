@@ -13,16 +13,99 @@ import { useEncounterEvents } from '../components/EncounterBanner';
 import '../styles/arena.css';
 import RollResultOverlay from '../components/RollResultOverlay';
 import AchievementToast from '../components/AchievementToast';
+import LevelUpOverlay from '../components/LevelUpOverlay';
 import { useUiSounds } from '../hooks/useUiSounds';
+import { useArenaSounds } from '../hooks/useArenaSounds';
+import SceneAudio from './scenes/SceneAudio';
 
 const DiceOverlay = lazy(() => import('../components/DiceOverlay'));
 import EmotePopup from '../components/EmotePopup';
 import ArenaEmoteGrid from '../components/ArenaEmoteGrid';
 
+// ── Confetti canvas for victory screen (same effect as arena location transition) ──
+const CONFETTI_COLORS = [
+  '#ef4444', '#f97316', '#eab308', '#22c55e',
+  '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff',
+];
+
+function VictoryConfetti() {
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+  const particlesRef = useRef([]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.scale(dpr, dpr);
+
+    particlesRef.current = Array.from({ length: 60 }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * -h,
+      width: Math.random() * 10 + 8,
+      height: Math.random() * 6 + 4,
+      speedY: Math.random() * 2 + 1.5,
+      wobbleSpeed: Math.random() * 0.06 + 0.03,
+      wobbleAmp: Math.random() * 40 + 20,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.12,
+      flipPhase: Math.random() * Math.PI * 2,
+      flipSpeed: Math.random() * 0.08 + 0.04,
+      life: Math.random() * Math.PI * 2,
+      color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      opacity: Math.random() * 0.3 + 0.7,
+    }));
+
+    function animate() {
+      ctx.clearRect(0, 0, w, h);
+      for (const p of particlesRef.current) {
+        p.life += p.wobbleSpeed;
+        p.x += Math.sin(p.life) * p.wobbleAmp * 0.02;
+        p.y += p.speedY;
+        p.rotation += p.rotSpeed;
+        p.flipPhase += p.flipSpeed;
+        if (p.y > h + 20) { p.y = -10; p.x = Math.random() * w; }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.scale(Math.cos(p.flipPhase), 1);
+        ctx.globalAlpha = p.opacity;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.width / 2, -p.height / 2, p.width, p.height);
+        ctx.restore();
+      }
+      animRef.current = requestAnimationFrame(animate);
+    }
+    animate();
+    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
+  }, []);
+
+  return <canvas ref={canvasRef} className="arena-victory-confetti" />;
+}
+
+const ARENA_AUDIO_CONFIGS = {
+  crowd:         { ambient: [{ src: '/sounds/arena/crowd-ambient.mp3', volume: 0.4 }] },
+  battle:        { music: { src: '/sounds/arena/battle-music.mp3', volume: 0.15 }, ambient: [{ src: '/sounds/arena/crowd-ambient.mp3', volume: 0.4 }] },
+  battleIntense: { music: { src: '/sounds/arena/battle-music-intense.mp3', volume: 0.22 }, ambient: [{ src: '/sounds/arena/crowd-ambient.mp3', volume: 0.45 }] },
+  victory:       { music: { src: '/sounds/arena/victory-music.mp3', volume: 0.4 } },
+  defeat:        { music: { src: '/sounds/arena/defeat-music.mp3', volume: 0.35 } },
+};
+
 export default function Arena() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const playSound = useUiSounds();
+  const playArenaSound = useArenaSounds();
+  const playArenaSoundRef = useRef(playArenaSound);
+  playArenaSoundRef.current = playArenaSound;
   const locationId = 'the_arena';
 
   // Monster selection state
@@ -148,12 +231,46 @@ export default function Arena() {
     setAchievementQueue(prev => prev.slice(1));
   }, []);
 
+  // Level-up overlay state
+  const [levelUp, setLevelUp] = useState(null);
+
   // Queue only this player's achievements when result screen appears
   useEffect(() => {
     if (!encounterResult?.achievements || !user?.id) return;
     const myAchs = encounterResult.achievements[user.id];
     if (myAchs?.length > 0) setAchievementQueue(myAchs);
   }, [encounterResult?.achievements, user?.id]);
+
+  // Extract level-up from encounter rewards for this player
+  useEffect(() => {
+    if (!encounterResult?.rewards || !user?.id) return;
+    const myReward = encounterResult.rewards[user.id];
+    if (myReward?.levelUp?.newLevel) {
+      setLevelUp(prev => Math.max(prev || 0, myReward.levelUp.newLevel));
+    }
+  }, [encounterResult?.rewards, user?.id]);
+
+  // Play victory/defeat sting when result appears
+  useEffect(() => {
+    if (!encounterResult) return;
+    if (encounterResult.type === 'victory') {
+      playArenaSoundRef.current('victorySting');
+      playArenaSoundRef.current('crowdCheer');
+    } else {
+      playArenaSoundRef.current('defeatSting');
+      playArenaSoundRef.current('crowdGasp');
+    }
+  }, [encounterResult?.type]);
+
+  // Play crowd cheer when the match starts (initiative → action phase)
+  const prevPhaseRef = useRef(null);
+  useEffect(() => {
+    const phase = activeEncounter?.phase;
+    if (prevPhaseRef.current === 'initiative_rolling' && phase === 'action') {
+      playArenaSoundRef.current('crowdCheer');
+    }
+    prevPhaseRef.current = phase || null;
+  }, [activeEncounter?.phase]);
 
   // Join overlay: fetched encounter details (participants with avatars)
   const [overlayEncounter, setOverlayEncounter] = useState(null);
@@ -255,7 +372,7 @@ export default function Arena() {
             setAttackResult(null);
             rollActiveRef.current = false;
           }
-          if (payload.type === 'encounter_bonus_result' || payload.type === 'encounter_turn_start') {
+          if (payload.type === 'encounter_bonus_result' || payload.type === 'encounter_turn_start' || payload.type === 'encounter_turn_skip') {
             setBonusActionPhase(false);
             setAvailableBonusActions([]);
             setInspirationTargetModal(false);
@@ -398,6 +515,10 @@ export default function Arena() {
       }
       if (cancelled) return;
       setTurnAnnouncement({ name: entry.name, type: entry.type });
+      // Play turn announcement sound
+      if (entry.id === userIdRef.current) playArenaSoundRef.current('yourTurn');
+      else if (entry.type === 'monster') playArenaSoundRef.current('monsterTurn');
+      else playArenaSoundRef.current('allyTurn');
       turnAnnouncementTimer.current = setTimeout(() => setTurnAnnouncement(null), 1500);
     })();
     return () => {
@@ -508,7 +629,7 @@ export default function Arena() {
       body: JSON.stringify(rollConfig),
     });
     const { rolls, total } = data;
-    await requestDiceRoll(notation, rollConfig.colorset, modifier, rolls, material, advantageType, rollingLabel);
+    await requestDiceRoll(notation, rollConfig.colorset, modifier, rolls, material, advantageType, rollingLabel || label);
     return { rolls, total };
   }, [locationId, requestDiceRoll]);
 
@@ -547,7 +668,8 @@ export default function Arena() {
 
     try {
       const dexMod = myDexMod;
-      const rolls = await requestDiceRoll('1d20', myDiceColorset || '#eab308', dexMod);
+      const rolls = await requestDiceRoll('1d20', myDiceColorset || '#eab308', dexMod, null, null, null, 'Rolling initiative');
+      playArenaSound('initiativeHorn');
       const roll = rolls[0];
       const total = roll + dexMod;
       setMyInitRoll({ roll, modifier: dexMod, total });
@@ -632,6 +754,7 @@ export default function Arena() {
       const accumulatedDmg = {};
 
       for (const attack of monsterRollRequest.attacks) {
+        playArenaSoundRef.current('monsterGrowl');
         setMonsterRollStatus(`${monsterRollRequest.monsterName} attacks ${attack.targetName}! Rolling d20...`);
 
         // 5e Disadvantage: if target is dodging, roll 2d20 and take lower
@@ -658,6 +781,11 @@ export default function Arena() {
         const isNat20 = usedD20 === 20;
         const isNat1 = usedD20 === 1;
         const isHit = isNat20 || (!isNat1 && total >= attack.targetAC);
+        // Monster attack result sound + crowd reaction (reversed — gasp on monster crit, cheer on fumble)
+        if (isNat20) { playArenaSoundRef.current('attackCrit'); playArenaSoundRef.current('crowdGasp'); }
+        else if (isNat1) { playArenaSoundRef.current('attackFumble'); playArenaSoundRef.current('crowdCheer'); }
+        else if (isHit) playArenaSoundRef.current('attackHit');
+        else playArenaSoundRef.current('attackMiss');
 
         // Show attack result overlay with disadvantage info
         const monsterImg = activeEncounterRef.current?.monster?.image;
@@ -692,6 +820,7 @@ export default function Arena() {
             isNat20 ? doubleDice(dice) : dice, modifier, '#ef4444', mCritLabel, '#ef4444'
           );
           damageTotal = dmgTotal;
+          playArenaSoundRef.current('monsterHit');
           // Show damage result overlay (track accumulated damage for multi-attacks)
           const dmgTargetP = activeEncounterRef.current?.participants?.[attack.targetId];
           const baseHp = dmgTargetP?.currentHp || 0;
@@ -838,6 +967,7 @@ export default function Arena() {
           if (useInspiration) {
             // Roll the inspiration die with 3D dice
             setRollPhase('inspiration_roll');
+            playArenaSound('bardicInspiration');
             const { total: inspTotal } = await requestServerRoll(
               `1${myStats.inspirationDie}`, 0, '#c084fc', `${pName} uses Bardic Inspiration!`, '#c084fc'
             );
@@ -849,6 +979,11 @@ export default function Arena() {
 
         setAttackResult({ roll: usedRoll, total, isHit, isNat20, isNat1 });
         setRollPhase('attack_result');
+        // Attack result sound + crowd reaction
+        if (isNat20) { playArenaSound('attackCrit'); playArenaSound('crowdCheer'); }
+        else if (isNat1) { playArenaSound('attackFumble'); playArenaSound('crowdGasp'); }
+        else if (isHit) playArenaSound('attackHit');
+        else playArenaSound('attackMiss');
 
         // Show attack result overlay with advantage info
         const attackOverlayData = {
@@ -873,6 +1008,7 @@ export default function Arena() {
 
         let damageTotal = 0;
         let smiteData = undefined;
+        let sneakAttackData = undefined;
 
         if (isHit) {
           // Divine Smite decision — BEFORE rolling damage
@@ -903,6 +1039,7 @@ export default function Arena() {
             weaponNotation, dmgMod, '#eab308', critLabel, myDiceColorset
           );
           damageTotal = dmgTotal;
+          playArenaSound('damageImpact');
 
           // Roll smite dice separately (gold metal) if smite was chosen
           if (smiteChoice) {
@@ -918,7 +1055,27 @@ export default function Arena() {
               smiteNotation, 0, '#FFD700', 'DIVINE SMITE!', '#FFD700', 'perfectmetal'
             );
             damageTotal += smiteTotal;
+            playArenaSound('divineSmite'); playArenaSound('crowdCheer');
             smiteData = { slotLevel: smiteChoice.slotLevel, smiteDamage: smiteTotal };
+          }
+
+          // Sneak Attack — auto-roll when eligible (Rogue feature)
+          if (myStats.sneakAttackDice > 0 && wpn && (wpn.finesse || wpn.ranged)) {
+            const hasAlly = Object.entries(activeEncounter.participants)
+              .some(([uid, p]) => uid !== user.id && !p.knockedOut);
+            const isEligible = advantageType === 'advantage' || hasAlly;
+            if (isEligible) {
+              setRollPhase('sneak_attack_roll');
+              let saDiceCount = myStats.sneakAttackDice;
+              if (isNat20) saDiceCount *= 2;
+              const saNotation = `${saDiceCount}d6`;
+              const { total: saTotal } = await requestServerRoll(
+                saNotation, 0, '#10b981', 'SNEAK ATTACK!', '#10b981', 'glass'
+              );
+              damageTotal += saTotal;
+              sneakAttackData = { sneakAttackDamage: saTotal };
+              playArenaSound('crowdCheer');
+            }
           }
 
           // Show damage result overlay
@@ -927,6 +1084,7 @@ export default function Arena() {
             damage: damageTotal,
             isCrit: isNat20,
             smiteDamage: smiteData?.smiteDamage,
+            sneakAttackDamage: sneakAttackData?.sneakAttackDamage,
             monsterHp: activeEncounter.monster.currentHp,
             newHp: Math.max(0, activeEncounter.monster.currentHp - damageTotal),
             attacker: { name: pName, avatar: myStats.avatar || (myStats.sprite && `/players/${myStats.sprite}`) },
@@ -945,6 +1103,7 @@ export default function Arena() {
             attackRoll2: roll2,
             damageTotal,
             smiteData,
+            sneakAttackData,
             inspirationData,
             weaponId: wpn?.id,
           }),
@@ -981,6 +1140,7 @@ export default function Arena() {
     setRollPhase(null);
     setAttackResult(null);
     setMonsterRollStatus(null);
+    setLevelUp(null);
     // Clear stale overlays from the finished encounter
     setRollResultOverlay(null);
     setSpectatorRoll(null);
@@ -1077,6 +1237,8 @@ export default function Arena() {
       const targetMaxHp = targetId === user.id ? myP.maxHp : (targetP?.maxHp || 0);
       const targetCurrentHp = targetId === user.id ? myP.currentHp : (targetP?.currentHp || 0);
       const isRevive = targetP?.knockedOut;
+      playArenaSound(isRevive ? 'revive' : 'healGulp');
+      if (isRevive) playArenaSound('crowdCheer');
       const newHp = isRevive ? healTotal : Math.min(targetMaxHp, targetCurrentHp + healTotal);
 
       // Show heal result overlay
@@ -1205,6 +1367,8 @@ export default function Arena() {
       const targetMaxHp = targetId === user.id ? myP.maxHp : (targetP?.maxHp || 0);
       const targetCurrentHp = targetId === user.id ? myP.currentHp : (targetP?.currentHp || 0);
       const newHp = isRevive ? amount : Math.min(targetMaxHp, targetCurrentHp + amount);
+      playArenaSound(isRevive ? 'revive' : 'healShimmer');
+      if (isRevive) playArenaSound('crowdCheer');
 
       // Show heal overlay (no dice roll needed)
       const healOverlay = {
@@ -1271,6 +1435,7 @@ export default function Arena() {
       const targetMaxHp = myP.maxHp;
       const targetCurrentHp = myP.currentHp;
       const newHp = Math.min(targetMaxHp, targetCurrentHp + healTotal);
+      playArenaSound('healGulp');
 
       const healOverlay = {
         type: 'heal',
@@ -1328,6 +1493,7 @@ export default function Arena() {
           targetId,
         }),
       });
+      playArenaSound('bardicInspiration');
       setBonusActionPhase(false);
       setAvailableBonusActions([]);
     } catch (err) {
@@ -1373,6 +1539,9 @@ export default function Arena() {
       const saveTotal = saveRoll + saveBonus;
       const saveDC = myStats?.spellSaveDC || 0;
       const saved = saveTotal >= saveDC;
+      const isElectric = spell.damageType === 'thunder' || spell.damageType === 'lightning';
+      const isViciousMockery = spell.id === 'vicious_mockery';
+      playArenaSound(isViciousMockery ? 'viciousMockery' : isElectric ? 'electricSpell' : 'spellCast');
 
       // Step 2: Show save result overlay
       const saveOverlay = {
@@ -1385,6 +1554,8 @@ export default function Arena() {
       };
       broadcastRollResult(saveOverlay);
       await showRollResult(saveOverlay);
+      if (saved) { playArenaSound('spellFail'); playArenaSound('crowdGasp'); }
+      else playArenaSound('crowdCheer');
 
       let damageTotal = 0;
 
@@ -1395,6 +1566,7 @@ export default function Arena() {
           spell.damageDice, 0, '#eab308', `${spell.name} damage`, myDiceColorset
         );
         damageTotal = dmgTotal;
+        playArenaSound('damageImpact');
 
         // Show damage overlay
         const dmgOverlay = {
@@ -1453,6 +1625,8 @@ export default function Arena() {
       const rawDice = healRoll - spellMod;
       const target = activeEncounter.participants[targetId];
       const targetName = target?.name || 'Ally';
+      playArenaSound(target?.knockedOut ? 'revive' : 'healShimmer');
+      if (target?.knockedOut) playArenaSound('crowdCheer');
 
       // Show heal overlay
       const healOverlay = {
@@ -1532,6 +1706,11 @@ export default function Arena() {
 
       setAttackResult({ roll: usedRoll, total, isHit, isNat20, isNat1 });
       setRollPhase('attack_result');
+      // Offhand attack result sound + crowd reaction
+      if (isNat20) { playArenaSound('attackCrit'); playArenaSound('crowdCheer'); }
+      else if (isNat1) { playArenaSound('attackFumble'); playArenaSound('crowdGasp'); }
+      else if (isHit) playArenaSound('attackHit');
+      else playArenaSound('attackMiss');
 
       // Show attack result overlay
       const attackOverlay = {
@@ -1558,6 +1737,7 @@ export default function Arena() {
           weaponNotation, dmgMod, '#eab308', critLabel, myDiceColorset
         );
         damageTotal = dmgTotal;
+        playArenaSound('damageImpact');
 
         const dmgOverlay = {
           type: 'damage',
@@ -1618,6 +1798,15 @@ export default function Arena() {
   const isMyTurn = currentTurnEntry?.id === user?.id;
   const isMonsterTurn = currentTurnEntry?.type === 'monster';
 
+  // Arena audio phase for SceneAudio ambient config
+  // Switches to intense music when monster HP drops below 30%
+  const monsterHpPct = monster ? (monster.currentHp / monster.maxHp) : 1;
+  const arenaAudioPhase = encounterResult
+    ? (encounterResult.type === 'victory' ? 'victory' : 'defeat')
+    : (activeEncounter && monster && isParticipant)
+      ? (monsterHpPct <= 0.3 ? 'battleIntense' : 'battle')
+      : 'crowd';
+
   const getStatusText = () => {
     if (rollPhase === 'monster_rolling') {
       return monsterRollStatus || 'Monster is attacking...';
@@ -1654,7 +1843,18 @@ export default function Arena() {
   if (showResult) {
     return (
       <div className="arena">
+        <SceneAudio config={ARENA_AUDIO_CONFIGS[arenaAudioPhase]} />
         <div className="arena-result-overlay">
+          {/* Background image + confetti for victory */}
+          {encounterResult.type === 'victory' && (
+            <>
+              <div
+                className="arena-result-bg"
+                style={{ backgroundImage: "url('/images/scenes/arena_exterior.webp')" }}
+              />
+              <VictoryConfetti />
+            </>
+          )}
           <div className="arena-result-card">
             {encounterResult.type === 'victory' ? (
               <>
@@ -1682,12 +1882,14 @@ export default function Arena() {
                 <div className="arena-result-subtitle">{encounterResult.defeatText}</div>
               </>
             )}
-            <button
-              className="arena-result-dismiss"
-              onClick={() => { playSound('buttonTap'); handleDismissResult(); }}
-            >
-              Continue
-            </button>
+            {achievementQueue.length === 0 && !levelUp && (
+              <button
+                className="arena-result-dismiss"
+                onClick={() => { playSound('buttonTap'); handleDismissResult(); }}
+              >
+                Continue
+              </button>
+            )}
           </div>
         </div>
         {achievementQueue.length > 0 && (
@@ -1695,6 +1897,13 @@ export default function Arena() {
             key={achievementQueue[0].id}
             achievement={achievementQueue[0]}
             onDismiss={dismissAchievement}
+          />
+        )}
+        {levelUp && achievementQueue.length === 0 && (
+          <LevelUpOverlay
+            key={levelUp}
+            level={levelUp}
+            onDismiss={() => setLevelUp(null)}
           />
         )}
       </div>
@@ -1760,6 +1969,7 @@ export default function Arena() {
   if (showInitiativeScreen) {
     return (
       <div className="arena">
+        <SceneAudio config={ARENA_AUDIO_CONFIGS[arenaAudioPhase]} />
         <div className="arena-header arena-header-battle">
           <button className="arena-back" onClick={() => {
             playSound('buttonTap');
@@ -1855,6 +2065,7 @@ export default function Arena() {
 
     return (
       <div className="arena">
+        <SceneAudio config={ARENA_AUDIO_CONFIGS[arenaAudioPhase]} />
         {/* Header */}
         <div className="arena-header arena-header-battle">
           <button className="arena-back" onClick={() => { playSound('buttonTap'); navigate('/map'); }}>
@@ -1900,6 +2111,11 @@ export default function Arena() {
                   {p.knockedOut && <span className="arena-badge arena-badge-defeated">KO</span>}
                   {p.dodging && !p.knockedOut && <span className="arena-badge arena-badge-dodging">DODGE</span>}
                   {p.advantageOnNextAttack && !p.knockedOut && <span className="arena-badge arena-badge-advantage">ADV</span>}
+                  {!p.knockedOut && (p.conditions || []).map(c => (
+                    <span key={c.id} className={`arena-badge arena-badge-condition arena-badge-${c.id}`} title={c.description}>
+                      {c.icon}
+                    </span>
+                  ))}
                 </div>
               );
             })}
@@ -1918,6 +2134,11 @@ export default function Arena() {
               </div>
               <span className="arena-info-hp-text">{monster.currentHp}/{monster.maxHp}</span>
               <span className="arena-info-ac">{monster.ac}</span>
+              {(monster.conditions || []).map(c => (
+                <span key={c.id} className={`arena-badge arena-badge-condition arena-badge-${c.id}`} title={c.description}>
+                  {c.icon}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -2809,6 +3030,7 @@ export default function Arena() {
   // ── Monster Selection (idle state) ──
   return (
     <div className="arena" onClick={() => selectedMonster && setSelectedMonster(null)}>
+      <SceneAudio config={ARENA_AUDIO_CONFIGS[arenaAudioPhase]} />
       <div className="arena-header">
         <button className="arena-back" onClick={() => { playSound('buttonTap'); navigate('/map'); }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

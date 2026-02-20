@@ -12,6 +12,7 @@ const { getCharacterSheet } = require('./characterSheets');
 const { getAllWeapons, rollD20, rollDamage } = require('./weapons');
 const { awardQuestXp, incrementLifetimeStat, getLevel } = require('./xp');
 const { awardGold } = require('./economy');
+const { addCondition, removeCondition, hasCondition, getAttackModifiers, getDefenseModifiers, canAct, tickConditions, getConditionsPublic } = require('./conditions');
 
 // ============================================
 // SPELL DEFINITIONS (data-driven)
@@ -111,6 +112,7 @@ function spawnEncounter(locationId, monsterId, startedBy) {
       creatureType: monsterDef.creatureType || 'beast',
       savingThrows: monsterDef.savingThrows || {},
       disadvantageOnNextAttack: false,
+      conditions: [],
     },
     round: 1,
     phase: 'initiative_rolling', // 'initiative_rolling' | 'action' | 'resolving' | 'monster_rolling' | 'monster_turn' | 'ended'
@@ -216,10 +218,17 @@ function joinEncounter(encounterId, userId, username, avatar, sprite) {
       // Received inspiration (on all participants)
       inspirationDie: null,
       inspiredBy: null,
+      // Sneak Attack (Rogue)
+      sneakAttackDice: (() => {
+        const rogueLevel = sheet.classes?.find(c => c.name === 'Rogue')?.level || 0;
+        return rogueLevel > 0 ? Math.ceil(rogueLevel / 2) : 0;
+      })(),
+      sneakAttackUsed: false,
       // Spellcasting stats
       spellSaveDC: sheet.spellcasting?.spellSaveDC || 0,
       spellAttackBonus: sheet.spellcasting?.spellAttackBonus || 0,
       spellcastingMod: sheet.spellcasting?.abilityModifier || 0,
+      conditions: [],
     };
   } else {
     // Default stats for players without character sheets
@@ -255,9 +264,12 @@ function joinEncounter(encounterId, userId, username, avatar, sprite) {
       bardicInspirationDie: 'd6',
       inspirationDie: null,
       inspiredBy: null,
+      sneakAttackDice: 0,
+      sneakAttackUsed: false,
       spellSaveDC: 0,
       spellAttackBonus: 0,
       spellcastingMod: 0,
+      conditions: [],
     };
   }
 
@@ -338,10 +350,17 @@ function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll)
       })(),
       inspirationDie: null,
       inspiredBy: null,
+      // Sneak Attack (Rogue)
+      sneakAttackDice: (() => {
+        const rogueLevel = sheet.classes?.find(c => c.name === 'Rogue')?.level || 0;
+        return rogueLevel > 0 ? Math.ceil(rogueLevel / 2) : 0;
+      })(),
+      sneakAttackUsed: false,
       // Spellcasting stats
       spellSaveDC: sheet.spellcasting?.spellSaveDC || 0,
       spellAttackBonus: sheet.spellcasting?.spellAttackBonus || 0,
       spellcastingMod: sheet.spellcasting?.abilityModifier || 0,
+      conditions: [],
     };
   } else {
     combatStats = {
@@ -374,9 +393,12 @@ function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll)
       bardicInspirationDie: 'd6',
       inspirationDie: null,
       inspiredBy: null,
+      sneakAttackDice: 0,
+      sneakAttackUsed: false,
       spellSaveDC: 0,
       spellAttackBonus: 0,
       spellcastingMod: 0,
+      conditions: [],
     };
   }
 
@@ -529,6 +551,10 @@ function submitAction(encounterId, userId, action, rollData) {
     // Divine Smite data (client decides to smite after hitting)
     if (rollData.smiteData) {
       player.smiteData = rollData.smiteData;
+    }
+    // Sneak Attack data (client auto-rolls when eligible)
+    if (rollData.sneakAttackData) {
+      player.sneakAttackData = rollData.sneakAttackData;
     }
     // Bardic Inspiration data (client decides to use after seeing roll)
     if (rollData.inspirationData) {
@@ -786,6 +812,11 @@ function resolveSingleAction(encounter, userId) {
     let text = '';
     let smiteApplied = false;
     let smiteDamage = 0;
+    let sneakAttackApplied = false;
+    let sneakAttackDamage = 0;
+
+    // Look up the weapon used for this attack (for Vex, Sneak Attack checks)
+    const usedWeapon = (player.weapons || []).find(w => w.id === player.mainActionWeaponId) || null;
 
     const advLabel = advantageType === 'advantage' ? ' *(with advantage)*' : advantageType === 'disadvantage' ? ' *(with disadvantage)*' : '';
 
@@ -802,6 +833,31 @@ function resolveSingleAction(encounter, userId) {
         if (isNat20) {
           const critExtra = rollDamage(player.damageNotation);
           damage += critExtra.total;
+        }
+      }
+
+      // Sneak Attack — once per turn, finesse/ranged weapon, advantage or ally present
+      if (player.sneakAttackDice > 0 && !player.sneakAttackUsed) {
+        const isEligibleWeapon = usedWeapon ? (usedWeapon.finesse || usedWeapon.ranged) : false;
+        if (isEligibleWeapon) {
+          const hasAlly = Object.entries(encounter.participants)
+            .some(([uid, p]) => uid !== userId && !p.knockedOut);
+          const eligible = advantageType === 'advantage' || (hasAlly && advantageType !== 'disadvantage');
+          if (eligible) {
+            if (player.sneakAttackData) {
+              // Client-driven: damage already included in damageTotalValue
+              sneakAttackDamage = player.sneakAttackData.sneakAttackDamage || 0;
+            } else {
+              // Server-driven fallback (auto-attacks, NPCs)
+              const saDice = `${player.sneakAttackDice}d6`;
+              const saResult = rollDamage(saDice);
+              sneakAttackDamage = saResult.total;
+              if (isNat20) { sneakAttackDamage += rollDamage(saDice).total; }
+              damage += sneakAttackDamage;
+            }
+            sneakAttackApplied = true;
+            player.sneakAttackUsed = true;
+          }
         }
       }
 
@@ -827,11 +883,19 @@ function resolveSingleAction(encounter, userId) {
           `Deals **${damage} ${player.damageType} damage.**`;
       }
 
+      if (sneakAttackApplied) {
+        text += ` **SNEAK ATTACK!** (+${sneakAttackDamage} damage)`;
+      }
       if (smiteApplied) {
         text += ` **DIVINE SMITE!** Holy radiant energy erupts from the blade!`;
       }
       if (inspirationBonus > 0) {
         text += ` *(+${inspirationBonus} Bardic Inspiration)*`;
+      }
+
+      // Vex — advantage on next attack after hitting with a Vex weapon
+      if (usedWeapon && usedWeapon.vex) {
+        player.advantageOnNextAttack = true;
       }
     } else {
       let missText = `**${player.name}** swings their ${player.weaponName}...${advLabel} **${totalAttack}** vs AC ${encounter.monster.ac} — **Miss!**`;
@@ -849,19 +913,20 @@ function resolveSingleAction(encounter, userId) {
       try { incrementLifetimeStat(userId, player.name, 'combat_fumbles', 1); } catch {}
     }
 
-    // Clean up roll values
+    // Clean up roll values (keep player.action so bonus action phase can check it)
     delete player.attackRollValue;
     delete player.attackRollValue2;
     delete player.damageTotalValue;
     delete player.smiteData;
+    delete player.sneakAttackData;
     delete player.inspirationData;
-    player.action = null;
 
     return {
       type: 'attack', userId, name: player.name,
       roll: usedRoll, roll2: attackRoll2, usedRoll, advantageType,
       total: totalAttack, hit, damage, isNat20, isNat1, text,
       smiteApplied, smiteDamage,
+      sneakAttackApplied, sneakAttackDamage,
       inspirationBonus, inspirationDie,
     };
   }
@@ -951,9 +1016,13 @@ function advanceTurn(encounter) {
 
   // Clear dodge/defend status and reset bonus action when this player's turn comes around
   const nextEntry = encounter.initiativeOrder[nextIndex];
+  let conditionEffects = null;
   if (nextEntry && nextEntry.type === 'player') {
     const nextPlayer = encounter.participants[nextEntry.id];
     if (nextPlayer) {
+      // Tick conditions at start of turn (DoT damage, decrement durations, remove expired)
+      conditionEffects = tickConditions(nextPlayer);
+
       // Clear dodge from their previous turn
       if (nextPlayer.dodging) {
         nextPlayer.dodging = false;
@@ -961,10 +1030,30 @@ function advanceTurn(encounter) {
       if (nextPlayer.action === 'defend') {
         nextPlayer.action = null;
       }
-      // Reset bonus action for the new turn
+      // Reset bonus action and sneak attack for the new turn
       nextPlayer.bonusActionUsed = false;
+      nextPlayer.sneakAttackUsed = false;
+
+      // Stunned/incapacitated: skip this player's turn
+      if (!canAct(nextPlayer)) {
+        encounter.currentTurnIndex = nextIndex;
+        encounter.lastActivity = Date.now();
+        return {
+          type: 'turn_skipped',
+          entry: nextEntry,
+          name: nextPlayer.name,
+          reason: getIncapacitatingConditionName(nextPlayer),
+          conditionEffects,
+          round: encounter.round,
+          newRound,
+        };
+      }
     }
   }
+
+  // Note: Monster conditions are ticked AFTER monster attacks (in resolveMonsterTurn /
+  // resolveMonsterWithRolls), not here. Ticking here would remove conditions like
+  // "mockery" before the monster gets to attack with disadvantage.
 
   encounter.currentTurnIndex = nextIndex;
   encounter.turnDeadline = Date.now() + TURN_TIMER_MS;
@@ -975,6 +1064,7 @@ function advanceTurn(encounter) {
     entry: encounter.initiativeOrder[nextIndex],
     round: encounter.round,
     newRound,
+    conditionEffects,
   };
 }
 
@@ -1185,9 +1275,8 @@ function resolveMonsterTurn(encounter) {
   const monster = encounter.monster;
   const results = [];
 
-  // Clear Vicious Mockery disadvantage after this turn
-  const monsterDisadvantage = !!monster.disadvantageOnNextAttack;
-  if (monsterDisadvantage) monster.disadvantageOnNextAttack = false;
+  // Get monster attack modifiers from conditions (e.g., mockery → disadvantage)
+  const monsterAttackMods = getAttackModifiers(monster);
 
   // Get players active for combat (not knocked out, not dying, not stabilized)
   const activePlayers = Object.entries(encounter.participants)
@@ -1202,11 +1291,25 @@ function resolveMonsterTurn(encounter) {
     for (const [targetId, targetPlayer] of targets) {
       if (!isActiveForCombat(targetPlayer)) continue;
 
-      // 5e Dodge or Vicious Mockery: monster rolls with disadvantage
-      const hasDisadvantage = targetPlayer.dodging || monsterDisadvantage;
+      // 5e: Determine advantage/disadvantage for this monster attack
+      let monsterHasAdvantage = false;
+      let monsterHasDisadvantage = targetPlayer.dodging || monsterAttackMods.hasDisadvantage;
+
+      // Check target's conditions (e.g., stunned → attackers have advantage)
+      const targetDefMods = getDefenseModifiers(targetPlayer);
+      if (targetDefMods.attackersHaveAdvantage) monsterHasAdvantage = true;
+      if (targetDefMods.attackersHaveDisadvantage) monsterHasDisadvantage = true;
+
+      // 5e: advantage + disadvantage cancel out
+      const hasAdvantage = monsterHasAdvantage && !monsterHasDisadvantage;
+      const hasDisadvantage = monsterHasDisadvantage && !monsterHasAdvantage;
+      const rollTwice = hasAdvantage || hasDisadvantage;
+
       let attackRoll = rollD20();
-      let attackRoll2 = hasDisadvantage ? rollD20() : null;
-      const usedRoll = hasDisadvantage ? Math.min(attackRoll, attackRoll2) : attackRoll;
+      let attackRoll2 = rollTwice ? rollD20() : null;
+      const usedRoll = hasAdvantage ? Math.max(attackRoll, attackRoll2)
+        : hasDisadvantage ? Math.min(attackRoll, attackRoll2)
+        : attackRoll;
 
       const totalAttack = usedRoll + attack.bonus;
       const effectiveAC = targetPlayer.ac;
@@ -1271,7 +1374,10 @@ function resolveMonsterTurn(encounter) {
     }
   }
 
-  return results;
+  // Tick monster conditions AFTER attacks (so conditions like "mockery" apply during the attacks)
+  const monsterConditionEffects = tickConditions(monster);
+
+  return { results, monsterConditionEffects };
 }
 
 /**
@@ -1289,14 +1395,21 @@ function prepareMonsterAttacks(encounter) {
   const targets = pickTargets(activePlayers, monster.multiattack);
   const attacks = [];
   let index = 0;
-  const monsterDisadvantage = !!encounter.monster.disadvantageOnNextAttack;
+  const monsterAttackMods = getAttackModifiers(monster);
 
   for (const attack of monster.attacks) {
     for (const [targetId, targetPlayer] of targets) {
       if (!isActiveForCombat(targetPlayer)) continue;
       const effectiveAC = targetPlayer.ac;
-      // 5e Dodge or Vicious Mockery: monster attacks with disadvantage
-      const disadvantage = !!targetPlayer.dodging || monsterDisadvantage;
+      // 5e: Check advantage/disadvantage from conditions
+      let hasAdv = false;
+      let hasDisadv = !!targetPlayer.dodging || monsterAttackMods.hasDisadvantage;
+      const targetDefMods = getDefenseModifiers(targetPlayer);
+      if (targetDefMods.attackersHaveAdvantage) hasAdv = true;
+      if (targetDefMods.attackersHaveDisadvantage) hasDisadv = true;
+      // Advantage + disadvantage cancel
+      const advantage = hasAdv && !hasDisadv;
+      const disadvantage = hasDisadv && !hasAdv;
       attacks.push({
         index,
         name: attack.name,
@@ -1306,6 +1419,7 @@ function prepareMonsterAttacks(encounter) {
         targetId,
         targetName: targetPlayer.name,
         targetAC: effectiveAC,
+        advantage,
         disadvantage,
       });
       index++;
@@ -1331,9 +1445,6 @@ function resolveMonsterWithRolls(encounterId, rollData) {
   const monster = encounter.monster;
   const results = [];
 
-  // Clear Vicious Mockery disadvantage (was already applied in prepareMonsterAttacks)
-  if (monster.disadvantageOnNextAttack) monster.disadvantageOnNextAttack = false;
-
   for (const roll of rollData) {
     const setup = encounter.monsterAttackSetup?.attacks?.[roll.index];
     if (!setup) continue;
@@ -1342,12 +1453,12 @@ function resolveMonsterWithRolls(encounterId, rollData) {
     if (!targetPlayer) continue;
     if (targetPlayer.knockedOut) continue;
 
-    // 5e Disadvantage: if attack has disadvantage (e.g. target dodging), use lower of 2 rolls
+    // 5e: Resolve advantage/disadvantage from attack setup
     let attackRoll, usedRoll;
-    if (setup.disadvantage) {
+    if (setup.advantage || setup.disadvantage) {
       attackRoll = typeof roll.attackRoll === 'number' ? roll.attackRoll : rollD20();
       const attackRoll2 = typeof roll.attackRoll2 === 'number' ? roll.attackRoll2 : rollD20();
-      usedRoll = Math.min(attackRoll, attackRoll2);
+      usedRoll = setup.advantage ? Math.max(attackRoll, attackRoll2) : Math.min(attackRoll, attackRoll2);
     } else {
       attackRoll = typeof roll.attackRoll === 'number' ? roll.attackRoll : rollD20();
       usedRoll = attackRoll;
@@ -1419,6 +1530,9 @@ function resolveMonsterWithRolls(encounterId, rollData) {
   delete encounter.monsterAttackSetup;
   delete encounter.monsterRollDeadline;
 
+  // Tick monster conditions AFTER attacks (so conditions like "mockery" applied during attacks)
+  const monsterConditionEffects = tickConditions(monster);
+
   // Check if all players are out of the fight (knocked out = fully defeated)
   const activePlayers = Object.values(encounter.participants)
     .filter(p => !p.knockedOut);
@@ -1428,10 +1542,10 @@ function resolveMonsterWithRolls(encounterId, rollData) {
     encounter.outcome = 'defeat';
     activeEncounters.delete(encounter.id);
 
-
     return {
       locationId: encounter.locationId,
       results,
+      monsterConditionEffects,
       defeat: true,
       defeatText: monster.fleeText || 'The monster escapes as the last fighter falls.',
     };
@@ -1441,12 +1555,25 @@ function resolveMonsterWithRolls(encounterId, rollData) {
   return {
     locationId: encounter.locationId,
     results,
+    monsterConditionEffects,
   };
 }
 
 // ============================================
-// 5e HELPERS: ADVANTAGE, DEATH SAVES, POTIONS
+// 5e HELPERS: ADVANTAGE, CONDITIONS, POTIONS
 // ============================================
+
+/**
+ * Get the name of the condition preventing a participant from acting.
+ */
+function getIncapacitatingConditionName(participant) {
+  const { CONDITIONS } = require('./conditions');
+  for (const c of (participant.conditions || [])) {
+    const def = CONDITIONS[c.id];
+    if (def && !def.canAct) return c.name;
+  }
+  return 'a condition';
+}
 
 /**
  * Check if a player is active for combat targeting (not knocked out).
@@ -1468,10 +1595,18 @@ function isStillInFight(p) {
  * Returns 'advantage' | 'disadvantage' | 'normal'.
  * If both advantage and disadvantage apply, they cancel to 'normal' (5e rule).
  */
-function resolveAttackAdvantage(attacker, _defender) {
+function resolveAttackAdvantage(attacker, defender) {
   let hasAdvantage = !!attacker.advantageOnNextAttack;
   let hasDisadvantage = false;
-  // Future: defender conditions could impose disadvantage on attacker
+
+  // Attacker conditions (e.g., frightened, poisoned → disadvantage)
+  const attackMods = getAttackModifiers(attacker);
+  if (attackMods.hasDisadvantage) hasDisadvantage = true;
+
+  // Defender conditions (e.g., stunned, restrained → attackers have advantage)
+  const defenseMods = getDefenseModifiers(defender);
+  if (defenseMods.attackersHaveAdvantage) hasAdvantage = true;
+  if (defenseMods.attackersHaveDisadvantage) hasDisadvantage = true;
 
   if (hasAdvantage && hasDisadvantage) return 'normal';
   if (hasAdvantage) return 'advantage';
@@ -1805,6 +1940,7 @@ function getPublicState(encounter) {
       dodging: p.dodging || false,
       advantageOnNextAttack: p.advantageOnNextAttack || false,
       bonusActionUsed: p.bonusActionUsed || false,
+      conditions: getConditionsPublic(p),
       // Class abilities
       spellSlots: p.spellSlots || [],
       classNames: p.classNames || [],
@@ -1815,6 +1951,8 @@ function getPublicState(encounter) {
         ),
       layOnHandsPool: p.layOnHandsPool || 0,
       layOnHandsUsed: p.layOnHandsUsed || 0,
+      // Rogue features
+      sneakAttackDice: p.sneakAttackDice || 0,
       // Bardic Inspiration
       hasBardicInspiration: p.hasBardicInspiration || false,
       bardicInspirationUses: p.bardicInspirationUses || 0,
@@ -1852,6 +1990,7 @@ function getPublicState(encounter) {
       creatureType: encounter.monster.creatureType || 'beast',
       savingThrows: encounter.monster.savingThrows || {},
       disadvantageOnNextAttack: encounter.monster.disadvantageOnNextAttack || false,
+      conditions: getConditionsPublic(encounter.monster),
     },
     round: encounter.round,
     phase: encounter.phase,
@@ -1895,9 +2034,9 @@ function resolveSaveDamageSpell(encounter, player, userId, spell, spellId, rollD
     player.totalDamage += damage;
   }
 
-  // Apply extra effects (Vicious Mockery disadvantage)
+  // Apply extra effects via conditions system
   if (!saved && spell.extraEffect === 'disadvantage_next_attack') {
-    monster.disadvantageOnNextAttack = true;
+    addCondition(monster, 'mockery', { duration: 1, durationType: 'rounds', source: player.name });
   }
 
   let text;

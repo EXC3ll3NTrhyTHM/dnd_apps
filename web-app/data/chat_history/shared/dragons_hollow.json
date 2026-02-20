@@ -1346,5 +1346,67 @@
     ],
     "modifier": 0,
     "timestamp": "2026-02-18T00:30:13.209Z"
+  },
+  {
+    "id": "504ebd5f-3462-42ae-ac2a-5b4624f3f96d",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "notation": "2d20",
+    "rolls": [
+      3,
+      1
+    ],
+    "total": 4,
+    "kept": [
+      0,
+      1
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-18T22:41:39.040Z"
+  },
+  {
+    "id": "925f4b06-04b2-4240-ab52-5179e960b0d7",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "notation": "2d20",
+    "rolls": [
+      18,
+      8
+    ],
+    "total": 26,
+    "kept": [
+      0,
+      1
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-18T22:41:49.132Z"
+  },
+  {
+    "id": "6ff0c747-f6b5-4864-98bc-8be6ee51856a",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "notation": "3d20",
+    "rolls": [
+      7,
+      9,
+      19
+    ],
+    "total": 35,
+    "kept": [
+      0,
+      1,
+      2
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-18T22:41:56.533Z"
   }
 ]

@@ -25,18 +25,18 @@
   },
   "228241331296665600": {
     "username": "badbeachpeach",
-    "total_caught": 14,
-    "total_escaped": 1,
-    "total_sold": 13,
-    "gold_earned": 122,
+    "total_caught": 15,
+    "total_escaped": 2,
+    "total_sold": 14,
+    "gold_earned": 130,
     "catches": {
       "mudcarp": 5,
       "ember_bass": 1,
-      "silver_trout": 4,
+      "silver_trout": 5,
       "ironjaw": 3,
       "glowfin": 1
     },
-    "last_catch": "2026-02-16T08:08:10.995Z",
+    "last_catch": "2026-02-19T06:37:30.782Z",
     "biggest_catch": {
       "fishId": "ember_bass",
       "name": "Ember Bass",

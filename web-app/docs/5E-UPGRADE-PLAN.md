@@ -1,7 +1,7 @@
 # Arena D&D 5e Upgrade Plan
 
 **Created:** 2026-02-16
-**Status:** Planning
+**Status:** In Progress (Phase 1 ✅, Phase 2 partial ✅, Phase 5 ✅)
 
 This document outlines the phased implementation plan for upgrading the Arena combat system to incorporate full D&D 5th Edition rules.
 
@@ -17,11 +17,19 @@ The Arena currently supports:
 - Damage rolls (weapon dice + STR/DEX mod)
 - Critical hits (NAT 20 = roll damage twice)
 - Fumbles (NAT 1 = auto-miss)
-- Defend action (+2 AC)
+- Dodge action (5e — attackers have disadvantage)
+- Help action (ally gets advantage on next attack)
 - Flee action
 - HP tracking, knockout at 0 HP
 - Monster multiattack
 - D&D Beyond character sheet integration
+- Advantage/Disadvantage system
+- Bonus action system (offhand attack, spells, Bardic Inspiration)
+- Potion system (heal self or revive ally)
+- Spell slot tracking & spellcasting (save-based + heal spells)
+- Acacia (Bard): Bardic Inspiration, Vicious Mockery, Thunderwave, Healing Word
+- Thalor (Paladin): Divine Smite, Lay on Hands
+- Conditions framework (stunned, frightened, poisoned, burning, blinded, restrained, mockery)
 
 ---
 
@@ -415,48 +423,65 @@ For spells/abilities that force monster saves (e.g., Stunning Strike, Vicious Mo
 
 ---
 
-## Phase 5: Conditions & Status Effects
+## Phase 5: Conditions & Status Effects ✅
 
-> **Note:** Build conditions iteratively as spells/abilities require them.
+> **Status:** Framework implemented. Conditions are added as abilities require them.
 
-### 5.1 Condition System Framework
+### 5.1 Condition System Framework ✅
+
+**File:** `server/lib/conditions.js`
 
 **Data structure:**
 ```javascript
 participant.conditions = [
-  { 
-    id: 'poisoned', 
+  {
+    id: 'poisoned',
     duration: 3,
-    durationType: 'rounds',
+    durationType: 'rounds', // 'rounds' | 'end_of_next_turn' | 'save_end'
     source: 'Giant Spider',
-    sourceId: 'monster'
+    name: 'Poisoned',
+    icon: '☠️',
+    description: 'Disadvantage on attack rolls.'
   }
 ]
 ```
 
-**Core functions:**
-- `addCondition(participantId, condition)`
-- `removeCondition(participantId, conditionId)`
-- `hasCondition(participantId, conditionId)`
-- `tickConditions(participantId)` - called at end of turn
-- `getAttackModifiers(participantId)` - returns advantage/disadvantage based on conditions
+**Implemented functions:**
+- `addCondition(participant, conditionId, { duration, durationType, source })` — no stacking, refreshes duration
+- `removeCondition(participant, conditionId)`
+- `hasCondition(participant, conditionId)`
+- `tickConditions(participant)` — called at start of turn, decrements durations, applies DoT, removes expired
+- `getAttackModifiers(participant)` — returns disadvantage from conditions (frightened, poisoned, etc.)
+- `getDefenseModifiers(participant)` — returns advantage_against from conditions (stunned, restrained, etc.)
+- `canAct(participant)` — returns false if stunned/incapacitated
+- `getConditionsPublic(participant)` — returns conditions for client display
 
-### 5.2 Conditions (Add as Needed)
+**Integration:**
+- `resolveAttackAdvantage()` checks attacker + defender conditions
+- Monster attacks check monster conditions (mockery) + target conditions (stunned)
+- `advanceTurn()` ticks conditions at start of each turn, auto-skips stunned players
+- `getPublicState()` includes conditions on both players and monster
+- Vicious Mockery uses `addCondition(monster, 'mockery')` instead of ad-hoc boolean
 
-Build these as abilities/spells require them:
+### 5.2 Defined Conditions
 
-| Condition | Attack Rolls | Attacked By | Trigger |
-|-----------|--------------|-------------|---------|
-| **Stunned** | Can't attack | Advantage | Nalyd's Stunning Strike |
-| **Frightened** | Disadvantage | — | Acacia's abilities |
-| **Burning** | — | — | Nalyd's Ignition hits |
-| **Poisoned** | Disadvantage | — | Monster abilities |
+| Condition | Attack Rolls | Attacked By | canAct | DoT | Trigger |
+|-----------|--------------|-------------|--------|-----|---------|
+| **Stunned** | Can't attack | Advantage | No | — | Nalyd's Stunning Strike |
+| **Frightened** | Disadvantage | — | Yes | — | Acacia's abilities |
+| **Poisoned** | Disadvantage | — | Yes | — | Monster abilities |
+| **Burning** | — | — | Yes | 1d4 fire | Nalyd's Ignition hits |
+| **Blinded** | Disadvantage | Advantage | Yes | — | Various |
+| **Restrained** | Disadvantage | Advantage | Yes | — | Various |
+| **Mocked** | Disadvantage | — | Yes | — | Vicious Mockery ✅ |
 
-### 5.3 Condition UI
+### 5.3 Condition UI ✅
 
-- Status icons displayed on player/monster portraits
-- Tooltip on hover showing condition name, description, duration
-- Visual indicator when condition expires
+- Condition badges displayed on player/monster info bars (icon only, compact)
+- Color-coded per condition type (gold=stunned, green=poisoned, orange=burning, etc.)
+- Burning badge pulses with animation
+- Turn skip narration when stunned player's turn comes up
+- DoT damage and condition expiry narrated in combat log
 
 ### 4.1 Spell Slot Tracking
 
@@ -502,43 +527,39 @@ participant.spellSlots = {
 
 ## Implementation Priority
 
-**Philosophy:** Build abilities/spells first that trigger conditions, then implement conditions one-by-one as needed. Don't build a full condition system with no way to test it.
+**Philosophy:** The conditions framework is built. Now build each character's abilities — when an ability needs a condition, just call `addCondition()` with the appropriate condition ID.
 
-### Recommended Order
+### Progress
 
-| Step | Feature | Why |
-|------|---------|-----|
-| 1 | Advantage/Disadvantage | Foundation for many mechanics |
-| 2 | Death Saving Throws | Core 5e survival mechanic |
-| 3 | Potion System | Heal downed players, buy from shop |
-| 4 | Bonus Action System | Needed for spells/abilities |
-| 5 | Dodge Action | Tests advantage system |
-| 6 | Spell Slot Tracking | Foundation for casters |
-| 7 | Ki Points (Nalyd) | Monk resource system |
-| 8 | First Class Ability (e.g., Flurry of Blows) | Test ability system |
-| 9 | First Spell (e.g., Healing Word) | Test spell system |
-| 10 | Saving Throw Framework | Needed for Stunning Strike, etc. |
-| 11 | Stunning Strike (Nalyd) | First ability that adds a condition |
-| 12 | Stunned Condition | Built because Stunning Strike needs it |
-| 13 | Homebrew: Ignition Form | Nalyd's transformation |
-| 14 | Continue iteratively... | Each ability adds what it needs |
+| Step | Feature | Status |
+|------|---------|--------|
+| 1 | Advantage/Disadvantage | ✅ Done |
+| 2 | Dodge Action (5e) | ✅ Done |
+| 3 | Help Action | ✅ Done |
+| 4 | Potion System | ✅ Done |
+| 5 | Bonus Action System | ✅ Done |
+| 6 | Spell Slot Tracking | ✅ Done |
+| 7 | Spellcasting Framework | ✅ Done (save-based + heal spells) |
+| 8 | Acacia — Bardic Inspiration | ✅ Done |
+| 9 | Acacia — Vicious Mockery, Thunderwave, Healing Word | ✅ Done |
+| 10 | Thalor — Divine Smite | ✅ Done |
+| 11 | Thalor — Lay on Hands | ✅ Done |
+| 12 | Conditions System Framework | ✅ Done |
+| 13 | Death Saving Throws | Planned |
+| 14 | Nalyd — Ki Points + Flurry of Blows | Next |
+| 15 | Nalyd — Stunning Strike (uses Stunned condition) | Next |
+| 16 | Nalyd — Homebrew: Ignition Form (uses Burning condition) | Next |
+| 17 | Aly — Cleric spells + abilities | Next |
+| 18 | Tyren — Ranger spells + abilities | Next |
+| 19 | Saving Throw Framework (player saves) | Planned |
+| 20 | Concentration | Planned |
 
-### Condition-First vs Ability-First
+### Ad-hoc Fields Kept (not migrated to conditions)
 
-❌ **Old approach (condition-first):**
-1. Build full condition framework
-2. Implement 10 conditions
-3. Build UI for all conditions
-4. Then build abilities that use them
-5. Find bugs with no way to trigger them
-
-✅ **New approach (ability-first):**
-1. Pick an ability (e.g., Nalyd's Ignition)
-2. Build the ability
-3. If it needs a condition (e.g., "burning"), build just that condition
-4. Test thoroughly with that ability
-5. Move to next ability, add conditions as needed
-6. Condition system grows organically with real test cases
+- `player.dodging` — simple 1-turn toggle, clears at start of player's next turn
+- `player.advantageOnNextAttack` — consumed on use by Help action
+- `player.inspirationDie` — Bardic Inspiration, separate mechanic
+- `monster.disadvantageOnNextAttack` — kept for backwards compat, but Vicious Mockery now uses `addCondition(monster, 'mockery')` instead
 
 ---
 
@@ -547,18 +568,17 @@ participant.spellSlots = {
 ```
 server/
   lib/
-    conditions.js      # Condition definitions and helpers
-    savingThrows.js    # Save calculation and resolution
-    spells.js          # Spell casting logic
-    homebrew.js        # Custom ability handlers
+    conditions.js      # ✅ Condition definitions and helpers
+    savingThrows.js    # Save calculation and resolution (planned)
+    spells.js          # Spell casting logic (planned — currently inline in encounters.js)
+    homebrew.js        # Custom ability handlers (planned)
 
 client/
   src/
     components/
-      ConditionIcons.jsx     # Status effect icons
-      DeathSaveTracker.jsx   # Death save UI
-      SpellSelector.jsx      # Spell casting modal
-      TransformOverlay.jsx   # Transformation effects
+      DeathSaveTracker.jsx   # Death save UI (planned)
+      SpellSelector.jsx      # Spell casting modal (planned)
+      TransformOverlay.jsx   # Transformation effects (planned)
 ```
 
 ---
@@ -576,3 +596,4 @@ client/
 | Date | Change |
 |------|--------|
 | 2026-02-16 | Initial plan created |
+| 2026-02-18 | Conditions framework implemented (Phase 5). Migrated Vicious Mockery. Updated priority order to reflect completed work (Phases 1-2 partial + conditions). |
