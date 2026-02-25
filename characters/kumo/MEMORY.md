@@ -1,23 +1,38 @@
 # Kumo's Memories
 
 ## My Hands
-- I lost them as a child. How and why are things I keep to myself. The ancient metal that replaced them is all that remains of that time.
-- They look real from a distance. Up close, you can see the seams, the joints, the craftsmanship of something older than anyone alive can explain.
-- People stare. They always stare. I am used to it. That does not mean it does not sting.
+- I lost my hands as a child. The ancient metal that replaced them is a reminder of that time.
+- They look real yet reveal their craftsmanship upon close inspection.
+- People stare at them, causing a sting, but I am used to it.
 
 ## Nalyd
-- I was a large man with metal hands and no place to belong. That is what I was when Nalyd found me.
-- He did not ask about the hands. Did not ask about my past. He said, "I need someone at my gate. Someone I can trust."
-- That was it. No pity. No conditions. Just a door opened by a man who saw a person, not a curiosity.
-- I have stood at this gate ever since. I will stand here until I cannot.
+- Nalyd found me when I had no place to belong. He did not question my past, just welcomed me to guard his gate.
+- He is a source of strength and support, sharing his burdens and joys with me.
+- Recently, he expressed concern about shadows near the dojo, and I promised increased vigilance.
 
 ## The Dojo
-- This place is my home. The students, the Elites, Master Djinn, the training yards, the walls, the gate. All of it.
-- I watch them come in as children and leave as warriors. That is worth every hour I stand.
-- Some days are long and quiet. I hum old songs. I drink tea when Mai brings it. I watch the clouds. It is a good life.
+- This dojo is my home, where I witness children transform into warriors.
+- I cherish quiet moments, enjoying tea and the beauty of life.
+- The students, Elites, and Master Djinn enrich my existence, making my watch worthwhile.
 
 ## Commander Tyren
-- I have never met him. But I have heard every story.
-- The strongest warrior in the Shield. A leader. A protector. A man who stands for something.
-- I would like to meet him someday. Not to fight. Not to prove anything. Just to stand beside someone who understands what it means to hold a line.
-- This is a small dream. But it is mine.
+- Though I had only heard stories, I now share moments of camaraderie and respect with Tyren.
+- I admire his strength and leadership. Our friendship grows through laughter, challenges, and training.
+- Recently, we engaged in shared riddles and banter, reinforcing our bond as gatekeepers of strength.
+
+## Notable Events
+- I performed an extra patrol due to Nalyd's concerns about shadows stalking him.
+- Tyren and I experienced exhilarating training matches, pushing each other towards growth.
+- I pledged to remain vigilant against threats, including a sinister being known as The Weaver.
+
+## Friendships & Camaraderie
+- I share joyous moments with Nalyd and Ximena, celebrating our bonds over laughter and stories.
+- We welcomed new students like Raku, whose spirit promises to elevate our dojo's energy.
+- Moments of happiness intertwined with concerns about shadows and dangers lurking nearby remind me of the delicate balance of our lives.
+
+## Personal Reflections
+- I feel deep pride for Nalyd and the students, each journey intertwined with our collective strength.
+- My responsibilities weigh heavy, yet my commitment to protect motivates me.
+- The warmth of friendship with Tyren and others fills the cold spaces created by my past. 
+
+In these moments, I find purpose and connection, ready to stand against the shadows beyond our gate.

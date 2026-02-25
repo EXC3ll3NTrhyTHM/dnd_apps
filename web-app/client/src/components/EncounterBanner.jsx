@@ -71,6 +71,19 @@ export default function EncounterBanner({
 
     async function rollMonsterAttacks() {
       const results = [];
+      let dotRolls = null;
+
+      // Roll DoT damage dice first (e.g. ensnared → green d6)
+      if (monsterRollRequest.pendingDots && monsterRollRequest.pendingDots.length > 0) {
+        dotRolls = {};
+        for (const dot of monsterRollRequest.pendingDots) {
+          setMonsterRollStatus(`🪴 ${dot.name} — ${monsterRollRequest.monsterName} takes ${dot.type} damage!`);
+          const dotDice = await requestDiceRoll(dot.dice, '#22c55e');
+          const dotTotal = dotDice.reduce((s, v) => s + v, 0);
+          dotRolls[dot.conditionId] = dotTotal;
+          await new Promise(r => setTimeout(r, 800));
+        }
+      }
 
       for (const attack of monsterRollRequest.attacks) {
         // Show which attack is happening
@@ -113,7 +126,9 @@ export default function EncounterBanner({
           await new Promise(r => setTimeout(r, 1200));
         }
 
-        results.push({ index: attack.index, attackRoll: d20, damageTotal });
+        results.push({ index: attack.index, attackRoll: d20, damageTotal, dotRolls: dotRolls || undefined });
+        // Only include dotRolls on the first result entry, then clear
+        dotRolls = null;
       }
 
       // Send all results to server
@@ -424,6 +439,8 @@ export function useEncounterEvents(locationId, userId) {
   const [resultScreen, setResultScreen] = useState(null);
   const [narrations, setNarrations] = useState([]);
   const [monsterRollRequest, setMonsterRollRequest] = useState(null);
+  const [monsterSaveRequest, setMonsterSaveRequest] = useState(null);
+  const [monsterEscapeRequest, setMonsterEscapeRequest] = useState(null);
   // monsterId → { encounterId, participantCount, currentHp, maxHp }
   const [encounterMap, setEncounterMap] = useState({});
   // Initiative tracking
@@ -542,7 +559,7 @@ export function useEncounterEvents(locationId, userId) {
       case 'encounter_initiative_complete':
         updateMapFromEncounter(payload.encounter);
         if (isMyEncounter || (payload.encounter &&
-            Object.keys(payload.encounter.participants || {}).includes(userId))) {
+          Object.keys(payload.encounter.participants || {}).includes(userId))) {
           setEncounter(payload.encounter);
           // Sync ref immediately so the next WS event (e.g. monster_roll_needed)
           // can check isMyEncounter before React re-renders
@@ -575,6 +592,9 @@ export function useEncounterEvents(locationId, userId) {
         if (isMyEncounter) {
           setEncounter(payload.encounter);
           setCurrentTurn(payload.currentTurn);
+          setMonsterRollRequest(null);
+          setMonsterSaveRequest(null);
+          setMonsterEscapeRequest(null);
         }
         break;
 
@@ -583,12 +603,22 @@ export function useEncounterEvents(locationId, userId) {
         if (isMyEncounter) {
           if (payload.encounter) setEncounter(payload.encounter);
           if (payload.result) {
-            setNarrations(prev => [...prev, {
+            const turnMsgs = [{
               id: `enc_turn_${Date.now()}`,
               role: 'system', type: 'encounter', subtype: 'combat',
               text: payload.result.text,
               timestamp: new Date().toISOString(),
-            }]);
+            }];
+            // Ensnaring Strike save result — show as separate prominent narration
+            if (payload.result.ensnaringStrikeResult) {
+              turnMsgs.push({
+                id: `enc_es_save_${Date.now()}`,
+                role: 'system', type: 'encounter', subtype: 'combat',
+                text: payload.result.ensnaringStrikeResult.text,
+                timestamp: new Date().toISOString(),
+              });
+            }
+            setNarrations(prev => [...prev, ...turnMsgs]);
           }
         }
         break;
@@ -642,6 +672,20 @@ export function useEncounterEvents(locationId, userId) {
             rollerId: payload.rollerId,
             attacks: payload.attacks,
             monsterName: payload.monsterName,
+            pendingDots: payload.pendingDots || null,
+          });
+        }
+        break;
+
+      case 'encounter_monster_escape_needed':
+        if (isMyEncounter) {
+          if (payload.encounter) setEncounter(payload.encounter);
+          setMonsterEscapeRequest({
+            encounterId: payload.encounterId,
+            rollerId: payload.rollerId,
+            pendingEscapes: payload.pendingEscapes,
+            pendingDots: payload.pendingDots || null,
+            monsterName: payload.monsterName,
           });
         }
         break;
@@ -655,6 +699,8 @@ export function useEncounterEvents(locationId, userId) {
         // can match isMyEncounter and show the defeat screen.
         if (payload.encounter) setEncounter(payload.encounter);
         setMonsterRollRequest(null);
+        setMonsterSaveRequest(null);
+        setMonsterEscapeRequest(null);
         const monsterMsgs = (payload.attacks || []).map((a, i) => ({
           id: `enc_monster_${i}_${Date.now()}`,
           role: 'system',
@@ -667,6 +713,17 @@ export function useEncounterEvents(locationId, userId) {
         const condMsgs = [];
         const mfx = payload.monsterConditionEffects;
         if (mfx) {
+          // Narrate DoT damage (e.g. Ensnaring Strike piercing damage)
+          for (const dot of (mfx.dotEffects || [])) {
+            condMsgs.push({
+              id: `enc_mdot_${dot.id}_${Date.now()}`,
+              role: 'system',
+              type: 'encounter',
+              subtype: 'combat',
+              text: `**${dot.name}** deals **${dot.damage} ${dot.type}** damage to the monster!`,
+              timestamp: new Date().toISOString(),
+            });
+          }
           for (const rem of (mfx.removed || [])) {
             condMsgs.push({
               id: `enc_mcond_rem_${rem.id}_${Date.now()}`,
@@ -678,14 +735,79 @@ export function useEncounterEvents(locationId, userId) {
             });
           }
         }
+        // Narrate concentration saves as separate messages
+        const concSaveMsgs = (payload.concentrationSaves || []).map((cs, i) => ({
+          id: `enc_consave_${i}_${Date.now()}`,
+          role: 'system',
+          type: 'encounter',
+          subtype: 'combat',
+          text: cs.conSave
+            ? (cs.broken
+              ? `${cs.playerName} CON save: **${cs.conSave.total}** (${cs.conSave.roll}+${cs.conSave.conMod}) vs DC ${cs.conSave.dc} — **Failed!** Concentration on **${cs.spellName}** is broken!`
+              : `${cs.playerName} CON save: **${cs.conSave.total}** (${cs.conSave.roll}+${cs.conSave.conMod}) vs DC ${cs.conSave.dc} — **Saved!** Maintains concentration on **${cs.spellName}**.`)
+            : `${cs.playerName}'s concentration on **${cs.spellName}** is broken!`,
+          timestamp: new Date().toISOString(),
+        }));
+        // Narrate escape attempts (Nature's Wrath — monster spends action to escape)
+        const escapeMsgs = (payload.escapeAttempts || []).map((ea, i) => ({
+          id: `enc_mescape_${i}_${Date.now()}`,
+          role: 'system',
+          type: 'encounter',
+          subtype: 'combat',
+          text: ea.text,
+          timestamp: new Date().toISOString(),
+        }));
+        const hasEscapeAttempts = escapeMsgs.length > 0;
+        const headerText = hasEscapeAttempts && monsterMsgs.length === 0
+          ? `**[Combat] Monster Struggles**`
+          : `**[Combat] Monster Strikes Back**`;
         setNarrations(prev => [...prev, {
           id: `enc_monster_header_${Date.now()}`,
           role: 'system',
           type: 'encounter',
           subtype: 'round_header',
-          text: `**[Combat] Monster Strikes Back**`,
+          text: headerText,
           timestamp: new Date().toISOString(),
-        }, ...monsterMsgs, ...condMsgs]);
+        }, ...monsterMsgs, ...condMsgs, ...concSaveMsgs, ...escapeMsgs]);
+        break;
+      }
+
+      case 'encounter_monster_save_needed':
+        if (isMyEncounter) {
+          if (payload.encounter) setEncounter(payload.encounter);
+          setMonsterSaveRequest({
+            encounterId: payload.encounterId,
+            rollerId: payload.rollerId,
+            pendingSaves: payload.pendingSaves,
+            monsterName: payload.monsterName,
+          });
+        }
+        break;
+
+      case 'encounter_monster_saves': {
+        updateMapFromEncounter(payload.encounter);
+        if (!isMyEncounter) break;
+        if (payload.encounter) setEncounter(payload.encounter);
+        setMonsterSaveRequest(null);
+        // Narrate save results
+        const mSaveMsgs = [];
+        for (const save of (payload.saveResults || [])) {
+          const monsterName = payload.encounter?.monster?.name || 'The monster';
+          const saveText = save.saved
+            ? `${monsterName} rolls ${save.saveAbility} save: **${save.total}** vs DC ${save.saveDC} — **Saved!** **${save.name}** ends!`
+            : `${monsterName} rolls ${save.saveAbility} save: **${save.total}** vs DC ${save.saveDC} — **Failed!** **${save.name}** persists.`;
+          mSaveMsgs.push({
+            id: `enc_msave_${save.id}_${Date.now()}`,
+            role: 'system',
+            type: 'encounter',
+            subtype: 'combat',
+            text: saveText,
+            timestamp: new Date().toISOString(),
+          });
+        }
+        if (mSaveMsgs.length > 0) {
+          setNarrations(prev => [...prev, ...mSaveMsgs]);
+        }
         break;
       }
 
@@ -694,6 +816,8 @@ export function useEncounterEvents(locationId, userId) {
         if (isMyEncounter) {
           setEncounter(payload.encounter);
           setMonsterRollRequest(null);
+          setMonsterSaveRequest(null);
+          setMonsterEscapeRequest(null);
         }
         break;
 
@@ -706,6 +830,20 @@ export function useEncounterEvents(locationId, userId) {
             type: 'encounter',
             subtype: 'combat',
             text: `**${payload.name}** is **${payload.reason}** and cannot act!`,
+            timestamp: new Date().toISOString(),
+          });
+        }
+        break;
+
+      case 'encounter_monster_turn_skipped':
+        if (isMyEncounter) {
+          if (payload.encounter) setEncounter(payload.encounter);
+          addNarration({
+            id: `enc_monster_skip_${Date.now()}`,
+            role: 'system',
+            type: 'encounter',
+            subtype: 'combat',
+            text: `**${payload.monsterName}** is **${payload.reason}** and cannot act!`,
             timestamp: new Date().toISOString(),
           });
         }
@@ -765,6 +903,8 @@ export function useEncounterEvents(locationId, userId) {
 
         if (!isMyEncounter) break;
         setMonsterRollRequest(null);
+        setMonsterSaveRequest(null);
+        setMonsterEscapeRequest(null);
         setInitiativeResults({});
         setCurrentTurn(null);
         // Keep encounter alive for victory/defeat so the battle screen
@@ -778,6 +918,7 @@ export function useEncounterEvents(locationId, userId) {
             deathText: payload.deathText,
             monsterName: payload.monsterName,
             achievements: payload.achievements,
+            completedGoals: payload.completedGoals,
           });
           setNarrations(prev => [...prev, {
             id: `enc_victory_${Date.now()}`,
@@ -833,12 +974,22 @@ export function useEncounterEvents(locationId, userId) {
     setMonsterRollRequest(null);
   }, []);
 
+  const clearMonsterSaveRequest = useCallback(() => {
+    setMonsterSaveRequest(null);
+  }, []);
+
+  const clearMonsterEscapeRequest = useCallback(() => {
+    setMonsterEscapeRequest(null);
+  }, []);
+
   return {
     encounter, setEncounter,
     encounterMap, initEncounterMap,
     resultScreen, clearResult,
     narrations, handleEncounterEvent,
     monsterRollRequest, clearMonsterRollRequest,
+    monsterSaveRequest, clearMonsterSaveRequest,
+    monsterEscapeRequest, clearMonsterEscapeRequest,
     initiativeResults, setInitiativeResults,
     currentTurn, setCurrentTurn,
   };

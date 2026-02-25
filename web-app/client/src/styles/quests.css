@@ -90,3 +90,35 @@
   font-weight: 700;
   flex-shrink: 0;
 }
+
+/* ============================================
+   ARENA DAILY GOALS
+   ============================================ */
+
+.arena-goals-section .section-title {
+  color: #e8a04e;
+}
+
+.arena-goal-claim-btn {
+  background: linear-gradient(135deg, #d4a843 0%, #b8860b 100%);
+  color: #1a1510;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.1s, opacity 0.1s;
+}
+
+.arena-goal-claim-btn:active {
+  transform: scale(0.95);
+  opacity: 0.9;
+}
+
+.arena-goal-claim-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

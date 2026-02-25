@@ -16,6 +16,7 @@ import EmojiReactionBar from '../components/EmojiReactionBar';
 import EmojiPickerSheet from '../components/EmojiPickerSheet';
 import EffectsOverlay, { useEffects } from '../components/EffectsOverlay';
 import ItemCard from '../components/ItemCard';
+import GoldBadge from '../components/GoldBadge';
 import Toast from '../components/Toast';
 import XpFloat from '../components/XpFloat';
 import AchievementToast from '../components/AchievementToast';
@@ -57,6 +58,9 @@ export default function LocationChat() {
   const [menuOpen, setMenuOpen] = useState(null);
   const [menuData, setMenuData] = useState(null);
   const [buying, setBuying] = useState(false);
+  const [shopTab, setShopTab] = useState('buy');
+  const [sellData, setSellData] = useState(null);
+  const [selling, setSelling] = useState(false);
   const [toast, setToast] = useState(null);
   const [viewMode, setViewMode] = useState('scene'); // 'scene' | 'chat'
   const [insertNpc, setInsertNpc] = useState(null);
@@ -1007,8 +1011,8 @@ export default function LocationChat() {
         body: JSON.stringify({ item_id: item.id })
       });
 
-      if (result.wallet) {
-        refreshWallet(result.wallet);
+      if (result.balance != null) {
+        refreshWallet({ balance: result.balance });
       }
 
       const purchaseMsg = {
@@ -1024,11 +1028,68 @@ export default function LocationChat() {
       if (result.xpAwarded) showXpFloat(result.xpAwarded);
       queueAchievements(result.newAchievements);
       if (result.levelUp) triggerLevelUp(result.levelUp.newLevel);
-      setToast({ type: 'success', message: result.message || `Purchased ${item.name}!` });
+
+      // Dice sets get auto-equipped on purchase — refresh local colorset
+      if (item.type === 'dice_set') {
+        api('/api/dice/equipped')
+          .then(data => {
+            const cs = data.colorset || 'default';
+            setMyDiceColorset(cs === 'default' ? 'white' : cs);
+          })
+          .catch(() => {});
+      }
     } catch (err) {
       setToast({ type: 'error', message: err.data?.error || 'Purchase failed' });
     } finally {
       setBuying(false);
+    }
+  }
+
+  // Load sell data when switching to sell tab
+  async function loadSellData() {
+    try {
+      const [inv, priceData] = await Promise.all([
+        api('/api/inventory'),
+        api('/api/shop/sell-prices')
+      ]);
+      setSellData({ items: inv.items || [], prices: priceData.prices || {} });
+    } catch (err) {
+      console.error('Failed to load sell data:', err);
+      setSellData({ items: [], prices: {} });
+    }
+  }
+
+  function handleShopTabChange(tab) {
+    setShopTab(tab);
+    if (tab === 'sell') loadSellData();
+  }
+
+  async function handleSell(item) {
+    if (selling) return;
+    setSelling(true);
+    try {
+      const result = await api('/api/shop/sell', {
+        method: 'POST',
+        body: JSON.stringify({ item_id: item.item_id, quantity: 1 })
+      });
+      if (result.balance != null) refreshWallet({ balance: result.balance });
+      setSellData(prev => {
+        if (!prev) return prev;
+        const updated = prev.items.map(i =>
+          i.item_id === item.item_id ? { ...i, quantity: i.quantity - 1 } : i
+        ).filter(i => i.quantity > 0);
+        return { ...prev, items: updated };
+      });
+      setMessages(prev => [...prev, {
+        role: 'player',
+        text: `*sells ${(item.name || item.item_id).toLowerCase()} to the shop*`,
+        timestamp: new Date().toISOString()
+      }]);
+      playSound('purchase');
+    } catch (err) {
+      setToast({ type: 'error', message: err.data?.error || 'Sell failed' });
+    } finally {
+      setSelling(false);
     }
   }
 
@@ -1260,17 +1321,28 @@ export default function LocationChat() {
           {/* Menu Overlay */}
           {menuOpen && menuData && (
             <>
-              <div className="menu-overlay" onClick={() => { playSound('menuClose'); setMenuOpen(null); setMenuData(null); }} />
+              <div className="menu-overlay" onClick={() => { playSound('menuClose'); setMenuOpen(null); setMenuData(null); setShopTab('buy'); setSellData(null); }} />
               <div className="menu-panel">
                 <div className="menu-panel-header">
                   <span className="menu-panel-title">
                     {menuOpen === 'tavern' ? (menuData.tavern_name || 'Tavern Menu') : 'Shop'}
                   </span>
-                  <button className="menu-panel-close" onClick={() => { playSound('menuClose'); setMenuOpen(null); setMenuData(null); }}>
+                  {wallet && <GoldBadge amount={wallet.balance} size="md" />}
+                  <button className="menu-panel-close" onClick={() => { playSound('menuClose'); setMenuOpen(null); setMenuData(null); setShopTab('buy'); setSellData(null); }}>
                     &times;
                   </button>
                 </div>
-                {Object.entries(menuData.categories || {}).map(([catKey, category]) => (
+
+                {/* Shop tab bar (only for shop, not tavern) */}
+                {menuOpen === 'shop' && (
+                  <div className="menu-tab-bar">
+                    <button className={`menu-tab${shopTab === 'buy' ? ' menu-tab-active' : ''}`} onClick={() => handleShopTabChange('buy')}>Buy</button>
+                    <button className={`menu-tab${shopTab === 'sell' ? ' menu-tab-active' : ''}`} onClick={() => handleShopTabChange('sell')}>Sell</button>
+                  </div>
+                )}
+
+                {/* Buy tab (default) — catalog grid */}
+                {(menuOpen !== 'shop' || shopTab === 'buy') && Object.entries(menuData.categories || {}).map(([catKey, category]) => (
                   <div key={catKey} className="items-grid" style={{ marginBottom: 16 }}>
                     <h3 className="section-title">
                       <span className="section-emoji">{category.emoji}</span>
@@ -1287,6 +1359,32 @@ export default function LocationChat() {
                     ))}
                   </div>
                 ))}
+
+                {/* Sell tab — inventory items with sell prices */}
+                {menuOpen === 'shop' && shopTab === 'sell' && (
+                  <div className="sell-items-list">
+                    {!sellData ? (
+                      <div className="sell-empty">Loading...</div>
+                    ) : sellData.items.length === 0 ? (
+                      <div className="sell-empty">No items to sell</div>
+                    ) : (
+                      sellData.items
+                        .filter(item => sellData.prices[item.item_id] != null)
+                        .map(item => (
+                          <div key={item.item_id} className="sell-item-row">
+                            <div className="sell-item-info">
+                              <span className="sell-item-name">{item.name}</span>
+                              <span className="sell-item-qty">&times;{item.quantity}</span>
+                            </div>
+                            <GoldBadge amount={sellData.prices[item.item_id]} size="sm" />
+                            <button className="btn-sell" onClick={() => handleSell(item)} disabled={selling}>
+                              Sell
+                            </button>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                )}
               </div>
             </>
           )}

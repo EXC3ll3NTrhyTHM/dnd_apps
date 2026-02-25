@@ -60,6 +60,20 @@
   margin-bottom: 8px;
 }
 
+.item-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dice-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 2px solid;
+  flex-shrink: 0;
+}
+
 .item-card-name {
   font-family: var(--font-display);
   font-size: 1rem;
@@ -479,4 +493,100 @@
   background: rgba(212, 168, 67, 0.15);
   color: var(--color-gold-bright);
   border: 1px solid rgba(212, 168, 67, 0.3);
+}
+
+.achievement-toast-hint {
+  font-size: 0.6rem;
+  color: rgba(212, 168, 67, 0.6);
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+/* ---- Quest Completion Toast ---- */
+
+.quest-toast {
+  position: fixed;
+  top: calc(12px + var(--safe-area-top));
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 4px;
+  background: linear-gradient(165deg, #1a2318, #121c12);
+  border: 1px solid rgba(100, 200, 120, 0.35);
+  box-shadow: var(--shadow-lg), 0 0 16px rgba(100, 200, 120, 0.2);
+  z-index: 500;
+  cursor: pointer;
+  animation: quest-toast-slide 0.4s ease-out;
+}
+
+@keyframes quest-toast-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.quest-toast-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(100, 200, 120, 0.4));
+}
+
+.quest-toast-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.quest-toast-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #6ddb82;
+  margin-bottom: 2px;
+}
+
+.quest-toast-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+
+.quest-toast-rewards {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.quest-toast-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.quest-toast-xp {
+  background: rgba(120, 130, 220, 0.2);
+  color: #a8b4ff;
+  border: 1px solid rgba(120, 130, 220, 0.3);
+}
+
+.quest-toast-gold {
+  background: rgba(212, 168, 67, 0.15);
+  color: var(--color-gold-bright);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+}
+
+.quest-toast-hint {
+  font-size: 0.6rem;
+  color: rgba(100, 200, 120, 0.6);
+  letter-spacing: 0.05em;
 }

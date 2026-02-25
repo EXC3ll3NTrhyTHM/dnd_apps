@@ -42,9 +42,16 @@
 - [x] NPCs still respond when no @mention is added (should require mention)
 - [x] **[iPhone]** @mention popup doesn't add mentions to keyboard
 
+### Dice
+- [ ] **[iPhone] Dice disappearing** — Dice randomly stop showing up on iPhone (inconsistent, hard to reproduce)
+
 ### Keyboard/Input
 - [ ] **Swipe typing backspace** — After swiping to type, pressing backspace should delete the swiped text (currently doesn't work as expected)
 - [ ] **[iOS] Text selection** — Users can't adjust/move the text cursor or selection in the input field
+
+### Combat/Arena
+- [ ] **Stun condition (Dylan)** — Dylan's stun effect on enemies doesn't actually do anything
+- [ ] **50 dice rolls achievement** — Doesn't count Arena dice rolls toward the total
 
 ### Locations
 - [ ] **Fishing** — Currently just an overlay, needs to be an actual location with proper transition

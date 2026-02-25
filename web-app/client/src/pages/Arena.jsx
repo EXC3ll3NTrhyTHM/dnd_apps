@@ -5,7 +5,7 @@
  * Other players arriving mid-fight see the active encounter and can join.
  */
 
-import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../hooks/useApi';
 import { useAuth } from '../hooks/useAuth';
@@ -13,6 +13,7 @@ import { useEncounterEvents } from '../components/EncounterBanner';
 import '../styles/arena.css';
 import RollResultOverlay from '../components/RollResultOverlay';
 import AchievementToast from '../components/AchievementToast';
+import QuestToast from '../components/QuestToast';
 import LevelUpOverlay from '../components/LevelUpOverlay';
 import { useUiSounds } from '../hooks/useUiSounds';
 import { useArenaSounds } from '../hooks/useArenaSounds';
@@ -21,6 +22,15 @@ import SceneAudio from './scenes/SceneAudio';
 const DiceOverlay = lazy(() => import('../components/DiceOverlay'));
 import EmotePopup from '../components/EmotePopup';
 import ArenaEmoteGrid from '../components/ArenaEmoteGrid';
+import DmRollControl from '../components/DmRollControl';
+import FateOverlay from '../components/FateOverlay';
+
+const EMOTE_SOUND_MAP = {
+  crying: 'emoteCrying',
+  party_face: 'emoteParty',
+  screaming: 'emoteScream',
+  ember_laugh: 'emoteGoblinLaugh',
+};
 
 // ── Confetti canvas for victory screen (same effect as arena location transition) ──
 const CONFETTI_COLORS = [
@@ -92,11 +102,11 @@ function VictoryConfetti() {
 }
 
 const ARENA_AUDIO_CONFIGS = {
-  crowd:         { ambient: [{ src: '/sounds/arena/crowd-ambient.mp3', volume: 0.4 }] },
-  battle:        { music: { src: '/sounds/arena/battle-music.mp3', volume: 0.15 }, ambient: [{ src: '/sounds/arena/crowd-ambient.mp3', volume: 0.4 }] },
+  crowd: { ambient: [{ src: '/sounds/arena/crowd-ambient.mp3', volume: 0.4 }] },
+  battle: { music: { src: '/sounds/arena/battle-music.mp3', volume: 0.15 }, ambient: [{ src: '/sounds/arena/crowd-ambient.mp3', volume: 0.4 }] },
   battleIntense: { music: { src: '/sounds/arena/battle-music-intense.mp3', volume: 0.22 }, ambient: [{ src: '/sounds/arena/crowd-ambient.mp3', volume: 0.45 }] },
-  victory:       { music: { src: '/sounds/arena/victory-music.mp3', volume: 0.4 } },
-  defeat:        { music: { src: '/sounds/arena/defeat-music.mp3', volume: 0.35 } },
+  victory: { music: { src: '/sounds/arena/victory-music.mp3', volume: 0.4 } },
+  defeat: { music: { src: '/sounds/arena/defeat-music.mp3', volume: 0.35 } },
 };
 
 export default function Arena() {
@@ -125,6 +135,10 @@ export default function Arena() {
     handleEncounterEvent,
     monsterRollRequest,
     clearMonsterRollRequest,
+    monsterSaveRequest,
+    clearMonsterSaveRequest,
+    monsterEscapeRequest,
+    clearMonsterEscapeRequest,
     initiativeResults,
     setInitiativeResults,
     currentTurn,
@@ -139,14 +153,24 @@ export default function Arena() {
   const [attackResult, setAttackResult] = useState(null);
   const [monsterRollStatus, setMonsterRollStatus] = useState(null);
   const [actionTooltip, setActionTooltip] = useState(null);
+  const [abilitiesOpen, setAbilitiesOpen] = useState(false);
   const tooltipTimerRef = useRef(null);
   const timerRef = useRef(null);
+  const timerPauseStartRef = useRef(null);
+  const timerPauseOffsetRef = useRef(0);
   const rollActiveRef = useRef(false);
   const monsterRollActiveRef = useRef(false);
+  const monsterSaveActiveRef = useRef(false);
+  const monsterEscapeActiveRef = useRef(false);
   const combatLogRef = useRef(null);
   const [logOpen, setLogOpen] = useState(false);
   const [turnAnnouncement, setTurnAnnouncement] = useState(null);
   const turnAnnouncementTimer = useRef(null);
+  const lastAnnouncedTurnRef = useRef(null);
+  const [bonusResultBanner, setBonusResultBanner] = useState(null);
+  const bonusResultTimerRef = useRef(null);
+  const [monsterSkipBanner, setMonsterSkipBanner] = useState(null);
+  const monsterSkipTimerRef = useRef(null);
 
   // Dice cosmetic state ('default' maps to 'white' for dice-box library)
   const [myDiceColorset, setMyDiceColorset] = useState('white');
@@ -171,6 +195,9 @@ export default function Arena() {
   const [availableSpells, setAvailableSpells] = useState([]);
   const [castingSpell, setCastingSpell] = useState(null);
   const [healingWordTargetModal, setHealingWordTargetModal] = useState(false);
+  const [vineEffect, setVineEffect] = useState(false);
+  // Stunning Strike toggle (Monk)
+  const [stunningStrikeToggle, setStunningStrikeToggle] = useState(false);
   // Weapon picker state
   const [weaponModalOpen, setWeaponModalOpen] = useState(false);
   const [availableWeapons, setAvailableWeapons] = useState([]);
@@ -180,6 +207,12 @@ export default function Arena() {
   const initiativeRollRef = useRef(false);
   const [pendingJoinEncounterId, setPendingJoinEncounterId] = useState(null);
   const [myDexMod, setMyDexMod] = useState(0);
+
+  // DM Roll Control ("Fate's Hand") state
+  const isDM = user?.isDM || false;
+  const [dmRollControlEnabled, setDmRollControlEnabled] = useState(false);
+  const [dmPendingRoll, setDmPendingRoll] = useState(null);
+  const [fateOverlayVisible, setFateOverlayVisible] = useState(false);
 
   // Admin sprite editor state
   const ADMIN_IDS = ['424061511833747467'];
@@ -201,6 +234,8 @@ export default function Arena() {
 
   // Dice overlay state
   const [diceRoll, setDiceRoll] = useState(null);
+  const diceRollRef = useRef(null);
+  diceRollRef.current = diceRoll;
   const encounterDiceRef = useRef(null);
   const diceRollKeyRef = useRef(0);
 
@@ -220,6 +255,8 @@ export default function Arena() {
   // Emote state
   const [activeEmotes, setActiveEmotes] = useState([]);
   const [emoteGridOpen, setEmoteGridOpen] = useState(false);
+  const [emoteCatalog, setEmoteCatalog] = useState([]);
+  const [favoriteEmotes, setFavoriteEmotes] = useState([]);
   const emoteCooldownRef = useRef(false);
 
   // Hide result screen while dice are still animating
@@ -231,6 +268,12 @@ export default function Arena() {
     setAchievementQueue(prev => prev.slice(1));
   }, []);
 
+  // Quest completion toast queue
+  const [questQueue, setQuestQueue] = useState([]);
+  const dismissQuest = useCallback(() => {
+    setQuestQueue(prev => prev.slice(1));
+  }, []);
+
   // Level-up overlay state
   const [levelUp, setLevelUp] = useState(null);
 
@@ -240,6 +283,13 @@ export default function Arena() {
     const myAchs = encounterResult.achievements[user.id];
     if (myAchs?.length > 0) setAchievementQueue(myAchs);
   }, [encounterResult?.achievements, user?.id]);
+
+  // Queue this player's completed arena daily goals
+  useEffect(() => {
+    if (!encounterResult?.completedGoals || !user?.id) return;
+    const myGoals = encounterResult.completedGoals[user.id];
+    if (myGoals?.length > 0) setQuestQueue(myGoals);
+  }, [encounterResult?.completedGoals, user?.id]);
 
   // Extract level-up from encounter rewards for this player
   useEffect(() => {
@@ -256,9 +306,11 @@ export default function Arena() {
     if (encounterResult.type === 'victory') {
       playArenaSoundRef.current('victorySting');
       playArenaSoundRef.current('crowdCheer');
+      playArenaSoundRef.current('youWin');
     } else {
       playArenaSoundRef.current('defeatSting');
       playArenaSoundRef.current('crowdGasp');
+      playArenaSoundRef.current('youLose');
     }
   }, [encounterResult?.type]);
 
@@ -296,21 +348,21 @@ export default function Arena() {
       .catch(() => setMonsters([]));
     api('/api/admin/arena-config')
       .then(setArenaConfig)
-      .catch(() => {});
+      .catch(() => { });
     // Fetch DEX modifier for initiative display (before joining)
     api('/api/character-sheet/me')
       .then(data => {
         const dex = data.characterSheet?.stats?.find(s => s.abbr === 'DEX');
         setMyDexMod(dex?.modifier || 0);
       })
-      .catch(() => {});
+      .catch(() => { });
     // Fetch equipped dice colorset ('default' → 'white' for dice-box)
     api('/api/dice/equipped')
       .then(data => {
         const cs = data.colorset || 'default';
         setMyDiceColorset(cs === 'default' ? 'white' : cs);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // ── Check for active encounters on mount ──
@@ -321,7 +373,7 @@ export default function Arena() {
       // Restore player's own encounter if they were in one
       const myEnc = encounters.find(e => e.participants?.[user?.id]);
       if (myEnc) setActiveEncounter(myEnc);
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
   // ── Fetch potions when entering an active encounter ──
@@ -331,6 +383,42 @@ export default function Arena() {
       .then(data => setPotions(data.potions || []))
       .catch(() => setPotions([]));
   }, [activeEncounter?.id]);
+
+  // ── Fetch emote catalog ──
+  useEffect(() => {
+    api('/api/emotes/catalog')
+      .then(data => setEmoteCatalog(data.emotes || []))
+      .catch(() => setEmoteCatalog([]));
+  }, []);
+
+  // ── Fetch emote favorites ──
+  useEffect(() => {
+    api('/api/emotes/favorites')
+      .then(data => setFavoriteEmotes(data.favorites || []))
+      .catch(() => setFavoriteEmotes([]));
+  }, []);
+
+  // ── Resolve favorites to emote objects, fill remaining from catalog defaults ──
+  const quickBarEmotes = useMemo(() => {
+    if (!emoteCatalog.length) return [];
+    const resolved = favoriteEmotes
+      .map(id => emoteCatalog.find(e => e.id === id))
+      .filter(Boolean);
+    if (resolved.length >= 4) return resolved.slice(0, 4);
+    const remaining = emoteCatalog.filter(e => !favoriteEmotes.includes(e.id));
+    return [...resolved, ...remaining].slice(0, 4);
+  }, [emoteCatalog, favoriteEmotes]);
+
+  // ── Toggle emote favorite ──
+  const handleToggleFavorite = useCallback(async (emoteId) => {
+    try {
+      const data = await api('/api/emotes/favorites', {
+        method: 'POST',
+        body: JSON.stringify({ emoteId }),
+      });
+      setFavoriteEmotes(data.favorites);
+    } catch { }
+  }, []);
 
   // ── WebSocket ──
   // Use refs so the WS effect doesn't reconnect when callbacks change
@@ -355,13 +443,19 @@ export default function Arena() {
 
     function connect() {
       ws = new WebSocket(wsUrl);
+      ws.onopen = () => {
+        // Identify this connection for targeted DM broadcasts
+        if (userIdRef.current) {
+          ws.send(JSON.stringify({ type: 'identify', userId: userIdRef.current, currentLocation: locationId }));
+        }
+      };
       ws.onmessage = (event) => {
         if (!active) return;
         try {
           const payload = JSON.parse(event.data);
           if (payload.locationId !== locationId) return;
           if (payload.type?.startsWith('encounter_')) {
-            handleEncounterEventRef.current(payload);
+            try { handleEncounterEventRef.current(payload); } catch (e) { console.error('[ARENA WS] handler error:', e); }
           }
           // Bonus action phase detection — clear main action state so bonus UI shows
           if (payload.type === 'encounter_bonus_phase' && payload.userId === userIdRef.current) {
@@ -372,11 +466,43 @@ export default function Arena() {
             setAttackResult(null);
             rollActiveRef.current = false;
           }
-          if (payload.type === 'encounter_bonus_result' || payload.type === 'encounter_turn_start' || payload.type === 'encounter_turn_skip') {
+          if (payload.type === 'encounter_bonus_result' || payload.type === 'encounter_turn_start' || payload.type === 'encounter_turn_skip' || payload.type === 'encounter_monster_turn_skipped') {
             setBonusActionPhase(false);
             setAvailableBonusActions([]);
             setInspirationTargetModal(false);
             setHealingWordTargetModal(false);
+          }
+          // Play bardic inspiration sound for other players
+          if (payload.type === 'encounter_bonus_result' && payload.result?.type === 'bardic_inspiration' && payload.result?.userId !== userIdRef.current) {
+            playArenaSoundRef.current('bardicInspiration');
+          }
+          // Show brief banner for Patient Defense result
+          if (payload.type === 'encounter_bonus_result' && payload.result?.type === 'patient_defense') {
+            setBonusResultBanner(payload.result);
+            if (bonusResultTimerRef.current) clearTimeout(bonusResultTimerRef.current);
+            bonusResultTimerRef.current = setTimeout(() => setBonusResultBanner(null), 3000);
+          }
+          // Show banner when monster turn is skipped (stunned)
+          if (payload.type === 'encounter_monster_turn_skipped') {
+            // Clear the turn announcement so it doesn't overlap the stun banner
+            if (turnAnnouncementTimer.current) clearTimeout(turnAnnouncementTimer.current);
+            setTurnAnnouncement(null);
+            setMonsterSkipBanner({ monsterName: payload.monsterName, reason: payload.reason });
+            if (monsterSkipTimerRef.current) clearTimeout(monsterSkipTimerRef.current);
+            monsterSkipTimerRef.current = setTimeout(() => setMonsterSkipBanner(null), 3000);
+          }
+          // Play ensnaring strike sound + vine animation when monster fails a restraining save
+          if (payload.type === 'encounter_turn_result' && payload.result?.ensnaringStrikeResult?.saved === false) {
+            playArenaSoundRef.current('ensnaringStrike');
+            setVineEffect(true);
+          }
+          // Play stun sound when stunning strike lands
+          if (payload.type === 'encounter_turn_result' && payload.result?.stunningStrikeResult?.saved === false) {
+            playArenaSoundRef.current('crowdCheer');
+          }
+          if (payload.type === 'encounter_turn_result' && payload.result?.subAction === 'natures_wrath' && payload.result?.saved === false) {
+            playArenaSoundRef.current('ensnaringStrike');
+            setVineEffect(true);
           }
           if (payload.senderId !== userIdRef.current && activeEncounterRef.current?.participants?.[userIdRef.current]) {
             const enc = activeEncounterRef.current;
@@ -399,8 +525,20 @@ export default function Arena() {
               characterName: payload.characterName,
               left: 20 + Math.random() * 60,
             }]);
+            const emoteSound = EMOTE_SOUND_MAP[payload.emoteId];
+            if (emoteSound) playArenaSoundRef.current(emoteSound);
           }
-        } catch {}
+          // DM Roll Control events ("Fate's Hand")
+          if (payload.type === 'dm_roll_pending') {
+            setDmPendingRoll(payload.pendingRoll);
+          }
+          if (payload.type === 'fate_deliberation_start') {
+            setFateOverlayVisible(true);
+          }
+          if (payload.type === 'fate_deliberation_end') {
+            setFateOverlayVisible(false);
+          }
+        } catch (wsErr) { console.error('[ARENA WS] Error handling message:', wsErr); }
       };
       ws.onclose = () => {
         if (!active) return;
@@ -421,12 +559,12 @@ export default function Arena() {
     api('/api/presence/join', {
       method: 'POST',
       body: JSON.stringify({ locationId })
-    }).catch(() => {});
+    }).catch(() => { });
 
     const fetchPresence = () => {
       api('/api/presence').then(data => {
         setPresence(data?.presence?.[locationId] || []);
-      }).catch(() => {});
+      }).catch(() => { });
     };
     fetchPresence();
 
@@ -434,7 +572,7 @@ export default function Arena() {
       api('/api/presence/heartbeat', {
         method: 'POST',
         body: JSON.stringify({ locationId })
-      }).catch(() => {});
+      }).catch(() => { });
       fetchPresence();
     }, 10000);
 
@@ -466,6 +604,7 @@ export default function Arena() {
         setCastingSpell(null);
         setSpellModalOpen(false);
         setHealingWordTargetModal(false);
+        setStunningStrikeToggle(false);
       }
     }
     // Reset initiative state when entering a fresh encounter
@@ -477,13 +616,30 @@ export default function Arena() {
       setSpectatorRoll(null);
       spectatorQueueRef.current = [];
     }
-  }, [activeEncounter?.phase, activeEncounter?.currentTurnIndex, activeEncounter?.turnDeadline, user?.id]);
+  // NOTE: turnDeadline intentionally excluded — DM roll control extends the deadline
+  // mid-turn, which would reset action state and cause players to re-roll.
+  }, [activeEncounter?.phase, activeEncounter?.currentTurnIndex, user?.id]);
 
-  // ── Countdown timer (per-turn: 30s) ──
+  // ── Countdown timer (per-turn: 90s, pauses during dice rolls & result screens) ──
   useEffect(() => {
     if (!activeEncounter || activeEncounter.phase !== 'action' || !activeEncounter.turnDeadline) return;
+    // Reset pause tracking on new turn
+    timerPauseStartRef.current = null;
+    timerPauseOffsetRef.current = 0;
     const tick = () => {
-      setTimeLeft(Math.max(0, activeEncounter.turnDeadline - Date.now()));
+      const isPaused = !!diceRollRef.current || !!rollResultOverlayRef.current;
+      if (isPaused) {
+        if (!timerPauseStartRef.current) {
+          timerPauseStartRef.current = Date.now();
+        }
+        return; // freeze timeLeft
+      }
+      // Accumulate pause duration when unpausing
+      if (timerPauseStartRef.current) {
+        timerPauseOffsetRef.current += Date.now() - timerPauseStartRef.current;
+        timerPauseStartRef.current = null;
+      }
+      setTimeLeft(Math.max(0, activeEncounter.turnDeadline + timerPauseOffsetRef.current - Date.now()));
     };
     tick();
     timerRef.current = setInterval(tick, 250);
@@ -492,12 +648,19 @@ export default function Arena() {
 
   // ── Turn announcement ("Tyren's Turn", "Goblin's Turn") ──
   // Waits for spectator dice from the previous turn to finish first.
+  // Tracks the last announced turn to avoid re-announcing on timer resets
+  // (e.g. pre-bonus actions like Ensnaring Strike reset turnDeadline).
   useEffect(() => {
     const phase = activeEncounter?.phase;
     if (!activeEncounter || !phase) return;
     if (phase !== 'action' && phase !== 'monster_rolling' && phase !== 'monster_turn') return;
     const entry = activeEncounter.initiativeOrder?.[activeEncounter.currentTurnIndex];
     if (!entry) return;
+
+    // Skip if we already announced this exact turn
+    const turnKey = `${activeEncounter.id}_${activeEncounter.round}_${activeEncounter.currentTurnIndex}`;
+    if (lastAnnouncedTurnRef.current === turnKey) return;
+
     let cancelled = false;
     (async () => {
       // Wait for spectator dice + roll result overlays to finish
@@ -514,6 +677,7 @@ export default function Arena() {
         }
       }
       if (cancelled) return;
+      lastAnnouncedTurnRef.current = turnKey;
       setTurnAnnouncement({ name: entry.name, type: entry.type });
       // Play turn announcement sound
       if (entry.id === userIdRef.current) playArenaSoundRef.current('yourTurn');
@@ -535,7 +699,7 @@ export default function Arena() {
   }, [encounterNarrations]);
 
   // ── Dice roll promise pattern ──
-  const requestDiceRoll = useCallback((notation, colorset, modifier, forcedValues, material, advantageType, label) => {
+  const requestDiceRoll = useCallback((notation, colorset, modifier, forcedValues, material, advantageType, label, forcedTotal) => {
     // Dismiss spectator overlay to free the dice canvas for the local roll
     setSpectatorRoll(null);
     return new Promise((resolve) => {
@@ -547,6 +711,7 @@ export default function Arena() {
         material: material || 'plastic',
         modifier: modifier || 0,
         forcedValues: forcedValues || null,
+        forcedTotal: forcedTotal ?? null,
         advantageType: advantageType || null,
         label: label || null,
         key: diceRollKeyRef.current,
@@ -608,8 +773,10 @@ export default function Arena() {
           characterName: user?.characterName || user?.global_name || user?.username || 'You',
           left: 20 + Math.random() * 60,
         }]);
+        const emoteSound = EMOTE_SOUND_MAP[emoteId];
+        if (emoteSound) playArenaSoundRef.current(emoteSound);
       }
-    } catch {}
+    } catch { }
   }, [user, locationId]);
 
   // ── Broadcast a dice roll to all arena spectators ──
@@ -618,7 +785,7 @@ export default function Arena() {
     return api('/api/encounters/roll-broadcast', {
       method: 'POST',
       body: JSON.stringify({ notation, modifier, total, color, label, locationId }),
-    }).catch(() => {});
+    }).catch(() => { });
   }, [locationId]);
 
   // ── Request server-generated dice roll, broadcast to spectators, animate locally ──
@@ -629,16 +796,63 @@ export default function Arena() {
       body: JSON.stringify(rollConfig),
     });
     const { rolls, total } = data;
-    await requestDiceRoll(notation, rollConfig.colorset, modifier, rolls, material, advantageType, rollingLabel || label);
+    await requestDiceRoll(notation, rollConfig.colorset, modifier, rolls, material, advantageType, rollingLabel || label, total);
     return { rolls, total };
   }, [locationId, requestDiceRoll]);
+
+  // ── DM Roll Control handlers ──
+  // Resolve encounterId from active encounter or encounter map (DM may not be a participant)
+  const dmEncounterId = activeEncounter?.id || (encounterMap && Object.values(encounterMap)[0]?.encounterId) || null;
+
+  const handleDmToggle = useCallback(async (enabled) => {
+    if (!dmEncounterId) return;
+    setDmRollControlEnabled(enabled);
+    try {
+      await api(`/api/encounters/${dmEncounterId}/dm-roll-control`, {
+        method: 'POST',
+        body: JSON.stringify({ enabled }),
+      });
+    } catch {
+      setDmRollControlEnabled(!enabled); // revert on failure
+    }
+  }, [dmEncounterId]);
+
+  const handleDmResolve = useCallback(async (chosenRolls) => {
+    if (!dmPendingRoll) return;
+    try {
+      await api('/api/encounters/dm-roll-resolve', {
+        method: 'POST',
+        body: JSON.stringify({
+          encounterId: dmPendingRoll.encounterId,
+          pendingRollId: dmPendingRoll.id,
+          chosenRolls,
+        }),
+      });
+    } catch { }
+    setDmPendingRoll(null);
+  }, [dmPendingRoll]);
+
+  // Sync dmRollControl state from encounter public state
+  useEffect(() => {
+    if (activeEncounter?.dmRollControl !== undefined) {
+      setDmRollControlEnabled(activeEncounter.dmRollControl);
+    }
+  }, [activeEncounter?.dmRollControl]);
+
+  // Clear fate overlay when encounter ends
+  useEffect(() => {
+    if (!activeEncounter || activeEncounter.phase === 'ended') {
+      setFateOverlayVisible(false);
+      setDmPendingRoll(null);
+    }
+  }, [activeEncounter?.phase]);
 
   // ── Broadcast a roll result overlay to all arena spectators ──
   const broadcastRollResult = useCallback((resultData) => {
     api('/api/encounters/result-broadcast', {
       method: 'POST',
       body: JSON.stringify({ locationId, resultData }),
-    }).catch(() => {});
+    }).catch(() => { });
   }, [locationId]);
 
   // ── Roll result overlay (promise-based) ──
@@ -700,6 +914,7 @@ export default function Arena() {
     if (!diceRoll && !spectatorRoll && !rollResultOverlay && spectatorQueueRef.current.length > 0) {
       const next = spectatorQueueRef.current.shift();
       if (next.queueType === 'roll_result') {
+        if (next.data.sounds) next.data.sounds.forEach(s => playArenaSoundRef.current(s));
         setRollResultOverlay(next.data);
       } else {
         setSpectatorRoll(next);
@@ -752,6 +967,49 @@ export default function Arena() {
       const results = [];
       // Track accumulated damage per target (server doesn't update HP mid-turn)
       const accumulatedDmg = {};
+      let dotRolls = null;
+
+      // Roll DoT damage dice first (e.g. ensnared → green d6)
+      let totalDotDamage = 0;
+      if (monsterRollRequest.pendingDots && monsterRollRequest.pendingDots.length > 0) {
+        dotRolls = {};
+        for (const dot of monsterRollRequest.pendingDots) {
+          setMonsterRollStatus(`\u{1FAB4} ${dot.name} \u2014 ${monsterRollRequest.monsterName} takes ${dot.type} damage!`);
+          const { total } = await requestServerRoll(
+            dot.dice, 0, '#22c55e', `${dot.name} \u2014 ${dot.type} damage`, '#22c55e'
+          );
+          dotRolls[dot.conditionId] = total;
+          totalDotDamage += total;
+          await new Promise(r => setTimeout(r, 800));
+        }
+      }
+
+      // If DoT killed the monster, skip attack rolls and submit immediately
+      const monsterHp = activeEncounterRef.current?.monster?.currentHp || 0;
+      if (totalDotDamage > 0 && monsterHp - totalDotDamage <= 0) {
+        setMonsterRollStatus('The vines finish their work...');
+        try {
+          await api(`/api/encounters/${monsterRollRequest.encounterId}/monster-rolls`, {
+            method: 'POST',
+            body: JSON.stringify({ rolls: [{ index: 0, attackRoll: 0, damageTotal: 0, dotRolls }] }),
+          });
+        } catch (err) {
+          console.error('Failed to submit DoT-kill monster rolls:', err);
+        }
+        setRollPhase(null);
+        setMonsterRollStatus(null);
+        monsterRollActiveRef.current = false;
+        clearMonsterRollRequest?.();
+        return;
+      }
+
+      // Optimistically update monster HP to reflect DoT damage
+      if (totalDotDamage > 0) {
+        setActiveEncounter(prev => prev ? {
+          ...prev,
+          monster: { ...prev.monster, currentHp: Math.max(0, prev.monster.currentHp - totalDotDamage) },
+        } : prev);
+      }
 
       for (const attack of monsterRollRequest.attacks) {
         playArenaSoundRef.current('monsterGrowl');
@@ -804,6 +1062,7 @@ export default function Arena() {
           roll1: d20,
           roll2: d20b,
           attackBonus: attack.bonus,
+          sounds: isNat20 ? ['attackCrit', 'crowdGasp'] : isNat1 ? ['attackFumble', 'crowdCheer'] : isHit ? ['attackHit'] : ['attackMiss'],
         };
         broadcastRollResult(monsterAtkOverlay);
         await showRollResult(monsterAtkOverlay);
@@ -821,12 +1080,17 @@ export default function Arena() {
           );
           damageTotal = dmgTotal;
           playArenaSoundRef.current('monsterHit');
+          if (damageTotal >= 20 && damageTotal < 30) playArenaSoundRef.current('bigDamage');
+          if (damageTotal >= 30) playArenaSoundRef.current('massiveDamage');
           // Show damage result overlay (track accumulated damage for multi-attacks)
           const dmgTargetP = activeEncounterRef.current?.participants?.[attack.targetId];
           const baseHp = dmgTargetP?.currentHp || 0;
           const priorDmg = accumulatedDmg[attack.targetId] || 0;
           const effectiveHp = Math.max(0, baseHp - priorDmg);
           accumulatedDmg[attack.targetId] = priorDmg + damageTotal;
+          const monsterDmgSounds = ['monsterHit'];
+          if (damageTotal >= 20 && damageTotal < 30) monsterDmgSounds.push('bigDamage');
+          if (damageTotal >= 30) monsterDmgSounds.push('massiveDamage');
           const monsterDmgOverlay = {
             type: 'damage',
             damage: damageTotal,
@@ -835,12 +1099,15 @@ export default function Arena() {
             newHp: Math.max(0, effectiveHp - damageTotal),
             attacker: { name: monsterRollRequest.monsterName, avatar: monsterImg && `/monsters/${monsterImg}` },
             defender: { name: attack.targetName, avatar: dmgTargetP?.avatar },
+            sounds: monsterDmgSounds,
           };
           broadcastRollResult(monsterDmgOverlay);
           await showRollResult(monsterDmgOverlay);
         }
 
-        results.push({ index: attack.index, attackRoll: usedD20, attackRoll2: d20b, damageTotal });
+        results.push({ index: attack.index, attackRoll: usedD20, attackRoll2: d20b, damageTotal, dotRolls: dotRolls || undefined });
+        // Only include dotRolls on the first result entry, then clear
+        dotRolls = null;
       }
 
       setMonsterRollStatus('Resolving monster attacks...');
@@ -861,6 +1128,197 @@ export default function Arena() {
 
     rollMonsterAttacks();
   }, [monsterRollRequest, user?.id, requestServerRoll, clearMonsterRollRequest, broadcastRollResult]);
+
+  // ── Monster end-of-turn save rolling ──
+  useEffect(() => {
+    if (!monsterSaveRequest || monsterSaveActiveRef.current) return;
+    if (monsterSaveRequest.rollerId !== user?.id) return;
+
+    monsterSaveActiveRef.current = true;
+    setRollPhase('monster_saving');
+
+    async function rollMonsterSaves() {
+      // Wait for any active spectator or roll overlays to finish
+      let settled = false;
+      while (!settled) {
+        while (spectatorQueueRef.current.length > 0 || spectatorRollRef.current || rollResultOverlayRef.current) {
+          await new Promise(r => setTimeout(r, 300));
+        }
+        await new Promise(r => setTimeout(r, 500));
+        if (spectatorQueueRef.current.length === 0 && !spectatorRollRef.current && !rollResultOverlayRef.current) {
+          settled = true;
+        }
+      }
+      await new Promise(r => setTimeout(r, 800));
+
+      const saveResults = [];
+      const monsterImg = activeEncounterRef.current?.monster?.image;
+
+      for (const save of monsterSaveRequest.pendingSaves) {
+        const saveLabel = `${monsterSaveRequest.monsterName} ${save.saveAbility} save vs DC ${save.saveDC}`;
+        setMonsterRollStatus(`${monsterSaveRequest.monsterName} rolls ${save.saveAbility} save...`);
+
+        const { rolls } = await requestServerRoll(
+          '1d20', save.saveBonus, '#ef4444', saveLabel, '#ef4444',
+          undefined, undefined, { rollingLabel: saveLabel }
+        );
+        const saveRoll = rolls[0];
+        const total = saveRoll + save.saveBonus;
+        const saved = total >= save.saveDC;
+
+        // Show save result overlay
+        const saveOverlay = {
+          type: 'spell_save',
+          spellName: save.conditionName,
+          saveAbility: save.saveAbility,
+          saveRoll, saveBonus: save.saveBonus, saveTotal: total,
+          saveDC: save.saveDC, saved,
+          attacker: { name: monsterSaveRequest.monsterName, avatar: monsterImg && `/monsters/${monsterImg}` },
+          defender: { name: monsterSaveRequest.monsterName, avatar: monsterImg && `/monsters/${monsterImg}` },
+          sounds: saved ? ['spellFail'] : ['crowdCheer'],
+        };
+        broadcastRollResult(saveOverlay);
+        await showRollResult(saveOverlay);
+
+        saveResults.push({ conditionId: save.conditionId, roll: saveRoll });
+        await new Promise(r => setTimeout(r, 400));
+      }
+
+      // Submit save results to server
+      try {
+        await api(`/api/encounters/${monsterSaveRequest.encounterId}/monster-saves`, {
+          method: 'POST',
+          body: JSON.stringify({ saveRolls: saveResults }),
+        });
+      } catch (err) {
+        console.error('Failed to submit monster saves:', err);
+      }
+
+      setRollPhase(null);
+      setMonsterRollStatus(null);
+      monsterSaveActiveRef.current = false;
+      clearMonsterSaveRequest?.();
+    }
+
+    rollMonsterSaves();
+  }, [monsterSaveRequest, user?.id, requestServerRoll, clearMonsterSaveRequest, broadcastRollResult, showRollResult]);
+
+  // ── Monster escape check rolling ──
+  useEffect(() => {
+    if (!monsterEscapeRequest || monsterEscapeActiveRef.current) return;
+    if (monsterEscapeRequest.rollerId !== user?.id) return;
+
+    monsterEscapeActiveRef.current = true;
+    setRollPhase('monster_escaping');
+
+    async function rollMonsterEscape() {
+      // Wait for any active spectator or roll overlays to finish
+      let settled = false;
+      while (!settled) {
+        while (spectatorQueueRef.current.length > 0 || spectatorRollRef.current || rollResultOverlayRef.current) {
+          await new Promise(r => setTimeout(r, 300));
+        }
+        await new Promise(r => setTimeout(r, 500));
+        if (spectatorQueueRef.current.length === 0 && !spectatorRollRef.current && !rollResultOverlayRef.current) {
+          settled = true;
+        }
+      }
+      await new Promise(r => setTimeout(r, 800));
+
+      const escapeResults = [];
+      const monsterImg = activeEncounterRef.current?.monster?.image;
+      let dotRolls = null;
+
+      // Roll DoT damage dice first (e.g. ensnared → 1d6 piercing)
+      let totalDotDamage = 0;
+      let currentMonsterHp = activeEncounterRef.current?.monster?.currentHp ?? 0;
+      if (monsterEscapeRequest.pendingDots && monsterEscapeRequest.pendingDots.length > 0) {
+        dotRolls = {};
+        for (const dot of monsterEscapeRequest.pendingDots) {
+          setMonsterRollStatus(`\u{1FAB4} ${dot.name} \u2014 ${monsterEscapeRequest.monsterName} takes ${dot.type} damage!`);
+          const { total } = await requestServerRoll(
+            dot.dice, 0, '#22c55e', `${dot.name} \u2014 ${dot.type} damage`, '#22c55e'
+          );
+          dotRolls[dot.conditionId] = total;
+          totalDotDamage += total;
+
+          // Show damage overlay for the DoT
+          const hpBefore = currentMonsterHp;
+          currentMonsterHp = Math.max(0, currentMonsterHp - total);
+          const dotDmgOverlay = {
+            type: 'damage',
+            damage: total,
+            damageType: dot.type,
+            monsterHp: hpBefore,
+            newHp: currentMonsterHp,
+            attacker: { name: dot.name, avatar: monsterImg && `/monsters/${monsterImg}` },
+            defender: { name: monsterEscapeRequest.monsterName, avatar: monsterImg && `/monsters/${monsterImg}` },
+            sounds: currentMonsterHp <= 0 ? ['bigDamage'] : ['attackHit'],
+          };
+          broadcastRollResult(dotDmgOverlay);
+          await showRollResult(dotDmgOverlay);
+        }
+      }
+
+      // Optimistic HP update so HP bar drops visually before escape check
+      if (totalDotDamage > 0) {
+        setActiveEncounter(prev => prev ? {
+          ...prev,
+          monster: { ...prev.monster, currentHp: Math.max(0, prev.monster.currentHp - totalDotDamage) },
+        } : prev);
+      }
+
+      // If DoT killed the monster, skip escape checks — server will handle defeat
+      if (currentMonsterHp > 0) {
+        for (const esc of monsterEscapeRequest.pendingEscapes) {
+          const escLabel = `${monsterEscapeRequest.monsterName} ${esc.checkAbility} check vs DC ${esc.saveDC}`;
+          setMonsterRollStatus(`${monsterEscapeRequest.monsterName} struggles to break free...`);
+
+          const { rolls } = await requestServerRoll(
+            '1d20', esc.checkBonus, '#ef4444', escLabel, '#ef4444',
+            undefined, undefined, { rollingLabel: escLabel }
+          );
+          const escRoll = rolls[0];
+          const total = escRoll + esc.checkBonus;
+          const escaped = total >= esc.saveDC;
+
+          // Show escape result overlay (reuse spell_save type)
+          const escOverlay = {
+            type: 'spell_save',
+            spellName: esc.conditionName,
+            saveAbility: esc.checkAbility,
+            saveRoll: escRoll, saveBonus: esc.checkBonus, saveTotal: total,
+            saveDC: esc.saveDC, saved: escaped,
+            attacker: { name: monsterEscapeRequest.monsterName, avatar: monsterImg && `/monsters/${monsterImg}` },
+            defender: { name: monsterEscapeRequest.monsterName, avatar: monsterImg && `/monsters/${monsterImg}` },
+            sounds: escaped ? ['spellFail'] : ['crowdCheer'],
+          };
+          broadcastRollResult(escOverlay);
+          await showRollResult(escOverlay);
+
+          escapeResults.push({ conditionId: esc.conditionId, roll: escRoll });
+          await new Promise(r => setTimeout(r, 400));
+        }
+      }
+
+      // Submit escape results + DoT rolls to server
+      try {
+        await api(`/api/encounters/${monsterEscapeRequest.encounterId}/monster-escape`, {
+          method: 'POST',
+          body: JSON.stringify({ escapeRolls: escapeResults, dotRolls: dotRolls || undefined }),
+        });
+      } catch (err) {
+        console.error('Failed to submit monster escape:', err);
+      }
+
+      setRollPhase(null);
+      setMonsterRollStatus(null);
+      monsterEscapeActiveRef.current = false;
+      clearMonsterEscapeRequest?.();
+    }
+
+    rollMonsterEscape();
+  }, [monsterEscapeRequest, user?.id, requestServerRoll, clearMonsterEscapeRequest, broadcastRollResult, showRollResult]);
 
   // ── Join an existing encounter by ID ──
   const handleJoinExisting = useCallback((encounterId) => {
@@ -923,7 +1381,11 @@ export default function Arena() {
         const pName = myStats.name || user?.characterName || user?.username || 'Player';
 
         // 5e Advantage/Disadvantage: check if player has advantage on attack
-        const hasAdvantage = myStats.advantageOnNextAttack;
+        // Also check monster conditions (stunned/restrained grant attackers advantage)
+        const monsterGivesAdv = (activeEncounter.monster?.conditions || []).some(c =>
+          c.id === 'stunned' || c.id === 'restrained'
+        );
+        const hasAdvantage = myStats.advantageOnNextAttack || monsterGivesAdv;
         const advantageType = hasAdvantage ? 'advantage' : 'normal';
         const diceNotation = advantageType !== 'normal' ? '2d20' : '1d20';
 
@@ -981,7 +1443,7 @@ export default function Arena() {
         setRollPhase('attack_result');
         // Attack result sound + crowd reaction
         if (isNat20) { playArenaSound('attackCrit'); playArenaSound('crowdCheer'); }
-        else if (isNat1) { playArenaSound('attackFumble'); playArenaSound('crowdGasp'); }
+        else if (isNat1) { playArenaSound('attackFumble'); playArenaSound('crowdGasp'); playArenaSound('youSuck'); }
         else if (isHit) playArenaSound('attackHit');
         else playArenaSound('attackMiss');
 
@@ -1002,6 +1464,7 @@ export default function Arena() {
           roll1: roll,
           roll2,
           attackBonus: atkBonus,
+          sounds: isNat20 ? ['attackCrit', 'crowdCheer'] : isNat1 ? ['attackFumble', 'crowdGasp', 'youSuck'] : isHit ? ['attackHit'] : ['attackMiss'],
         };
         broadcastRollResult(attackOverlayData);
         await showRollResult(attackOverlayData);
@@ -1009,6 +1472,8 @@ export default function Arena() {
         let damageTotal = 0;
         let smiteData = undefined;
         let sneakAttackData = undefined;
+        let ensnaringStrikeSaveRoll;
+        let stunningStrikeSaveRoll;
 
         if (isHit) {
           // Divine Smite decision — BEFORE rolling damage
@@ -1079,6 +1544,13 @@ export default function Arena() {
           }
 
           // Show damage result overlay
+          if (damageTotal >= 20 && damageTotal < 30) playArenaSound('bigDamage');
+          if (damageTotal >= 30) playArenaSound('massiveDamage');
+          const dmgSounds = ['damageImpact'];
+          if (damageTotal >= 20 && damageTotal < 30) dmgSounds.push('bigDamage');
+          if (damageTotal >= 30) dmgSounds.push('massiveDamage');
+          if (smiteData) dmgSounds.push('divineSmite', 'crowdCheer');
+          if (sneakAttackData) dmgSounds.push('crowdCheer');
           const damageOverlayData = {
             type: 'damage',
             damage: damageTotal,
@@ -1089,10 +1561,50 @@ export default function Arena() {
             newHp: Math.max(0, activeEncounter.monster.currentHp - damageTotal),
             attacker: { name: pName, avatar: myStats.avatar || (myStats.sprite && `/players/${myStats.sprite}`) },
             defender: { name: monster.name, avatar: monster.image && `/monsters/${monster.image}` },
+            sounds: dmgSounds,
           };
           broadcastRollResult(damageOverlayData);
           await showRollResult(damageOverlayData);
+
+          // Ensnaring Strike — if active and monster survives, roll visible STR save
+          // Skip if damage kills the monster (no point saving against vines on a corpse)
+          const monsterSurvives = activeEncounter.monster.currentHp - damageTotal > 0;
+          if (myStats.ensnaringStrikeActive && monsterSurvives) {
+            // Optimistically update HP so the bar reflects damage while save rolls
+            setActiveEncounter(prev => prev ? {
+              ...prev,
+              monster: { ...prev.monster, currentHp: Math.max(0, prev.monster.currentHp - damageTotal) },
+            } : prev);
+
+            const { saveRoll } = await rollMonsterSave({
+              saveAbility: 'STR',
+              spellName: 'Ensnaring Strike',
+              castSound: 'spellCast',
+            });
+            ensnaringStrikeSaveRoll = saveRoll;
+          }
+
+          // Stunning Strike — if toggled and monster survives, roll visible CON save
+          if (stunningStrikeToggle && monsterSurvives && myStats.hasKiPoints && myStats.kiPointsUsed < myStats.kiPointsMax) {
+            // Optimistically update HP so the bar reflects damage while save rolls
+            if (!myStats.ensnaringStrikeActive) {
+              setActiveEncounter(prev => prev ? {
+                ...prev,
+                monster: { ...prev.monster, currentHp: Math.max(0, prev.monster.currentHp - damageTotal) },
+              } : prev);
+            }
+
+            const { saveRoll: ssRoll } = await rollMonsterSave({
+              saveAbility: 'CON',
+              spellName: 'Stunning Strike',
+              castSound: 'spellCast',
+            });
+            stunningStrikeSaveRoll = ssRoll;
+          }
         }
+
+        // Reset toggle after use
+        setStunningStrikeToggle(false);
 
         setRollPhase('submitting');
         await api(`/api/encounters/${activeEncounter.id}/action`, {
@@ -1106,6 +1618,9 @@ export default function Arena() {
             sneakAttackData,
             inspirationData,
             weaponId: wpn?.id,
+            ensnaringStrikeSaveRoll,
+            stunningStrike: stunningStrikeToggle || undefined,
+            stunningStrikeSaveRoll,
           }),
         });
 
@@ -1131,7 +1646,7 @@ export default function Arena() {
         setActionChosen(null);
       }
     }
-  }, [activeEncounter, actionChosen, user?.id, requestServerRoll, broadcastRollResult]);
+  }, [activeEncounter, actionChosen, user?.id, requestServerRoll, broadcastRollResult, stunningStrikeToggle]);
 
   // ── Dismiss result → back to monster picker ──
   const handleDismissResult = useCallback(() => {
@@ -1155,6 +1670,9 @@ export default function Arena() {
     flee: 'Attempt to escape the encounter. You leave the fight immediately but forfeit any rewards.',
     potion: 'Use a healing potion from your inventory. Heals yourself or revives a knocked out ally. Uses your action.',
     layonhands: 'Channel divine energy to heal a target. Choose a specific amount from your healing pool. Uses your action.',
+    stunning_strike: 'Toggle ON before attacking. On hit, spend 1 Ki to force a CON save. On fail, the target is Stunned until your next turn (can\'t act, auto-fail STR/DEX saves, attacks against it have advantage).',
+    patient_defense: 'Spend 1 Ki as a bonus action to take the Dodge action. All attacks against you have disadvantage until your next turn.',
+    fist_of_unbroken_air: 'Spend 2 Ki to blast a creature with compressed air. STR save vs Ki DC. On fail: 3d10 bludgeoning + knocked prone. On save: half damage.',
   };
 
   const tooltipShownRef = useRef(false);
@@ -1194,10 +1712,11 @@ export default function Arena() {
     try {
       const data = await api(`/api/encounters/${activeEncounter.id}/weapons`);
       const weapons = data.weapons || [];
-      if (weapons.length <= 1) {
-        // Only one weapon (or none) — skip modal, proceed directly
-        handleAction('attack', weapons[0] || null);
+      if (weapons.length === 0) {
+        // No weapons at all — proceed with fists
+        handleAction('attack', null);
       } else {
+        // Always show weapon picker so player can see stats
         setAvailableWeapons(weapons);
         setWeaponModalOpen(true);
       }
@@ -1251,6 +1770,7 @@ export default function Arena() {
         newHp,
         maxHp: targetMaxHp,
         revived: isRevive,
+        sounds: isRevive ? ['revive', 'crowdCheer'] : ['healGulp'],
       };
       broadcastRollResult(healOverlay);
       await showRollResult(healOverlay);
@@ -1269,7 +1789,7 @@ export default function Arena() {
       // Refresh potions after use
       api(`/api/encounters/${activeEncounter.id}/potions`)
         .then(data => setPotions(data.potions || []))
-        .catch(() => {});
+        .catch(() => { });
 
       setRollPhase(null);
     } catch (err) {
@@ -1282,19 +1802,21 @@ export default function Arena() {
   }, [activeEncounter, actionChosen, user?.id, requestServerRoll, broadcastRollResult]);
 
   const handlePotionSelect = useCallback((potion) => {
-    // Show all allies as potential targets
+    // Show all allies as potential targets (including downed allies for revival)
     const allies = Object.entries(activeEncounter?.participants || {})
-      .filter(([uid, p]) => uid !== user?.id && !p.knockedOut)
+      .filter(([uid, p]) => uid !== user?.id && (p.knockedOut || p.currentHp < p.maxHp))
       .map(([uid, p]) => ({ id: uid, name: p.name, avatar: p.avatar || (p.sprite && `/players/${p.sprite}`), currentHp: p.currentHp, maxHp: p.maxHp }));
 
     if (allies.length > 0) {
       // Show target picker: self + all living allies
       setPotionModalOpen(false);
       const myP = activeEncounter.participants[user.id];
-      setPotionTargetModal({ potion, targets: [
-        { id: user.id, name: 'Yourself', currentHp: myP?.currentHp, maxHp: myP?.maxHp },
-        ...allies,
-      ] });
+      setPotionTargetModal({
+        potion, targets: [
+          { id: user.id, name: 'Yourself', currentHp: myP?.currentHp, maxHp: myP?.maxHp },
+          ...allies,
+        ]
+      });
     } else {
       // Solo encounter — auto-target self
       setPotionModalOpen(false);
@@ -1380,6 +1902,7 @@ export default function Arena() {
         newHp,
         maxHp: targetMaxHp,
         revived: isRevive,
+        sounds: isRevive ? ['revive', 'crowdCheer'] : ['healShimmer'],
       };
       broadcastRollResult(healOverlay);
       await showRollResult(healOverlay);
@@ -1400,6 +1923,316 @@ export default function Arena() {
       setRollPhase(null);
     }
   }, [activeEncounter, actionChosen, user?.id, broadcastRollResult]);
+
+  // ── Monster save roll helper (used by Nature's Wrath, spell casters, etc.) ──
+  const rollMonsterSave = useCallback(async ({ saveAbility, spellName, castSound, failSound }) => {
+    const monsterData = activeEncounter.monster;
+    const myStats = activeEncounter.participants[user.id];
+    const pName = myStats?.name || 'Player';
+
+    setRollPhase('spell_save_roll');
+    const saveBonus = monsterData.savingThrows?.[saveAbility] ?? 0;
+    const saveLabel = `${monsterData.name} rolls ${saveAbility} save`;
+    const { rolls: saveRolls } = await requestServerRoll(
+      '1d20', saveBonus, '#ef4444', saveLabel, '#ef4444',
+      undefined, undefined, { rollingLabel: saveLabel }
+    );
+    const saveRoll = saveRolls[0];
+    const saveTotal = saveRoll + saveBonus;
+    const saveDC = myStats?.spellSaveDC || myStats?.kiSaveDC || 0;
+    const saved = saveTotal >= saveDC;
+
+    const failSounds = failSound ? [castSound, failSound] : [castSound, 'crowdCheer'];
+    const saveOverlay = {
+      type: 'spell_save',
+      spellName,
+      saveAbility,
+      saveRoll, saveBonus, saveTotal, saveDC, saved,
+      attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
+      defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
+      sounds: saved ? [castSound, 'spellFail', 'crowdGasp'] : failSounds,
+    };
+    broadcastRollResult(saveOverlay);
+    if (saved) { playArenaSound('spellFail'); playArenaSound('crowdGasp'); }
+    else { playArenaSound(failSound || 'crowdCheer'); }
+    await showRollResult(saveOverlay);
+
+    return { saveRoll, saveTotal, saveBonus, saveDC, saved };
+  }, [activeEncounter, user?.id, requestServerRoll, broadcastRollResult, showRollResult]);
+
+  // ── Nature's Wrath handler ──
+  const handleNaturesWrath = useCallback(async () => {
+    if (actionChosen || !activeEncounter || rollActiveRef.current) return;
+    setActionChosen('channel_divinity');
+    rollActiveRef.current = true;
+
+    try {
+      const monsterData = activeEncounter.monster;
+      // Monster picks best save (STR or DEX — whichever bonus is higher)
+      const strBonus = monsterData.savingThrows?.STR ?? 0;
+      const dexBonus = monsterData.savingThrows?.DEX ?? 0;
+      const saveAbility = strBonus >= dexBonus ? 'STR' : 'DEX';
+
+      const { saveRoll, saved } = await rollMonsterSave({
+        saveAbility,
+        spellName: "Nature's Wrath",
+        castSound: 'ensnaringStrike',
+      });
+
+      // Show vine animation on failed save (same as Ensnaring Strike)
+      if (!saved) setVineEffect(true);
+
+      // Submit to server with the visual roll value
+      setRollPhase('submitting');
+      const res = await api(`/api/encounters/${activeEncounter.id}/action`, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'channel_divinity',
+          subAction: 'natures_wrath',
+          saveRoll,
+        }),
+      });
+      if (res.error) {
+        setActionChosen(null);
+      }
+      setRollPhase(null);
+    } catch (err) {
+      console.error('Failed Nature\'s Wrath:', err);
+      setActionChosen(null);
+      setRollPhase(null);
+    } finally {
+      rollActiveRef.current = false;
+    }
+  }, [activeEncounter, actionChosen, rollMonsterSave, broadcastRollResult, showRollResult]);
+
+  // ── Ensnaring Strike handler (works as both pre-bonus and post-action bonus) ──
+  const handleEnsnaringStrike = useCallback(async () => {
+    if (!activeEncounter) return;
+    const endpoint = bonusActionPhase
+      ? `/api/encounters/${activeEncounter.id}/bonus-action`
+      : `/api/encounters/${activeEncounter.id}/pre-bonus-action`;
+    try {
+      const res = await api(endpoint, {
+        method: 'POST',
+        body: JSON.stringify({ bonusAction: 'ensnaring_strike' }),
+      });
+      if (res.error) {
+        console.error('Ensnaring Strike failed:', res.error);
+      }
+      if (bonusActionPhase) {
+        setBonusActionPhase(false);
+        setAvailableBonusActions([]);
+      }
+    } catch (err) {
+      console.error('Failed Ensnaring Strike:', err);
+    }
+  }, [activeEncounter, bonusActionPhase]);
+
+  // ── Fist of Unbroken Air handler (Way of the Four Elements, main action, 2 ki) ──
+  const handleFistOfUnbrokenAir = useCallback(async () => {
+    if (actionChosen || !activeEncounter || rollActiveRef.current) return;
+    setActionChosen('ki_ability');
+    rollActiveRef.current = true;
+
+    try {
+      const myStats = activeEncounter.participants[user.id];
+      const pName = myStats?.name || 'Player';
+      const monsterData = activeEncounter.monster;
+
+      // Roll STR save (visible d20)
+      const { saveRoll, saved } = await rollMonsterSave({
+        saveAbility: 'STR',
+        spellName: 'Fist of Unbroken Air',
+        castSound: 'spellCast',
+      });
+
+      // Roll 3d10 damage (visible dice — golden ki color)
+      setRollPhase('damage_roll');
+      const { total: rawDamage } = await requestServerRoll(
+        '3d10', 0, '#f0c040', saved ? `${pName} — half damage` : `${pName} — full damage!`, myDiceColorset
+      );
+      const damageTotal = saved ? Math.floor(rawDamage / 2) : rawDamage;
+
+      playArenaSound('fistOfUnbrokenAir');
+      if (damageTotal >= 20) playArenaSound('bigDamage');
+
+      const dmgOverlay = {
+        type: 'damage',
+        damage: damageTotal,
+        isCrit: false,
+        monsterHp: monsterData.currentHp,
+        newHp: Math.max(0, monsterData.currentHp - damageTotal),
+        attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
+        defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
+        sounds: damageTotal >= 20 ? ['fistOfUnbrokenAir', 'bigDamage'] : ['fistOfUnbrokenAir'],
+      };
+      broadcastRollResult(dmgOverlay);
+      await showRollResult(dmgOverlay);
+
+      // Submit to server
+      setRollPhase('submitting');
+      await api(`/api/encounters/${activeEncounter.id}/action`, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'ki_ability',
+          subAction: 'fist_of_unbroken_air',
+          saveRoll,
+          damageTotal: rawDamage, // send raw — server halves on save
+        }),
+      });
+
+      setRollPhase(null);
+    } catch (err) {
+      console.error('Failed Fist of Unbroken Air:', err);
+      setActionChosen(null);
+      setRollPhase(null);
+    } finally {
+      rollActiveRef.current = false;
+    }
+  }, [activeEncounter, actionChosen, user?.id, rollMonsterSave, requestServerRoll, broadcastRollResult, showRollResult, myDiceColorset]);
+
+  // ── Flurry of Blows handler (Monk, post-attack bonus — 2 visible unarmed strikes) ──
+  const handleFlurryOfBlows = useCallback(async () => {
+    if (!activeEncounter || rollActiveRef.current) return;
+    setActionChosen('flurry_of_blows');
+    setBonusActionPhase(false);
+    setAvailableBonusActions([]);
+
+    const myStats = activeEncounter.participants[user.id];
+    const pName = myStats?.name || 'Player';
+    const monsterData = activeEncounter.monster;
+    const unarmed = (myStats.weapons || []).find(w => w.id === 'unarmed_strike')
+      || { attackBonus: myStats.attackBonus || 2, damageMod: myStats.damageMod || 0, dice: '1d4' };
+
+    // Check if monster has conditions that grant attackers advantage (e.g. stunned, restrained)
+    const monsterGivesAdvantage = (monsterData.conditions || []).some(c =>
+      c.id === 'stunned' || c.id === 'restrained'
+    );
+    const flurryAdvantage = monsterGivesAdvantage || myStats.advantageOnNextAttack;
+    const flurryDiceNotation = flurryAdvantage ? '2d20' : '1d20';
+
+    rollActiveRef.current = true;
+    const clientStrikes = [];
+
+    try {
+      for (let i = 0; i < 2; i++) {
+        const strikeLabel = i === 0 ? 'Flurry — Strike 1' : 'Flurry — Strike 2';
+
+        // Roll attack d20 (2d20 with advantage if monster is stunned/restrained)
+        setRollPhase('attack_roll');
+        const { rolls: atkRolls } = await requestServerRoll(
+          flurryDiceNotation, unarmed.attackBonus, '#f0c040', `${pName} ${strikeLabel}`, myDiceColorset,
+          undefined, flurryAdvantage ? 'advantage' : undefined
+        );
+        let usedRoll;
+        if (flurryAdvantage && atkRolls.length >= 2) {
+          usedRoll = Math.max(atkRolls[0], atkRolls[1]);
+        } else {
+          usedRoll = atkRolls[0];
+        }
+        const total = usedRoll + unarmed.attackBonus;
+        const isNat20 = usedRoll === 20;
+        const isNat1 = usedRoll === 1;
+        const isHit = isNat20 || (!isNat1 && total >= monsterData.ac);
+
+        // Sound + overlay
+        if (isNat20) { playArenaSound('attackCrit'); playArenaSound('crowdCheer'); }
+        else if (isNat1) { playArenaSound('attackFumble'); playArenaSound('crowdGasp'); playArenaSound('youSuck'); }
+        else if (isHit) playArenaSound('attackHit');
+        else playArenaSound('attackMiss');
+
+        const attackOverlay = {
+          type: 'attack',
+          total,
+          breakdown: `${usedRoll} + ${unarmed.attackBonus}`,
+          targetAC: monsterData.ac,
+          isHit, isCrit: isNat20, isFumble: isNat1,
+          label: strikeLabel,
+          attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
+          defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
+          advantageType: flurryAdvantage ? 'advantage' : undefined,
+          roll1: flurryAdvantage ? atkRolls[0] : undefined,
+          roll2: flurryAdvantage && atkRolls.length >= 2 ? atkRolls[1] : undefined,
+          attackBonus: unarmed.attackBonus,
+          sounds: isNat20 ? ['attackCrit', 'crowdCheer'] : isNat1 ? ['attackFumble', 'crowdGasp', 'youSuck'] : isHit ? ['attackHit'] : ['attackMiss'],
+        };
+        broadcastRollResult(attackOverlay);
+        await showRollResult(attackOverlay);
+
+        let damageTotal = 0;
+        if (isHit) {
+          setRollPhase('damage_roll');
+          const baseDmgNotation = unarmed.dice;
+          const weaponNotation = isNat20 ? doubleDice(baseDmgNotation) : baseDmgNotation;
+          const critLabel = isNat20 ? `${pName} crits!` : `${pName} rolls damage`;
+
+          const { total: dmgTotal } = await requestServerRoll(
+            weaponNotation, unarmed.damageMod, '#f0c040', critLabel, myDiceColorset
+          );
+          damageTotal = dmgTotal;
+          playArenaSound('damageImpact');
+
+          const dmgOverlay = {
+            type: 'damage',
+            damage: damageTotal,
+            isCrit: isNat20,
+            monsterHp: monsterData.currentHp,
+            newHp: Math.max(0, monsterData.currentHp - damageTotal),
+            attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
+            defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
+            sounds: ['damageImpact'],
+          };
+          broadcastRollResult(dmgOverlay);
+          await showRollResult(dmgOverlay);
+
+          // Optimistically update monster HP for next strike's overlay
+          monsterData.currentHp = Math.max(0, monsterData.currentHp - damageTotal);
+        }
+
+        clientStrikes.push({ attackRoll: usedRoll, damageTotal });
+      }
+
+      // Submit to server with client-provided rolls
+      setRollPhase('submitting');
+      await api(`/api/encounters/${activeEncounter.id}/bonus-action`, {
+        method: 'POST',
+        body: JSON.stringify({
+          bonusAction: 'flurry_of_blows',
+          strikes: clientStrikes,
+        }),
+      });
+
+      setRollPhase(null);
+    } catch (err) {
+      console.error('Failed Flurry of Blows:', err);
+      setRollPhase(null);
+    } finally {
+      rollActiveRef.current = false;
+    }
+  }, [activeEncounter, user?.id, requestServerRoll, broadcastRollResult, showRollResult, myDiceColorset]);
+
+  // ── Patient Defense handler (Monk, pre or post bonus action) ──
+  const handlePatientDefense = useCallback(async () => {
+    if (!activeEncounter) return;
+    const endpoint = bonusActionPhase
+      ? `/api/encounters/${activeEncounter.id}/bonus-action`
+      : `/api/encounters/${activeEncounter.id}/pre-bonus-action`;
+    try {
+      const res = await api(endpoint, {
+        method: 'POST',
+        body: JSON.stringify({ bonusAction: 'patient_defense' }),
+      });
+      if (res.error) {
+        console.error('Patient Defense failed:', res.error);
+      }
+      if (bonusActionPhase) {
+        setBonusActionPhase(false);
+        setAvailableBonusActions([]);
+      }
+    } catch (err) {
+      console.error('Failed Patient Defense:', err);
+    }
+  }, [activeEncounter, bonusActionPhase]);
 
   // ── Bonus action handlers ──
   const handleBonusActionSkip = useCallback(async () => {
@@ -1446,6 +2279,7 @@ export default function Arena() {
         newHp,
         maxHp: targetMaxHp,
         revived: false,
+        sounds: ['healGulp'],
       };
       broadcastRollResult(healOverlay);
       await showRollResult(healOverlay);
@@ -1462,7 +2296,7 @@ export default function Arena() {
       // Refresh potions after use
       api(`/api/encounters/${activeEncounter.id}/potions`)
         .then(data => setPotions(data.potions || []))
-        .catch(() => {});
+        .catch(() => { });
 
       setRollPhase(null);
       setBonusActionPhase(false);
@@ -1501,6 +2335,7 @@ export default function Arena() {
     }
   }, [activeEncounter, bonusActionPhase]);
 
+  // ── Shared monster saving throw (visible 3D d20 + overlay) ──
   // ── Spell casting handlers ──
 
   const handleSpellClick = useCallback(async () => {
@@ -1528,34 +2363,20 @@ export default function Arena() {
     const monsterData = activeEncounter.monster;
 
     try {
-      // Step 1: Roll d20 for monster's saving throw
-      setRollPhase('spell_save_roll');
-      const saveBonus = monsterData.savingThrows?.[spell.saveAbility] ?? 0;
-      const saveLabel = `${monsterData.name} rolls ${spell.saveAbility} save`;
-      const { rolls: saveRolls } = await requestServerRoll(
-        '1d20', saveBonus, '#ef4444', saveLabel, '#ef4444', undefined, undefined, { rollingLabel: saveLabel }
-      );
-      const saveRoll = saveRolls[0];
-      const saveTotal = saveRoll + saveBonus;
-      const saveDC = myStats?.spellSaveDC || 0;
-      const saved = saveTotal >= saveDC;
+      // Step 1: Roll monster's saving throw (shared helper)
       const isElectric = spell.damageType === 'thunder' || spell.damageType === 'lightning';
       const isViciousMockery = spell.id === 'vicious_mockery';
-      playArenaSound(isViciousMockery ? 'viciousMockery' : isElectric ? 'electricSpell' : 'spellCast');
+      // Electric/mockery sounds play on damage/fail, not on cast
+      const deferSound = isElectric || isViciousMockery;
+      const castSound = isViciousMockery ? 'viciousMockery' : isElectric ? 'electricSpell' : 'spellCast';
+      if (!deferSound) playArenaSound(castSound);
 
-      // Step 2: Show save result overlay
-      const saveOverlay = {
-        type: 'spell_save',
-        spellName: spell.name,
+      const { saveRoll, saved } = await rollMonsterSave({
         saveAbility: spell.saveAbility,
-        saveRoll, saveBonus, saveTotal, saveDC, saved,
-        attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
-        defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
-      };
-      broadcastRollResult(saveOverlay);
-      await showRollResult(saveOverlay);
-      if (saved) { playArenaSound('spellFail'); playArenaSound('crowdGasp'); }
-      else playArenaSound('crowdCheer');
+        spellName: spell.name,
+        castSound: deferSound ? 'spellCast' : castSound,
+        failSound: isViciousMockery ? 'viciousMockery' : undefined,
+      });
 
       let damageTotal = 0;
 
@@ -1566,9 +2387,15 @@ export default function Arena() {
           spell.damageDice, 0, '#eab308', `${spell.name} damage`, myDiceColorset
         );
         damageTotal = dmgTotal;
-        playArenaSound('damageImpact');
+        // Electric sound plays on damage; mockery already played on save result
+        playArenaSound(isElectric ? 'electricSpell' : 'damageImpact');
+        if (damageTotal >= 20 && damageTotal < 30) playArenaSound('bigDamage');
+        if (damageTotal >= 30) playArenaSound('massiveDamage');
 
         // Show damage overlay
+        const spellDmgSounds = [isElectric ? 'electricSpell' : 'damageImpact'];
+        if (damageTotal >= 20 && damageTotal < 30) spellDmgSounds.push('bigDamage');
+        if (damageTotal >= 30) spellDmgSounds.push('massiveDamage');
         const dmgOverlay = {
           type: 'damage',
           damage: damageTotal,
@@ -1577,6 +2404,7 @@ export default function Arena() {
           newHp: Math.max(0, monsterData.currentHp - damageTotal),
           attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
           defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
+          sounds: spellDmgSounds,
         };
         broadcastRollResult(dmgOverlay);
         await showRollResult(dmgOverlay);
@@ -1642,6 +2470,7 @@ export default function Arena() {
         newHp: Math.min(target?.maxHp || 0, (target?.currentHp || 0) + healAmount),
         maxHp: target?.maxHp || 0,
         revived: target?.knockedOut || false,
+        sounds: target?.knockedOut ? ['revive', 'crowdCheer'] : ['healShimmer'],
       };
       broadcastRollResult(healOverlay);
       await showRollResult(healOverlay);
@@ -1708,7 +2537,7 @@ export default function Arena() {
       setRollPhase('attack_result');
       // Offhand attack result sound + crowd reaction
       if (isNat20) { playArenaSound('attackCrit'); playArenaSound('crowdCheer'); }
-      else if (isNat1) { playArenaSound('attackFumble'); playArenaSound('crowdGasp'); }
+      else if (isNat1) { playArenaSound('attackFumble'); playArenaSound('crowdGasp'); playArenaSound('youSuck'); }
       else if (isHit) playArenaSound('attackHit');
       else playArenaSound('attackMiss');
 
@@ -1721,6 +2550,7 @@ export default function Arena() {
         isHit, isCrit: isNat20, isFumble: isNat1,
         attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
         defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
+        sounds: isNat20 ? ['attackCrit', 'crowdCheer'] : isNat1 ? ['attackFumble', 'crowdGasp', 'youSuck'] : isHit ? ['attackHit'] : ['attackMiss'],
       };
       broadcastRollResult(attackOverlay);
       await showRollResult(attackOverlay);
@@ -1738,7 +2568,12 @@ export default function Arena() {
         );
         damageTotal = dmgTotal;
         playArenaSound('damageImpact');
+        if (damageTotal >= 20 && damageTotal < 30) playArenaSound('bigDamage');
+        if (damageTotal >= 30) playArenaSound('massiveDamage');
 
+        const offhandDmgSounds = ['damageImpact'];
+        if (damageTotal >= 20 && damageTotal < 30) offhandDmgSounds.push('bigDamage');
+        if (damageTotal >= 30) offhandDmgSounds.push('massiveDamage');
         const dmgOverlay = {
           type: 'damage',
           damage: damageTotal,
@@ -1747,6 +2582,7 @@ export default function Arena() {
           newHp: Math.max(0, monsterData.currentHp - damageTotal),
           attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
           defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
+          sounds: offhandDmgSounds,
         };
         broadcastRollResult(dmgOverlay);
         await showRollResult(dmgOverlay);
@@ -1790,13 +2626,51 @@ export default function Arena() {
   const hpPercent = monster ? Math.max(0, Math.round((monster.currentHp / monster.maxHp) * 100)) : 0;
   const hpBarColor = hpPercent > 60 ? '#4ade80' : hpPercent > 30 ? '#fbbf24' : '#ef4444';
 
-  const isMonsterRolling = rollPhase === 'monster_rolling' ||
-    (monsterRollRequest && monsterRollRequest.rollerId !== user?.id);
+  const isMonsterRolling = rollPhase === 'monster_rolling' || rollPhase === 'monster_saving' || rollPhase === 'monster_escaping' ||
+    (monsterRollRequest && monsterRollRequest.rollerId !== user?.id) ||
+    (monsterSaveRequest && monsterSaveRequest.rollerId !== user?.id) ||
+    (monsterEscapeRequest && monsterEscapeRequest.rollerId !== user?.id);
 
   // Turn-based derived state
   const currentTurnEntry = activeEncounter?.initiativeOrder?.[activeEncounter?.currentTurnIndex];
   const isMyTurn = currentTurnEntry?.id === user?.id;
   const isMonsterTurn = currentTurnEntry?.type === 'monster';
+
+  // Config map for server-driven pre-bonus actions
+  const preBonusActionConfig = {
+    bardic_inspiration: {
+      className: 'arena-ability-btn-inspire',
+      icon: '\uD83C\uDFB5',
+      label: 'Inspire',
+      onClick: () => { playSound('buttonTap'); setInspirationTargetModal(true); },
+      detail: (action) => `${action.usesLeft} left`,
+    },
+    healing_word: {
+      className: 'arena-ability-btn-heal',
+      icon: '\u2728',
+      label: 'Healing Word',
+      onClick: () => { playSound('buttonTap'); setHealingWordTargetModal(true); },
+    },
+    ensnaring_strike: {
+      className: 'arena-ability-btn-ensnaring',
+      icon: '\u{1FAB4}',
+      label: 'Ensnaring Strike',
+      onClick: () => { playSound('buttonTap'); handleEnsnaringStrike(); },
+    },
+    patient_defense: {
+      className: 'arena-ability-btn-patient-defense',
+      icon: '\uD83D\uDEE1',
+      label: 'Patient Defense',
+      onClick: () => { playSound('buttonTap'); handlePatientDefense(); },
+      detail: () => '1 ki',
+      tooltip: 'patient_defense',
+    },
+  };
+
+  // ── Auto-close abilities drawer when action chosen or turn changes ──
+  useEffect(() => {
+    setAbilitiesOpen(false);
+  }, [actionChosen, isMyTurn]);
 
   // Arena audio phase for SceneAudio ambient config
   // Switches to intense music when monster HP drops below 30%
@@ -1808,7 +2682,7 @@ export default function Arena() {
       : 'crowd';
 
   const getStatusText = () => {
-    if (rollPhase === 'monster_rolling') {
+    if (rollPhase === 'monster_rolling' || rollPhase === 'monster_saving' || rollPhase === 'monster_escaping') {
       return monsterRollStatus || 'Monster is attacking...';
     }
     if (!actionChosen) return null;
@@ -1827,6 +2701,7 @@ export default function Arena() {
     if (rollPhase === 'spell_save_roll') return `${castingSpell?.name || 'Spell'} — rolling ${monster?.name || 'monster'}'s save...`;
     if (rollPhase === 'spell_damage_roll') return `${castingSpell?.name || 'Spell'} — rolling damage...`;
     if (rollPhase === 'submitting') return 'Submitting action...';
+    if (actionChosen === 'flurry_of_blows') return 'Rolling Flurry of Blows...';
     if (actionChosen === 'cast_spell') return `Cast ${castingSpell?.name || 'spell'}.`;
     if (actionChosen === 'attack') {
       if (attackResult && !attackResult.isHit) {
@@ -1882,7 +2757,7 @@ export default function Arena() {
                 <div className="arena-result-subtitle">{encounterResult.defeatText}</div>
               </>
             )}
-            {achievementQueue.length === 0 && !levelUp && (
+            {achievementQueue.length === 0 && questQueue.length === 0 && !levelUp && (
               <button
                 className="arena-result-dismiss"
                 onClick={() => { playSound('buttonTap'); handleDismissResult(); }}
@@ -1899,7 +2774,14 @@ export default function Arena() {
             onDismiss={dismissAchievement}
           />
         )}
-        {levelUp && achievementQueue.length === 0 && (
+        {questQueue.length > 0 && achievementQueue.length === 0 && (
+          <QuestToast
+            key={questQueue[0].key}
+            goal={questQueue[0]}
+            onDismiss={dismissQuest}
+          />
+        )}
+        {levelUp && achievementQueue.length === 0 && questQueue.length === 0 && (
           <LevelUpOverlay
             key={levelUp}
             level={levelUp}
@@ -2032,6 +2914,7 @@ export default function Arena() {
               material={diceRoll.material || 'plastic'}
               modifier={diceRoll.modifier || 0}
               forcedValues={diceRoll.forcedValues}
+              forcedTotal={diceRoll.forcedTotal}
               advantageType={diceRoll.advantageType}
               label={diceRoll.label}
               onResult={handleDiceResult}
@@ -2055,10 +2938,10 @@ export default function Arena() {
     // Put current user in the middle when there are 3 players
     const participantEntries = participantEntriesRaw.length === 3
       ? (() => {
-          const me = participantEntriesRaw.find(([uid]) => uid === user?.id);
-          const others = participantEntriesRaw.filter(([uid]) => uid !== user?.id);
-          return me ? [others[0], me, others[1]] : participantEntriesRaw;
-        })()
+        const me = participantEntriesRaw.find(([uid]) => uid === user?.id);
+        const others = participantEntriesRaw.filter(([uid]) => uid !== user?.id);
+        return me ? [others[0], me, others[1]] : participantEntriesRaw;
+      })()
       : participantEntriesRaw;
     const myHpPct = myStats ? Math.max(0, Math.round((myStats.currentHp / myStats.maxHp) * 100)) : 0;
     const myHpColor = myHpPct > 60 ? '#4ade80' : myHpPct > 30 ? '#fbbf24' : '#ef4444';
@@ -2164,6 +3047,18 @@ export default function Arena() {
           );
         })()}
 
+        {/* Combat Log Toggle — right-aligned below timer */}
+        <div className="arena-log-toggle-wrap">
+          <button className="arena-log-toggle" onClick={() => { playSound('buttonTap'); setLogOpen(o => !o); }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+          </button>
+        </div>
+
         {/* Initiative Tracker — vertical right strip */}
         {activeEncounter.initiativeOrder?.length > 0 && (
           <div className="arena-initiative-tracker">
@@ -2219,6 +3114,14 @@ export default function Arena() {
               {monster.name?.[0] || '?'}
             </div>
           )}
+          {vineEffect && (
+            <img
+              src="/images/effects/vines.webp"
+              className="arena-vine-overlay"
+              onAnimationEnd={() => setVineEffect(false)}
+              alt=""
+            />
+          )}
 
           {/* Player sprite tiles */}
           <div className="arena-sprite-row" style={{ transform: `translateY(${(effectiveConfig.playerOffsetY || 0) * viewScale * viewScale * viewScale}px)` }}>
@@ -2226,24 +3129,25 @@ export default function Arena() {
               const count = participantEntries.length;
               const gapScale = count <= 2 ? 1 : count === 3 ? 1.4 : 2 / count;
               return (
-              <div
-                key={uid}
-                className={`arena-sprite-tile ${p.sprite ? 'arena-sprite-tile-has-img' : ''} ${p.knockedOut ? 'arena-sprite-tile-ko' : ''} ${uid === user?.id ? 'arena-sprite-tile-me' : ''}`}
-                style={{
-                  width: `${effectiveConfig.playerTileSize * viewScale}px`,
-                  height: `${effectiveConfig.playerTileSize * viewScale}px`,
-                  marginLeft: idx > 0 ? `${effectiveConfig.playerTileGap * viewScale * gapScale}px` : undefined,
-                  ...(p.sprite ? {} : { backgroundColor: SPRITE_COLORS[idx % SPRITE_COLORS.length] }),
-                }}
-              >
-                {p.sprite ? (
-                  <img src={`/players/${p.sprite}`} alt={p.name} className="arena-sprite-tile-img" />
-                ) : (
-                  (p.name || '?')[0].toUpperCase()
-                )}
-                {p.inspirationDie && <span className="arena-inspiration-badge">{'\uD83C\uDFB5'}</span>}
-              </div>
-              ); })}
+                <div
+                  key={uid}
+                  className={`arena-sprite-tile ${p.sprite ? 'arena-sprite-tile-has-img' : ''} ${p.knockedOut ? 'arena-sprite-tile-ko' : ''} ${uid === user?.id ? 'arena-sprite-tile-me' : ''}`}
+                  style={{
+                    width: `${effectiveConfig.playerTileSize * viewScale}px`,
+                    height: `${effectiveConfig.playerTileSize * viewScale}px`,
+                    marginLeft: idx > 0 ? `${effectiveConfig.playerTileGap * viewScale * gapScale}px` : undefined,
+                    ...(p.sprite ? {} : { backgroundColor: SPRITE_COLORS[idx % SPRITE_COLORS.length] }),
+                  }}
+                >
+                  {p.sprite ? (
+                    <img src={`/players/${p.sprite}`} alt={p.name} className="arena-sprite-tile-img" />
+                  ) : (
+                    (p.name || '?')[0].toUpperCase()
+                  )}
+                  {p.inspirationDie && <span className="arena-inspiration-badge">{'\uD83C\uDFB5'}</span>}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -2256,223 +3160,401 @@ export default function Arena() {
           </div>
         )}
 
-        {/* Bottom UI — actions + timer */}
-        <div className="arena-bottom-ui">
-
-        {/* Emote Button */}
-        {activeEncounter && isParticipant && (
-          <div className="arena-emote-row">
-            <button
-              className="arena-emote-btn"
-              onClick={() => { playSound('buttonTap'); setEmoteGridOpen(o => !o); }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-                <line x1="9" y1="9" x2="9.01" y2="9" />
-                <line x1="15" y1="9" x2="15.01" y2="9" />
-              </svg>
-            </button>
+        {/* Bonus action result banner (Patient Defense) */}
+        {bonusResultBanner && bonusResultBanner.type === 'patient_defense' && (
+          <div className="arena-bonus-result-banner" onClick={() => setBonusResultBanner(null)}>
+            <div className="arena-bonus-result-content arena-bonus-patient">
+              <div className="arena-bonus-result-title">{'\uD83D\uDEE1'} Patient Defense</div>
+              <div className="arena-bonus-result-desc">Attacks have disadvantage until next turn</div>
+            </div>
           </div>
         )}
 
-        {/* Action Panel — turn-gated */}
-        <div className="arena-actions">
-          {isMonsterRolling || isMonsterTurn ? (
-            <div className="arena-status-text arena-monster-status">
-              {rollPhase === 'monster_rolling'
-                ? (monsterRollStatus || `${currentTurnEntry?.name || 'Monster'} is attacking...`)
-                : `${currentTurnEntry?.name || monsterRollRequest?.monsterName || 'Monster'} is attacking...`
-              }
+        {/* Monster turn skipped banner (stunned) */}
+        {monsterSkipBanner && (
+          <div className="arena-monster-skip-banner" onClick={() => setMonsterSkipBanner(null)}>
+            <div className="arena-monster-skip-content">
+              <div className="arena-monster-skip-icon">{'\uD83D\uDCAB'}</div>
+              <div className="arena-monster-skip-title">{monsterSkipBanner.monsterName} is {monsterSkipBanner.reason}!</div>
+              <div className="arena-monster-skip-desc">Can't move or take actions — turn skipped!</div>
             </div>
-          ) : isKnockedOut ? (
-            <div className="arena-status-text">You have been knocked out. An ally can revive you with healing.</div>
-          ) : actionChosen ? (
-            <div className={`arena-status-text ${rollPhase === 'attack_result' && attackResult?.isNat20 ? 'arena-crit-text' : ''} ${rollPhase === 'attack_result' && attackResult?.isNat1 ? 'arena-fumble-text' : ''}`}>
-              {getStatusText()}
-            </div>
-          ) : bonusActionPhase && isMyTurn ? (
-            <div className="arena-bonus-action-phase">
-              <div className="arena-bonus-label">BONUS ACTION</div>
-              <div className="arena-bonus-buttons">
-                {availableBonusActions.find(a => a.type === 'bardic_inspiration') && (
-                  <button
-                    className="arena-btn arena-btn-bonus-inspire"
-                    onClick={() => { playSound('buttonTap'); setInspirationTargetModal(true); }}
-                  >
-                    {'\uD83C\uDFB5'} Inspire ({availableBonusActions.find(a => a.type === 'bardic_inspiration').usesLeft})
-                  </button>
-                )}
-                {availableBonusActions.find(a => a.type === 'healing_word') && (
-                  <button
-                    className="arena-btn arena-btn-bonus-heal"
-                    onClick={() => { playSound('buttonTap'); setHealingWordTargetModal(true); }}
-                  >
-                    {'\u2728'} Healing Word
-                  </button>
-                )}
-                {availableBonusActions.find(a => a.type === 'offhand_attack') && (
-                  <button
-                    className="arena-btn arena-btn-attack"
-                    onClick={() => { playSound('buttonTap'); handleOffhandClick(); }}
-                  >
-                    {'\u2694'} Offhand Attack
-                    <span className="arena-action-tag arena-action-tag-bonus">BONUS</span>
-                  </button>
-                )}
+          </div>
+        )}
+
+        {/* Bottom UI — actions + timer */}
+        <div className="arena-bottom-ui">
+
+          {/* Quick Emote Bar */}
+          {activeEncounter && isParticipant && quickBarEmotes.length > 0 && (
+            <div className="arena-emote-quick-bar">
+              {quickBarEmotes.map(emote => (
                 <button
-                  className="arena-btn arena-btn-skip"
-                  onClick={() => { playSound('buttonTap'); handleBonusActionSkip(); }}
+                  key={emote.id}
+                  className="arena-emote-quick-btn"
+                  onClick={() => { playSound('buttonTap'); handleArenaEmote(emote.id); }}
                 >
-                  End Turn
+                  <img src={`/images/emotes/${emote.image}`} alt={emote.name} draggable={false} />
                 </button>
-              </div>
+              ))}
+              <button
+                className="arena-emote-quick-btn arena-emote-quick-more"
+                onClick={() => { playSound('buttonTap'); setEmoteGridOpen(o => !o); }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <circle cx="5" cy="12" r="1.5" fill="currentColor" /><circle cx="12" cy="12" r="1.5" fill="currentColor" /><circle cx="19" cy="12" r="1.5" fill="currentColor" />
+                </svg>
+              </button>
             </div>
-          ) : activeEncounter.phase === 'action' && isParticipant && isMyTurn ? (
-            <>
-              {actionTooltip && (
-                <div className="arena-action-tooltip" onClick={cancelTooltip}>
-                  <div className="arena-action-tooltip-content">
-                    {ACTION_TOOLTIPS[actionTooltip]}
+          )}
+
+          {/* Resource Bar — Spell Slots, Channel Divinity & Ki (visible to all participants) */}
+          {activeEncounter && isParticipant && myStats && (myStats.spellSlots?.length > 0 || myStats.channelDivinityMax > 0 || myStats.kiPointsMax > 0) && (
+            <div className="arena-resource-bar">
+              {(myStats.spellSlots || []).map((slot, idx) => (
+                <div key={idx} className="arena-resource-group">
+                  <span className="arena-resource-label">Lvl {slot.level}</span>
+                  <div className="arena-resource-pips">
+                    {Array.from({ length: slot.total }, (_, i) => (
+                      <span
+                        key={i}
+                        className={`arena-resource-pip ${i < slot.total - slot.used ? 'arena-resource-pip-full' : 'arena-resource-pip-empty'}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+              {myStats.channelDivinityMax > 0 && (
+                <div className="arena-resource-group">
+                  <span className="arena-resource-label">CD</span>
+                  <div className="arena-resource-pips">
+                    {Array.from({ length: myStats.channelDivinityMax }, (_, i) => (
+                      <span
+                        key={i}
+                        className={`arena-resource-pip arena-resource-pip-cd ${i < myStats.channelDivinityMax - (myStats.channelDivinityUsed || 0) ? 'arena-resource-pip-full' : 'arena-resource-pip-empty'}`}
+                      />
+                    ))}
                   </div>
                 </div>
               )}
-              <button
-                className="arena-btn arena-btn-attack"
-                onClick={() => { playSound('buttonTap'); handleAttackClick(); }}
-                onTouchStart={() => startTooltip('attack')}
-                onTouchEnd={cancelTooltip}
-                onTouchCancel={cancelTooltip}
-                onMouseDown={() => startTooltip('attack')}
-                onMouseUp={cancelTooltip}
-                onMouseLeave={cancelTooltip}
-              >
-                {'\u2694'} Attack
-                {myStats && <span className="arena-btn-detail">d20+{myStats.attackBonus || 0}</span>}
-              </button>
-              <button
-                className="arena-btn arena-btn-defend"
-                onClick={() => { playSound('buttonTap'); handleActionClick('defend'); }}
-                onTouchStart={() => startTooltip('defend')}
-                onTouchEnd={cancelTooltip}
-                onTouchCancel={cancelTooltip}
-                onMouseDown={() => startTooltip('defend')}
-                onMouseUp={cancelTooltip}
-                onMouseLeave={cancelTooltip}
-              >
-                {'\uD83D\uDEE1'} Dodge
-              </button>
-              <button
-                className="arena-btn arena-btn-potion"
-                onClick={() => { playSound('buttonTap'); setPotionModalOpen(true); }}
-                onTouchStart={() => startTooltip('potion')}
-                onTouchEnd={cancelTooltip}
-                onTouchCancel={cancelTooltip}
-                onMouseDown={() => startTooltip('potion')}
-                onMouseUp={cancelTooltip}
-                onMouseLeave={cancelTooltip}
-                disabled={potions.length === 0}
-              >
-                {'\uD83E\uDDEA'} Potion
-                {potions.length > 0 && <span className="arena-btn-detail">{potions.length}</span>}
-              </button>
-              {myStats?.hasAvailableSpells && (
-                <button
-                  className="arena-btn arena-btn-spell"
-                  onClick={() => { playSound('buttonTap'); handleSpellClick(); }}
-                >
-                  {'\u2728'} Cast Spell
-                  {myStats?.spellSlots?.length > 0 && (
-                    <span className="arena-btn-detail">
-                      {myStats.spellSlots.reduce((sum, s) => sum + s.total - s.used, 0)} slots
-                    </span>
-                  )}
-                  <span className="arena-action-tag arena-action-tag-action">ACTION</span>
-                </button>
+              {myStats.kiPointsMax > 0 && (
+                <div className="arena-resource-group">
+                  <span className="arena-resource-label">Ki</span>
+                  <div className="arena-resource-pips">
+                    {Array.from({ length: myStats.kiPointsMax }, (_, i) => (
+                      <span
+                        key={i}
+                        className={`arena-resource-pip arena-resource-pip-ki ${i < myStats.kiPointsMax - (myStats.kiPointsUsed || 0) ? 'arena-resource-pip-full' : 'arena-resource-pip-empty'}`}
+                      />
+                    ))}
+                  </div>
+                </div>
               )}
-              {(myStats?.classFeatures || []).includes('Lay on Hands') && ((myStats?.layOnHandsPool || 0) - (myStats?.layOnHandsUsed || 0)) > 0 && (
-                <button
-                  className="arena-btn arena-btn-layonhands"
-                  onClick={() => { playSound('buttonTap'); handleLayOnHandsClick(); }}
-                  onTouchStart={() => startTooltip('layonhands')}
-                  onTouchEnd={cancelTooltip}
-                  onTouchCancel={cancelTooltip}
-                  onMouseDown={() => startTooltip('layonhands')}
-                  onMouseUp={cancelTooltip}
-                  onMouseLeave={cancelTooltip}
-                >
-                  {'\u2728'} Lay on Hands
-                  <span className="arena-btn-detail">{(myStats?.layOnHandsPool || 0) - (myStats?.layOnHandsUsed || 0)} HP</span>
-                </button>
-              )}
-              <button
-                className="arena-btn arena-btn-help"
-                onClick={() => { playSound('buttonTap'); handleHelpClick(); }}
-                onTouchStart={() => startTooltip('help')}
-                onTouchEnd={cancelTooltip}
-                onTouchCancel={cancelTooltip}
-                onMouseDown={() => startTooltip('help')}
-                onMouseUp={cancelTooltip}
-                onMouseLeave={cancelTooltip}
-                disabled={!Object.entries(activeEncounter?.participants || {}).some(([uid, p]) => uid !== user?.id && !p.knockedOut)}
-              >
-                {'\uD83E\uDD1D'} Help
-              </button>
-              {/* Pre-action Bardic Inspiration (bonus action before main action) */}
-              {myStats?.hasBardicInspiration && !myStats?.bonusActionUsed &&
-               myStats.bardicInspirationUses < myStats.bardicInspirationMax &&
-               Object.entries(activeEncounter?.participants || {}).some(([uid, p]) => uid !== user?.id && !p.knockedOut && !p.inspirationDie) && (
-                <button
-                  className="arena-btn arena-btn-bonus-inspire"
-                  onClick={() => { playSound('buttonTap'); setInspirationTargetModal(true); }}
-                >
-                  {'\uD83C\uDFB5'} Inspire ({myStats.bardicInspirationMax - myStats.bardicInspirationUses})
-                  <span className="arena-action-tag arena-action-tag-bonus">BONUS</span>
-                </button>
-              )}
-              {/* Pre-action Healing Word (bonus action before main action) */}
-              {myStats?.hasHealingWord && !myStats?.bonusActionUsed && (
-                <button
-                  className="arena-btn arena-btn-bonus-heal"
-                  onClick={() => { playSound('buttonTap'); setHealingWordTargetModal(true); }}
-                >
-                  {'\u2728'} Healing Word
-                  <span className="arena-action-tag arena-action-tag-bonus">BONUS</span>
-                </button>
-              )}
-              <button
-                className="arena-btn arena-btn-flee"
-                onClick={() => { playSound('buttonTap'); handleActionClick('flee'); }}
-                onTouchStart={() => startTooltip('flee')}
-                onTouchEnd={cancelTooltip}
-                onTouchCancel={cancelTooltip}
-                onMouseDown={() => startTooltip('flee')}
-                onMouseUp={cancelTooltip}
-                onMouseLeave={cancelTooltip}
-              >
-                {'\uD83C\uDFC3'} Flee
-              </button>
-            </>
-          ) : activeEncounter.phase === 'action' && isParticipant && !isMyTurn ? (
-            <div className="arena-status-text arena-waiting-text">
-              Waiting for {currentTurnEntry?.name || 'someone'}...
             </div>
-          ) : activeEncounter.phase === 'resolving' || activeEncounter.phase === 'monster_turn' || activeEncounter.phase === 'monster_rolling' ? (
-            <div className="arena-status-text">Resolving...</div>
-          ) : null}
-        </div>
+          )}
+
+          {/* Action Panel — turn-gated */}
+          <div className="arena-actions">
+            {isMonsterRolling || isMonsterTurn ? (
+              <div className="arena-status-text arena-monster-status">
+                {rollPhase === 'monster_rolling' || rollPhase === 'monster_saving' || rollPhase === 'monster_escaping'
+                  ? (monsterRollStatus || `${currentTurnEntry?.name || 'Monster'} is attacking...`)
+                  : `${currentTurnEntry?.name || monsterRollRequest?.monsterName || monsterSaveRequest?.monsterName || monsterEscapeRequest?.monsterName || 'Monster'} is attacking...`
+                }
+              </div>
+            ) : isKnockedOut ? (
+              <div className="arena-status-text">You have been knocked out. An ally can revive you with healing.</div>
+            ) : actionChosen ? (
+              <div className={`arena-status-text ${rollPhase === 'attack_result' && attackResult?.isNat20 ? 'arena-crit-text' : ''} ${rollPhase === 'attack_result' && attackResult?.isNat1 ? 'arena-fumble-text' : ''}`}>
+                {getStatusText()}
+              </div>
+            ) : bonusActionPhase && isMyTurn ? (
+              <div className="arena-bonus-action-phase">
+                <div className="arena-bonus-label">BONUS ACTION</div>
+                <div className="arena-bonus-buttons">
+                  {availableBonusActions.find(a => a.type === 'bardic_inspiration') && (
+                    <button
+                      className="arena-btn arena-btn-bonus-inspire"
+                      onClick={() => { playSound('buttonTap'); setInspirationTargetModal(true); }}
+                    >
+                      {'\uD83C\uDFB5'} Inspire ({availableBonusActions.find(a => a.type === 'bardic_inspiration').usesLeft})
+                    </button>
+                  )}
+                  {availableBonusActions.find(a => a.type === 'healing_word') && (
+                    <button
+                      className="arena-btn arena-btn-bonus-heal"
+                      onClick={() => { playSound('buttonTap'); setHealingWordTargetModal(true); }}
+                    >
+                      {'\u2728'} Healing Word
+                    </button>
+                  )}
+                  {availableBonusActions.find(a => a.type === 'offhand_attack') && (
+                    <button
+                      className="arena-btn arena-btn-attack"
+                      onClick={() => { playSound('buttonTap'); handleOffhandClick(); }}
+                    >
+                      {'\u2694'} Offhand Attack
+                      <span className="arena-action-tag arena-action-tag-bonus">BONUS</span>
+                    </button>
+                  )}
+                  {availableBonusActions.find(a => a.type === 'ensnaring_strike') && (
+                    <button
+                      className="arena-btn arena-btn-ensnaring"
+                      onClick={() => { playSound('buttonTap'); handleEnsnaringStrike(); }}
+                    >
+                      {'\u{1FAB4}'} Ensnaring Strike
+                      <span className="arena-action-tag arena-action-tag-bonus">BONUS</span>
+                    </button>
+                  )}
+                  {availableBonusActions.find(a => a.type === 'flurry_of_blows') && (
+                    <button
+                      className="arena-btn arena-btn-flurry"
+                      onClick={() => { playSound('buttonTap'); handleFlurryOfBlows(); }}
+                    >
+                      {'\uD83D\uDC4A'} Flurry of Blows
+                      <span className="arena-action-tag arena-action-tag-bonus">BONUS</span>
+                    </button>
+                  )}
+                  {availableBonusActions.find(a => a.type === 'patient_defense') && (
+                    <button
+                      className="arena-btn arena-btn-patient-defense"
+                      onClick={() => { playSound('buttonTap'); handlePatientDefense(); }}
+                    >
+                      {'\uD83D\uDEE1'} Patient Defense
+                      <span className="arena-action-tag arena-action-tag-bonus">BONUS</span>
+                    </button>
+                  )}
+                  <button
+                    className="arena-btn arena-btn-skip"
+                    onClick={() => { playSound('buttonTap'); handleBonusActionSkip(); }}
+                  >
+                    End Turn
+                  </button>
+                </div>
+              </div>
+            ) : activeEncounter.phase === 'action' && isParticipant && isMyTurn ? (
+              <>
+                {actionTooltip && (
+                  <div className="arena-action-tooltip" onClick={cancelTooltip}>
+                    <div className="arena-action-tooltip-content">
+                      {ACTION_TOOLTIPS[actionTooltip]}
+                    </div>
+                  </div>
+                )}
+                {/* ── Core Actions Grid ── */}
+                <div className="arena-core-actions">
+                  <button
+                    className="arena-core-btn arena-core-btn-attack"
+                    onClick={() => { playSound('buttonTap'); handleAttackClick(); }}
+                    onTouchStart={() => startTooltip('attack')}
+                    onTouchEnd={cancelTooltip}
+                    onTouchCancel={cancelTooltip}
+                    onMouseDown={() => startTooltip('attack')}
+                    onMouseUp={cancelTooltip}
+                    onMouseLeave={cancelTooltip}
+                  >
+                    <span className="arena-core-btn-icon">{'\u2694'}</span>
+                    <span className="arena-core-btn-label">Attack</span>
+                    {myStats && <span className="arena-core-btn-detail">d20+{myStats.attackBonus || 0}</span>}
+                  </button>
+                  <button
+                    className="arena-core-btn arena-core-btn-defend"
+                    onClick={() => { playSound('buttonTap'); handleActionClick('defend'); }}
+                    onTouchStart={() => startTooltip('defend')}
+                    onTouchEnd={cancelTooltip}
+                    onTouchCancel={cancelTooltip}
+                    onMouseDown={() => startTooltip('defend')}
+                    onMouseUp={cancelTooltip}
+                    onMouseLeave={cancelTooltip}
+                  >
+                    <span className="arena-core-btn-icon">{'\uD83D\uDEE1'}</span>
+                    <span className="arena-core-btn-label">Dodge</span>
+                  </button>
+                  <button
+                    className="arena-core-btn arena-core-btn-potion"
+                    onClick={() => { playSound('buttonTap'); setPotionModalOpen(true); }}
+                    onTouchStart={() => startTooltip('potion')}
+                    onTouchEnd={cancelTooltip}
+                    onTouchCancel={cancelTooltip}
+                    onMouseDown={() => startTooltip('potion')}
+                    onMouseUp={cancelTooltip}
+                    onMouseLeave={cancelTooltip}
+                    disabled={potions.length === 0}
+                  >
+                    <span className="arena-core-btn-icon">{'\uD83E\uDDEA'}</span>
+                    <span className="arena-core-btn-label">Potion</span>
+                    {potions.length > 0 && <span className="arena-core-btn-detail">{potions.length}</span>}
+                  </button>
+                  <button
+                    className="arena-core-btn arena-core-btn-flee"
+                    onClick={() => { playSound('buttonTap'); handleActionClick('flee'); }}
+                    onTouchStart={() => startTooltip('flee')}
+                    onTouchEnd={cancelTooltip}
+                    onTouchCancel={cancelTooltip}
+                    onMouseDown={() => startTooltip('flee')}
+                    onMouseUp={cancelTooltip}
+                    onMouseLeave={cancelTooltip}
+                  >
+                    <span className="arena-core-btn-icon">{'\uD83C\uDFC3'}</span>
+                    <span className="arena-core-btn-label">Flee</span>
+                  </button>
+                </div>
+
+                {/* Active Ensnaring Strike buff indicator (always visible, outside drawer) */}
+                {myStats?.ensnaringStrikeActive && (
+                  <div className="arena-buff-indicator">
+                    {'\u{1FAB4}'} Ensnaring Strike active — next hit will trigger!
+                  </div>
+                )}
+
+                {/* Stunning Strike buff indicator (like Ensnaring Strike) */}
+                {stunningStrikeToggle && (
+                  <div
+                    className="arena-buff-indicator arena-buff-indicator-ki"
+                    onClick={() => { playSound('buttonTap'); setStunningStrikeToggle(false); setAbilitiesOpen(true); }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {'\uD83D\uDCAB'} Stunning Strike active — tap to cancel
+                  </div>
+                )}
+
+                {/* ── Abilities Toggle ── */}
+                <button
+                  className="arena-abilities-toggle"
+                  onClick={() => { playSound('buttonTap'); setAbilitiesOpen(o => !o); }}
+                >
+                  <span className={`arena-abilities-toggle-arrow ${abilitiesOpen ? 'open' : ''}`}>{'\u25B2'}</span>
+                  Abilities
+                </button>
+
+                {/* ── Abilities Drawer ── */}
+                <div className={`arena-abilities-drawer ${abilitiesOpen ? 'open' : ''}`}>
+                  <div className="arena-abilities-grid">
+                    {myStats?.hasAvailableSpells && (
+                      <button
+                        className="arena-ability-btn arena-ability-btn-spell"
+                        onClick={() => { playSound('buttonTap'); handleSpellClick(); }}
+                      >
+                        <span className="arena-ability-btn-name">
+                          {'\u2728'} Cast Spell
+                          <span className="arena-ability-btn-tag arena-ability-btn-tag-action">ACTION</span>
+                        </span>
+                        {myStats?.spellSlots?.length > 0 && (
+                          <span className="arena-ability-btn-detail">
+                            {myStats.spellSlots.reduce((sum, s) => sum + s.total - s.used, 0)} slots
+                          </span>
+                        )}
+                      </button>
+                    )}
+                    {(myStats?.classFeatures || []).includes('Lay on Hands') && ((myStats?.layOnHandsPool || 0) - (myStats?.layOnHandsUsed || 0)) > 0 && (
+                      <button
+                        className="arena-ability-btn arena-ability-btn-layonhands"
+                        onClick={() => { playSound('buttonTap'); handleLayOnHandsClick(); }}
+                        onTouchStart={() => startTooltip('layonhands')}
+                        onTouchEnd={cancelTooltip}
+                        onTouchCancel={cancelTooltip}
+                        onMouseDown={() => startTooltip('layonhands')}
+                        onMouseUp={cancelTooltip}
+                        onMouseLeave={cancelTooltip}
+                      >
+                        <span className="arena-ability-btn-name">{'\u2728'} Lay on Hands</span>
+                        <span className="arena-ability-btn-detail">{(myStats?.layOnHandsPool || 0) - (myStats?.layOnHandsUsed || 0)} HP</span>
+                      </button>
+                    )}
+                    {myStats?.hasNaturesWrath && ((myStats?.channelDivinityMax || 0) - (myStats?.channelDivinityUsed || 0)) > 0 && (
+                      <button
+                        className="arena-ability-btn arena-ability-btn-channel"
+                        onClick={() => { playSound('buttonTap'); handleNaturesWrath(); }}
+                      >
+                        <span className="arena-ability-btn-name">
+                          {'\u{26D3}\u{FE0F}'} Nature's Wrath
+                          <span className="arena-ability-btn-tag arena-ability-btn-tag-action">ACTION</span>
+                        </span>
+                        <span className="arena-ability-btn-detail">{(myStats?.channelDivinityMax || 0) - (myStats?.channelDivinityUsed || 0)} use</span>
+                      </button>
+                    )}
+                    {myStats?.hasKiPoints && (myStats?.kiPointsMax - (myStats?.kiPointsUsed || 0)) >= 2 && (
+                      <button
+                        className="arena-ability-btn arena-ability-btn-ki"
+                        onClick={() => { playSound('buttonTap'); handleFistOfUnbrokenAir(); }}
+                        onTouchStart={() => startTooltip('fist_of_unbroken_air')}
+                        onTouchEnd={cancelTooltip}
+                        onTouchCancel={cancelTooltip}
+                        onMouseDown={() => startTooltip('fist_of_unbroken_air')}
+                        onMouseUp={cancelTooltip}
+                        onMouseLeave={cancelTooltip}
+                      >
+                        <span className="arena-ability-btn-name">
+                          {'\uD83D\uDCA8'} Fist of Unbroken Air
+                          <span className="arena-ability-btn-tag arena-ability-btn-tag-action">ACTION</span>
+                        </span>
+                        <span className="arena-ability-btn-detail">2 ki</span>
+                      </button>
+                    )}
+                    {myStats?.hasKiPoints && (myStats?.kiPointsMax - (myStats?.kiPointsUsed || 0)) >= 1 && !stunningStrikeToggle && (
+                      <button
+                        className={`arena-ability-btn arena-ability-btn-ki`}
+                        onClick={() => { playSound('buttonTap'); setStunningStrikeToggle(true); setAbilitiesOpen(false); }}
+                        onTouchStart={() => startTooltip('stunning_strike')}
+                        onTouchEnd={cancelTooltip}
+                        onTouchCancel={cancelTooltip}
+                        onMouseDown={() => startTooltip('stunning_strike')}
+                        onMouseUp={cancelTooltip}
+                        onMouseLeave={cancelTooltip}
+                      >
+                        <span className="arena-ability-btn-name">
+                          {'\uD83D\uDCAB'} Stunning Strike
+                        </span>
+                        <span className="arena-ability-btn-detail">1 ki</span>
+                      </button>
+                    )}
+                    <button
+                      className="arena-ability-btn arena-ability-btn-help"
+                      onClick={() => { playSound('buttonTap'); handleHelpClick(); }}
+                      onTouchStart={() => startTooltip('help')}
+                      onTouchEnd={cancelTooltip}
+                      onTouchCancel={cancelTooltip}
+                      onMouseDown={() => startTooltip('help')}
+                      onMouseUp={cancelTooltip}
+                      onMouseLeave={cancelTooltip}
+                      disabled={!Object.entries(activeEncounter?.participants || {}).some(([uid, p]) => uid !== user?.id && !p.knockedOut)}
+                    >
+                      <span className="arena-ability-btn-name">{'\uD83E\uDD1D'} Help</span>
+                    </button>
+                    {(myStats?.availablePreBonusActions || []).map(action => {
+                      const config = preBonusActionConfig[action.type];
+                      if (!config) return null;
+                      return (
+                        <button key={action.type} className={`arena-ability-btn ${config.className}`}
+                          onClick={config.onClick}
+                          onTouchStart={config.tooltip ? () => startTooltip(config.tooltip) : undefined}
+                          onTouchEnd={config.tooltip ? cancelTooltip : undefined}
+                          onTouchCancel={config.tooltip ? cancelTooltip : undefined}
+                          onMouseDown={config.tooltip ? () => startTooltip(config.tooltip) : undefined}
+                          onMouseUp={config.tooltip ? cancelTooltip : undefined}
+                          onMouseLeave={config.tooltip ? cancelTooltip : undefined}>
+                          <span className="arena-ability-btn-name">
+                            {config.icon} {config.label}
+                            <span className="arena-ability-btn-tag arena-ability-btn-tag-bonus">BONUS</span>
+                          </span>
+                          {config.detail && <span className="arena-ability-btn-detail">{config.detail(action)}</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            ) : activeEncounter.phase === 'action' && isParticipant && !isMyTurn ? (
+              <div className="arena-status-text arena-waiting-text">
+                Waiting for {currentTurnEntry?.name || 'someone'}...
+              </div>
+            ) : activeEncounter.phase === 'resolving' || activeEncounter.phase === 'monster_turn' || activeEncounter.phase === 'monster_rolling' || activeEncounter.phase === 'monster_saving' || activeEncounter.phase === 'monster_escaping' ? (
+              <div className="arena-status-text">Resolving...</div>
+            ) : null}
+          </div>
 
         </div>{/* end .arena-bottom-ui */}
 
-        {/* Combat Log Toggle */}
-        <button className="arena-log-toggle" onClick={() => { playSound('buttonTap'); setLogOpen(o => !o); }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-          </svg>
-        </button>
+
 
         {/* Collapsible Combat Log */}
         {logOpen && (
@@ -2490,12 +3572,11 @@ export default function Arena() {
                 {encounterNarrations.map((n) => (
                   <div
                     key={n.id}
-                    className={`arena-log-entry ${
-                      n.subtype === 'round_header' ? 'arena-log-header' :
+                    className={`arena-log-entry ${n.subtype === 'round_header' ? 'arena-log-header' :
                       n.subtype === 'victory' ? 'arena-log-victory' :
-                      n.subtype === 'defeat' ? 'arena-log-defeat' :
-                      'arena-log-combat'
-                    }`}
+                        n.subtype === 'defeat' ? 'arena-log-defeat' :
+                          'arena-log-combat'
+                      }`}
                     dangerouslySetInnerHTML={{ __html: formatBold(n.text) }}
                   />
                 ))}
@@ -2988,6 +4069,7 @@ export default function Arena() {
               material={diceRoll.material || 'plastic'}
               modifier={diceRoll.modifier || 0}
               forcedValues={diceRoll.forcedValues}
+              forcedTotal={diceRoll.forcedTotal}
               advantageType={diceRoll.advantageType}
               label={diceRoll.label}
               onResult={handleDiceResult}
@@ -3016,6 +4098,8 @@ export default function Arena() {
           <ArenaEmoteGrid
             onSelect={handleArenaEmote}
             onClose={() => setEmoteGridOpen(false)}
+            favorites={favoriteEmotes}
+            onToggleFavorite={handleToggleFavorite}
           />
         )}
         {/* Emote floating popups */}
@@ -3023,6 +4107,18 @@ export default function Arena() {
           emotes={activeEmotes}
           onDismiss={(key) => setActiveEmotes(prev => prev.filter(e => e.key !== key))}
         />
+        {/* DM Roll Control */}
+        {isDM && dmEncounterId && (
+          <DmRollControl
+            encounterId={dmEncounterId}
+            enabled={dmRollControlEnabled}
+            pendingRoll={dmPendingRoll}
+            onToggle={handleDmToggle}
+            onResolve={handleDmResolve}
+          />
+        )}
+        {/* Fate Overlay (non-DM players) */}
+        {!isDM && <FateOverlay visible={fateOverlayVisible} />}
       </div>
     );
   }
@@ -3049,83 +4145,83 @@ export default function Arena() {
         const monsterMaxHp = activeFight ? activeFight.maxHp : selectedMonster.maxHp;
         return (
           <div className="arena-join-overlay" onClick={() => { playSound('buttonTap'); setSelectedMonster(null); }}>
-           <div className="arena-join-content" onClick={e => e.stopPropagation()}>
-            <button className="arena-join-close" onClick={() => { playSound('buttonTap'); setSelectedMonster(null); }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-
-            <div className="arena-join-name">{selectedMonster.name}</div>
-
-            {selectedMonster.image && (
-              <img src={`/monsters/${selectedMonster.image}`} alt={selectedMonster.name} className="arena-join-image" />
-            )}
-
-            <div className="arena-join-stats">
-              <div className="arena-join-stat arena-join-cr">
-                <span className="arena-join-stat-label">CR</span>
-                <span className="arena-join-stat-value">{selectedMonster.cr}</span>
-              </div>
-              <div className="arena-join-stat arena-join-hp">
-                <svg className="arena-join-heart" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            <div className="arena-join-content" onClick={e => e.stopPropagation()}>
+              <button className="arena-join-close" onClick={() => { playSound('buttonTap'); setSelectedMonster(null); }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
-                <span className="arena-join-stat-label">HP</span>
-                <span className="arena-join-stat-value">{monsterHp}/{monsterMaxHp}</span>
-              </div>
-              <div className="arena-join-stat arena-join-ac">
-                <svg className="arena-join-shield" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
-                </svg>
-                <span className="arena-join-stat-label">AC</span>
-                <span className="arena-join-stat-value">{selectedMonster.ac}</span>
-              </div>
-            </div>
-            <div className="arena-join-rewards">
-              <div className="arena-join-reward arena-join-reward-xp">
-                <span className="arena-join-reward-value">{selectedMonster.xpReward} XP</span>
-              </div>
-              <div className="arena-join-reward">
-                <span className="arena-join-reward-value">{selectedMonster.goldReward} Gold</span>
-              </div>
-            </div>
+              </button>
 
-            {activeFight && Object.keys(participants).length > 0 && (
-              <div className="arena-join-participants">
-                {Object.entries(participants).map(([uid, p]) => {
-                  const hpPct = Math.max(0, Math.round((p.currentHp / p.maxHp) * 100));
-                  const hpColor = p.knockedOut ? '#ef4444' : hpPct > 60 ? '#4ade80' : hpPct > 30 ? '#fbbf24' : '#ef4444';
-                  return (
-                    <div key={uid} className={`arena-join-participant ${p.knockedOut ? 'arena-join-participant-ko' : ''}`}>
-                      {p.avatar ? (
-                        <img src={p.avatar} alt={p.name} className="arena-join-avatar" />
-                      ) : (
-                        <div className="arena-join-avatar arena-join-avatar-fallback">{(p.name || '?')[0]}</div>
-                      )}
-                      <div className="arena-join-participant-info">
-                        <span className="arena-join-participant-name">{p.name}</span>
-                        <div className="arena-join-hp-track">
-                          <div className="arena-join-hp-fill" style={{ width: `${hpPct}%`, backgroundColor: hpColor }} />
+              <div className="arena-join-name">{selectedMonster.name}</div>
+
+              {selectedMonster.image && (
+                <img src={`/monsters/${selectedMonster.image}`} alt={selectedMonster.name} className="arena-join-image" />
+              )}
+
+              <div className="arena-join-stats">
+                <div className="arena-join-stat arena-join-cr">
+                  <span className="arena-join-stat-label">CR</span>
+                  <span className="arena-join-stat-value">{selectedMonster.cr}</span>
+                </div>
+                <div className="arena-join-stat arena-join-hp">
+                  <svg className="arena-join-heart" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                  <span className="arena-join-stat-label">HP</span>
+                  <span className="arena-join-stat-value">{monsterHp}/{monsterMaxHp}</span>
+                </div>
+                <div className="arena-join-stat arena-join-ac">
+                  <svg className="arena-join-shield" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
+                  </svg>
+                  <span className="arena-join-stat-label">AC</span>
+                  <span className="arena-join-stat-value">{selectedMonster.ac}</span>
+                </div>
+              </div>
+              <div className="arena-join-rewards">
+                <div className="arena-join-reward arena-join-reward-xp">
+                  <span className="arena-join-reward-value">{selectedMonster.xpReward} XP</span>
+                </div>
+                <div className="arena-join-reward">
+                  <span className="arena-join-reward-value">{selectedMonster.goldReward} Gold</span>
+                </div>
+              </div>
+
+              {activeFight && Object.keys(participants).length > 0 && (
+                <div className="arena-join-participants">
+                  {Object.entries(participants).map(([uid, p]) => {
+                    const hpPct = Math.max(0, Math.round((p.currentHp / p.maxHp) * 100));
+                    const hpColor = p.knockedOut ? '#ef4444' : hpPct > 60 ? '#4ade80' : hpPct > 30 ? '#fbbf24' : '#ef4444';
+                    return (
+                      <div key={uid} className={`arena-join-participant ${p.knockedOut ? 'arena-join-participant-ko' : ''}`}>
+                        {p.avatar ? (
+                          <img src={p.avatar} alt={p.name} className="arena-join-avatar" />
+                        ) : (
+                          <div className="arena-join-avatar arena-join-avatar-fallback">{(p.name || '?')[0]}</div>
+                        )}
+                        <div className="arena-join-participant-info">
+                          <span className="arena-join-participant-name">{p.name}</span>
+                          <div className="arena-join-hp-track">
+                            <div className="arena-join-hp-fill" style={{ width: `${hpPct}%`, backgroundColor: hpColor }} />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                    );
+                  })}
+                </div>
+              )}
 
-            <button
-              className="arena-join-btn"
-              onClick={activeFight
-                ? () => { playSound('buttonTap'); handleJoinExisting(activeFight.encounterId); }
-                : () => { playSound('buttonTap'); handleSpawnAndJoin(); }
-              }
-              disabled={!!spawning || joining}
-            >
-              {spawning ? 'Summoning...' : joining ? 'Joining...' : activeFight ? 'Join Battle' : 'Summon & Fight'}
-            </button>
-           </div>
+              <button
+                className="arena-join-btn"
+                onClick={activeFight
+                  ? () => { playSound('buttonTap'); handleJoinExisting(activeFight.encounterId); }
+                  : () => { playSound('buttonTap'); handleSpawnAndJoin(); }
+                }
+                disabled={!!spawning || joining}
+              >
+                {spawning ? 'Summoning...' : joining ? 'Joining...' : activeFight ? 'Join Battle' : 'Summon & Fight'}
+              </button>
+            </div>
           </div>
         );
       })()}
@@ -3183,7 +4279,9 @@ export default function Arena() {
             notation={diceRoll.notation}
             colorset={diceRoll.colorset || 'white'}
             material={diceRoll.material || 'plastic'}
+            modifier={diceRoll.modifier || 0}
             forcedValues={diceRoll.forcedValues}
+            forcedTotal={diceRoll.forcedTotal}
             advantageType={diceRoll.advantageType}
             label={diceRoll.label}
             onResult={handleDiceResult}
@@ -3219,6 +4317,18 @@ export default function Arena() {
         emotes={activeEmotes}
         onDismiss={(key) => setActiveEmotes(prev => prev.filter(e => e.key !== key))}
       />
+      {/* DM Roll Control (visible even when not in encounter) */}
+      {isDM && dmEncounterId && (
+        <DmRollControl
+          encounterId={dmEncounterId}
+          enabled={dmRollControlEnabled}
+          pendingRoll={dmPendingRoll}
+          onToggle={handleDmToggle}
+          onResolve={handleDmResolve}
+        />
+      )}
+      {/* Fate Overlay (non-DM players) */}
+      {!isDM && <FateOverlay visible={fateOverlayVisible} />}
     </div>
   );
 }

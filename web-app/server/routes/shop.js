@@ -1,15 +1,18 @@
 /**
  * Shop Routes - Grumm's Shop
- * 
- * GET  /api/shop/catalog  - Get the full shop catalog
- * POST /api/shop/buy      - Purchase an item
+ *
+ * GET  /api/shop/catalog       - Get the full shop catalog
+ * POST /api/shop/buy           - Purchase an item
+ * POST /api/shop/sell          - Sell an item from inventory
+ * GET  /api/shop/sell-prices   - Get sell prices for inventory items
  */
 
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { authRequired } = require('../middleware/auth');
-const { loadCatalog, findItemInCatalog, getWallet, spendGold, addItemToInventory, getInventory, useItem } = require('../lib/economy');
+const { loadCatalog, findItemInCatalog, getWallet, spendGold, awardGold, refundGold, addItemToInventory, getInventory, removeItemFromInventory, useItem } = require('../lib/economy');
+const { loadFishCatalog } = require('../lib/fishing');
 
 const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
 function loadPlayers() {
@@ -91,6 +94,9 @@ router.post('/buy', authRequired, (req, res) => {
     const before = xp.getXpRecord(req.user.id, req.user.username).total_xp;
     xp.awardGoldSpendXp(req.user.id, req.user.username, item.price);
     xp.incrementLifetimeStat(req.user.id, req.user.username, 'shop_purchases');
+    if (item.type === 'dice_set') {
+      xp.incrementLifetimeStat(req.user.id, req.user.username, 'dice_sets_collected');
+    }
     const after = xp.getXpRecord(req.user.id, req.user.username).total_xp;
     xpAwarded = after - before;
   } catch (e) { console.error('[xp]', e.message); }
@@ -166,6 +172,95 @@ router.post('/use', authRequired, (req, res) => {
     success: true,
     use_message,
     inventory: result.inventory,
+  });
+});
+
+// Helper: look up sell price for an inventory item
+function getSellPrice(itemId) {
+  // Check shop catalog first
+  const catalogEntry = findItemInCatalog(itemId);
+  if (catalogEntry) return catalogEntry.item.price;
+
+  // Check fish catalog
+  const fishCatalog = loadFishCatalog();
+  const fish = (fishCatalog.fish || []).find(f => f.id === itemId);
+  if (fish && fish.goldValue) return fish.goldValue;
+
+  return null;
+}
+
+// Get sell prices for the player's inventory items
+router.get('/sell-prices', authRequired, (req, res) => {
+  const inventory = getInventory(req.user.id);
+  const prices = {};
+  for (const entry of inventory.items) {
+    const price = getSellPrice(entry.item_id);
+    if (price != null) prices[entry.item_id] = price;
+  }
+  res.json({ prices });
+});
+
+// Sell an item from inventory
+router.post('/sell', authRequired, (req, res) => {
+  const { item_id, quantity: rawQty } = req.body;
+  const quantity = rawQty || 1;
+
+  if (!item_id) {
+    return res.status(400).json({ error: 'item_id is required' });
+  }
+
+  // Verify item is in inventory with enough quantity
+  const inventory = getInventory(req.user.id);
+  const invEntry = inventory.items.find(i => i.item_id === item_id);
+  if (!invEntry || invEntry.quantity < quantity) {
+    return res.status(400).json({ error: 'Not enough of that item in inventory' });
+  }
+
+  // Determine sell price
+  const unitPrice = getSellPrice(item_id);
+  if (unitPrice == null) {
+    return res.status(400).json({ error: 'This item cannot be sold' });
+  }
+
+  const totalGold = unitPrice * quantity;
+  const itemName = invEntry.name || item_id;
+
+  // Remove from inventory
+  const updatedInv = removeItemFromInventory(req.user.id, item_id, quantity);
+  if (!updatedInv) {
+    return res.status(400).json({ error: 'Failed to remove item from inventory' });
+  }
+
+  // Refund gold (decrements lifetime_spent instead of inflating lifetime_earned)
+  const wallet = refundGold(req.user.id, req.user.username, totalGold, {
+    source: 'shop_sale',
+    item_id,
+    item_name: itemName,
+    quantity,
+    unit_price: unitPrice
+  });
+
+  // Dice set special handling: remove colorset from ownedDice
+  const catalogEntry = findItemInCatalog(item_id);
+  if (catalogEntry && catalogEntry.item.type === 'dice_set' && catalogEntry.item.colorset) {
+    try {
+      const players = loadPlayers();
+      const p = players[req.user.id];
+      if (p && p.ownedDice) {
+        p.ownedDice = p.ownedDice.filter(c => c !== catalogEntry.item.colorset);
+        if (p.equippedDice === catalogEntry.item.colorset) {
+          p.equippedDice = 'default';
+        }
+        savePlayers(players);
+      }
+    } catch (e) { console.error('[dice_set sell]', e.message); }
+  }
+
+  res.json({
+    success: true,
+    goldAwarded: totalGold,
+    balance: wallet.balance,
+    inventory: updatedInv
   });
 });
 

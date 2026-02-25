@@ -1,0 +1,313 @@
+/* DM Roll Control Panel ("Fate's Hand") */
+
+.dm-roll-panel {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 62px);
+  right: 12px;
+  width: 240px;
+  background: rgba(15, 10, 25, 0.92);
+  border: 1px solid rgba(218, 165, 32, 0.4);
+  border-radius: 10px;
+  z-index: 900;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6), 0 0 12px rgba(218, 165, 32, 0.1);
+  overflow: hidden;
+  font-size: 13px;
+  color: #e0d6c0;
+}
+
+.dm-roll-collapsed-btn {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 62px);
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(15, 10, 25, 0.9);
+  border: 1px solid rgba(218, 165, 32, 0.5);
+  color: #daa520;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.dm-roll-collapsed-btn:active {
+  transform: scale(0.95);
+}
+
+/* Header */
+.dm-roll-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(218, 165, 32, 0.2);
+  background: rgba(218, 165, 32, 0.06);
+}
+
+.dm-roll-title {
+  font-weight: 600;
+  color: #daa520;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.dm-roll-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Toggle switch */
+.dm-roll-toggle {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.dm-roll-toggle input {
+  display: none;
+}
+
+.dm-roll-toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.dm-roll-toggle-slider::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #888;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.dm-roll-toggle input:checked + .dm-roll-toggle-slider {
+  background: rgba(218, 165, 32, 0.3);
+}
+
+.dm-roll-toggle input:checked + .dm-roll-toggle-slider::before {
+  transform: translateX(16px);
+  background: #daa520;
+}
+
+.dm-roll-collapse-btn {
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.dm-roll-collapse-btn:hover {
+  color: #ccc;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Status messages */
+.dm-roll-disabled-hint,
+.dm-roll-waiting {
+  padding: 12px;
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  font-size: 12px;
+}
+
+/* Pending roll card */
+.dm-roll-card {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dm-roll-context {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dm-roll-player {
+  color: #daa520;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.dm-roll-label {
+  color: #aaa;
+  font-size: 12px;
+}
+
+.dm-roll-notation {
+  font-family: monospace;
+  font-size: 16px;
+  color: #fff;
+  text-align: center;
+  padding: 4px 0;
+  letter-spacing: 1px;
+}
+
+/* Dice inputs */
+.dm-roll-dice-inputs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dm-roll-die-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.dm-roll-die-input label {
+  font-size: 11px;
+  color: #888;
+  text-transform: lowercase;
+}
+
+.dm-roll-die-input input {
+  width: 56px;
+  padding: 6px 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(218, 165, 32, 0.3);
+  border-radius: 6px;
+  color: #fff;
+  text-align: center;
+  font-size: 16px;
+  font-family: monospace;
+  outline: none;
+}
+
+.dm-roll-die-input input:focus {
+  border-color: rgba(218, 165, 32, 0.7);
+  box-shadow: 0 0 6px rgba(218, 165, 32, 0.2);
+}
+
+.dm-roll-die-input input::placeholder {
+  color: #555;
+  font-size: 11px;
+}
+
+/* Modifier & total */
+.dm-roll-modifier {
+  text-align: center;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.dm-roll-total {
+  text-align: center;
+  font-size: 18px;
+  color: #fff;
+  padding: 4px 0;
+}
+
+.dm-roll-total strong {
+  color: #daa520;
+}
+
+.dm-roll-total-breakdown {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* Quick action buttons */
+.dm-roll-quick-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.dm-roll-quick-btn {
+  flex: 1;
+  padding: 6px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ccc;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.dm-roll-quick-btn:active {
+  transform: scale(0.97);
+}
+
+.dm-roll-quick-max {
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+}
+
+.dm-roll-quick-max:hover {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.dm-roll-quick-min {
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.dm-roll-quick-min:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.dm-roll-quick-random {
+  border-color: rgba(168, 85, 247, 0.3);
+  color: #c084fc;
+}
+
+.dm-roll-quick-random:hover {
+  background: rgba(168, 85, 247, 0.1);
+}
+
+.dm-roll-quick-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Confirm button */
+.dm-roll-confirm-btn {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #daa520, #b8860b);
+  color: #1a0e00;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.dm-roll-confirm-btn:active {
+  transform: scale(0.97);
+}
+
+.dm-roll-confirm-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+}

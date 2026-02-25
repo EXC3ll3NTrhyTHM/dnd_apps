@@ -207,17 +207,21 @@ function getAllWeapons(equipment, sheet) {
     }
   }
 
-  // Always include Unarmed Strike
+  // Always include Unarmed Strike (Monks get Martial Arts: DEX option + martial arts die)
   if (!weapons.some(w => w.name === 'Unarmed Strike')) {
+    const isMonk = (sheet.classes || []).some(c => c.name === 'Monk');
+    const monkLevel = isMonk ? (sheet.classes.find(c => c.name === 'Monk')?.level || 0) : 0;
+    const martialArtsDie = monkLevel >= 17 ? '1d10' : monkLevel >= 11 ? '1d8' : monkLevel >= 5 ? '1d6' : '1d4';
+    const unarmedMod = isMonk ? Math.max(strMod, dexMod) : strMod;
     weapons.push({
       id: 'unarmed_strike',
       name: 'Unarmed Strike',
-      dice: '1d4',
+      dice: isMonk ? martialArtsDie : '1d4',
       type: 'bludgeoning',
-      finesse: false,
+      finesse: isMonk,
       ranged: false,
-      attackBonus: strMod + profBonus,
-      damageMod: strMod,
+      attackBonus: unarmedMod + profBonus,
+      damageMod: unarmedMod,
     });
   }
 

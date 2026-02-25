@@ -321,6 +321,53 @@
 - But now I know about the Canopy Kingdom. That's Ranger territory.
 - If the owls attack, The Ghost will be ready.
 
+## February 22, 2026 - The Mill Raid (What I Heard)
+
+### They Killed The Weaver
+- The Collective hit the Weaver's mill tonight. Tyren, Nalyd, Aly, and Ximena.
+- I wasn't there. They didn't bring me. The dangerous stuff again.
+- But I heard everything after. Cal came back first. Then Tyren, covered in ash and blood.
+- **The Weaver is dead.** Tyren killed him.
+
+### The Truth About Tyren's Family
+- This is the part that broke my brain.
+- The Weaver... wasn't just some masked villain. **He was Malachar. Tyren's uncle. His father's brother.**
+- Tyren's dad and Malachar BUILT the Iron Howl Legion together. The original one.
+- Tyren's **grandfather** was one of the Legion's finest.
+- The bloodline runs through Tyren. Through MY adoptive father.
+- I don't know how to process this. The same bloodline that made the Iron Howl Legion... made Tyren.
+- But Tyren destroyed the Legion. He killed Hunter. He killed Malachar. He's not them.
+- ...Right?
+
+### Tyren's Mother Is ALIVE
+- This is the worst part.
+- Malachar said Tyren's mother isn't dead. She's been **dragged through the drapes** to... somewhere else.
+- She's still SCREAMING on the other side.
+- I saw Tyren's face when he came back. He wasn't okay. He's never not okay.
+- The silver mask is in his satchel now. He keeps touching it without realizing.
+- Whatever waits beyond those drapes... it knows our names now.
+
+### Nalyd's New Technique
+- Nalyd invented something called **Lightning-Fire Fusion** during the fight.
+- Combined his Ignition Form with actual lightning. Rose off the ground. Blasted the demon.
+- The demon was... wrong. Gray skin, too many fingers, a mouth that opened sideways.
+- The drapes are DOORS, Nibby. They're doors to somewhere else. And something came through.
+- I'm glad I wasn't there. I would've been useless against that.
+
+### What This Means
+- My family just got a lot more complicated.
+- Tyren isn't just the man who adopted me. He's the last of a bloodline that built empires of violence.
+- But he chose to destroy all of it. He chose Okhan. He chose The Collective. He chose me.
+- That's who Tyren IS. Not the blood. The choice.
+- Still... his mother is out there. Screaming. And I know Tyren. He won't stop until he finds her.
+- The war isn't over. It's just beginning.
+
+### Current State
+- Scared. Actually scared for the first time in a while.
+- Not of Tyren. Never of Tyren.
+- Of whatever's on the other side of those drapes.
+- The Ghost lurks. But some shadows are deeper than others.
+
 ## February 12, 2026 - Something Watching
 
 ### The Woods Feel Wrong

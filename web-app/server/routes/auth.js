@@ -17,6 +17,8 @@ const { authRequired } = require('../middleware/auth');
 const { getWallet, getInventory } = require('../lib/economy');
 const { getXpRecord, getLevelFromXp } = require('../lib/xp');
 
+const DM_USER_IDS = (process.env.DM_USER_IDS || '').split(',').filter(Boolean);
+
 const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
 
 function loadPlayers() {
@@ -109,7 +111,8 @@ router.get('/me', authRequired, (req, res) => {
       username: req.user.username,
       global_name: req.user.global_name,
       avatar: req.user.avatar,
-      characterName
+      characterName,
+      isDM: DM_USER_IDS.includes(req.user.id),
     },
     wallet: {
       balance: wallet.balance,

@@ -27,6 +27,14 @@ const CHARACTER_MAP = {
 // Maps Discord user ID → array of user IDs they can impersonate
 const ALIAS_ALLOWED = {
   '1472286665417560167': [
+    { id: '424061511833747467', name: 'The Architect' },
+    { id: '1073385140669128725', name: 'Nalyd' },
+    { id: '1374906408046166036', name: 'Tyren' },
+    { id: '765978025937469481', name: 'Aly' },
+    { id: '228241331296665600', name: 'Acacia' }
+  ],
+  '424061511833747467': [
+    { id: '424061511833747467', name: 'The Architect' },
     { id: '1073385140669128725', name: 'Nalyd' },
     { id: '1374906408046166036', name: 'Tyren' },
     { id: '765978025937469481', name: 'Aly' },
@@ -185,7 +193,7 @@ function parseSheet(raw) {
     }
   }
 
-  // Class features available at current level
+  // Class features available at current level (base class + subclass)
   const classFeatures = [];
   for (const cls of (d.classes || [])) {
     for (const feat of (cls.definition?.classFeatures || [])) {
@@ -193,7 +201,15 @@ function parseSheet(raw) {
         classFeatures.push(feat.name);
       }
     }
+    for (const feat of (cls.subclassDefinition?.classFeatures || [])) {
+      if (feat.requiredLevel <= cls.level) {
+        classFeatures.push(feat.name);
+      }
+    }
   }
+
+  // Channel Divinity uses (Paladin/Cleric — 1 use per short rest at level 3+)
+  const channelDivinityMax = classFeatures.includes('Channel Divinity') ? 1 : 0;
 
   // DEX mod for AC calc
   const dexStat = stats.find(s => s.id === 2);
@@ -249,6 +265,7 @@ function parseSheet(raw) {
     equipment: equippedItems,
     spellcasting,
     classFeatures,
+    channelDivinityMax,
   };
 }
 

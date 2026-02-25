@@ -1,11 +1,11 @@
 {
   "424061511833747467": {
     "user_id": "424061511833747467",
-    "username": "The Architect",
-    "balance": 357,
-    "lifetime_earned": 3607,
-    "lifetime_spent": 3250,
-    "last_updated": "2026-02-19T14:24:28.709Z"
+    "username": "Nalyd",
+    "balance": 934,
+    "lifetime_earned": 10134,
+    "lifetime_spent": 9200,
+    "last_updated": "2026-02-25T07:46:25.468Z"
   },
   "1374906408046166036": {
     "user_id": "1374906408046166036",
@@ -42,17 +42,17 @@
   "228241331296665600": {
     "user_id": "228241331296665600",
     "username": "Acacia",
-    "balance": 501,
-    "lifetime_earned": 1166,
-    "lifetime_spent": 665,
-    "last_updated": "2026-02-19T07:02:33.769Z"
+    "balance": 1018,
+    "lifetime_earned": 5463,
+    "lifetime_spent": 4445,
+    "last_updated": "2026-02-25T07:46:25.534Z"
   },
   "1472286665417560167": {
     "user_id": "1472286665417560167",
     "username": "Acacia",
-    "balance": 176,
-    "lifetime_earned": 826,
+    "balance": 191,
+    "lifetime_earned": 841,
     "lifetime_spent": 650,
-    "last_updated": "2026-02-19T05:46:16.269Z"
+    "last_updated": "2026-02-21T22:06:49.811Z"
   }
 }

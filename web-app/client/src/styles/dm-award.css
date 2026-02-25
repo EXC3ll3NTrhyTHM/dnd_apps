@@ -30,6 +30,14 @@
     inset 0 0 160px 40px rgba(168, 85, 247, 0.15);
 }
 
+.dm-award-combined .dm-award-shimmer {
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 0 0 80px 20px rgba(220, 195, 140, 0.3),
+    inset 0 0 160px 40px rgba(220, 195, 140, 0.12);
+}
+
 /* ── Floating particles ── */
 
 .dm-award-particles {
@@ -63,6 +71,16 @@
   box-shadow: 0 0 6px 2px rgba(168, 85, 247, 0.6);
 }
 
+.dm-award-combined .dm-award-particle:nth-child(odd) {
+  background: radial-gradient(circle, #ffd700 0%, #d4af37 50%, transparent 100%);
+  box-shadow: 0 0 6px 2px rgba(212, 175, 55, 0.6);
+}
+
+.dm-award-combined .dm-award-particle:nth-child(even) {
+  background: radial-gradient(circle, #c084fc 0%, #a855f7 50%, transparent 100%);
+  box-shadow: 0 0 6px 2px rgba(168, 85, 247, 0.6);
+}
+
 /* ── Floating text ── */
 
 .dm-award-text {
@@ -91,6 +109,21 @@
   text-shadow:
     0 0 12px rgba(168, 85, 247, 0.8),
     0 0 30px rgba(168, 85, 247, 0.4);
+}
+
+.dm-award-line-xp {
+  color: #a855f7;
+  text-shadow:
+    0 0 12px rgba(168, 85, 247, 0.8),
+    0 0 30px rgba(168, 85, 247, 0.4);
+}
+
+.dm-award-line-gold {
+  color: #d4af37;
+  text-shadow:
+    0 0 12px rgba(212, 175, 55, 0.8),
+    0 0 30px rgba(212, 175, 55, 0.4);
+  margin-top: 4px;
 }
 
 /* ── Exit class ── */

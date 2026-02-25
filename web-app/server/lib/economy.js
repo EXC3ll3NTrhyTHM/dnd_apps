@@ -159,6 +159,22 @@ function awardGold(userId, username, amount, metadata = {}) {
   return wallets[userId];
 }
 
+function refundGold(userId, username, amount, metadata = {}) {
+  const wallets = loadWallets();
+  if (!wallets[userId]) {
+    getWallet(userId, username);
+    return refundGold(userId, username, amount, metadata);
+  }
+  wallets[userId].balance += amount;
+  wallets[userId].lifetime_spent = Math.max(0, wallets[userId].lifetime_spent - amount);
+  wallets[userId].username = username || wallets[userId].username;
+  wallets[userId].last_updated = new Date().toISOString();
+  saveWallets(wallets);
+
+  logTransaction(userId, username, 'shop_sale', amount, wallets[userId].balance, metadata);
+  return wallets[userId];
+}
+
 function logTransaction(userId, username, type, amount, balanceAfter, metadata = {}) {
   const txData = loadTransactions();
   txData.transactions.push({
@@ -417,6 +433,7 @@ module.exports = {
   getWallet,
   spendGold,
   awardGold,
+  refundGold,
   logTransaction,
 
   // Inventory

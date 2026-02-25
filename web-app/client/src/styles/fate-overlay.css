@@ -1,0 +1,130 @@
+/* Fate Overlay — mystical waiting screen during DM dice deliberation */
+
+.fate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fate-fade-in 0.5s ease-out;
+  pointer-events: all;
+}
+
+.fate-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(15, 10, 30, 0.85) 0%, rgba(5, 0, 15, 0.95) 100%);
+  backdrop-filter: blur(4px);
+}
+
+.fate-overlay-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Cosmic Eye */
+.fate-eye {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fate-eye-outer {
+  width: 100px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid rgba(218, 165, 32, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fate-eye-pulse 3s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(218, 165, 32, 0.3), inset 0 0 15px rgba(218, 165, 32, 0.1);
+}
+
+.fate-eye-iris {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #daa520 0%, #8b6914 60%, #4a3508 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(218, 165, 32, 0.5);
+}
+
+.fate-eye-pupil {
+  width: 12px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0a0510;
+  animation: fate-pupil-drift 4s ease-in-out infinite;
+}
+
+.fate-eye-rays {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border: 1px solid rgba(218, 165, 32, 0.2);
+  animation: fate-rays-spin 12s linear infinite;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(218, 165, 32, 0.08) 30deg,
+    transparent 60deg,
+    rgba(218, 165, 32, 0.08) 90deg,
+    transparent 120deg,
+    rgba(218, 165, 32, 0.08) 150deg,
+    transparent 180deg,
+    rgba(218, 165, 32, 0.08) 210deg,
+    transparent 240deg,
+    rgba(218, 165, 32, 0.08) 270deg,
+    transparent 300deg,
+    rgba(218, 165, 32, 0.08) 330deg,
+    transparent 360deg
+  );
+}
+
+/* Flavor text */
+.fate-text {
+  color: rgba(218, 165, 32, 0.9);
+  font-size: 16px;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  text-align: center;
+  max-width: 280px;
+  transition: opacity 0.4s ease;
+  text-shadow: 0 0 8px rgba(218, 165, 32, 0.3);
+}
+
+.fate-text-fading {
+  opacity: 0;
+}
+
+/* Animations */
+@keyframes fate-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fate-eye-pulse {
+  0%, 100% { transform: scale(1); border-color: rgba(218, 165, 32, 0.6); }
+  50% { transform: scale(1.08); border-color: rgba(218, 165, 32, 0.9); }
+}
+
+@keyframes fate-pupil-drift {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(3px); }
+  75% { transform: translateX(-3px); }
+}
+
+@keyframes fate-rays-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

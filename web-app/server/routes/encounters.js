@@ -10,6 +10,7 @@ const router = express.Router();
 const { authRequired } = require('../middleware/auth');
 const { getAllMonsters } = require('../lib/monsters');
 const {
+  TURN_TIMER_MS,
   spawnEncounter,
   joinEncounter,
   joinWithInitiative,
@@ -20,6 +21,7 @@ const {
   prepareMonsterAttacks,
   resolveRound,
   resolveMonsterWithRolls,
+  resolveMonsterSaves,
   resolveMonsterTurn,
   distributeRewards,
   getEncounter,
@@ -31,7 +33,16 @@ const {
   getAvailableBonusActions,
   resolveBonusAction,
   SPELL_DEFINITIONS,
+  getPendingDots,
+  monsterHasEscapeConditions,
+  prepareMonsterEscape,
+  resolveMonsterEscapeWithRolls,
+  setDmRollControl,
+  setPendingRoll,
+  getPendingRoll,
+  clearPendingRoll,
 } = require('../lib/encounters');
+const { canAct, tickConditions } = require('../lib/conditions');
 const { checkAchievements } = require('../lib/achievements');
 const { generateRolls } = require('../lib/weapons');
 const { getActiveAlias } = require('../lib/characterSheets');
@@ -63,6 +74,37 @@ function broadcastToLocation(req, locationId, payload) {
   const data = JSON.stringify(payload);
   wss.clients.forEach(client => {
     if (client.readyState === 1) {
+      client.send(data);
+    }
+  });
+}
+
+/**
+ * Broadcast to all WS clients at a location EXCEPT specific user IDs.
+ */
+function broadcastToLocationExcept(req, locationId, payload, excludeUserIds) {
+  const wss = req.app.get('wss');
+  if (!wss) return;
+
+  const data = JSON.stringify(payload);
+  const excludeSet = new Set(excludeUserIds);
+  wss.clients.forEach(client => {
+    if (client.readyState === 1 && !excludeSet.has(client.userId)) {
+      client.send(data);
+    }
+  });
+}
+
+/**
+ * Broadcast to a specific user's WS connections only.
+ */
+function broadcastToUser(req, userId, payload) {
+  const wss = req.app.get('wss');
+  if (!wss) return;
+
+  const data = JSON.stringify(payload);
+  wss.clients.forEach(client => {
+    if (client.readyState === 1 && client.userId === userId) {
       client.send(data);
     }
   });
@@ -132,6 +174,81 @@ router.post('/:encounterId/cancel', authRequired, (req, res) => {
   res.json({ success: true });
 });
 
+/**
+ * POST /api/encounters/:encounterId/dm-roll-control
+ * Toggle DM dice control ("Fate's Hand"). DM only.
+ * Body: { enabled: boolean }
+ */
+router.post('/:encounterId/dm-roll-control', authRequired, (req, res) => {
+  if (!isDM(req.user.id)) {
+    return res.status(403).json({ error: 'DM only.' });
+  }
+  const { enabled } = req.body;
+  const result = setDmRollControl(req.params.encounterId, enabled);
+  if (result.error) return res.status(404).json({ error: result.error });
+  res.json({ success: true, enabled: !!enabled });
+});
+
+/**
+ * POST /api/encounters/dm-roll-resolve
+ * DM submits chosen dice values for a pending roll.
+ * Body: { encounterId, pendingRollId, chosenRolls: [number, ...] }
+ */
+router.post('/dm-roll-resolve', authRequired, (req, res) => {
+  if (!isDM(req.user.id)) {
+    return res.status(403).json({ error: 'DM only.' });
+  }
+
+  const { encounterId, pendingRollId, chosenRolls } = req.body;
+  if (!encounterId || !pendingRollId || !Array.isArray(chosenRolls)) {
+    return res.status(400).json({ error: 'encounterId, pendingRollId, and chosenRolls are required.' });
+  }
+
+  const enc = getEncounter(encounterId);
+  if (!enc) return res.status(404).json({ error: 'Encounter not found.' });
+  if (!enc.pendingRoll || enc.pendingRoll.id !== pendingRollId) {
+    return res.status(400).json({ error: 'No matching pending roll.' });
+  }
+
+  const pending = enc.pendingRoll;
+  const mod = pending.modifier || 0;
+  const total = chosenRolls.reduce((s, r) => s + r, 0) + mod;
+
+  // Store resolved roll for the long-poll to pick up
+  enc._lastResolvedRoll = { rolls: chosenRolls, total };
+  clearPendingRoll(encounterId);
+
+  // Extend turn deadline by the time spent deliberating
+  if (enc.turnDeadline) {
+    const deliberationMs = Date.now() - pending.timestamp;
+    enc.turnDeadline += deliberationMs;
+  }
+
+  // Broadcast dice animation to ALL clients (same event as normal rolls)
+  broadcastToLocation(req, pending.locationId, {
+    type: 'arena_dice_roll',
+    locationId: pending.locationId,
+    senderId: pending.requesterId,
+    notation: pending.notation,
+    modifier: mod,
+    total,
+    rolls: chosenRolls,
+    color: pending.color || '#eab308',
+    colorset: pending.colorset || 'white',
+    material: pending.material || 'plastic',
+    label: pending.label || '',
+    advantageType: pending.advantageType || undefined,
+  });
+
+  // Dismiss fate overlay for non-DM clients
+  broadcastToLocationExcept(req, pending.locationId, {
+    type: 'fate_deliberation_end',
+    locationId: pending.locationId,
+  }, [req.user.id]);
+
+  res.json({ rolls: chosenRolls, total });
+});
+
 // ============================================
 // PLAYER ACTIONS
 // ============================================
@@ -169,7 +286,7 @@ router.post('/:encounterId/join', authRequired, (req, res) => {
     });
 
     // Track lifetime stat
-    try { require('../lib/xp').incrementLifetimeStat(userId, username, 'encounters_joined', 1); } catch {}
+    try { require('../lib/xp').incrementLifetimeStat(userId, username, 'encounters_joined', 1); } catch { }
 
     // Handle initiative completion
     if (result.midCombatJoin) {
@@ -229,7 +346,7 @@ router.post('/:encounterId/join', authRequired, (req, res) => {
     encounter: publicState,
   });
 
-  try { require('../lib/xp').incrementLifetimeStat(userId, username, 'encounters_joined', 1); } catch {}
+  try { require('../lib/xp').incrementLifetimeStat(userId, username, 'encounters_joined', 1); } catch { }
 
   res.json({ encounter: publicState, combatStats: result.combatStats });
 });
@@ -313,7 +430,7 @@ router.post('/:encounterId/initiative', authRequired, (req, res) => {
  */
 router.post('/:encounterId/action', authRequired, (req, res) => {
   const userId = req.user.id;
-  const { action, attackRoll, attackRoll2, damageTotal, potionId, targetId, healRoll, helpTargetId, smiteData, sneakAttackData, inspirationData, healAmount, spellId, saveRoll, weaponId } = req.body;
+  const { action, attackRoll, attackRoll2, damageTotal, potionId, targetId, healRoll, helpTargetId, smiteData, sneakAttackData, inspirationData, healAmount, spellId, saveRoll, weaponId, subAction, ensnaringStrikeSaveRoll, stunningStrike, stunningStrikeSaveRoll } = req.body;
 
   if (!action) {
     return res.status(400).json({ error: 'action is required.' });
@@ -335,6 +452,10 @@ router.post('/:encounterId/action', authRequired, (req, res) => {
   if (spellId) rollData.spellId = spellId;
   if (typeof saveRoll === 'number') rollData.saveRoll = saveRoll;
   if (weaponId) rollData.weaponId = weaponId;
+  if (subAction) rollData.subAction = subAction;
+  if (typeof ensnaringStrikeSaveRoll === 'number') rollData.ensnaringStrikeSaveRoll = ensnaringStrikeSaveRoll;
+  if (stunningStrike) rollData.stunningStrike = true;
+  if (typeof stunningStrikeSaveRoll === 'number') rollData.stunningStrikeSaveRoll = stunningStrikeSaveRoll;
 
   const result = submitAction(req.params.encounterId, userId, action, rollData);
   if (result.error) {
@@ -492,7 +613,7 @@ router.post('/:encounterId/bonus-action', authRequired, (req, res) => {
     return res.status(400).json({ error: 'Not in bonus action phase.' });
   }
 
-  const { bonusAction, potionId, healRoll, targetId, weaponId, attackRoll, damageTotal } = req.body;
+  const { bonusAction, potionId, healRoll, targetId, weaponId, attackRoll, damageTotal, strikes } = req.body;
 
   if (bonusAction === 'skip') {
     encounter.bonusActionPhase = false;
@@ -501,7 +622,7 @@ router.post('/:encounterId/bonus-action', authRequired, (req, res) => {
     return res.json({ success: true });
   }
 
-  const result = resolveBonusAction(encounter, userId, bonusAction, { potionId, healRoll, targetId, weaponId, attackRoll, damageTotal });
+  const result = resolveBonusAction(encounter, userId, bonusAction, { potionId, healRoll, targetId, weaponId, attackRoll, damageTotal, strikes });
   if (result.error) {
     return res.status(400).json({ error: result.error });
   }
@@ -553,6 +674,10 @@ router.post('/:encounterId/pre-bonus-action', authRequired, (req, res) => {
     return res.status(400).json({ error: result.error });
   }
 
+  // Reset turn timer — player still needs their main action after the pre-bonus
+  encounter.lastActivity = Date.now();
+  encounter.turnDeadline = Date.now() + TURN_TIMER_MS;
+
   // Broadcast result but do NOT advance turn — player still needs their main action
   broadcastToLocation(req, encounter.locationId, {
     type: 'encounter_bonus_result',
@@ -581,29 +706,55 @@ router.post('/:encounterId/monster-rolls', authRequired, (req, res) => {
   if (result.error) {
     return res.status(400).json({ error: result.error });
   }
+  // Timeout already auto-resolved these monster rolls — just return success
+  if (result.alreadyResolved) {
+    return res.json({ success: true, alreadyResolved: true });
+  }
 
   const encounter = getEncounter(req.params.encounterId);
   const locationId = result.locationId;
 
   // Return to action phase before broadcasting so clients get the right phase
+  // (will be overridden to monster_saving if saves are pending)
   if (encounter && !result.defeat) {
     encounter.phase = 'action';
   }
 
-  // Broadcast monster attack results
-  if (result.results && result.results.length > 0) {
+  // Broadcast monster attack results (also broadcast if DoT effects occurred with no attacks)
+  const hasResults = result.results && result.results.length > 0;
+  const hasDotEffects = result.monsterConditionEffects?.dotEffects?.length > 0;
+  if (hasResults || hasDotEffects) {
     broadcastToLocation(req, locationId, {
       type: 'encounter_monster_turn',
       locationId,
       encounterId: req.params.encounterId,
-      attacks: result.results,
+      attacks: result.results || [],
       monsterConditionEffects: result.monsterConditionEffects || null,
+      concentrationSaves: result.concentrationSaves || [],
       encounter: encounter ? getPublicState(encounter) : null,
     });
   }
 
-  // Turn-based: after monster attacks, advance turn
-  if (encounter && !result.defeat) {
+  // If monster has pending end-of-turn saves, enter save phase instead of advancing
+  if (encounter && !result.defeat && result.pendingSaves && result.pendingSaves.length > 0) {
+    encounter.phase = 'monster_saving';
+    encounter.monsterSaveDeadline = Date.now() + 30_000;
+    const rollerId = result.rollerId || Object.keys(encounter.participants)[0];
+    encounter.monsterSaveSetup = {
+      pendingSaves: result.pendingSaves,
+      rollerId,
+    };
+    broadcastToLocation(req, locationId, {
+      type: 'encounter_monster_save_needed',
+      locationId,
+      encounterId: req.params.encounterId,
+      rollerId,
+      pendingSaves: result.pendingSaves,
+      monsterName: encounter.monster.name,
+      encounter: getPublicState(encounter),
+    });
+  } else if (encounter && !result.defeat) {
+    // No saves needed — advance turn immediately
     const turnResult = advanceTurn(encounter);
     handleTurnAdvance(req, encounter, turnResult);
   } else if (result.defeat) {
@@ -614,6 +765,111 @@ router.post('/:encounterId/monster-rolls', authRequired, (req, res) => {
       outcome: 'defeat',
       defeatText: result.defeatText,
     });
+  }
+
+  res.json({ success: true });
+});
+
+/**
+ * POST /api/encounters/:encounterId/monster-saves
+ * Submit client-rolled save results for monster end-of-turn saves.
+ * Body: { saveRolls: [{ conditionId, roll }, ...] }
+ */
+router.post('/:encounterId/monster-saves', authRequired, (req, res) => {
+  const { saveRolls } = req.body;
+  if (!Array.isArray(saveRolls)) {
+    return res.status(400).json({ error: 'saveRolls array is required.' });
+  }
+
+  const encounter = getEncounter(req.params.encounterId);
+  if (!encounter) return res.status(404).json({ error: 'Encounter not found.' });
+  if (encounter.phase !== 'monster_saving') return res.json({ success: true, alreadyResolved: true });
+
+  const result = resolveMonsterSaves(req.params.encounterId, saveRolls);
+  if (result.error) return res.status(400).json({ error: result.error });
+
+  delete encounter.monsterSaveSetup;
+  delete encounter.monsterSaveDeadline;
+  encounter.phase = 'action';
+
+  // Broadcast save results
+  broadcastToLocation(req, encounter.locationId, {
+    type: 'encounter_monster_saves',
+    locationId: encounter.locationId,
+    encounterId: req.params.encounterId,
+    saveResults: result.savedConditions,
+    encounter: getPublicState(encounter),
+  });
+
+  // Now advance turn
+  const turnResult = advanceTurn(encounter);
+  handleTurnAdvance(req, encounter, turnResult);
+
+  res.json({ success: true });
+});
+
+/**
+ * POST /api/encounters/:encounterId/monster-escape
+ * Submit client-rolled escape check results for monster action_escape conditions.
+ * Body: { escapeRolls: [{ conditionId, roll }, ...] }
+ */
+router.post('/:encounterId/monster-escape', authRequired, (req, res) => {
+  const { escapeRolls, dotRolls } = req.body;
+  if (!Array.isArray(escapeRolls)) {
+    return res.status(400).json({ error: 'escapeRolls array is required.' });
+  }
+
+  const encounter = getEncounter(req.params.encounterId);
+  if (!encounter) return res.status(404).json({ error: 'Encounter not found.' });
+  if (encounter.phase !== 'monster_escaping') return res.json({ success: true, alreadyResolved: true });
+
+  const result = resolveMonsterEscapeWithRolls(req.params.encounterId, escapeRolls, dotRolls || undefined);
+  if (result.error) return res.status(400).json({ error: result.error });
+
+  delete encounter.monsterEscapeSetup;
+  delete encounter.monsterEscapeDeadline;
+  encounter.phase = 'action';
+
+  // Broadcast escape results as a monster turn with escape attempts
+  broadcastToLocation(req, encounter.locationId, {
+    type: 'encounter_monster_turn',
+    locationId: encounter.locationId,
+    encounterId: req.params.encounterId,
+    attacks: [],
+    escapeAttempts: result.escapeAttempts,
+    monsterConditionEffects: result.monsterConditionEffects || null,
+    encounter: getPublicState(encounter),
+  });
+
+  // Check for save_end conditions after escape
+  const monster = encounter.monster;
+  const pendingSaves = (monster.conditions || [])
+    .filter(c => c.durationType === 'save_end' && c.saveAbility && c.saveDC)
+    .map(c => ({
+      conditionId: c.id,
+      conditionName: c.name,
+      saveAbility: c.saveAbility,
+      saveDC: c.saveDC,
+      saveBonus: c.saveBonus ?? ((monster.savingThrows && monster.savingThrows[c.saveAbility]) || 0),
+    }));
+
+  if (pendingSaves.length > 0) {
+    encounter.phase = 'monster_saving';
+    encounter.monsterSaveDeadline = Date.now() + 30_000;
+    const rollerId = Object.keys(encounter.participants)[0];
+    encounter.monsterSaveSetup = { pendingSaves, rollerId };
+    broadcastToLocation(req, encounter.locationId, {
+      type: 'encounter_monster_save_needed',
+      locationId: encounter.locationId,
+      encounterId: req.params.encounterId,
+      rollerId,
+      pendingSaves,
+      monsterName: monster.name,
+      encounter: getPublicState(encounter),
+    });
+  } else {
+    const turnResult = advanceTurn(encounter);
+    handleTurnAdvance(req, encounter, turnResult);
   }
 
   res.json({ success: true });
@@ -685,6 +941,152 @@ router.post('/roll-broadcast', authRequired, (req, res) => {
     return res.status(400).json({ error: 'notation is required.' });
   }
 
+  // Track dice roll for lifetime stats (achievements like "50 rolls", "200 rolls")
+  try {
+    const { incrementLifetimeStat } = require('../lib/xp');
+    incrementLifetimeStat(req.user.id, req.user.username, 'dice_rolls', 1);
+  } catch { }
+
+  // Extend monster roll deadline — client is actively rolling dice
+  const encounters = getActiveEncounters({ locationId });
+  for (const enc of encounters) {
+    if (enc.phase === 'monster_rolling' && enc.monsterRollDeadline) {
+      enc.monsterRollDeadline = Date.now() + 30_000;
+    }
+  }
+
+  // --- DM Roll Control ("Fate's Hand") interception ---
+  const dmControlledEnc = encounters.find(e => e.dmRollControl && e.phase !== 'ended');
+  if (dmControlledEnc) {
+    const mod = modifier || 0;
+
+    // Look up the roller's character name
+    const playerData = getPlayerData(req.user.id);
+    const requesterName = playerData?.characterName || req.user.global_name || req.user.username;
+
+    // Store as pending roll
+    const pendingRoll = setPendingRoll(dmControlledEnc.id, {
+      requesterId: req.user.id,
+      requesterName,
+      notation,
+      modifier: mod,
+      color: color || '#eab308',
+      colorset: colorset || 'white',
+      material: material || 'plastic',
+      label: label || '',
+      advantageType: advantageType || undefined,
+      locationId,
+    });
+
+    // Update activity so encounter doesn't time out during deliberation
+    dmControlledEnc.lastActivity = Date.now();
+
+    // Broadcast fate overlay to non-DM players
+    const dmIds = DM_USER_IDS;
+    broadcastToLocationExcept(req, locationId, {
+      type: 'fate_deliberation_start',
+      locationId,
+    }, dmIds);
+
+    // Notify the DM with full roll context
+    for (const dmId of dmIds) {
+      broadcastToUser(req, dmId, {
+        type: 'dm_roll_pending',
+        locationId,
+        pendingRoll: {
+          id: pendingRoll.id,
+          encounterId: dmControlledEnc.id,
+          requesterName,
+          requesterId: req.user.id,
+          notation,
+          modifier: mod,
+          label: label || '',
+          advantageType: advantageType || undefined,
+        },
+      });
+    }
+
+    // Long-poll: wait for DM to resolve or timeout after 60s
+    const startTime = Date.now();
+    const TIMEOUT = 60_000;
+    const POLL_INTERVAL = 200;
+
+    const pollTimer = setInterval(() => {
+      // Check if pending roll was cleared (DM resolved or toggle-off)
+      const currentPending = getPendingRoll(dmControlledEnc.id);
+      if (!currentPending || currentPending.id !== pendingRoll.id) {
+        clearInterval(pollTimer);
+
+        // Pick up resolved values or fall back to random
+        const resolved = dmControlledEnc._lastResolvedRoll;
+        dmControlledEnc._lastResolvedRoll = null;
+
+        if (resolved) {
+          return res.json({ rolls: resolved.rolls, total: resolved.total });
+        }
+
+        // Fallback: generate random rolls
+        const { rolls, total: diceTotal } = generateRolls(notation);
+        const total = diceTotal + mod;
+        broadcastToLocation(req, locationId, {
+          type: 'arena_dice_roll',
+          locationId,
+          senderId: req.user.id,
+          notation,
+          modifier: mod,
+          total,
+          rolls,
+          color: color || '#eab308',
+          colorset: colorset || 'white',
+          material: material || 'plastic',
+          label: label || '',
+          advantageType: advantageType || undefined,
+        });
+        broadcastToLocationExcept(req, locationId, {
+          type: 'fate_deliberation_end',
+          locationId,
+        }, dmIds);
+        return res.json({ rolls, total });
+      }
+
+      // Timeout — fall back to random
+      if (Date.now() - startTime > TIMEOUT) {
+        clearInterval(pollTimer);
+        clearPendingRoll(dmControlledEnc.id);
+
+        // Extend turn deadline by timeout duration
+        if (dmControlledEnc.turnDeadline) {
+          dmControlledEnc.turnDeadline += TIMEOUT;
+        }
+
+        const { rolls, total: diceTotal } = generateRolls(notation);
+        const total = diceTotal + mod;
+        broadcastToLocation(req, locationId, {
+          type: 'arena_dice_roll',
+          locationId,
+          senderId: req.user.id,
+          notation,
+          modifier: mod,
+          total,
+          rolls,
+          color: color || '#eab308',
+          colorset: colorset || 'white',
+          material: material || 'plastic',
+          label: label || '',
+          advantageType: advantageType || undefined,
+        });
+        broadcastToLocationExcept(req, locationId, {
+          type: 'fate_deliberation_end',
+          locationId,
+        }, dmIds);
+        return res.json({ rolls, total });
+      }
+    }, POLL_INTERVAL);
+
+    return; // Don't continue to normal roll logic
+  }
+
+  // --- Normal (non-DM-controlled) roll ---
   const { rolls, total: diceTotal } = generateRolls(notation);
   const mod = modifier || 0;
   const total = diceTotal + mod;
@@ -750,6 +1152,8 @@ function handleTurnAdvance(req, encounter, turnResult) {
 
   if (turnResult.type === 'victory') {
     const rewardResults = distributeRewards(turnResult.victoryResult.rewards, encounter.monster?.id);
+    const completedGoals = rewardResults._completedGoals || {};
+    delete rewardResults._completedGoals;
 
     // Check achievements for all participants
     const allAchievements = {};
@@ -765,7 +1169,7 @@ function handleTurnAdvance(req, encounter, turnResult) {
         if (achResult.newAchievements && achResult.newAchievements.length > 0) {
           allAchievements[userId] = achResult.newAchievements;
         }
-      } catch {}
+      } catch { }
     }
 
     broadcastToLocation(req, locationId, {
@@ -777,6 +1181,7 @@ function handleTurnAdvance(req, encounter, turnResult) {
       monsterName: turnResult.victoryResult.monsterName,
       rewards: rewardResults,
       achievements: allAchievements,
+      completedGoals,
     });
     return;
   }
@@ -787,7 +1192,7 @@ function handleTurnAdvance(req, encounter, turnResult) {
       if (player.knockedOut && player.action !== 'fled') {
         try {
           require('../lib/xp').incrementLifetimeStat(userId, player.name, 'times_knocked_out', 1);
-        } catch {}
+        } catch { }
       }
     }
 
@@ -856,6 +1261,66 @@ function handleTurnAdvance(req, encounter, turnResult) {
 }
 
 function handleMonsterTurn(req, encounter) {
+  const mc = (encounter.monster.conditions || []).map(c => `${c.id}(${c.durationType})`);
+  console.log('[ES_DEBUG] handleMonsterTurn:', encounter.monster.name,
+    'round:', encounter.round, 'conditions:', mc.join(', ') || 'none',
+    'hasEscape:', monsterHasEscapeConditions(encounter));
+
+  // Stunned/incapacitated: monster skips its turn
+  if (!canAct(encounter.monster)) {
+    const skippedCondition = (encounter.monster.conditions || []).find(c => {
+      const CONDITIONS = require('../lib/conditions').CONDITIONS;
+      const def = CONDITIONS[c.id];
+      return def && def.canAct === false;
+    });
+    const conditionName = skippedCondition ? skippedCondition.name || skippedCondition.id : 'stunned';
+
+    // Tick conditions so the stun expires after the skipped turn
+    const conditionEffects = tickConditions(encounter.monster);
+
+    // Broadcast the skip — keep encounter state showing monster's turn
+    broadcastToLocation(req, encounter.locationId, {
+      type: 'encounter_monster_turn_skipped',
+      locationId: encounter.locationId,
+      encounterId: encounter.id,
+      monsterName: encounter.monster.name,
+      reason: conditionName,
+      conditionEffects,
+      encounter: getPublicState(encounter),
+    });
+
+    // After 3 seconds, advance to the next player's turn
+    setTimeout(() => {
+      const turnResult = advanceTurn(encounter);
+      handleTurnAdvance(req, encounter, turnResult);
+    }, 3000);
+    return;
+  }
+
+  // RAW: If monster has action_escape conditions (e.g. Nature's Wrath, Ensnaring Strike restrained),
+  // it must spend its action attempting to escape instead of attacking.
+  // Send to client for visible rolling through Fate's Hand.
+  if (monsterHasEscapeConditions(encounter)) {
+    const { pendingEscapes, rollerId } = prepareMonsterEscape(encounter);
+    const pendingDots = getPendingDots(encounter.monster);
+
+    encounter.phase = 'monster_escaping';
+    encounter.monsterEscapeDeadline = Date.now() + 30_000;
+    encounter.monsterEscapeSetup = { pendingEscapes, rollerId };
+
+    broadcastToLocation(req, encounter.locationId, {
+      type: 'encounter_monster_escape_needed',
+      locationId: encounter.locationId,
+      encounterId: encounter.id,
+      rollerId,
+      pendingEscapes,
+      pendingDots: pendingDots.length > 0 ? pendingDots : undefined,
+      monsterName: encounter.monster.name,
+      encounter: getPublicState(encounter),
+    });
+    return;
+  }
+
   const monsterSetup = prepareMonsterAttacks(encounter);
 
   if (monsterSetup.attacks.length === 0) {
@@ -869,6 +1334,9 @@ function handleMonsterTurn(req, encounter) {
   encounter.phase = 'monster_rolling';
   encounter.monsterRollDeadline = Date.now() + 30_000;
 
+  // Check for pending DoT conditions on the monster (e.g. ensnared → green d6)
+  const pendingDots = getPendingDots(encounter.monster);
+
   broadcastToLocation(req, encounter.locationId, {
     type: 'encounter_monster_roll_needed',
     locationId: encounter.locationId,
@@ -876,6 +1344,7 @@ function handleMonsterTurn(req, encounter) {
     rollerId: monsterSetup.rollerId,
     attacks: monsterSetup.attacks,
     monsterName: encounter.monster.name,
+    pendingDots: pendingDots.length > 0 ? pendingDots : undefined,
     encounter: getPublicState(encounter),
   });
 }
@@ -930,6 +1399,8 @@ function handleRoundResult(req, encounter, roundResult) {
   // Victory
   if (roundResult.victory) {
     const rewardResults = distributeRewards(roundResult.victory.rewards, encounter.monster?.id);
+    const completedGoals = rewardResults._completedGoals || {};
+    delete rewardResults._completedGoals;
 
     // Check achievements for all participants
     const allAchievements = {};
@@ -945,7 +1416,7 @@ function handleRoundResult(req, encounter, roundResult) {
         if (achResult.newAchievements && achResult.newAchievements.length > 0) {
           allAchievements[userId] = achResult.newAchievements;
         }
-      } catch {}
+      } catch { }
     }
 
     broadcastToLocation(req, locationId, {
@@ -957,6 +1428,7 @@ function handleRoundResult(req, encounter, roundResult) {
       monsterName: roundResult.victory.monsterName,
       rewards: rewardResults,
       achievements: allAchievements,
+      completedGoals,
     });
     return;
   }
@@ -968,7 +1440,7 @@ function handleRoundResult(req, encounter, roundResult) {
       if (player.knockedOut && player.action !== 'fled') {
         try {
           require('../lib/xp').incrementLifetimeStat(userId, player.name, 'times_knocked_out', 1);
-        } catch {}
+        } catch { }
       }
     }
 
@@ -1056,6 +1528,8 @@ function startTimeoutChecker(app) {
               locationId,
               encounterId: encounter.id,
               attacks: result.results,
+              monsterConditionEffects: result.monsterConditionEffects || null,
+              concentrationSaves: result.concentrationSaves || [],
               encounter: getPublicState(getEncounter(encounter.id)),
             });
           }
@@ -1068,15 +1542,74 @@ function startTimeoutChecker(app) {
               defeatText: result.defeatText,
             });
           } else {
-            // Turn-based: advance to next turn after monster auto-roll
             const enc = getEncounter(encounter.id);
             if (enc) {
+              // Auto-resolve pending saves server-side (no client to roll)
+              if (result.pendingSaves && result.pendingSaves.length > 0) {
+                const autoSaveRolls = result.pendingSaves.map(s => ({ conditionId: s.conditionId }));
+                const saveResult = resolveMonsterSaves(encounter.id, autoSaveRolls);
+                if (saveResult.savedConditions) {
+                  broadcastToLocation(fakeReq, locationId, {
+                    type: 'encounter_monster_saves',
+                    locationId,
+                    encounterId: encounter.id,
+                    saveResults: saveResult.savedConditions,
+                    encounter: getPublicState(enc),
+                  });
+                }
+              }
               enc.phase = 'action';
               const turnResult = advanceTurn(enc);
               handleTurnAdvance(fakeReq, enc, turnResult);
             }
           }
         }
+      } else if (reason === 'monster_save_timeout') {
+        // Client didn't roll saves in time — auto-resolve server-side
+        const fakeReq = { app };
+        const pendingSaves = encounter.monsterSaveSetup?.pendingSaves || [];
+        const autoSaveRolls = pendingSaves.map(s => ({ conditionId: s.conditionId }));
+        const saveResult = resolveMonsterSaves(encounter.id, autoSaveRolls);
+
+        delete encounter.monsterSaveSetup;
+        delete encounter.monsterSaveDeadline;
+        encounter.phase = 'action';
+
+        if (saveResult.savedConditions) {
+          broadcastToLocation(fakeReq, encounter.locationId, {
+            type: 'encounter_monster_saves',
+            locationId: encounter.locationId,
+            encounterId: encounter.id,
+            saveResults: saveResult.savedConditions,
+            encounter: getPublicState(encounter),
+          });
+        }
+
+        const turnResult = advanceTurn(encounter);
+        handleTurnAdvance(fakeReq, encounter, turnResult);
+      } else if (reason === 'monster_escape_timeout') {
+        // Client didn't roll escape in time — auto-resolve server-side
+        const fakeReq = { app };
+        const pendingEscapes = encounter.monsterEscapeSetup?.pendingEscapes || [];
+        const autoEscapeRolls = pendingEscapes.map(e => ({ conditionId: e.conditionId }));
+        const escResult = resolveMonsterEscapeWithRolls(encounter.id, autoEscapeRolls);
+
+        delete encounter.monsterEscapeSetup;
+        delete encounter.monsterEscapeDeadline;
+        encounter.phase = 'action';
+
+        broadcastToLocation(fakeReq, encounter.locationId, {
+          type: 'encounter_monster_turn',
+          locationId: encounter.locationId,
+          encounterId: encounter.id,
+          attacks: [],
+          escapeAttempts: escResult.escapeAttempts || [],
+          monsterConditionEffects: escResult.monsterConditionEffects || null,
+          encounter: getPublicState(encounter),
+        });
+
+        const turnResult = advanceTurn(encounter);
+        handleTurnAdvance(fakeReq, encounter, turnResult);
       } else if (reason === 'timeout') {
         // Full encounter timeout
         const fakeReq = { app };

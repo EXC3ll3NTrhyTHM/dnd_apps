@@ -5,7 +5,7 @@
  * ticking durations, and computing attack/defense modifiers.
  */
 
-const { rollDamage } = require('./weapons');
+const { rollDamage, rollD20 } = require('./weapons');
 
 // ============================================
 // CONDITION DEFINITIONS
@@ -61,6 +61,15 @@ const CONDITIONS = {
     defenseModifier: 'advantage_against',
     canAct: true,
   },
+  ensnared: {
+    name: 'Ensnared',
+    icon: '\u{1FAB4}',
+    description: 'Restrained by thorny vines. Takes 1d6 piercing per turn.',
+    attackModifier: 'disadvantage',
+    defenseModifier: 'advantage_against',
+    canAct: true,
+    dot: { dice: '1d6', type: 'piercing' },
+  },
   mockery: {
     name: 'Mocked',
     icon: '\u{1F3AD}',
@@ -84,7 +93,7 @@ const CONDITIONS = {
  * @param {string} opts.durationType - 'rounds' | 'end_of_next_turn' | 'save_end'
  * @param {string} opts.source - name of the source (caster, monster, etc.)
  */
-function addCondition(participant, conditionId, { duration = 1, durationType = 'rounds', source = '' } = {}) {
+function addCondition(participant, conditionId, { duration = 1, durationType = 'rounds', source = '', saveAbility = null, saveDC = null, saveBonus = null } = {}) {
   const def = CONDITIONS[conditionId];
   if (!def) return;
 
@@ -101,7 +110,14 @@ function addCondition(participant, conditionId, { duration = 1, durationType = '
     duration,
     durationType,
     source,
+    saveAbility,
+    saveDC,
+    saveBonus,
   });
+  if (conditionId === 'ensnared' || conditionId === 'restrained') {
+    console.log('[ES_DEBUG] addCondition:', conditionId, 'durationType:', durationType, 'saveDC:', saveDC, 'saveBonus:', saveBonus,
+      'conditions now:', participant.conditions.map(c => `${c.id}(${c.durationType})`).join(', '));
+  }
 }
 
 /**
@@ -109,7 +125,13 @@ function addCondition(participant, conditionId, { duration = 1, durationType = '
  */
 function removeCondition(participant, conditionId) {
   if (!participant.conditions) return;
+  const had = participant.conditions.some(c => c.id === conditionId);
   participant.conditions = participant.conditions.filter(c => c.id !== conditionId);
+  if (had) {
+    const caller = new Error().stack.split('\n')[2]?.trim() || 'unknown';
+    console.log('[ES_DEBUG] removeCondition:', conditionId, 'caller:', caller,
+      'remaining:', participant.conditions.map(c => c.id).join(', ') || 'none');
+  }
 }
 
 /**
@@ -170,33 +192,92 @@ function canAct(participant) {
 }
 
 /**
+ * Check if a participant has any DoT conditions pending (for requesting client rolls).
+ * Returns array of { conditionId, name, dice, type } for conditions with DoT effects.
+ */
+function getPendingDots(participant) {
+  if (!participant.conditions || participant.conditions.length === 0) return [];
+  const dots = [];
+  for (const c of participant.conditions) {
+    const def = CONDITIONS[c.id];
+    if (def && def.dot) {
+      dots.push({ conditionId: c.id, name: def.name, dice: def.dot.dice, type: def.dot.type });
+    }
+  }
+  return dots;
+}
+
+/**
+ * Apply only DoT damage from conditions (no expiry/removal).
+ * Used to check if DoT kills a target before processing further actions.
+ * @param {object} participant
+ * @param {object} [clientDotRolls] - Optional map of conditionId → damage total (from client dice)
+ * Returns { dotEffects: [{ id, name, damage, type }] }
+ */
+function applyDotDamage(participant, clientDotRolls) {
+  if (!participant.conditions || participant.conditions.length === 0) {
+    return { dotEffects: [] };
+  }
+  const dotEffects = [];
+  for (const c of participant.conditions) {
+    const def = CONDITIONS[c.id];
+    if (def && def.dot) {
+      const damage = (clientDotRolls && typeof clientDotRolls[c.id] === 'number')
+        ? clientDotRolls[c.id]
+        : rollDamage(def.dot.dice).total;
+      dotEffects.push({ id: c.id, name: def.name, damage, type: def.dot.type });
+      if (typeof participant.currentHp === 'number') {
+        participant.currentHp -= damage;
+        if (participant.currentHp < 0) participant.currentHp = 0;
+      }
+    }
+  }
+  return { dotEffects };
+}
+
+/**
  * Tick conditions at the start of a participant's turn.
  * Decrements round-based durations, removes expired ones, applies DoT damage.
+ * @param {object} participant
+ * @param {object} [clientDotRolls] - Optional map of conditionId → damage total (from client dice)
+ * @param {object} [opts]
+ * @param {boolean} [opts.skipDot] - Skip DoT damage (already applied separately)
  * Returns { removed: [{ id, name }], dotEffects: [{ id, name, damage, type }] }
  */
-function tickConditions(participant) {
+function tickConditions(participant, clientDotRolls, { skipDot = false } = {}) {
   if (!participant.conditions || participant.conditions.length === 0) {
     return { removed: [], dotEffects: [] };
+  }
+  const hadEnsnared = participant.conditions.some(c => c.id === 'ensnared');
+  if (hadEnsnared) {
+    const caller = new Error().stack.split('\n')[2]?.trim() || 'unknown';
+    console.log('[ES_DEBUG] tickConditions ENTRY — has ensnared, caller:', caller,
+      'all conditions:', participant.conditions.map(c => `${c.id}(${c.durationType}, dur:${c.duration})`).join(', '));
   }
 
   const removed = [];
   const dotEffects = [];
 
   // Apply DoT damage first (before removing expired conditions)
-  for (const c of participant.conditions) {
-    const def = CONDITIONS[c.id];
-    if (def && def.dot) {
-      const result = rollDamage(def.dot.dice);
-      dotEffects.push({
-        id: c.id,
-        name: def.name,
-        damage: result.total,
-        type: def.dot.type,
-      });
-      // Apply damage
-      if (typeof participant.currentHp === 'number') {
-        participant.currentHp -= result.total;
-        if (participant.currentHp < 0) participant.currentHp = 0;
+  if (!skipDot) {
+    for (const c of participant.conditions) {
+      const def = CONDITIONS[c.id];
+      if (def && def.dot) {
+        // Use client-provided roll if available, otherwise roll server-side
+        const damage = (clientDotRolls && typeof clientDotRolls[c.id] === 'number')
+          ? clientDotRolls[c.id]
+          : rollDamage(def.dot.dice).total;
+        dotEffects.push({
+          id: c.id,
+          name: def.name,
+          damage,
+          type: def.dot.type,
+        });
+        // Apply damage
+        if (typeof participant.currentHp === 'number') {
+          participant.currentHp -= damage;
+          if (participant.currentHp < 0) participant.currentHp = 0;
+        }
       }
     }
   }
@@ -214,7 +295,55 @@ function tickConditions(participant) {
     return true;
   });
 
+  if (hadEnsnared) {
+    const stillHas = participant.conditions.some(c => c.id === 'ensnared');
+    console.log('[ES_DEBUG] tickConditions EXIT — ensnared survived:', stillHas,
+      'removed:', removed.map(r => r.id).join(', ') || 'none');
+  }
   return { removed, dotEffects };
+}
+
+/**
+ * Resolve end-of-turn saves for 'save_end' conditions (e.g. Nature's Wrath, Ensnaring Strike).
+ * Called at the end of the monster's turn to let it attempt to break free.
+ * Returns { savedConditions: [{ id, name, saveAbility, roll, saveBonus, total, saveDC, saved }] }
+ */
+function resolveEndOfTurnSaves(participant) {
+  if (!participant.conditions || participant.conditions.length === 0) {
+    return { savedConditions: [] };
+  }
+  const hadEnsnared = participant.conditions.some(c => c.id === 'ensnared');
+  if (hadEnsnared) {
+    console.log('[ES_DEBUG] resolveEndOfTurnSaves ENTRY — save_end conditions:',
+      participant.conditions.filter(c => c.durationType === 'save_end').map(c => `${c.id}(DC:${c.saveDC}, bonus:${c.saveBonus})`).join(', '));
+  }
+
+  const savedConditions = [];
+
+  participant.conditions = participant.conditions.filter(c => {
+    if (c.durationType !== 'save_end' || !c.saveAbility || !c.saveDC) return true;
+
+    const saveBonus = c.saveBonus ?? ((participant.savingThrows && participant.savingThrows[c.saveAbility]) || 0);
+    const roll = rollD20();
+    const total = roll + saveBonus;
+    const saved = total >= c.saveDC;
+    console.log('[ES_DEBUG] resolveEndOfTurnSaves:', c.id, 'roll:', roll, 'bonus:', saveBonus, 'total:', total, 'DC:', c.saveDC, 'saved:', saved);
+
+    savedConditions.push({
+      id: c.id,
+      name: c.name,
+      saveAbility: c.saveAbility,
+      roll,
+      saveBonus,
+      total,
+      saveDC: c.saveDC,
+      saved,
+    });
+
+    return !saved; // keep if failed save
+  });
+
+  return { savedConditions };
 }
 
 /**
@@ -227,7 +356,10 @@ function getConditionsPublic(participant) {
     icon: c.icon,
     description: c.description,
     duration: c.duration,
+    durationType: c.durationType || 'rounds',
     source: c.source,
+    saveAbility: c.saveAbility || null,
+    saveDC: c.saveDC || null,
   }));
 }
 
@@ -239,6 +371,9 @@ module.exports = {
   getAttackModifiers,
   getDefenseModifiers,
   canAct,
+  applyDotDamage,
   tickConditions,
+  resolveEndOfTurnSaves,
   getConditionsPublic,
+  getPendingDots,
 };

@@ -24,6 +24,7 @@ const XP_PER_GOLD_SPENT = 1;
 
 const MAX_DAILY_MESSAGES = 50;
 const MAX_DAILY_REACTIONS = 50;
+const MAX_DAILY_GOLD_SPEND_XP = 200;
 
 const GOLD_TO_XP_RATIO = 0.5;
 
@@ -74,7 +75,7 @@ function saveXpData(data) {
 // ============================================
 
 function getTodayDate() {
-  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // YYYY-MM-DD in Central Time
 }
 
 function ensureFreshDaily(record) {
@@ -85,7 +86,15 @@ function ensureFreshDaily(record) {
       messages_sent: 0,
       reactions_given: 0,
       locations_visited: [],
-      login_claimed: false
+      login_claimed: false,
+      // Arena daily counters
+      arena_wins: 0,
+      arena_kills: 0,
+      arena_crits: 0,
+      arena_untouchable: 0,
+      arena_potions: 0,
+      arena_goals_claimed: [],
+      gold_spend_xp: 0,
     };
   }
   return record;
@@ -132,6 +141,7 @@ const LIFETIME_DEFAULTS = {
   pet_plays: 0,
   pet_interactions: 0,
   pet_names_given: 0,
+  dice_sets_collected: 0,
 };
 
 function ensureLifetime(record) {
@@ -165,7 +175,14 @@ function getXpRecord(userId, username) {
         messages_sent: 0,
         reactions_given: 0,
         locations_visited: [],
-        login_claimed: false
+        login_claimed: false,
+        arena_wins: 0,
+        arena_kills: 0,
+        arena_crits: 0,
+        arena_untouchable: 0,
+        arena_potions: 0,
+        arena_goals_claimed: [],
+        gold_spend_xp: 0,
       },
       gold_conversion_done: false
     };
@@ -332,7 +349,15 @@ function awardGoldSpendXp(userId, username, goldAmount) {
     return record;
   }
 
-  record.total_xp += xpGained;
+  const remaining = MAX_DAILY_GOLD_SPEND_XP - (record.daily.gold_spend_xp || 0);
+  const capped = Math.min(xpGained, remaining);
+  if (capped <= 0) {
+    saveXpData(data);
+    return record;
+  }
+
+  record.daily.gold_spend_xp = (record.daily.gold_spend_xp || 0) + capped;
+  record.total_xp += capped;
   record.last_updated = new Date().toISOString();
   saveXpData(data);
   return record;
@@ -378,6 +403,21 @@ function incrementLifetimeStat(userId, username, stat, amount = 1) {
   ensureLifetime(record);
   if (typeof record.lifetime[stat] === 'number') {
     record.lifetime[stat] += amount;
+  }
+  saveXpData(data);
+  return record;
+}
+
+function incrementDailyStat(userId, username, stat, amount = 1) {
+  const data = loadXpData();
+  if (!data[userId]) {
+    getXpRecord(userId, username);
+    return incrementDailyStat(userId, username, stat, amount);
+  }
+  const record = data[userId];
+  ensureFreshDaily(record);
+  if (typeof record.daily[stat] === 'number') {
+    record.daily[stat] += amount;
   }
   saveXpData(data);
   return record;
@@ -443,6 +483,7 @@ module.exports = {
   ensureFreshDaily,
   ensureLifetime,
   incrementLifetimeStat,
+  incrementDailyStat,
 
   // Awards
   awardMessageXp,
@@ -465,6 +506,7 @@ module.exports = {
   XP_PER_GOLD_SPENT,
   MAX_DAILY_MESSAGES,
   MAX_DAILY_REACTIONS,
+  MAX_DAILY_GOLD_SPEND_XP,
   GOLD_TO_XP_RATIO,
   BASE_XP,
   LEVEL_MULTIPLIER,

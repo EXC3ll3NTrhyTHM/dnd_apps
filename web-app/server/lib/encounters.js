@@ -10,9 +10,10 @@ const crypto = require('crypto');
 const { getMonster } = require('./monsters');
 const { getCharacterSheet } = require('./characterSheets');
 const { getAllWeapons, rollD20, rollDamage } = require('./weapons');
-const { awardQuestXp, incrementLifetimeStat, getLevel } = require('./xp');
+const { awardQuestXp, incrementLifetimeStat, incrementDailyStat, getLevel, getXpRecord } = require('./xp');
 const { awardGold } = require('./economy');
-const { addCondition, removeCondition, hasCondition, getAttackModifiers, getDefenseModifiers, canAct, tickConditions, getConditionsPublic } = require('./conditions');
+const { ARENA_DAILY_GOALS } = require('./arenaGoals');
+const { addCondition, removeCondition, hasCondition, getAttackModifiers, getDefenseModifiers, canAct, applyDotDamage, tickConditions, resolveEndOfTurnSaves, getConditionsPublic, getPendingDots } = require('./conditions');
 
 // ============================================
 // SPELL DEFINITIONS (data-driven)
@@ -51,6 +52,17 @@ const SPELL_DEFINITIONS = {
     damageType: 'thunder',
     description: 'A wave of thunderous force sweeps out',
     classes: ['Bard'],
+  },
+  ensnaring_strike: {
+    name: 'Ensnaring Strike',
+    level: 1,
+    actionType: 'bonus',
+    effectType: 'buff_next_attack',
+    saveAbility: 'STR',
+    conditionOnHit: 'ensnared',
+    concentration: true,
+    description: 'Thorny vines surround your weapon. On your next hit, the target must save or be restrained.',
+    classes: ['Paladin', 'Ranger'],
   },
 };
 
@@ -128,6 +140,10 @@ function spawnEncounter(locationId, monsterId, startedBy) {
     startedBy,
     startedAt: new Date().toISOString(),
     log: [],
+    // DM roll control ("Fate's Hand")
+    dmRollControl: false,
+    pendingRoll: null,
+    _lastResolvedRoll: null,
   };
 
   activeEncounters.set(encounterId, encounter);
@@ -228,6 +244,37 @@ function joinEncounter(encounterId, userId, username, avatar, sprite) {
       spellSaveDC: sheet.spellcasting?.spellSaveDC || 0,
       spellAttackBonus: sheet.spellcasting?.spellAttackBonus || 0,
       spellcastingMod: sheet.spellcasting?.abilityModifier || 0,
+      // Channel Divinity (Paladin/Cleric)
+      channelDivinityMax: sheet.channelDivinityMax || 0,
+      channelDivinityUsed: 0,
+      hasNaturesWrath: (sheet.classFeatures || []).includes('Channel Divinity') &&
+        (sheet.classes || []).some(c => c.subclass === 'Oath of the Ancients'),
+      // Concentration tracking
+      concentration: null,
+      ensnaringStrikeActive: false,
+      // CON mod for concentration saves
+      conMod: (() => {
+        const con = sheet.stats?.find(s => s.abbr === 'CON');
+        return con ? con.modifier : 0;
+      })(),
+      // Ki Points (Monk)
+      hasKiPoints: (sheet.classes || []).some(c => c.name === 'Monk'),
+      kiPointsMax: (() => {
+        const ml = (sheet.classes || []).find(c => c.name === 'Monk')?.level || 0;
+        return ml >= 2 ? ml : 0;
+      })(),
+      kiPointsUsed: 0,
+      kiSaveDC: (() => {
+        const ml = (sheet.classes || []).find(c => c.name === 'Monk')?.level || 0;
+        if (ml < 2) return 0;
+        const wisMod = (sheet.stats?.find(s => s.abbr === 'WIS'))?.modifier || 0;
+        return 8 + (sheet.profBonus || 2) + wisMod;
+      })(),
+      martialArtsDie: (() => {
+        const ml = (sheet.classes || []).find(c => c.name === 'Monk')?.level || 0;
+        return ml >= 17 ? '1d10' : ml >= 11 ? '1d8' : ml >= 5 ? '1d6' : '1d4';
+      })(),
+      stunningStrikeActive: false,
       conditions: [],
     };
   } else {
@@ -269,6 +316,18 @@ function joinEncounter(encounterId, userId, username, avatar, sprite) {
       spellSaveDC: 0,
       spellAttackBonus: 0,
       spellcastingMod: 0,
+      channelDivinityMax: 0,
+      channelDivinityUsed: 0,
+      hasNaturesWrath: false,
+      concentration: null,
+      ensnaringStrikeActive: false,
+      conMod: 0,
+      hasKiPoints: false,
+      kiPointsMax: 0,
+      kiPointsUsed: 0,
+      kiSaveDC: 0,
+      martialArtsDie: '1d4',
+      stunningStrikeActive: false,
       conditions: [],
     };
   }
@@ -360,6 +419,37 @@ function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll)
       spellSaveDC: sheet.spellcasting?.spellSaveDC || 0,
       spellAttackBonus: sheet.spellcasting?.spellAttackBonus || 0,
       spellcastingMod: sheet.spellcasting?.abilityModifier || 0,
+      // Channel Divinity (Paladin/Cleric)
+      channelDivinityMax: sheet.channelDivinityMax || 0,
+      channelDivinityUsed: 0,
+      hasNaturesWrath: (sheet.classFeatures || []).includes('Channel Divinity') &&
+        (sheet.classes || []).some(c => c.subclass === 'Oath of the Ancients'),
+      // Concentration tracking
+      concentration: null,
+      ensnaringStrikeActive: false,
+      // CON mod for concentration saves
+      conMod: (() => {
+        const con = sheet.stats?.find(s => s.abbr === 'CON');
+        return con ? con.modifier : 0;
+      })(),
+      // Ki Points (Monk)
+      hasKiPoints: (sheet.classes || []).some(c => c.name === 'Monk'),
+      kiPointsMax: (() => {
+        const ml = (sheet.classes || []).find(c => c.name === 'Monk')?.level || 0;
+        return ml >= 2 ? ml : 0;
+      })(),
+      kiPointsUsed: 0,
+      kiSaveDC: (() => {
+        const ml = (sheet.classes || []).find(c => c.name === 'Monk')?.level || 0;
+        if (ml < 2) return 0;
+        const wisMod = (sheet.stats?.find(s => s.abbr === 'WIS'))?.modifier || 0;
+        return 8 + (sheet.profBonus || 2) + wisMod;
+      })(),
+      martialArtsDie: (() => {
+        const ml = (sheet.classes || []).find(c => c.name === 'Monk')?.level || 0;
+        return ml >= 17 ? '1d10' : ml >= 11 ? '1d8' : ml >= 5 ? '1d6' : '1d4';
+      })(),
+      stunningStrikeActive: false,
       conditions: [],
     };
   } else {
@@ -398,6 +488,18 @@ function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll)
       spellSaveDC: 0,
       spellAttackBonus: 0,
       spellcastingMod: 0,
+      channelDivinityMax: 0,
+      channelDivinityUsed: 0,
+      hasNaturesWrath: false,
+      concentration: null,
+      ensnaringStrikeActive: false,
+      conMod: 0,
+      hasKiPoints: false,
+      kiPointsMax: 0,
+      kiPointsUsed: 0,
+      kiSaveDC: 0,
+      martialArtsDie: '1d4',
+      stunningStrikeActive: false,
       conditions: [],
     };
   }
@@ -526,8 +628,32 @@ function submitAction(encounterId, userId, action, rollData) {
     return { encounter, result };
   }
 
+  // Ki Ability (Monk elemental disciplines)
+  if (action === 'ki_ability') {
+    if (rollData?.subAction === 'fist_of_unbroken_air') {
+      const result = resolveFistOfUnbrokenAir(encounter, userId, rollData);
+      if (result.error) return result;
+      player.action = 'ki_ability';
+      encounter.lastActivity = Date.now();
+      return { encounter, result };
+    }
+    return { error: 'Unknown Ki ability.' };
+  }
+
+  // Channel Divinity: Nature's Wrath
+  if (action === 'channel_divinity') {
+    if (rollData?.subAction === 'natures_wrath') {
+      const result = resolveNaturesWrath(encounter, userId, rollData);
+      if (result.error) return result;
+      player.action = 'channel_divinity';
+      encounter.lastActivity = Date.now();
+      return { encounter, result };
+    }
+    return { error: 'Unknown Channel Divinity option.' };
+  }
+
   if (!['attack', 'defend', 'flee', 'help'].includes(action)) {
-    return { error: 'Invalid action. Choose attack, defend, flee, potion, help, lay_on_hands, or cast_spell.' };
+    return { error: 'Invalid action. Choose attack, defend, flee, potion, help, lay_on_hands, cast_spell, channel_divinity, or ki_ability.' };
   }
 
   player.action = action;
@@ -572,6 +698,13 @@ function submitAction(encounterId, userId, action, rollData) {
         player.mainActionWeaponId = chosen.id;
       }
     }
+    // Ensnaring Strike save roll (client rolls visible d20 for monster's STR save)
+    if (typeof rollData.ensnaringStrikeSaveRoll === 'number') {
+      player.ensnaringStrikeSaveRoll = rollData.ensnaringStrikeSaveRoll;
+    }
+    // Stunning Strike toggle (Monk)
+    if (rollData.stunningStrike) player.stunningStrikeActive = true;
+    if (typeof rollData.stunningStrikeSaveRoll === 'number') player.stunningStrikeSaveRoll = rollData.stunningStrikeSaveRoll;
   }
 
   encounter.lastActivity = Date.now();
@@ -814,6 +947,8 @@ function resolveSingleAction(encounter, userId) {
     let smiteDamage = 0;
     let sneakAttackApplied = false;
     let sneakAttackDamage = 0;
+    let ensnaringStrikeResult = null;
+    let stunningStrikeResult = null;
 
     // Look up the weapon used for this attack (for Vex, Sneak Attack checks)
     const usedWeapon = (player.weapons || []).find(w => w.id === player.mainActionWeaponId) || null;
@@ -889,6 +1024,78 @@ function resolveSingleAction(encounter, userId) {
       if (smiteApplied) {
         text += ` **DIVINE SMITE!** Holy radiant energy erupts from the blade!`;
       }
+
+      // Ensnaring Strike trigger — on hit, force STR save, apply ensnared condition
+      // Skip if the damage already killed the monster
+      console.log('[ES_DEBUG] pre-ES check: ensnaringStrikeActive:', player.ensnaringStrikeActive, 'monsterHP:', encounter.monster.currentHp, 'hit:', hit);
+      if (player.ensnaringStrikeActive && encounter.monster.currentHp > 0) {
+        player.ensnaringStrikeActive = false;
+        // Mark bonus action used so the post-action phase doesn't re-offer Ensnaring Strike
+        player.bonusActionUsed = true;
+        const esDef = SPELL_DEFINITIONS.ensnaring_strike;
+        const esBonus = getMonsterSaveBonus(encounter.monster, esDef.saveAbility);
+        const esRoll = (typeof player.ensnaringStrikeSaveRoll === 'number')
+          ? player.ensnaringStrikeSaveRoll : rollD20();
+        const esTotal = esRoll + esBonus;
+        const esSaved = esTotal >= player.spellSaveDC;
+        console.log('[ES_DEBUG] ES save: roll:', esRoll, 'bonus:', esBonus, 'total:', esTotal, 'DC:', player.spellSaveDC, 'saved:', esSaved,
+          'rollSource:', typeof player.ensnaringStrikeSaveRoll === 'number' ? 'client' : 'server');
+        if (!esSaved) {
+          addCondition(encounter.monster, 'ensnared', {
+            durationType: 'action_escape',
+            source: player.name,
+            saveAbility: esDef.saveAbility,
+            saveDC: player.spellSaveDC,
+            saveBonus: esBonus,
+          });
+          player.concentration = { spellId: 'ensnaring_strike', targetId: 'monster', conditionId: 'ensnared' };
+          console.log('[ES_DEBUG] Ensnared APPLIED. Monster conditions:', encounter.monster.conditions.map(c => `${c.id}(${c.durationType})`).join(', '));
+        } else {
+          player.concentration = null;
+          console.log('[ES_DEBUG] Monster SAVED — ensnared NOT applied');
+        }
+        ensnaringStrikeResult = {
+          triggered: true,
+          saved: esSaved,
+          roll: esRoll,
+          bonus: esBonus,
+          total: esTotal,
+          dc: player.spellSaveDC,
+          monsterName: encounter.monster.name,
+          text: esSaved
+            ? `**Ensnaring Strike!** Vines lash out! ${encounter.monster.name} rolls STR save: **${esTotal}** (${esRoll}+${esBonus}) vs DC ${player.spellSaveDC} — **Saved!** The vines fall away.`
+            : `**Ensnaring Strike!** Thorny vines burst from the blow! ${encounter.monster.name} rolls STR save: **${esTotal}** (${esRoll}+${esBonus}) vs DC ${player.spellSaveDC} — **Failed!** ${encounter.monster.name} is **Ensnared!**`,
+        };
+      }
+
+      // Stunning Strike trigger — on hit, spend ki, force CON save
+      if (player.stunningStrikeActive && encounter.monster.currentHp > 0 && player.hasKiPoints && player.kiPointsUsed < player.kiPointsMax) {
+        player.kiPointsUsed++;
+        const ssBonus = getMonsterSaveBonus(encounter.monster, 'CON');
+        const ssRoll = (typeof player.stunningStrikeSaveRoll === 'number')
+          ? player.stunningStrikeSaveRoll : rollD20();
+        const ssTotal = ssRoll + ssBonus;
+        const ssSaved = ssTotal >= player.kiSaveDC;
+        if (!ssSaved) {
+          addCondition(encounter.monster, 'stunned', { durationType: 'rounds', duration: 1, source: player.name });
+        }
+        stunningStrikeResult = {
+          triggered: true,
+          saved: ssSaved,
+          roll: ssRoll,
+          bonus: ssBonus,
+          total: ssTotal,
+          dc: player.kiSaveDC,
+          kiLeft: player.kiPointsMax - player.kiPointsUsed,
+          monsterName: encounter.monster.name,
+          text: ssSaved
+            ? `**Stunning Strike!** ${player.name} channels ki into the blow! ${encounter.monster.name} rolls CON save: **${ssTotal}** (${ssRoll}+${ssBonus}) vs DC ${player.kiSaveDC} — **Saved!**`
+            : `**Stunning Strike!** ${player.name} channels ki into the blow! ${encounter.monster.name} rolls CON save: **${ssTotal}** (${ssRoll}+${ssBonus}) vs DC ${player.kiSaveDC} — **Failed!** ${encounter.monster.name} is **Stunned!**`,
+        };
+      }
+      // Clear stunning strike flag regardless of hit/miss
+      player.stunningStrikeActive = false;
+
       if (inspirationBonus > 0) {
         text += ` *(+${inspirationBonus} Bardic Inspiration)*`;
       }
@@ -898,19 +1105,26 @@ function resolveSingleAction(encounter, userId) {
         player.advantageOnNextAttack = true;
       }
     } else {
+      // Clear stunning strike on miss too
+      player.stunningStrikeActive = false;
+
       let missText = `**${player.name}** swings their ${player.weaponName}...${advLabel} **${totalAttack}** vs AC ${encounter.monster.ac} — **Miss!**`;
       if (inspirationBonus > 0) {
         missText += ` *(even with +${inspirationBonus} Bardic Inspiration)*`;
       }
+      if (player.ensnaringStrikeActive) {
+        missText += ` The thorny vines still coil around the weapon, ready for the next strike.`;
+      }
       text = missText;
     }
 
-    // Track lifetime stats
+    // Track lifetime + daily stats
     if (isNat20) {
-      try { incrementLifetimeStat(userId, player.name, 'combat_crits', 1); } catch {}
+      try { incrementLifetimeStat(userId, player.name, 'combat_crits', 1); } catch { }
+      try { incrementDailyStat(userId, player.name, 'arena_crits', 1); } catch { }
     }
     if (isNat1) {
-      try { incrementLifetimeStat(userId, player.name, 'combat_fumbles', 1); } catch {}
+      try { incrementLifetimeStat(userId, player.name, 'combat_fumbles', 1); } catch { }
     }
 
     // Clean up roll values (keep player.action so bonus action phase can check it)
@@ -920,6 +1134,8 @@ function resolveSingleAction(encounter, userId) {
     delete player.smiteData;
     delete player.sneakAttackData;
     delete player.inspirationData;
+    delete player.ensnaringStrikeSaveRoll;
+    delete player.stunningStrikeSaveRoll;
 
     return {
       type: 'attack', userId, name: player.name,
@@ -928,6 +1144,8 @@ function resolveSingleAction(encounter, userId) {
       smiteApplied, smiteDamage,
       sneakAttackApplied, sneakAttackDamage,
       inspirationBonus, inspirationDie,
+      ensnaringStrikeResult,
+      stunningStrikeResult,
     };
   }
 
@@ -1059,6 +1277,10 @@ function advanceTurn(encounter) {
   encounter.turnDeadline = Date.now() + TURN_TIMER_MS;
   encounter.lastActivity = Date.now();
 
+  const nextEntryDebug = encounter.initiativeOrder[nextIndex];
+  console.log('[ES_DEBUG] advanceTurn → next:', nextEntryDebug?.type, nextEntryDebug?.type === 'player' ? nextEntryDebug?.id : '',
+    'round:', encounter.round, 'monsterConditions:', (encounter.monster.conditions || []).map(c => c.id).join(', ') || 'none');
+
   return {
     type: 'next_turn',
     entry: encounter.initiativeOrder[nextIndex],
@@ -1149,12 +1371,13 @@ function resolveRound(encounter) {
         text = `**${player.name}** swings their ${player.weaponName}... **${totalAttack}** vs AC ${encounter.monster.ac} — **Miss!**`;
       }
 
-      // Track crit/fumble lifetime stats
+      // Track crit/fumble lifetime + daily stats
       if (isNat20) {
-        try { incrementLifetimeStat(userId, player.name, 'combat_crits', 1); } catch {}
+        try { incrementLifetimeStat(userId, player.name, 'combat_crits', 1); } catch { }
+        try { incrementDailyStat(userId, player.name, 'arena_crits', 1); } catch { }
       }
       if (isNat1) {
-        try { incrementLifetimeStat(userId, player.name, 'combat_fumbles', 1); } catch {}
+        try { incrementLifetimeStat(userId, player.name, 'combat_fumbles', 1); } catch { }
       }
 
       playerAttacks.push({
@@ -1274,6 +1497,7 @@ function resolveMonsterTurn(encounter) {
   encounter.phase = 'monster_turn';
   const monster = encounter.monster;
   const results = [];
+  const concentrationSaves = [];
 
   // Get monster attack modifiers from conditions (e.g., mockery → disadvantage)
   const monsterAttackMods = getAttackModifiers(monster);
@@ -1309,7 +1533,7 @@ function resolveMonsterTurn(encounter) {
       let attackRoll2 = rollTwice ? rollD20() : null;
       const usedRoll = hasAdvantage ? Math.max(attackRoll, attackRoll2)
         : hasDisadvantage ? Math.min(attackRoll, attackRoll2)
-        : attackRoll;
+          : attackRoll;
 
       const totalAttack = usedRoll + attack.bonus;
       const effectiveAC = targetPlayer.ac;
@@ -1351,6 +1575,30 @@ function resolveMonsterTurn(encounter) {
         if (damageInfo.knocked) {
           text += `\n**${targetPlayer.name}** has been knocked out!`;
         }
+
+        // Handle concentration breaking — push to separate array for clear narration
+        if (damageInfo.concentrationBroken && damageInfo.brokenConcentration) {
+          const conc = damageInfo.brokenConcentration;
+          const concTarget = conc.targetId === 'monster' ? monster : encounter.participants[conc.targetId];
+          if (concTarget && conc.conditionId) {
+            removeCondition(concTarget, conc.conditionId);
+          }
+          const spellName = SPELL_DEFINITIONS[conc.spellId]?.name || 'a spell';
+          concentrationSaves.push({
+            playerName: targetPlayer.name,
+            spellName,
+            conSave: damageInfo.conSave || null,
+            broken: true,
+          });
+        } else if (damageInfo.conSave) {
+          const spellName = SPELL_DEFINITIONS[targetPlayer.concentration?.spellId]?.name || 'a spell';
+          concentrationSaves.push({
+            playerName: targetPlayer.name,
+            spellName,
+            conSave: damageInfo.conSave,
+            broken: false,
+          });
+        }
       } else {
         text = missTextTemplate.replace('{target}', `**${targetPlayer.name}**`) +
           ` *(${totalAttack} vs AC ${effectiveAC})*`;
@@ -1376,8 +1624,20 @@ function resolveMonsterTurn(encounter) {
 
   // Tick monster conditions AFTER attacks (so conditions like "mockery" apply during the attacks)
   const monsterConditionEffects = tickConditions(monster);
+  console.log('[ES_DEBUG] resolveMonsterTurn (legacy) after tick:', (monster.conditions || []).map(c => c.id).join(', ') || 'none');
 
-  return { results, monsterConditionEffects };
+  // Build pendingSaves for client-visible save rolling (replaces server-side resolveEndOfTurnSaves)
+  const pendingSaves = (monster.conditions || [])
+    .filter(c => c.durationType === 'save_end' && c.saveAbility && c.saveDC)
+    .map(c => ({
+      conditionId: c.id,
+      conditionName: c.name,
+      saveAbility: c.saveAbility,
+      saveDC: c.saveDC,
+      saveBonus: c.saveBonus ?? ((monster.savingThrows && monster.savingThrows[c.saveAbility]) || 0),
+    }));
+
+  return { results, monsterConditionEffects, concentrationSaves, pendingSaves };
 }
 
 /**
@@ -1438,12 +1698,39 @@ function prepareMonsterAttacks(encounter) {
 function resolveMonsterWithRolls(encounterId, rollData) {
   const encounter = activeEncounters.get(encounterId);
   if (!encounter) return { error: 'Encounter not found.' };
-  if (encounter.phase !== 'monster_rolling') return { error: 'Not in monster rolling phase.' };
+  if (encounter.phase !== 'monster_rolling') return { alreadyResolved: true };
 
   encounter.phase = 'monster_turn';
   encounter.lastActivity = Date.now();
   const monster = encounter.monster;
+  console.log('[ES_DEBUG] resolveMonsterWithRolls START:', monster.name,
+    'conditions:', (monster.conditions || []).map(c => `${c.id}(${c.durationType}, DC:${c.saveDC}, bonus:${c.saveBonus})`).join(', ') || 'none');
   const results = [];
+  const concentrationSaves = [];
+
+  // Apply DoT damage BEFORE attacks (e.g. ensnared 1d6 piercing at start of turn)
+  // so that if DoT kills the monster, we skip attacks entirely.
+  const clientDotRolls = {};
+  for (const roll of rollData) {
+    if (roll.dotRolls) {
+      for (const [condId, dmg] of Object.entries(roll.dotRolls)) {
+        clientDotRolls[condId] = dmg;
+      }
+    }
+  }
+  const dotResult = applyDotDamage(monster, Object.keys(clientDotRolls).length > 0 ? clientDotRolls : undefined);
+
+  // If DoT killed the monster, skip attacks and condition expiry
+  if (monster.currentHp <= 0) {
+    delete encounter.monsterAttackSetup;
+    delete encounter.monsterRollDeadline;
+    return {
+      locationId: encounter.locationId,
+      results: [],
+      monsterConditionEffects: { removed: [], dotEffects: dotResult.dotEffects },
+      pendingSaves: [],
+    };
+  }
 
   for (const roll of rollData) {
     const setup = encounter.monsterAttackSetup?.attacks?.[roll.index];
@@ -1504,6 +1791,33 @@ function resolveMonsterWithRolls(encounterId, rollData) {
       if (damageInfo.knocked) {
         text += `\n**${targetPlayer.name}** has been knocked out!`;
       }
+
+      // Handle concentration breaking — push to separate array for clear narration
+      if (damageInfo.concentrationBroken && damageInfo.brokenConcentration) {
+        const conc = damageInfo.brokenConcentration;
+        console.log('[ES_DEBUG] CONCENTRATION BROKEN by monster attack on', targetPlayer.name,
+          'spell:', conc.spellId, 'conditionId:', conc.conditionId, 'targetId:', conc.targetId,
+          'conSave:', JSON.stringify(damageInfo.conSave));
+        const concTarget = conc.targetId === 'monster' ? monster : encounter.participants[conc.targetId];
+        if (concTarget && conc.conditionId) {
+          removeCondition(concTarget, conc.conditionId);
+        }
+        const spellName = SPELL_DEFINITIONS[conc.spellId]?.name || 'a spell';
+        concentrationSaves.push({
+          playerName: targetPlayer.name,
+          spellName,
+          conSave: damageInfo.conSave || null,
+          broken: true,
+        });
+      } else if (damageInfo.conSave) {
+        const spellName = SPELL_DEFINITIONS[targetPlayer.concentration?.spellId]?.name || 'a spell';
+        concentrationSaves.push({
+          playerName: targetPlayer.name,
+          spellName,
+          conSave: damageInfo.conSave,
+          broken: false,
+        });
+      }
     } else {
       text = missTextTemplate.replace('{target}', `**${targetPlayer.name}**`) +
         ` *(${totalAttack} vs AC ${setup.targetAC})*`;
@@ -1526,12 +1840,30 @@ function resolveMonsterWithRolls(encounterId, rollData) {
     });
   }
 
+  // Save rollerId before cleanup (needed for save phase)
+  const rollerId = encounter.monsterAttackSetup?.rollerId || null;
+
   // Clean up setup
   delete encounter.monsterAttackSetup;
   delete encounter.monsterRollDeadline;
 
-  // Tick monster conditions AFTER attacks (so conditions like "mockery" applied during attacks)
-  const monsterConditionEffects = tickConditions(monster);
+  // Tick monster conditions AFTER attacks for expiry/removal (DoT already applied above)
+  const monsterConditionEffects = tickConditions(monster, undefined, { skipDot: true });
+  // Merge in the DoT effects that were applied before attacks
+  monsterConditionEffects.dotEffects = dotResult.dotEffects;
+  console.log('[ES_DEBUG] after tickConditions:', (monster.conditions || []).map(c => `${c.id}(${c.durationType})`).join(', ') || 'none',
+    'removed:', monsterConditionEffects.removed.map(r => r.id).join(', ') || 'none');
+
+  // Build pendingSaves for client-visible save rolling (replaces server-side resolveEndOfTurnSaves)
+  const pendingSaves = (monster.conditions || [])
+    .filter(c => c.durationType === 'save_end' && c.saveAbility && c.saveDC)
+    .map(c => ({
+      conditionId: c.id,
+      conditionName: c.name,
+      saveAbility: c.saveAbility,
+      saveDC: c.saveDC,
+      saveBonus: c.saveBonus ?? ((monster.savingThrows && monster.savingThrows[c.saveAbility]) || 0),
+    }));
 
   // Check if all players are out of the fight (knocked out = fully defeated)
   const activePlayers = Object.values(encounter.participants)
@@ -1546,6 +1878,8 @@ function resolveMonsterWithRolls(encounterId, rollData) {
       locationId: encounter.locationId,
       results,
       monsterConditionEffects,
+      concentrationSaves,
+      pendingSaves,
       defeat: true,
       defeatText: monster.fleeText || 'The monster escapes as the last fighter falls.',
     };
@@ -1556,7 +1890,56 @@ function resolveMonsterWithRolls(encounterId, rollData) {
     locationId: encounter.locationId,
     results,
     monsterConditionEffects,
+    concentrationSaves,
+    pendingSaves,
+    rollerId,
   };
+}
+
+/**
+ * Resolve monster end-of-turn saves using client-provided dice rolls.
+ * Called after the client rolls visible save dice and submits results.
+ */
+function resolveMonsterSaves(encounterId, saveRolls) {
+  const encounter = activeEncounters.get(encounterId);
+  if (!encounter) return { error: 'Encounter not found.' };
+  const monster = encounter.monster;
+  const savedConditions = [];
+
+  for (const sr of saveRolls) {
+    const cond = (monster.conditions || []).find(c => c.id === sr.conditionId);
+    if (!cond || cond.durationType !== 'save_end') continue;
+
+    const saveBonus = cond.saveBonus ?? ((monster.savingThrows && monster.savingThrows[cond.saveAbility]) || 0);
+    const roll = typeof sr.roll === 'number' ? sr.roll : rollD20();
+    const total = roll + saveBonus;
+    const saved = total >= cond.saveDC;
+
+    savedConditions.push({
+      id: cond.id, name: cond.name, saveAbility: cond.saveAbility,
+      roll, saveBonus, total, saveDC: cond.saveDC, saved,
+    });
+
+    if (saved) {
+      removeCondition(monster, cond.id);
+    }
+  }
+
+  // Clear player concentration when monster saves free from their spell
+  for (const save of savedConditions) {
+    if (save.saved) {
+      for (const [, p] of Object.entries(encounter.participants)) {
+        if (p.concentration && p.concentration.conditionId === save.id) {
+          console.log('[ES_DEBUG] resolveMonsterSaves clearing concentration for', p.name, '— monster saved vs', save.id);
+          p.concentration = null;
+          p.ensnaringStrikeActive = false;
+          break;
+        }
+      }
+    }
+  }
+
+  return { savedConditions, locationId: encounter.locationId };
 }
 
 // ============================================
@@ -1615,6 +1998,71 @@ function resolveAttackAdvantage(attacker, defender) {
 }
 
 /**
+ * Resolve Fist of Unbroken Air (Way of the Four Elements Monk).
+ * Costs 2 ki. STR save vs Ki DC. 3d10 bludgeoning on fail (half on save).
+ * On fail: pushed + knocked prone.
+ */
+function resolveFistOfUnbrokenAir(encounter, userId, rollData) {
+  const player = encounter.participants[userId];
+  if (!player) return { error: 'Not a participant.' };
+  if (!player.hasKiPoints) return { error: 'You don\'t have Ki Points.' };
+
+  const kiCost = 2;
+  const kiRemaining = player.kiPointsMax - player.kiPointsUsed;
+  if (kiRemaining < kiCost) return { error: `Need ${kiCost} Ki Points (only ${kiRemaining} remaining).` };
+
+  const monster = encounter.monster;
+  const saveBonus = getMonsterSaveBonus(monster, 'STR');
+  const saveRoll = typeof rollData?.saveRoll === 'number' ? rollData.saveRoll : rollD20();
+  const saveTotal = saveRoll + saveBonus;
+  const saveDC = player.kiSaveDC;
+  const saved = saveTotal >= saveDC;
+
+  // Spend ki
+  player.kiPointsUsed += kiCost;
+
+  // Roll damage (3d10) — client can provide
+  let damage = typeof rollData?.damageTotal === 'number'
+    ? rollData.damageTotal
+    : rollDamage('3d10').total;
+
+  if (saved) {
+    damage = Math.floor(damage / 2);
+  }
+
+  // Apply damage
+  monster.currentHp = Math.max(0, monster.currentHp - damage);
+  player.totalDamage = (player.totalDamage || 0) + damage;
+
+  // On failed save: knock prone
+  if (!saved && monster.currentHp > 0) {
+    addCondition(monster, 'prone', { durationType: 'rounds', duration: 1, source: player.name });
+  }
+
+  let text;
+  if (saved) {
+    text = `**${player.name}** thrusts their palm forward, unleashing a **Fist of Unbroken Air!** ` +
+      `${monster.name} rolls a STR save: **${saveTotal}** (${saveRoll}+${saveBonus}) vs DC ${saveDC} — **Saved!** ` +
+      `The blast still deals **${damage} bludgeoning damage** (half).`;
+  } else {
+    text = `**${player.name}** thrusts their palm forward, unleashing a **Fist of Unbroken Air!** ` +
+      `A blast of compressed air slams into ${monster.name}! STR save: **${saveTotal}** (${saveRoll}+${saveBonus}) vs DC ${saveDC} — **Failed!** ` +
+      `Deals **${damage} bludgeoning damage** and knocks ${monster.name} **prone!**`;
+  }
+
+  return {
+    type: 'ki_ability', subAction: 'fist_of_unbroken_air',
+    userId, name: player.name,
+    saveAbility: 'STR', saveRoll, saveBonus, saveTotal, saveDC, saved,
+    damage, damageType: 'bludgeoning',
+    prone: !saved,
+    kiCost,
+    kiLeft: player.kiPointsMax - player.kiPointsUsed,
+    text,
+  };
+}
+
+/**
  * Get a monster's saving throw bonus for a given ability.
  * Falls back to CR-based defaults if not defined.
  */
@@ -1626,19 +2074,49 @@ function getMonsterSaveBonus(monster, ability) {
 }
 
 /**
- * Apply damage to a player, handling dying state transitions.
- * Returns { knocked }.
+ * Apply damage to a player, handling dying state transitions and concentration saves.
+ * Returns { knocked, concentrationBroken, brokenConcentration, conSave }.
  */
 function applyDamageToPlayer(player, damage) {
   if (player.knockedOut) return { knocked: true };
 
   player.currentHp -= damage;
+
+  let concentrationBroken = false;
+  let brokenConcentration = null;
+  let conSave = null;
+
   if (player.currentHp <= 0) {
     player.currentHp = 0;
     player.knockedOut = true;
-    return { knocked: true };
+    // KO auto-breaks concentration (no save)
+    if (player.concentration) {
+      concentrationBroken = true;
+      brokenConcentration = { ...player.concentration };
+      player.concentration = null;
+      player.ensnaringStrikeActive = false;
+    }
+    return { knocked: true, concentrationBroken, brokenConcentration, conSave };
   }
-  return { knocked: false };
+
+  // CON save for concentration (DC = max of 10 or half damage taken)
+  if (player.concentration) {
+    const dc = Math.max(10, Math.floor(damage / 2));
+    const roll = rollD20();
+    const conMod = player.conMod || 0;
+    const total = roll + conMod;
+    const saved = total >= dc;
+    conSave = { roll, conMod, total, dc, saved };
+
+    if (!saved) {
+      concentrationBroken = true;
+      brokenConcentration = { ...player.concentration };
+      player.concentration = null;
+      player.ensnaringStrikeActive = false;
+    }
+  }
+
+  return { knocked: false, concentrationBroken, brokenConcentration, conSave };
 }
 
 /**
@@ -1699,8 +2177,9 @@ function resolvePotionUse(encounter, userId, potionId, targetId, healRoll) {
     }
   }
 
-  // Track lifetime stat
-  try { incrementLifetimeStat(userId, player.name, 'potions_used', 1); } catch {}
+  // Track lifetime + daily stat
+  try { incrementLifetimeStat(userId, player.name, 'potions_used', 1); } catch { }
+  try { incrementDailyStat(userId, player.name, 'arena_potions', 1); } catch { }
 
   return {
     type: 'potion', userId, name: player.name,
@@ -1836,6 +2315,34 @@ function distributeRewards(rewards, monsterId) {
       incrementLifetimeStat(userId, reward.name, 'monsters_killed', 1);
     }
 
+    // Track daily arena stats
+    try { incrementDailyStat(userId, reward.name, 'arena_wins', 1); } catch { }
+    if (reward.killingBlow) {
+      try { incrementDailyStat(userId, reward.name, 'arena_kills', 1); } catch { }
+    }
+    if (reward.untouchable) {
+      try { incrementDailyStat(userId, reward.name, 'arena_untouchable', 1); } catch { }
+    }
+
+    // Check which arena daily goals just became completable
+    try {
+      const record = getXpRecord(userId, reward.name);
+      const daily = record.daily || {};
+      const claimed = daily.arena_goals_claimed || [];
+      const newlyCompleted = [];
+      for (const goal of ARENA_DAILY_GOALS) {
+        if (claimed.includes(goal.key)) continue;
+        const progress = daily[goal.stat] || 0;
+        if (progress >= goal.target) {
+          newlyCompleted.push({ key: goal.key, label: goal.label, icon: goal.icon, xp: goal.xp, gold: goal.gold });
+        }
+      }
+      if (newlyCompleted.length > 0) {
+        results._completedGoals = results._completedGoals || {};
+        results._completedGoals[userId] = newlyCompleted;
+      }
+    } catch { }
+
     const levelAfter = getLevel(userId, reward.name);
     results[userId] = {
       ...reward,
@@ -1875,6 +2382,40 @@ function cancelEncounter(encounterId) {
   return { success: true, locationId: encounter.locationId };
 }
 
+// ============================================
+// DM ROLL CONTROL ("Fate's Hand")
+// ============================================
+
+function setDmRollControl(encounterId, enabled) {
+  const enc = activeEncounters.get(encounterId);
+  if (!enc) return { error: 'Encounter not found.' };
+  enc.dmRollControl = !!enabled;
+  if (!enabled) {
+    enc.pendingRoll = null;
+    enc._lastResolvedRoll = null;
+  }
+  return { success: true };
+}
+
+function setPendingRoll(encounterId, rollData) {
+  const enc = activeEncounters.get(encounterId);
+  if (!enc) return null;
+  const id = 'pr_' + crypto.randomBytes(4).toString('hex');
+  enc.pendingRoll = { id, timestamp: Date.now(), ...rollData };
+  return enc.pendingRoll;
+}
+
+function getPendingRoll(encounterId) {
+  const enc = activeEncounters.get(encounterId);
+  return enc?.pendingRoll || null;
+}
+
+function clearPendingRoll(encounterId) {
+  const enc = activeEncounters.get(encounterId);
+  if (!enc) return;
+  enc.pendingRoll = null;
+}
+
 /**
  * Check for timed-out rounds. Called periodically.
  * Returns encounters that need round resolution due to timeout.
@@ -1886,24 +2427,37 @@ function checkTimeouts() {
   for (const [encId, encounter] of activeEncounters) {
     if (encounter.phase === 'ended') continue;
 
+    // Skip turn/monster timers while a DM roll is pending (Fate's Hand deliberation)
+    const hasPendingDmRoll = !!encounter.pendingRoll;
+
     // Full encounter timeout (no activity for 2 min)
     if (now - encounter.lastActivity > TIMEOUT_MS) {
       encounter.phase = 'ended';
       encounter.outcome = 'timeout';
       activeEncounters.delete(encId);
-  
+
       timedOut.push({ encounter, reason: 'timeout' });
       continue;
     }
 
-    // Turn timer expired (turn-based)
-    if (encounter.phase === 'action' && encounter.turnDeadline && now > encounter.turnDeadline) {
+    // Turn timer expired (turn-based) — paused during DM deliberation
+    if (!hasPendingDmRoll && encounter.phase === 'action' && encounter.turnDeadline && now > encounter.turnDeadline) {
       timedOut.push({ encounter, reason: 'turn_timeout' });
     }
 
-    // Monster roll timeout — auto-roll if client didn't respond in time
-    if (encounter.phase === 'monster_rolling' && encounter.monsterRollDeadline && now > encounter.monsterRollDeadline) {
+    // Monster roll timeout — auto-roll if client didn't respond in time — paused during DM deliberation
+    if (!hasPendingDmRoll && encounter.phase === 'monster_rolling' && encounter.monsterRollDeadline && now > encounter.monsterRollDeadline) {
       timedOut.push({ encounter, reason: 'monster_roll_timeout' });
+    }
+
+    // Monster save timeout — auto-resolve if client didn't respond in time
+    if (!hasPendingDmRoll && encounter.phase === 'monster_saving' && encounter.monsterSaveDeadline && now > encounter.monsterSaveDeadline) {
+      timedOut.push({ encounter, reason: 'monster_save_timeout' });
+    }
+
+    // Monster escape timeout — auto-resolve if client didn't respond in time
+    if (!hasPendingDmRoll && encounter.phase === 'monster_escaping' && encounter.monsterEscapeDeadline && now > encounter.monsterEscapeDeadline) {
+      timedOut.push({ encounter, reason: 'monster_escape_timeout' });
     }
   }
 
@@ -1915,6 +2469,9 @@ function checkTimeouts() {
  */
 function getPublicState(encounter) {
   if (!encounter) return null;
+
+  const currentTurn = (encounter.initiativeOrder || [])[encounter.currentTurnIndex || 0];
+  const currentTurnUserId = currentTurn?.id;
 
   const participants = {};
   for (const [userId, p] of Object.entries(encounter.participants)) {
@@ -1968,6 +2525,23 @@ function getPublicState(encounter) {
       hasHealingWord: (p.classFeatures || []).includes('Spellcasting') &&
         SPELL_DEFINITIONS.healing_word.classes.some(c => (p.classNames || []).includes(c)) &&
         (p.spellSlots || []).some(s => s.level >= SPELL_DEFINITIONS.healing_word.level && s.used < s.total),
+      // Channel Divinity
+      channelDivinityMax: p.channelDivinityMax || 0,
+      channelDivinityUsed: p.channelDivinityUsed || 0,
+      hasNaturesWrath: p.hasNaturesWrath || false,
+      // Concentration & Ensnaring Strike
+      ensnaringStrikeActive: p.ensnaringStrikeActive || false,
+      concentration: p.concentration ? { spellId: p.concentration.spellId } : null,
+      // Ki Points (Monk)
+      hasKiPoints: p.hasKiPoints || false,
+      kiPointsMax: p.kiPointsMax || 0,
+      kiPointsUsed: p.kiPointsUsed || 0,
+      kiSaveDC: p.kiSaveDC || 0,
+      stunningStrikeActive: p.stunningStrikeActive || false,
+      // Pre-bonus actions (only for current turn holder)
+      availablePreBonusActions: userId === currentTurnUserId
+        ? getAvailableBonusActions(encounter, userId).filter(a => a.type !== 'offhand_attack' && a.type !== 'flurry_of_blows')
+        : [],
     };
   }
 
@@ -2002,10 +2576,11 @@ function getPublicState(encounter) {
     currentTurnIndex: encounter.currentTurnIndex || 0,
     turnDeadline: encounter.turnDeadline || null,
     bonusActionPhase: encounter.bonusActionPhase || false,
+    dmRollControl: encounter.dmRollControl || false,
     initiativeRolls: encounter.phase === 'initiative_rolling'
       ? Object.fromEntries(
-          Object.entries(encounter.initiativeRolls || {}).map(([uid, data]) => [uid, { total: data.total, roll: data.roll, modifier: data.modifier }])
-        )
+        Object.entries(encounter.initiativeRolls || {}).map(([uid, data]) => [uid, { total: data.total, roll: data.roll, modifier: data.modifier }])
+      )
       : null,
   };
 }
@@ -2099,6 +2674,179 @@ function resolveHealSpell(encounter, player, userId, spell, spellId, rollData) {
 }
 
 /**
+ * Resolve Channel Divinity: Nature's Wrath.
+ * Spectral vines restrain the monster (STR or DEX save, monster picks best).
+ */
+function resolveNaturesWrath(encounter, userId, rollData) {
+  const player = encounter.participants[userId];
+  if (!player) return { error: 'Not a participant.' };
+  if (!player.hasNaturesWrath) return { error: "You do not have Channel Divinity: Nature's Wrath." };
+
+  const remaining = (player.channelDivinityMax || 0) - (player.channelDivinityUsed || 0);
+  if (remaining <= 0) return { error: 'No Channel Divinity uses remaining.' };
+
+  const monster = encounter.monster;
+
+  // Monster picks best save (STR or DEX — whichever bonus is higher)
+  const strBonus = getMonsterSaveBonus(monster, 'STR');
+  const dexBonus = getMonsterSaveBonus(monster, 'DEX');
+  const saveAbility = strBonus >= dexBonus ? 'STR' : 'DEX';
+  const saveBonus = Math.max(strBonus, dexBonus);
+
+  const saveRoll = typeof rollData?.saveRoll === 'number' ? rollData.saveRoll : rollD20();
+  const saveTotal = saveRoll + saveBonus;
+  const saveDC = player.spellSaveDC;
+  const saved = saveTotal >= saveDC;
+
+  // Consume Channel Divinity use
+  player.channelDivinityUsed++;
+
+  let text;
+  if (saved) {
+    text = `**${player.name}** invokes **Nature's Wrath!** Spectral vines surge toward ${monster.name}! ` +
+      `${monster.name} rolls a ${saveAbility} save: **${saveTotal}** vs DC ${saveDC} — **Saved!** ` +
+      `The vines wither away harmlessly.`;
+  } else {
+    addCondition(monster, 'restrained', {
+      durationType: 'action_escape',
+      source: player.name,
+      saveAbility,
+      saveDC,
+      saveBonus,
+    });
+    text = `**${player.name}** invokes **Nature's Wrath!** Spectral vines erupt from the ground and ensnare ${monster.name}! ` +
+      `${monster.name} rolls a ${saveAbility} save: **${saveTotal}** vs DC ${saveDC} — **Failed!** ` +
+      `${monster.name} is **Restrained!**`;
+  }
+
+  return {
+    type: 'channel_divinity',
+    subAction: 'natures_wrath',
+    userId,
+    name: player.name,
+    saveAbility,
+    saveRoll,
+    saveBonus,
+    saveTotal,
+    saveDC,
+    saved,
+    cdRemaining: player.channelDivinityMax - player.channelDivinityUsed,
+    text,
+  };
+}
+
+/**
+ * Check if the monster has any action_escape conditions (e.g. Nature's Wrath restrained).
+ */
+function monsterHasEscapeConditions(encounter) {
+  const monster = encounter.monster;
+  if (!monster.conditions || monster.conditions.length === 0) return false;
+  return monster.conditions.some(c => c.durationType === 'action_escape');
+}
+
+/**
+ * Prepare monster escape data without rolling dice.
+ * Returns { pendingEscapes, rollerId } for client to roll visibly.
+ */
+function prepareMonsterEscape(encounter) {
+  const monster = encounter.monster;
+  const escapeConditions = (monster.conditions || []).filter(c => c.durationType === 'action_escape');
+
+  const pendingEscapes = escapeConditions.map(cond => {
+    const strBonus = getMonsterSaveBonus(monster, 'STR');
+    const dexBonus = getMonsterSaveBonus(monster, 'DEX');
+    const checkAbility = strBonus >= dexBonus ? 'STR' : 'DEX';
+    const checkBonus = Math.max(strBonus, dexBonus);
+    return {
+      conditionId: cond.id,
+      conditionName: cond.name,
+      checkAbility,
+      checkBonus,
+      saveDC: cond.saveDC,
+    };
+  });
+
+  const rollerId = Object.keys(encounter.participants)[0];
+  return { pendingEscapes, rollerId };
+}
+
+/**
+ * Resolve monster escape attempts using client-provided dice rolls.
+ * Called after client rolls visible escape dice and submits results.
+ * Also applies DoT damage (e.g. ensnared 1d6 piercing) before resolving escape.
+ */
+function resolveMonsterEscapeWithRolls(encounterId, escapeRolls, clientDotRolls) {
+  const encounter = activeEncounters.get(encounterId);
+  if (!encounter) return { error: 'Encounter not found.' };
+  const monster = encounter.monster;
+
+  // Apply DoT damage BEFORE escape (e.g. ensnared 1d6 piercing at start of turn)
+  const dotResult = applyDotDamage(monster, clientDotRolls || undefined);
+  const escapeAttempts = [];
+
+  // If DoT killed the monster, skip escape attempts
+  if (monster.currentHp <= 0) {
+    const monsterConditionEffects = { removed: [], dotEffects: dotResult.dotEffects };
+    return { escapeAttempts: [], monsterConditionEffects, locationId: encounter.locationId, dotKill: true };
+  }
+
+  for (const er of escapeRolls) {
+    const cond = (monster.conditions || []).find(c => c.id === er.conditionId && c.durationType === 'action_escape');
+    if (!cond) continue;
+
+    const strBonus = getMonsterSaveBonus(monster, 'STR');
+    const dexBonus = getMonsterSaveBonus(monster, 'DEX');
+    const checkAbility = strBonus >= dexBonus ? 'STR' : 'DEX';
+    const checkBonus = Math.max(strBonus, dexBonus);
+
+    const roll = typeof er.roll === 'number' ? er.roll : rollD20();
+    const total = roll + checkBonus;
+    const escaped = total >= cond.saveDC;
+
+    const text = escaped
+      ? `${monster.name} struggles against the vines — ${checkAbility} check: **${total}** (${roll}+${checkBonus}) vs DC ${cond.saveDC} — **Escaped!** The vines shatter apart!`
+      : `${monster.name} struggles against the vines — ${checkAbility} check: **${total}** (${roll}+${checkBonus}) vs DC ${cond.saveDC} — **Failed!** The vines hold firm.`;
+
+    escapeAttempts.push({
+      id: cond.id,
+      name: cond.name,
+      checkAbility,
+      roll,
+      checkBonus,
+      total,
+      saveDC: cond.saveDC,
+      escaped,
+      text,
+    });
+
+    if (escaped) {
+      removeCondition(monster, cond.id);
+    }
+  }
+
+  // Clear player concentration when monster escapes their spell
+  for (const ea of escapeAttempts) {
+    if (ea.escaped) {
+      for (const [, p] of Object.entries(encounter.participants)) {
+        if (p.concentration && p.concentration.conditionId === ea.id) {
+          console.log('[ES_DEBUG] resolveMonsterEscapeWithRolls clearing concentration for', p.name);
+          p.concentration = null;
+          p.ensnaringStrikeActive = false;
+          break;
+        }
+      }
+    }
+  }
+
+  // Tick conditions (e.g. mockery wearing off) — skipDot since applyDotDamage already handled it
+  const monsterConditionEffects = tickConditions(monster, undefined, { skipDot: true });
+  monsterConditionEffects.dotEffects = dotResult.dotEffects;
+  console.log('[ES_DEBUG] resolveMonsterEscape — after tick, conditions:', (monster.conditions || []).map(c => c.id).join(', ') || 'none',
+    'dotEffects:', dotResult.dotEffects.map(d => `${d.name}:${d.damage}`).join(', ') || 'none');
+  return { escapeAttempts, monsterConditionEffects, locationId: encounter.locationId };
+}
+
+/**
  * Dispatch spell casting. Validates slots, then calls the right resolver.
  */
 function resolveCastSpell(encounter, userId, spellId, rollData) {
@@ -2168,7 +2916,7 @@ function getAvailableBonusActions(encounter, userId) {
 
   // Healing Word (bonus action spell — Bard/Cleric only)
   if (player.classFeatures?.includes('Spellcasting') &&
-      SPELL_DEFINITIONS.healing_word.classes.some(c => (player.classNames || []).includes(c))) {
+    SPELL_DEFINITIONS.healing_word.classes.some(c => (player.classNames || []).includes(c))) {
     const hw = SPELL_DEFINITIONS.healing_word;
     const hasSlot = (player.spellSlots || []).some(s => s.level >= hw.level && s.used < s.total);
     if (hasSlot) {
@@ -2185,6 +2933,37 @@ function getAvailableBonusActions(encounter, userId) {
         });
       }
     }
+  }
+
+  // Ensnaring Strike (Paladin/Ranger bonus action spell)
+  const es = SPELL_DEFINITIONS.ensnaring_strike;
+  if (es.classes.some(c => (player.classNames || []).includes(c)) && !player.ensnaringStrikeActive) {
+    const hasSlot = (player.spellSlots || []).some(s => s.level >= es.level && s.used < s.total);
+    if (hasSlot) {
+      actions.push({
+        type: 'ensnaring_strike',
+        spellName: es.name,
+        description: es.description,
+      });
+    }
+  }
+
+  // Flurry of Blows (Monk, post-attack only — requires ki)
+  if (player.hasKiPoints && player.kiPointsUsed < player.kiPointsMax && player.action === 'attack') {
+    actions.push({
+      type: 'flurry_of_blows',
+      kiCost: 1,
+      kiLeft: player.kiPointsMax - player.kiPointsUsed,
+    });
+  }
+
+  // Patient Defense (Monk, pre or post — requires ki)
+  if (player.hasKiPoints && player.kiPointsUsed < player.kiPointsMax) {
+    actions.push({
+      type: 'patient_defense',
+      kiCost: 1,
+      kiLeft: player.kiPointsMax - player.kiPointsUsed,
+    });
   }
 
   return actions;
@@ -2294,10 +3073,136 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
     };
   }
 
+  if (bonusAction === 'ensnaring_strike') {
+    const spell = SPELL_DEFINITIONS.ensnaring_strike;
+    if (!spell.classes.some(c => (player.classNames || []).includes(c))) {
+      return { error: 'Your class cannot cast Ensnaring Strike.' };
+    }
+
+    // Consume spell slot
+    const slot = (player.spellSlots || []).find(s => s.level >= spell.level && s.used < s.total);
+    if (!slot) return { error: 'No spell slots remaining.' };
+    slot.used++;
+
+    // Break existing concentration (drop old condition from target)
+    if (player.concentration && player.concentration.conditionId) {
+      const oldTarget = player.concentration.targetId === 'monster'
+        ? encounter.monster
+        : encounter.participants[player.concentration.targetId];
+      if (oldTarget) {
+        removeCondition(oldTarget, player.concentration.conditionId);
+      }
+    }
+
+    // Set the buff
+    player.ensnaringStrikeActive = true;
+    player.concentration = { spellId: 'ensnaring_strike', targetId: null, conditionId: null };
+    player.bonusActionUsed = true;
+    console.log('[ES_DEBUG] Ensnaring Strike CAST by', player.name, '— ensnaringStrikeActive:', player.ensnaringStrikeActive);
+
+    return {
+      type: 'ensnaring_strike',
+      userId,
+      name: player.name,
+      spellName: spell.name,
+      text: `**${player.name}** casts **Ensnaring Strike!** Thorny vines coil around their weapon, ready to ensnare the next target they hit.`,
+    };
+  }
+
+  // Flurry of Blows (Monk — 2 unarmed strikes, costs 1 ki)
+  if (bonusAction === 'flurry_of_blows') {
+    if (!player.hasKiPoints) return { error: 'You don\'t have Ki Points.' };
+    if (player.kiPointsUsed >= player.kiPointsMax) return { error: 'No Ki Points remaining.' };
+    if (player.action !== 'attack') return { error: 'Flurry of Blows requires an Attack action first.' };
+
+    player.kiPointsUsed++;
+    player.bonusActionUsed = true;
+
+    // Find unarmed strike weapon for attack/damage stats
+    const unarmed = (player.weapons || []).find(w => w.id === 'unarmed_strike')
+      || { attackBonus: 2, damageMod: 0, dice: player.martialArtsDie || '1d4' };
+
+    // Client can provide pre-rolled strike data (from 3D dice overlay)
+    const clientStrikes = Array.isArray(data.strikes) ? data.strikes : null;
+
+    const strikes = [];
+    let totalFlurryDamage = 0;
+
+    for (let i = 0; i < 2; i++) {
+      const cs = clientStrikes ? clientStrikes[i] : null;
+      const atkRoll = (cs && typeof cs.attackRoll === 'number') ? cs.attackRoll : rollD20();
+      const totalAtk = atkRoll + unarmed.attackBonus;
+      const isNat20 = atkRoll === 20;
+      const isNat1 = atkRoll === 1;
+      let hit = false;
+      let dmg = 0;
+
+      if (isNat1) {
+        // auto miss
+      } else if (isNat20 || totalAtk >= encounter.monster.ac) {
+        hit = true;
+        if (cs && typeof cs.damageTotal === 'number') {
+          dmg = cs.damageTotal;
+        } else {
+          const dmgResult = rollDamage(unarmed.dice);
+          dmg = dmgResult.total + unarmed.damageMod;
+          if (isNat20) {
+            dmg += rollDamage(unarmed.dice).total;
+          }
+        }
+        encounter.monster.currentHp = Math.max(0, encounter.monster.currentHp - dmg);
+        player.totalDamage = (player.totalDamage || 0) + dmg;
+        totalFlurryDamage += dmg;
+      }
+
+      strikes.push({ roll: atkRoll, total: totalAtk, hit, damage: dmg, isNat20, isNat1 });
+    }
+
+    const strikeTexts = strikes.map((s, i) => {
+      const label = i === 0 ? 'First strike' : 'Second strike';
+      if (s.isNat1) return `${label}: **NAT 1!** Fumble!`;
+      if (s.isNat20) return `${label}: **NAT 20! CRITICAL HIT!** Deals **${s.damage} bludgeoning damage!**`;
+      if (s.hit) return `${label}: **${s.total}** vs AC ${encounter.monster.ac} — **Hit!** Deals **${s.damage} bludgeoning damage.**`;
+      return `${label}: **${s.total}** vs AC ${encounter.monster.ac} — **Miss!**`;
+    });
+
+    const text = `**${player.name}** unleashes a **Flurry of Blows!** ` + strikeTexts.join(' ') +
+      (totalFlurryDamage > 0 ? ` Total: **${totalFlurryDamage} damage.**` : ' Both strikes miss!');
+
+    return {
+      type: 'flurry_of_blows',
+      userId, name: player.name,
+      strikes,
+      totalDamage: totalFlurryDamage,
+      kiLeft: player.kiPointsMax - player.kiPointsUsed,
+      monsterHp: encounter.monster.currentHp,
+      monsterMaxHp: encounter.monster.maxHp,
+      text,
+    };
+  }
+
+  // Patient Defense (Monk — Dodge, costs 1 ki)
+  if (bonusAction === 'patient_defense') {
+    if (!player.hasKiPoints) return { error: 'You don\'t have Ki Points.' };
+    if (player.kiPointsUsed >= player.kiPointsMax) return { error: 'No Ki Points remaining.' };
+
+    player.kiPointsUsed++;
+    player.dodging = true;
+    player.bonusActionUsed = true;
+
+    return {
+      type: 'patient_defense',
+      userId, name: player.name,
+      kiLeft: player.kiPointsMax - player.kiPointsUsed,
+      text: `**${player.name}** centers their ki, taking a **Patient Defense** stance. Attacks against them have **disadvantage** until their next turn.`,
+    };
+  }
+
   return { error: 'Unknown bonus action.' };
 }
 
 module.exports = {
+  TURN_TIMER_MS,
   spawnEncounter,
   joinEncounter,
   joinWithInitiative,
@@ -2308,6 +3213,7 @@ module.exports = {
   advanceTurn,
   resolveRound,
   resolveMonsterWithRolls,
+  resolveMonsterSaves,
   resolveMonsterTurn,
   prepareMonsterAttacks,
   distributeRewards,
@@ -2325,4 +3231,12 @@ module.exports = {
   SPELL_DEFINITIONS,
   ROUND_TIMER_MS,
   TURN_TIMER_MS,
+  getPendingDots,
+  monsterHasEscapeConditions,
+  prepareMonsterEscape,
+  resolveMonsterEscapeWithRolls,
+  setDmRollControl,
+  setPendingRoll,
+  getPendingRoll,
+  clearPendingRoll,
 };

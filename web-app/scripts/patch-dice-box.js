@@ -42,16 +42,21 @@ if (src.includes(spawnFixed)) {
   console.warn('[patch-dice-box] Could not find spawn position code.');
 }
 
-// --- Patch 2: Disable antialiasing (blank canvas on iOS Safari) ---
+// --- Patch 2: Conditional antialiasing (disable only on iOS Safari where it causes blank canvas) ---
 const aaOrig = 'this.renderer = new xo({ antialias: !0, alpha: !0 })';
-const aaFixed = 'this.renderer = new xo({ antialias: !1, alpha: !0 })';
+const aaOldPatch = 'this.renderer = new xo({ antialias: !1, alpha: !0 })';
+const aaConditional = 'this.renderer = new xo({ antialias: !(/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent))), alpha: !0 })';
 
-if (src.includes(aaFixed)) {
-  console.log('[patch-dice-box] Antialiasing already patched.');
-} else if (src.includes(aaOrig)) {
-  src = src.replace(aaOrig, aaFixed);
+if (src.includes(aaConditional)) {
+  console.log('[patch-dice-box] Antialiasing already patched (conditional).');
+} else if (src.includes(aaOldPatch)) {
+  src = src.replace(aaOldPatch, aaConditional);
   changed = true;
-  console.log('[patch-dice-box] Disabled antialiasing (iOS Safari fix).');
+  console.log('[patch-dice-box] Updated antialiasing patch (unconditional -> iOS-only).');
+} else if (src.includes(aaOrig)) {
+  src = src.replace(aaOrig, aaConditional);
+  changed = true;
+  console.log('[patch-dice-box] Applied conditional antialiasing (disabled on iOS only).');
 } else {
   console.warn('[patch-dice-box] Could not find antialias code.');
 }

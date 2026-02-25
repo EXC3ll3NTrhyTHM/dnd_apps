@@ -133,8 +133,8 @@
 
 .arena-monster-card {
   position: relative;
-  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 14px 12px;
   cursor: pointer;
@@ -147,7 +147,7 @@
 .arena-monster-card:active {
   transform: scale(0.97);
   border-color: var(--color-gold);
-  background: linear-gradient(180deg, rgba(212,168,67,0.1) 0%, rgba(212,168,67,0.04) 100%);
+  background: linear-gradient(180deg, rgba(212, 168, 67, 0.1) 0%, rgba(212, 168, 67, 0.04) 100%);
 }
 
 .arena-monster-card:disabled {
@@ -209,7 +209,7 @@
   font-weight: 600;
   color: #ef4444;
   margin-bottom: 6px;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 .arena-card-stats {
@@ -225,7 +225,7 @@
   font-size: 0.7rem;
   font-weight: 600;
   color: var(--text-secondary);
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   padding: 2px 6px;
   border-radius: 4px;
   white-space: nowrap;
@@ -233,7 +233,7 @@
 
 .arena-card-cr {
   color: var(--color-gold);
-  background: rgba(212,168,67,0.12);
+  background: rgba(212, 168, 67, 0.12);
 }
 
 
@@ -243,7 +243,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   border-radius: 12px;
   color: var(--color-gold);
   font-weight: 600;
@@ -277,8 +277,15 @@
 }
 
 @keyframes arena-overlay-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .arena-join-close {
@@ -540,7 +547,7 @@
 .arena-monster-panel {
   padding: 12px 16px 10px;
   background: linear-gradient(180deg, #1a1510 0%, #231c14 100%);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
   position: relative;
   z-index: 2;
@@ -551,7 +558,7 @@
   font-size: 1.15rem;
   font-weight: 600;
   color: #ef4444;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
   margin-bottom: 8px;
 }
 
@@ -574,17 +581,17 @@
 .arena-hp-track {
   flex: 1;
   height: 14px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 7px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .arena-hp-fill {
   height: 100%;
   border-radius: 7px;
   transition: width 0.5s ease, background-color 0.5s ease;
-  box-shadow: 0 0 8px rgba(74,222,128,0.3);
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.3);
 }
 
 .arena-hp-text {
@@ -599,7 +606,7 @@
   font-size: 0.7rem;
   font-weight: 600;
   color: var(--text-secondary);
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   padding: 3px 8px;
   border-radius: 4px;
   white-space: nowrap;
@@ -666,6 +673,10 @@
 /* 1v1 duel offset — enemy nudged right, player nudged left */
 .arena-battle-field-duel .arena-enemy-sprite {
   transform-origin: center center;
+  translate: 15% 0;
+}
+
+.arena-battle-field-duel .arena-vine-overlay {
   translate: 15% 0;
 }
 
@@ -890,8 +901,15 @@
 }
 
 @keyframes arena-timer-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* ---- Turn Announcement ---- */
@@ -931,18 +949,47 @@
 }
 
 @keyframes arena-announce-fade {
-  0% { opacity: 0; }
-  10% { opacity: 1; }
-  70% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes arena-announce-pop {
-  0% { transform: scale(0.8); opacity: 0; }
-  10% { transform: scale(1.05); opacity: 1; }
-  20% { transform: scale(1); }
-  70% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(1); opacity: 0; }
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  10% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+
+  20% {
+    transform: scale(1);
+  }
+
+  70% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
 }
 
 /* ---- Player Sprite Tiles ---- */
@@ -954,7 +1001,7 @@
   width: 100%;
   flex-shrink: 0;
   position: relative;
-  z-index: 0;
+  z-index: 3;
 }
 
 .arena-sprite-tile {
@@ -1067,12 +1114,21 @@
 
 /* ---- Combat Log Toggle Button ---- */
 
+.arena-log-toggle-wrap {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  height: 0;
+  overflow: visible;
+  z-index: 50;
+  padding-right: 8px;
+}
+
 .arena-log-toggle {
-  position: fixed;
-  bottom: 14px;
-  right: 14px;
-  width: 40px;
-  height: 40px;
+  position: relative;
+  top: 4px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: rgba(30, 25, 18, 0.9);
   border: 1px solid rgba(212, 168, 67, 0.3);
@@ -1147,8 +1203,13 @@
 }
 
 @keyframes arena-slide-up {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
 
 /* ---- Combat Log (legacy, keep for log entries styling) ---- */
@@ -1163,7 +1224,7 @@
 }
 
 .arena-log-entry {
-  background: rgba(220,38,38,0.08);
+  background: rgba(220, 38, 38, 0.08);
   border-left: 3px solid #dc2626;
   padding: 6px 10px;
   border-radius: 0 6px 6px 0;
@@ -1173,7 +1234,7 @@
 }
 
 .arena-log-header {
-  background: rgba(212,168,67,0.08);
+  background: rgba(212, 168, 67, 0.08);
   border-left-color: var(--color-gold);
   font-weight: 600;
   font-size: 0.75rem;
@@ -1184,14 +1245,14 @@
 }
 
 .arena-log-victory {
-  background: rgba(74,222,128,0.08);
+  background: rgba(74, 222, 128, 0.08);
   border-left-color: #4ade80;
   font-weight: 600;
   color: #4ade80;
 }
 
 .arena-log-defeat {
-  background: rgba(239,68,68,0.08);
+  background: rgba(239, 68, 68, 0.08);
   border-left-color: #ef4444;
   font-weight: 600;
   color: #ef4444;
@@ -1222,15 +1283,15 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 8px;
   padding: 6px 10px;
 }
 
 .arena-player-row.arena-player-me {
-  border-color: rgba(212,168,67,0.25);
-  background: rgba(212,168,67,0.06);
+  border-color: rgba(212, 168, 67, 0.25);
+  background: rgba(212, 168, 67, 0.06);
 }
 
 .arena-player-row.arena-player-ko {
@@ -1279,7 +1340,7 @@
 .arena-player-hp-track {
   flex: 1;
   height: 8px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -1343,7 +1404,7 @@
   cursor: pointer;
   transition: all 0.15s ease;
   font-family: var(--font-display);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .arena-btn:active {
@@ -1359,7 +1420,7 @@
 .arena-btn-attack {
   background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(220,38,38,0.3);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
 }
 
 .arena-btn-attack:active {
@@ -1369,7 +1430,7 @@
 .arena-btn-defend {
   background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
 
 .arena-btn-defend:active {
@@ -1379,7 +1440,7 @@
 .arena-btn-flee {
   background: linear-gradient(180deg, #78716c 0%, #57534e 100%);
   color: #e7e5e4;
-  box-shadow: 0 2px 8px rgba(120,113,108,0.2);
+  box-shadow: 0 2px 8px rgba(120, 113, 108, 0.2);
 }
 
 .arena-btn-flee:active {
@@ -1390,7 +1451,7 @@
   background: linear-gradient(180deg, var(--color-gold) 0%, #b8860b 100%);
   color: #1a1510;
   max-width: 220px;
-  box-shadow: 0 2px 10px rgba(212,168,67,0.3);
+  box-shadow: 0 2px 10px rgba(212, 168, 67, 0.3);
 }
 
 .arena-btn-join:active {
@@ -1458,7 +1519,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   animation: arena-fade-in 0.3s ease;
@@ -1491,7 +1552,7 @@
   text-align: center;
   max-width: 360px;
   width: 90%;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.7);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);
   animation: arena-scale-in 0.3s ease;
 }
 
@@ -1505,7 +1566,7 @@
   font-size: 1.8rem;
   font-weight: 700;
   color: var(--color-gold);
-  text-shadow: 0 2px 8px rgba(212,168,67,0.3);
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
   margin-bottom: 8px;
 }
 
@@ -1525,7 +1586,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 6px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   gap: 8px;
 }
 
@@ -1550,7 +1611,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #fbbf24;
-  background: rgba(251,191,36,0.15);
+  background: rgba(251, 191, 36, 0.15);
   padding: 1px 5px;
   border-radius: 4px;
 }
@@ -1575,18 +1636,37 @@
 /* ---- Animations ---- */
 
 @keyframes arena-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes arena-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes arena-scale-in {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ---- Admin Sprite Editor ---- */
@@ -1769,8 +1849,15 @@
 }
 
 @keyframes arena-scale-in {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .arena-init-result-me {
@@ -1920,8 +2007,15 @@
 }
 
 @keyframes arena-pulse-wait {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 /* ============================================
@@ -1940,8 +2034,13 @@
 }
 
 @keyframes rro-backdrop-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .rro-content {
@@ -1975,13 +2074,27 @@
 }
 
 @keyframes rro-fly-in-left {
-  from { opacity: 0; transform: translateX(-80px) scale(0.7); }
-  to { opacity: 1; transform: translateX(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateX(-80px) scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 @keyframes rro-fly-in-right {
-  from { opacity: 0; transform: translateX(80px) scale(0.7); }
-  to { opacity: 1; transform: translateX(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateX(80px) scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 .rro-avatar {
@@ -2036,9 +2149,20 @@
 }
 
 @keyframes rro-clash-pop {
-  from { opacity: 0; transform: scale(0); }
-  60% { opacity: 1; transform: scale(1.3); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .rro-arrow {
@@ -2057,9 +2181,20 @@
 }
 
 @keyframes rro-result-slam {
-  from { opacity: 0; transform: scale(2.5); }
-  60% { opacity: 1; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(2.5);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .rro-hit {
@@ -2118,17 +2253,51 @@
 }
 
 @keyframes rro-screen-shake {
-  0%, 100% { transform: translate(0, 0); }
-  8% { transform: translate(-6px, -3px); }
-  16% { transform: translate(6px, 4px); }
-  24% { transform: translate(-5px, 5px); }
-  32% { transform: translate(5px, -4px); }
-  40% { transform: translate(-4px, 3px); }
-  50% { transform: translate(3px, -2px); }
-  60% { transform: translate(-3px, 2px); }
-  70% { transform: translate(2px, -2px); }
-  80% { transform: translate(-1px, 1px); }
-  90% { transform: translate(1px, -1px); }
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  8% {
+    transform: translate(-6px, -3px);
+  }
+
+  16% {
+    transform: translate(6px, 4px);
+  }
+
+  24% {
+    transform: translate(-5px, 5px);
+  }
+
+  32% {
+    transform: translate(5px, -4px);
+  }
+
+  40% {
+    transform: translate(-4px, 3px);
+  }
+
+  50% {
+    transform: translate(3px, -2px);
+  }
+
+  60% {
+    transform: translate(-3px, 2px);
+  }
+
+  70% {
+    transform: translate(2px, -2px);
+  }
+
+  80% {
+    transform: translate(-1px, 1px);
+  }
+
+  90% {
+    transform: translate(1px, -1px);
+  }
 }
 
 /* Crit backdrop — golden flash */
@@ -2137,9 +2306,17 @@
 }
 
 @keyframes rro-crit-flash {
-  0% { background: rgba(0, 0, 0, 0.6); }
-  30% { background: rgba(255, 200, 0, 0.25); }
-  100% { background: rgba(0, 0, 0, 0.6); }
+  0% {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  30% {
+    background: rgba(255, 200, 0, 0.25);
+  }
+
+  100% {
+    background: rgba(0, 0, 0, 0.6);
+  }
 }
 
 /* Gold particles burst */
@@ -2169,9 +2346,11 @@
     opacity: 1;
     transform: translate(0, 0) scale(1);
   }
+
   70% {
     opacity: 0.8;
   }
+
   100% {
     opacity: 0;
     transform: translate(var(--dx), var(--dy)) scale(0.2);
@@ -2186,10 +2365,25 @@
 }
 
 @keyframes rro-clash-freeze {
-  0% { transform: scale(1); filter: brightness(1); }
-  15% { transform: scale(1.6); filter: brightness(2.5) drop-shadow(0 0 12px rgba(255, 215, 0, 0.9)); }
-  40% { transform: scale(1.4); filter: brightness(1.8) drop-shadow(0 0 8px rgba(255, 215, 0, 0.6)); }
-  100% { transform: scale(1); filter: brightness(1); }
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  15% {
+    transform: scale(1.6);
+    filter: brightness(2.5) drop-shadow(0 0 12px rgba(255, 215, 0, 0.9));
+  }
+
+  40% {
+    transform: scale(1.4);
+    filter: brightness(1.8) drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
 }
 
 /* Crit comparison: sides pause briefly mid-flight (slow-mo effect) */
@@ -2202,17 +2396,47 @@
 }
 
 @keyframes rro-fly-crit-left {
-  0% { opacity: 0; transform: translateX(-80px) scale(0.7); }
-  50% { opacity: 1; transform: translateX(-8px) scale(1.05); }
-  70% { opacity: 1; transform: translateX(-8px) scale(1.05); }
-  100% { opacity: 1; transform: translateX(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateX(-80px) scale(0.7);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(-8px) scale(1.05);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateX(-8px) scale(1.05);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 @keyframes rro-fly-crit-right {
-  0% { opacity: 0; transform: translateX(80px) scale(0.7); }
-  50% { opacity: 1; transform: translateX(8px) scale(1.05); }
-  70% { opacity: 1; transform: translateX(8px) scale(1.05); }
-  100% { opacity: 1; transform: translateX(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateX(80px) scale(0.7);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(8px) scale(1.05);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateX(8px) scale(1.05);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 /* ── Advantage/Disadvantage Badge ── */
@@ -2239,8 +2463,15 @@
 }
 
 @keyframes rro-badge-pop {
-  0% { opacity: 0; transform: scale(0.5); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Advantage dual dice display */
@@ -2294,8 +2525,15 @@
 }
 
 @keyframes rro-revive-pulse {
-  0%, 100% { text-shadow: 0 0 24px rgba(251, 191, 36, 0.7); }
-  50% { text-shadow: 0 0 40px rgba(251, 191, 36, 1), 0 0 60px rgba(34, 197, 94, 0.5); }
+
+  0%,
+  100% {
+    text-shadow: 0 0 24px rgba(251, 191, 36, 0.7);
+  }
+
+  50% {
+    text-shadow: 0 0 40px rgba(251, 191, 36, 1), 0 0 60px rgba(34, 197, 94, 0.5);
+  }
 }
 
 /* ── Player Status Badges ── */
@@ -2318,6 +2556,7 @@
   background: rgba(59, 130, 246, 0.2);
   color: #93c5fd;
 }
+
 .arena-badge-advantage {
   background: rgba(139, 92, 246, 0.25);
   color: #c4b5fd;
@@ -2328,39 +2567,53 @@
   font-size: 0.6rem;
   text-transform: none;
 }
+
 .arena-badge-stunned {
   background: rgba(234, 179, 8, 0.25);
   color: #fde047;
 }
+
 .arena-badge-frightened {
   background: rgba(168, 85, 247, 0.25);
   color: #c084fc;
 }
+
 .arena-badge-poisoned {
   background: rgba(34, 197, 94, 0.25);
   color: #86efac;
 }
+
 .arena-badge-burning {
   background: rgba(249, 115, 22, 0.25);
   color: #fdba74;
   animation: condition-pulse 1.5s ease-in-out infinite;
 }
+
 .arena-badge-blinded {
   background: rgba(100, 100, 100, 0.3);
   color: #a1a1aa;
 }
+
 .arena-badge-restrained {
   background: rgba(180, 120, 60, 0.25);
   color: #d4a574;
 }
+
 .arena-badge-mockery {
   background: rgba(236, 72, 153, 0.25);
   color: #f9a8d4;
 }
 
 @keyframes condition-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
 }
 
 /* ── Potion Button ── */
@@ -2379,6 +2632,7 @@
   color: #fff;
   box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
+
 .arena-btn-help:active {
   background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
 }
@@ -2410,7 +2664,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   font-weight: 600;
   font-size: 0.95rem;
   color: #e7e5e4;
@@ -2443,8 +2697,8 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -2503,7 +2757,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   font-weight: 700;
   font-size: 0.85rem;
   color: #a8a29e;
@@ -2526,14 +2780,7 @@
    SPELL SLOTS & RESOURCE BAR
    ══════════════════════════════════════════ */
 
-.arena-resource-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 0 12px;
-  background: rgba(26, 21, 16, 0.95);
-}
+/* old resource-bar definition removed — see standalone definition below */
 
 .arena-slot-group {
   display: flex;
@@ -2587,6 +2834,7 @@
   box-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
   font-weight: 700;
 }
+
 .arena-btn-layonhands:active {
   background: linear-gradient(180deg, #b8922e 0%, #9a7a24 100%);
 }
@@ -2595,11 +2843,13 @@
 .arena-loh-modal {
   min-height: 180px;
 }
+
 .arena-loh-hp-tag {
   margin-left: 8px;
   font-size: 0.7rem;
   opacity: 0.7;
 }
+
 .arena-loh-amount-section {
   padding: 16px;
   display: flex;
@@ -2607,25 +2857,30 @@
   gap: 12px;
   align-items: center;
 }
+
 .arena-loh-target-name {
   font-size: 0.85rem;
   font-weight: 600;
   color: #d4a843;
 }
+
 .arena-loh-slider {
   width: 100%;
   accent-color: #d4a843;
 }
+
 .arena-loh-amount-display {
   font-size: 1.2rem;
   font-weight: 700;
   color: #fbbf24;
 }
+
 .arena-loh-buttons {
   display: flex;
   gap: 8px;
   width: 100%;
 }
+
 .arena-loh-buttons .arena-btn {
   flex: 1;
 }
@@ -2685,6 +2940,7 @@
   font-weight: 700;
   width: 100%;
 }
+
 .arena-btn-smite:active {
   background: linear-gradient(180deg, #b8922e 0%, #9a7a24 100%);
 }
@@ -2694,6 +2950,7 @@
   color: rgba(255, 255, 255, 0.8);
   width: 100%;
 }
+
 .arena-btn-no-smite:active {
   background: linear-gradient(180deg, #44403c 0%, #3a3632 100%);
 }
@@ -2731,10 +2988,12 @@
   background: rgba(255, 255, 255, 0.06);
   border-radius: 8px;
 }
+
 .arena-inspiration-hit {
   color: #4ade80;
   font-weight: 700;
 }
+
 .arena-inspiration-miss {
   color: #ef4444;
   font-weight: 700;
@@ -2752,6 +3011,7 @@
   font-weight: 700;
   width: 100%;
 }
+
 .arena-btn-use-inspiration:active {
   background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
 }
@@ -2788,6 +3048,51 @@
    Emote Button & Grid
    ══════════════════════════════════════════ */
 
+/* ── Quick Emote Bar (inline, above action panel) ── */
+.arena-emote-quick-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px 4px;
+}
+
+.arena-emote-quick-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: all 0.15s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.arena-emote-quick-btn img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.arena-emote-quick-btn:active {
+  transform: scale(0.88);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.arena-emote-quick-more {
+  color: rgba(212, 168, 67, 0.6);
+  border-color: rgba(212, 168, 67, 0.2);
+}
+
+.arena-emote-quick-more:active {
+  color: rgba(212, 168, 67, 1);
+}
+
+/* Legacy (keep for potential reuse) */
 .arena-emote-row {
   display: flex;
   justify-content: flex-end;
@@ -2869,9 +3174,55 @@
   font-size: 0.85rem;
 }
 
+.arena-emote-cell-wrapper {
+  position: relative;
+}
+
+.arena-emote-fav-btn {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+  transition: color 0.15s, background 0.15s;
+}
+
+.arena-emote-fav-btn:active {
+  transform: scale(0.9);
+}
+
+.arena-emote-fav-active {
+  color: #d4a843;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.arena-emote-fav-disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
 @keyframes arena-emote-pop {
-  from { transform: scale(0.85); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* ── Bonus Action Phase ── */
@@ -2893,8 +3244,16 @@
 }
 
 @keyframes arena-bonus-pulse {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 1; text-shadow: 0 0 12px rgba(192, 132, 252, 0.6); }
+
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 12px rgba(192, 132, 252, 0.6);
+  }
 }
 
 .arena-bonus-buttons {
@@ -2910,6 +3269,7 @@
   color: #fff;
   border: 1px solid rgba(139, 92, 246, 0.5);
 }
+
 .arena-btn-bonus-potion:active {
   background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
 }
@@ -2919,6 +3279,7 @@
   color: #fff;
   border: 1px solid rgba(168, 85, 247, 0.5);
 }
+
 .arena-btn-bonus-inspire:active {
   background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
 }
@@ -2928,6 +3289,7 @@
   color: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
+
 .arena-btn-skip:active {
   background: rgba(255, 255, 255, 0.15);
 }
@@ -2951,8 +3313,15 @@
 }
 
 @keyframes arena-inspire-glow {
-  0%, 100% { box-shadow: 0 0 6px rgba(168, 85, 247, 0.4); }
-  50% { box-shadow: 0 0 12px rgba(168, 85, 247, 0.8); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 6px rgba(168, 85, 247, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -2965,6 +3334,7 @@
   color: #fff;
   border: 1px solid rgba(99, 102, 241, 0.5);
 }
+
 .arena-btn-spell:active {
   background: linear-gradient(135deg, #4f46e5 0%, #6d28d9 100%);
 }
@@ -2975,6 +3345,7 @@
   color: #fff;
   border: 1px solid rgba(34, 197, 94, 0.5);
 }
+
 .arena-btn-bonus-heal:active {
   background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
 }
@@ -2999,6 +3370,7 @@
   transition: background 0.15s, border-color 0.15s;
   width: 100%;
 }
+
 .arena-spell-card:active {
   background: rgba(255, 255, 255, 0.12);
 }
@@ -3006,6 +3378,7 @@
 .arena-spell-card-cantrip {
   border-left: 3px solid #2dd4bf;
 }
+
 .arena-spell-card-level1 {
   border-left: 3px solid #818cf8;
 }
@@ -3015,10 +3388,12 @@
   justify-content: space-between;
   align-items: center;
 }
+
 .arena-spell-card-name {
   font-weight: 700;
   font-size: 0.95rem;
 }
+
 .arena-spell-card-level {
   font-size: 0.7rem;
   font-weight: 600;
@@ -3027,10 +3402,12 @@
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
+
 .arena-spell-level-cantrip {
   background: rgba(45, 212, 191, 0.2);
   color: #2dd4bf;
 }
+
 .arena-spell-level-1 {
   background: rgba(129, 140, 248, 0.2);
   color: #818cf8;
@@ -3043,6 +3420,7 @@
   align-items: center;
   flex-shrink: 0;
 }
+
 .arena-spell-card-action {
   font-size: 0.65rem;
   font-weight: 700;
@@ -3051,10 +3429,12 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+
 .arena-spell-action-main {
   background: rgba(251, 191, 36, 0.18);
   color: #fbbf24;
 }
+
 .arena-spell-action-bonus {
   background: rgba(52, 211, 153, 0.18);
   color: #34d399;
@@ -3073,11 +3453,13 @@
   vertical-align: middle;
   line-height: 1.4;
 }
+
 .arena-action-tag-action {
   background: rgba(251, 191, 36, 0.2);
   color: #fbbf24;
   border: 1px solid rgba(251, 191, 36, 0.3);
 }
+
 .arena-action-tag-bonus {
   background: rgba(52, 211, 153, 0.2);
   color: #34d399;
@@ -3090,12 +3472,15 @@
   font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.7);
 }
+
 .arena-spell-card-dice {
   font-weight: 600;
 }
+
 .arena-spell-card-save {
   color: rgba(255, 255, 255, 0.5);
 }
+
 .arena-spell-card-desc {
   font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.45);
@@ -3118,35 +3503,43 @@
   transition: background 0.15s, border-color 0.15s;
   width: 100%;
 }
+
 .arena-weapon-card:active {
   background: rgba(255, 255, 255, 0.12);
 }
+
 .arena-weapon-card-ranged {
   border-left-color: #38bdf8;
 }
+
 .arena-weapon-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .arena-weapon-card-name {
   font-weight: 700;
   font-size: 0.95rem;
 }
+
 .arena-weapon-card-hit {
   font-size: 0.8rem;
   font-weight: 600;
   color: #fbbf24;
 }
+
 .arena-weapon-card-info {
   display: flex;
   gap: 10px;
   font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.7);
 }
+
 .arena-weapon-card-dice {
   font-weight: 600;
 }
+
 .arena-weapon-card-type {
   color: rgba(255, 255, 255, 0.5);
 }
@@ -3177,4 +3570,582 @@
 .rro-result.rro-failed {
   color: #ef4444;
   text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+/* ---- Resource Bar (Spell Slots & Channel Divinity) ---- */
+
+.arena-resource-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  padding: 2px 8px;
+  margin: 6px 0 2px;
+  font-size: 0.7rem;
+  color: #ccc;
+}
+
+.arena-resource-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.arena-resource-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #aaa;
+  font-size: 0.65rem;
+}
+
+.arena-resource-pips {
+  display: flex;
+  gap: 3px;
+}
+
+.arena-resource-pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transform: rotate(45deg);
+}
+
+.arena-resource-pip-full {
+  background: #3b82f6;
+  border-color: #60a5fa;
+  box-shadow: 0 0 4px rgba(59, 130, 246, 0.5);
+}
+
+.arena-resource-pip-empty {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.arena-resource-pip-cd.arena-resource-pip-full {
+  background: #f59e0b;
+  border-color: #fbbf24;
+  box-shadow: 0 0 4px rgba(245, 158, 11, 0.5);
+}
+
+/* Ki Points (Monk) */
+.arena-resource-pip-ki.arena-resource-pip-full {
+  background: #f0c040;
+  border-color: #fbbf24;
+  box-shadow: 0 0 6px rgba(240, 192, 64, 0.6);
+}
+
+/* ---- Channel Divinity & Ensnaring Strike Buttons ---- */
+
+.arena-btn-channel-divinity {
+  background: linear-gradient(135deg, #065f46 0%, #064e3b 100%) !important;
+  border-color: #059669 !important;
+}
+
+.arena-btn-channel-divinity:active {
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
+}
+
+.arena-btn-ensnaring {
+  background: linear-gradient(135deg, #3f6212 0%, #365314 100%) !important;
+  border-color: #65a30d !important;
+}
+
+.arena-btn-ensnaring:active {
+  background: linear-gradient(135deg, #4d7c0f 0%, #3f6212 100%) !important;
+}
+
+/* Flurry of Blows (Monk) */
+.arena-btn-flurry {
+  background: linear-gradient(135deg, #78350f 0%, #713f12 100%) !important;
+  border-color: #f0c040 !important;
+}
+
+.arena-btn-flurry:active {
+  background: linear-gradient(135deg, #92400e 0%, #78350f 100%) !important;
+}
+
+/* Patient Defense (Monk) */
+.arena-btn-patient-defense {
+  background: linear-gradient(135deg, #1e3a5f 0%, #172554 100%) !important;
+  border-color: #60a5fa !important;
+}
+
+.arena-btn-patient-defense:active {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a5f 100%) !important;
+}
+
+/* Stunning Strike Toggle */
+.arena-stunning-strike-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(240, 192, 64, 0.08);
+  border: 1px solid rgba(240, 192, 64, 0.25);
+  border-radius: 8px;
+  color: rgba(240, 192, 64, 0.6);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.arena-stunning-strike-toggle.active {
+  background: rgba(240, 192, 64, 0.15);
+  border-color: #f0c040;
+  color: #f0c040;
+  box-shadow: 0 0 8px rgba(240, 192, 64, 0.3);
+  animation: arena-buff-pulse 2s ease-in-out infinite;
+}
+
+/* ---- Bonus Action Result Banner (Flurry / Patient Defense) ---- */
+
+.arena-bonus-result-banner {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  pointer-events: auto;
+  animation: arena-bonus-banner-in 0.3s ease-out;
+}
+
+.arena-bonus-result-content {
+  padding: 16px 24px;
+  border-radius: 12px;
+  text-align: center;
+  min-width: 200px;
+  animation: arena-bonus-banner-in 0.3s ease-out;
+}
+
+.arena-bonus-patient {
+  background: rgba(30, 58, 95, 0.9);
+  border: 2px solid #60a5fa;
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+}
+
+.arena-bonus-result-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.arena-bonus-result-desc {
+  color: #93c5fd;
+  font-size: 0.85rem;
+}
+
+@keyframes arena-bonus-banner-in {
+  0% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ---- Monster Turn Skipped Banner ---- */
+
+.arena-monster-skip-banner {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.4);
+  animation: arena-bonus-banner-in 0.3s ease-out;
+}
+
+.arena-monster-skip-content {
+  padding: 20px 28px;
+  border-radius: 12px;
+  text-align: center;
+  min-width: 220px;
+  background: rgba(60, 20, 20, 0.92);
+  border: 2px solid #f0c040;
+  box-shadow: 0 0 30px rgba(240, 192, 64, 0.35);
+}
+
+.arena-monster-skip-icon {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  animation: arena-stun-pulse 0.8s ease-in-out infinite alternate;
+}
+
+.arena-monster-skip-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f0c040;
+  margin-bottom: 6px;
+}
+
+.arena-monster-skip-desc {
+  color: #d4a040;
+  font-size: 0.85rem;
+}
+
+@keyframes arena-stun-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.15); opacity: 1; }
+}
+
+/* ---- Buff Indicator ---- */
+
+.arena-buff-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(101, 163, 13, 0.15);
+  border: 1px solid rgba(101, 163, 13, 0.4);
+  border-radius: 8px;
+  color: #a3e635;
+  font-size: 0.75rem;
+  font-weight: 600;
+  animation: arena-buff-pulse 2s ease-in-out infinite;
+}
+
+.arena-buff-indicator-ki {
+  background: rgba(240, 192, 64, 0.15);
+  border-color: rgba(240, 192, 64, 0.4);
+  color: #f0c040;
+}
+
+@keyframes arena-buff-pulse {
+
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ARENA CONTROLS REDESIGN — Core Actions + Abilities Drawer
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Core Actions Grid (Attack / Dodge / Potion / Flee) ── */
+.arena-core-actions {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1fr;
+  gap: 6px;
+  padding: 6px 12px;
+}
+
+.arena-core-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.arena-core-btn:active {
+  transform: scale(0.96);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.arena-core-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.arena-core-btn-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.arena-core-btn-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.arena-core-btn-detail {
+  font-size: 0.55rem;
+  font-weight: 400;
+  opacity: 0.7;
+  margin-top: 1px;
+}
+
+/* Attack — forged red steel */
+.arena-core-btn-attack {
+  background: linear-gradient(180deg, #c62828 0%, #7f1818 100%);
+  color: #fff;
+  border-color: rgba(220, 38, 38, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 120, 120, 0.25),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(220, 38, 38, 0.3),
+    0 0 12px rgba(220, 38, 38, 0.08);
+}
+
+.arena-core-btn-attack:active {
+  background: linear-gradient(180deg, #a31f1f 0%, #6b1414 100%);
+}
+
+/* Dodge — deep blue iron */
+.arena-core-btn-defend {
+  background: linear-gradient(180deg, #1e4fba 0%, #142d6e 100%);
+  color: #fff;
+  border-color: rgba(37, 99, 235, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(100, 160, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+.arena-core-btn-defend:active {
+  background: linear-gradient(180deg, #183fa0 0%, #0f1f50 100%);
+}
+
+/* Potion — dark emerald */
+.arena-core-btn-potion {
+  background: linear-gradient(180deg, #15803d 0%, #0c5227 100%);
+  color: #fff;
+  border-color: rgba(22, 163, 74, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(100, 255, 150, 0.12),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(22, 163, 74, 0.25);
+}
+
+.arena-core-btn-potion:active {
+  background: linear-gradient(180deg, #116b33 0%, #09401d 100%);
+}
+
+/* Flee — dull stone */
+.arena-core-btn-flee {
+  background: linear-gradient(180deg, #4a4541 0%, #302d2a 100%);
+  color: #a8a29e;
+  border-color: rgba(120, 113, 108, 0.25);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+    0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.arena-core-btn-flee:active {
+  background: linear-gradient(180deg, #3d3a37 0%, #252321 100%);
+  color: #d6d3d1;
+}
+
+/* ── Abilities Toggle Bar (ornate dividers) ── */
+.arena-abilities-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  color: rgba(212, 168, 67, 0.7);
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.arena-abilities-toggle::before,
+.arena-abilities-toggle::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 168, 67, 0.35), transparent);
+}
+
+.arena-abilities-toggle:active {
+  color: rgba(212, 168, 67, 1);
+}
+
+.arena-abilities-toggle-arrow {
+  display: inline-block;
+  font-size: 0.55rem;
+  transition: transform 0.3s ease;
+}
+
+.arena-abilities-toggle-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* ── Abilities Drawer (slide open/close) ── */
+.arena-abilities-drawer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arena-abilities-drawer.open {
+  max-height: 300px;
+}
+
+.arena-abilities-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 2px 12px 8px;
+}
+
+/* ── Ability Card Buttons ── */
+.arena-ability-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 9px 10px 8px;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  color: #e8e4df;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.arena-ability-btn:active {
+  transform: scale(0.97);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 100%);
+}
+
+.arena-ability-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.arena-ability-btn-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.2;
+}
+
+.arena-ability-btn-detail {
+  font-size: 0.6rem;
+  font-weight: 400;
+  opacity: 0.55;
+}
+
+.arena-ability-btn-tag {
+  display: inline-block;
+  font-size: 0.5rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: auto;
+  letter-spacing: 0.5px;
+}
+
+.arena-ability-btn-tag-action {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+.arena-ability-btn-tag-bonus {
+  background: rgba(52, 211, 153, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+/* Ability button color accents */
+.arena-ability-btn-spell {
+  border-color: rgba(99, 102, 241, 0.3);
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0.04) 100%);
+}
+
+.arena-ability-btn-layonhands {
+  border-color: rgba(212, 168, 67, 0.3);
+  background: linear-gradient(180deg, rgba(212, 168, 67, 0.1) 0%, rgba(212, 168, 67, 0.03) 100%);
+}
+
+.arena-ability-btn-channel {
+  border-color: rgba(5, 150, 105, 0.3);
+  background: linear-gradient(180deg, rgba(5, 150, 105, 0.1) 0%, rgba(5, 150, 105, 0.03) 100%);
+}
+
+.arena-ability-btn-help {
+  border-color: rgba(139, 92, 246, 0.25);
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%);
+}
+
+.arena-ability-btn-inspire {
+  border-color: rgba(168, 85, 247, 0.3);
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.03) 100%);
+}
+
+.arena-ability-btn-heal {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.03) 100%);
+}
+
+.arena-ability-btn-ensnaring {
+  border-color: rgba(101, 163, 13, 0.3);
+  background: linear-gradient(180deg, rgba(101, 163, 13, 0.1) 0%, rgba(101, 163, 13, 0.03) 100%);
+}
+
+.arena-ability-btn-patient-defense {
+  border-color: rgba(96, 165, 250, 0.3);
+  background: linear-gradient(180deg, rgba(96, 165, 250, 0.1) 0%, rgba(96, 165, 250, 0.03) 100%);
+}
+
+.arena-ability-btn-ki {
+  border-color: rgba(240, 192, 64, 0.3);
+  background: linear-gradient(180deg, rgba(240, 192, 64, 0.1) 0%, rgba(240, 192, 64, 0.03) 100%);
+}
+
+/* ---- Ensnaring Strike vine overlay ---- */
+
+.arena-vine-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.5);
+  width: 70%;
+  max-height: 70%;
+  object-fit: contain;
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+  animation: vine-ensnare 2.5s ease-out forwards;
+}
+
+@keyframes vine-ensnare {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+  20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  40%  { opacity: 1; transform: translate(-50%, -50%) scale(1.0); }
+  80%  { opacity: 0.9; transform: translate(-50%, -50%) scale(1.0); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
 }

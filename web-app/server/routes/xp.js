@@ -9,8 +9,9 @@
 
 const express = require('express');
 const { authRequired } = require('../middleware/auth');
-const { getXpRecord, getLevelFromXp, getXpLeaderboard, dmAwardXp, convertGoldToXp } = require('../lib/xp');
-const { getWallet } = require('../lib/economy');
+const { getXpRecord, getLevelFromXp, getXpLeaderboard, dmAwardXp, convertGoldToXp, loadXpData, saveXpData, ensureFreshDaily } = require('../lib/xp');
+const { getWallet, awardGold } = require('../lib/economy');
+const { ARENA_DAILY_GOALS } = require('../lib/arenaGoals');
 
 const DM_USER_IDS = (process.env.DM_USER_IDS || '').split(',').filter(Boolean);
 const router = express.Router();
@@ -84,6 +85,67 @@ router.post('/convert-gold', authRequired, (req, res) => {
     gold_balance: wallet.balance,
     xp_gained: result.xp_gained,
     total_xp: result.total_xp
+  });
+});
+
+// GET /api/xp/arena-daily - Arena daily goal progress
+router.get('/arena-daily', authRequired, (req, res) => {
+  const record = getXpRecord(req.user.id, req.user.username);
+  const daily = record.daily;
+
+  const goals = ARENA_DAILY_GOALS.map(goal => ({
+    ...goal,
+    progress: daily[goal.stat] || 0,
+    completed: (daily[goal.stat] || 0) >= goal.target,
+    claimed: (daily.arena_goals_claimed || []).includes(goal.key),
+  }));
+
+  res.json({ goals });
+});
+
+// POST /api/xp/arena-daily/claim - Claim a completed arena daily goal
+router.post('/arena-daily/claim', authRequired, (req, res) => {
+  const { goalKey } = req.body;
+  if (!goalKey) return res.status(400).json({ error: 'goalKey required' });
+
+  const goal = ARENA_DAILY_GOALS.find(g => g.key === goalKey);
+  if (!goal) return res.status(400).json({ error: 'Unknown goal' });
+
+  const data = loadXpData();
+  const record = data[req.user.id];
+  if (!record) return res.status(404).json({ error: 'No XP record' });
+  ensureFreshDaily(record);
+
+  if (!record.daily.arena_goals_claimed) record.daily.arena_goals_claimed = [];
+  if (record.daily.arena_goals_claimed.includes(goalKey)) {
+    return res.status(400).json({ error: 'Already claimed' });
+  }
+
+  const progress = record.daily[goal.stat] || 0;
+  if (progress < goal.target) {
+    return res.status(400).json({ error: 'Goal not completed yet' });
+  }
+
+  // Award XP
+  record.total_xp += goal.xp;
+  record.daily.arena_goals_claimed.push(goalKey);
+  record.last_updated = new Date().toISOString();
+  saveXpData(data);
+
+  // Award gold
+  if (goal.gold > 0) {
+    awardGold(req.user.id, req.user.username, goal.gold, { source: 'arena_daily_goal', goal: goalKey });
+  }
+
+  const levelInfo = getLevelFromXp(record.total_xp);
+
+  res.json({
+    success: true,
+    goalKey,
+    xpAwarded: goal.xp,
+    goldAwarded: goal.gold,
+    total_xp: record.total_xp,
+    level: levelInfo.level,
   });
 });
 

@@ -5860,6 +5860,2687 @@
         "source": "combat_encounter"
       },
       "timestamp": "2026-02-19T14:24:28.726Z"
+    },
+    {
+      "id": "tx_1771552727849_k50g44",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 382,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-20T01:58:47.849Z"
+    },
+    {
+      "id": "tx_1771562619310_ogdjfw",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 407,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-20T04:43:39.310Z"
+    },
+    {
+      "id": "tx_1771566815327_x1ptvp",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 432,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-20T05:53:35.327Z"
+    },
+    {
+      "id": "tx_1771699461346_iyk8he",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 442,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-21T18:44:21.346Z"
+    },
+    {
+      "id": "tx_1771699479375_ywg5gn",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 452,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-02-21T18:44:39.375Z"
+    },
+    {
+      "id": "tx_1771699480488_7crlr3",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 457,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-02-21T18:44:40.488Z"
+    },
+    {
+      "id": "tx_1771699481515_2x9wh2",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 472,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-02-21T18:44:41.515Z"
+    },
+    {
+      "id": "tx_1771706799187_e2j3n8",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 497,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-21T20:46:39.187Z"
+    },
+    {
+      "id": "tx_1771711609733_mz2ym1",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 507,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-21T22:06:49.733Z"
+    },
+    {
+      "id": "tx_1771711609816_p54rhh",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 191,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-21T22:06:49.816Z"
+    },
+    {
+      "id": "tx_1771711733556_m1y7zu",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 517,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-21T22:08:53.556Z"
+    },
+    {
+      "id": "tx_1771711792568_q118zr",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 527,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-21T22:09:52.568Z"
+    },
+    {
+      "id": "tx_1771712101338_8vyh8y",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 552,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-21T22:15:01.338Z"
+    },
+    {
+      "id": "tx_1771715769030_kytn6n",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 577,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-21T23:16:09.030Z"
+    },
+    {
+      "id": "tx_1771715991343_u3h2hi",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 602,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-21T23:19:51.343Z"
+    },
+    {
+      "id": "tx_1771722527473_7m8i0j",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 627,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T01:08:47.473Z"
+    },
+    {
+      "id": "tx_1771722719350_7xlgwn",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 652,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T01:11:59.350Z"
+    },
+    {
+      "id": "tx_1771722896841_1gb20r",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 602,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:14:56.841Z"
+    },
+    {
+      "id": "tx_1771722897495_9kync0",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 552,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:14:57.495Z"
+    },
+    {
+      "id": "tx_1771722897959_wcaasy",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 502,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:14:57.959Z"
+    },
+    {
+      "id": "tx_1771722952489_76u8va",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 477,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:15:52.489Z"
+    },
+    {
+      "id": "tx_1771723018063_lsibec",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 476,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:16:58.063Z"
+    },
+    {
+      "id": "tx_1771723018926_i3bjhi",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 451,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:16:58.926Z"
+    },
+    {
+      "id": "tx_1771723019156_adtow8",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 426,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:16:59.156Z"
+    },
+    {
+      "id": "tx_1771723019395_qgz9w0",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 401,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:16:59.395Z"
+    },
+    {
+      "id": "tx_1771723021708_lb2h4f",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 396,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:01.708Z"
+    },
+    {
+      "id": "tx_1771723021874_liz7qw",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 391,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:01.874Z"
+    },
+    {
+      "id": "tx_1771723022059_pr261z",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 386,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:02.059Z"
+    },
+    {
+      "id": "tx_1771723022187_7v0lpp",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 381,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:02.187Z"
+    },
+    {
+      "id": "tx_1771723022352_fle970",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 376,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:02.352Z"
+    },
+    {
+      "id": "tx_1771723022855_gstg46",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 351,
+      "metadata": {
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:02.855Z"
+    },
+    {
+      "id": "tx_1771723023287_89y4cg",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -75,
+      "balance_after": 276,
+      "metadata": {
+        "item_id": "abyssal_lure",
+        "item_name": "Abyssal Lure",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:03.287Z"
+    },
+    {
+      "id": "tx_1771723023844_38wx9q",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 251,
+      "metadata": {
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:03.844Z"
+    },
+    {
+      "id": "tx_1771723023988_9uzyep",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 226,
+      "metadata": {
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:03.988Z"
+    },
+    {
+      "id": "tx_1771723024154_bffvtc",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 201,
+      "metadata": {
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:04.154Z"
+    },
+    {
+      "id": "tx_1771723024384_tbwz7v",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -75,
+      "balance_after": 126,
+      "metadata": {
+        "item_id": "abyssal_lure",
+        "item_name": "Abyssal Lure",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:04.384Z"
+    },
+    {
+      "id": "tx_1771723024638_xusbtn",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 101,
+      "metadata": {
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:04.638Z"
+    },
+    {
+      "id": "tx_1771723024871_8xo8tn",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -5,
+      "balance_after": 96,
+      "metadata": {
+        "item_id": "basic_worm",
+        "item_name": "Basic Worm",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:04.871Z"
+    },
+    {
+      "id": "tx_1771723027645_pnao3p",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 46,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:07.645Z"
+    },
+    {
+      "id": "tx_1771723037080_tj2j6s",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 21,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:17:17.080Z"
+    },
+    {
+      "id": "tx_1771723488042_qnskhg",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 427,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:24:48.042Z"
+    },
+    {
+      "id": "tx_1771723969495_41c352",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 500,
+      "balance_after": 927,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_glitterparty",
+        "item_name": "Glitter Party Dice",
+        "quantity": 1,
+        "unit_price": 500
+      },
+      "timestamp": "2026-02-22T01:32:49.495Z"
+    },
+    {
+      "id": "tx_1771724125241_7pj2ni",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -750,
+      "balance_after": 177,
+      "metadata": {
+        "item_id": "dice_swrpg",
+        "item_name": "Obsidian Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:35:25.241Z"
+    },
+    {
+      "id": "tx_1771724189748_gm8h4o",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 750,
+      "balance_after": 927,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_swrpg",
+        "item_name": "Obsidian Dice",
+        "quantity": 1,
+        "unit_price": 750
+      },
+      "timestamp": "2026-02-22T01:36:29.748Z"
+    },
+    {
+      "id": "tx_1771724205528_zpud3n",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -300,
+      "balance_after": 627,
+      "metadata": {
+        "item_id": "dice_rainbow",
+        "item_name": "Prismatic Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:36:45.528Z"
+    },
+    {
+      "id": "tx_1771724271870_1oec8c",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 300,
+      "balance_after": 927,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_rainbow",
+        "item_name": "Prismatic Dice",
+        "quantity": 1,
+        "unit_price": 300
+      },
+      "timestamp": "2026-02-22T01:37:51.870Z"
+    },
+    {
+      "id": "tx_1771724295378_vsc716",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 46,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:15.378Z"
+    },
+    {
+      "id": "tx_1771724296662_knwzp7",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 71,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:16.662Z"
+    },
+    {
+      "id": "tx_1771724297182_7ecgku",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 96,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:17.182Z"
+    },
+    {
+      "id": "tx_1771724297656_64qtza",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 121,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:17.656Z"
+    },
+    {
+      "id": "tx_1771724298384_zr1z3m",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 146,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:18.385Z"
+    },
+    {
+      "id": "tx_1771724299424_9njzqt",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 171,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:19.424Z"
+    },
+    {
+      "id": "tx_1771724300007_pv7665",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 196,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:20.007Z"
+    },
+    {
+      "id": "tx_1771724301058_jb9n6r",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 221,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:21.058Z"
+    },
+    {
+      "id": "tx_1771724303744_7pns9r",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 246,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:23.744Z"
+    },
+    {
+      "id": "tx_1771724321200_k8kbsu",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 75,
+      "balance_after": 321,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "abyssal_lure",
+        "item_name": "Abyssal Lure",
+        "quantity": 1,
+        "unit_price": 75
+      },
+      "timestamp": "2026-02-22T01:38:41.200Z"
+    },
+    {
+      "id": "tx_1771724322068_2o0fvl",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 75,
+      "balance_after": 396,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "abyssal_lure",
+        "item_name": "Abyssal Lure",
+        "quantity": 1,
+        "unit_price": 75
+      },
+      "timestamp": "2026-02-22T01:38:42.068Z"
+    },
+    {
+      "id": "tx_1771724323502_jdjjfm",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 421,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:43.502Z"
+    },
+    {
+      "id": "tx_1771724324089_ycw638",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 446,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:44.089Z"
+    },
+    {
+      "id": "tx_1771724324649_m7ttpg",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 471,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:44.649Z"
+    },
+    {
+      "id": "tx_1771724325154_wxsu0s",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 496,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:45.155Z"
+    },
+    {
+      "id": "tx_1771724325733_uyqxsk",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 521,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "enchanted_grub",
+        "item_name": "Enchanted Grub",
+        "quantity": 1,
+        "unit_price": 25
+      },
+      "timestamp": "2026-02-22T01:38:45.733Z"
+    },
+    {
+      "id": "tx_1771724327638_1ezyld",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 50,
+      "balance_after": 571,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "quantity": 1,
+        "unit_price": 50
+      },
+      "timestamp": "2026-02-22T01:38:47.638Z"
+    },
+    {
+      "id": "tx_1771724328687_9dvlsv",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -500,
+      "balance_after": 427,
+      "metadata": {
+        "item_id": "dice_gold",
+        "item_name": "Golden Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:38:48.687Z"
+    },
+    {
+      "id": "tx_1771724333396_g3hjp6",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 200,
+      "balance_after": 771,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_ice",
+        "item_name": "Frostbite Dice",
+        "quantity": 1,
+        "unit_price": 200
+      },
+      "timestamp": "2026-02-22T01:38:53.396Z"
+    },
+    {
+      "id": "tx_1771724338973_c65qjs",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 452,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "dice_goblin"
+      },
+      "timestamp": "2026-02-22T01:38:58.973Z"
+    },
+    {
+      "id": "tx_1771724379417_xb0oe9",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -300,
+      "balance_after": 471,
+      "metadata": {
+        "item_id": "dice_radiant",
+        "item_name": "Radiant Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:39:39.417Z"
+    },
+    {
+      "id": "tx_1771724380868_csbdfk",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -300,
+      "balance_after": 171,
+      "metadata": {
+        "item_id": "dice_bronze",
+        "item_name": "Bronze Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:39:40.868Z"
+    },
+    {
+      "id": "tx_1771724521178_axc2n3",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 300,
+      "balance_after": 471,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_radiant",
+        "item_name": "Radiant Dice",
+        "quantity": 1,
+        "unit_price": 300
+      },
+      "timestamp": "2026-02-22T01:42:01.178Z"
+    },
+    {
+      "id": "tx_1771724523201_qsvq4u",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 300,
+      "balance_after": 771,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_bronze",
+        "item_name": "Bronze Dice",
+        "quantity": 1,
+        "unit_price": 300
+      },
+      "timestamp": "2026-02-22T01:42:03.201Z"
+    },
+    {
+      "id": "tx_1771724538495_51rfg6",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -200,
+      "balance_after": 571,
+      "metadata": {
+        "item_id": "dice_thunder",
+        "item_name": "Thunder Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:42:18.495Z"
+    },
+    {
+      "id": "tx_1771724544022_qexcmj",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -200,
+      "balance_after": 371,
+      "metadata": {
+        "item_id": "dice_earth",
+        "item_name": "Earthen Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:42:24.022Z"
+    },
+    {
+      "id": "tx_1771724544073_bvoj43",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 50,
+      "balance_after": 421,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "patron"
+      },
+      "timestamp": "2026-02-22T01:42:24.073Z"
+    },
+    {
+      "id": "tx_1771724556087_7cgdxl",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -200,
+      "balance_after": 221,
+      "metadata": {
+        "item_id": "dice_air",
+        "item_name": "Zephyr Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:42:36.087Z"
+    },
+    {
+      "id": "tx_1771724618540_qq3hhx",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 500,
+      "balance_after": 952,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_gold",
+        "item_name": "Golden Dice",
+        "quantity": 1,
+        "unit_price": 500
+      },
+      "timestamp": "2026-02-22T01:43:38.540Z"
+    },
+    {
+      "id": "tx_1771724704751_mf9ktj",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 962,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-02-22T01:45:04.751Z"
+    },
+    {
+      "id": "tx_1771724705486_5fl9b1",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 967,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-02-22T01:45:05.486Z"
+    },
+    {
+      "id": "tx_1771724706040_kl8kit",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 972,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_crit"
+      },
+      "timestamp": "2026-02-22T01:45:06.040Z"
+    },
+    {
+      "id": "tx_1771724706694_vgl7f6",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 987,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-02-22T01:45:06.694Z"
+    },
+    {
+      "id": "tx_1771724860634_5td664",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 200,
+      "balance_after": 421,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_air",
+        "item_name": "Zephyr Dice",
+        "quantity": 1,
+        "unit_price": 200
+      },
+      "timestamp": "2026-02-22T01:47:40.634Z"
+    },
+    {
+      "id": "tx_1771724862229_l26n3m",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 200,
+      "balance_after": 621,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_thunder",
+        "item_name": "Thunder Dice",
+        "quantity": 1,
+        "unit_price": 200
+      },
+      "timestamp": "2026-02-22T01:47:42.229Z"
+    },
+    {
+      "id": "tx_1771724878804_mtbw6o",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -300,
+      "balance_after": 321,
+      "metadata": {
+        "item_id": "dice_psychic",
+        "item_name": "Psychic Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:47:58.804Z"
+    },
+    {
+      "id": "tx_1771724892563_e0cca0",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -300,
+      "balance_after": 21,
+      "metadata": {
+        "item_id": "dice_inspired",
+        "item_name": "Bardic Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:48:12.563Z"
+    },
+    {
+      "id": "tx_1771724991945_q4t5i3",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -500,
+      "balance_after": 487,
+      "metadata": {
+        "item_id": "dice_gold",
+        "item_name": "Golden Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:49:51.945Z"
+    },
+    {
+      "id": "tx_1771725013765_iy0qln",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 50,
+      "balance_after": 537,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "jackpot"
+      },
+      "timestamp": "2026-02-22T01:50:13.765Z"
+    },
+    {
+      "id": "tx_1771725062123_0maxuj",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 500,
+      "balance_after": 1037,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_gold",
+        "item_name": "Golden Dice",
+        "quantity": 1,
+        "unit_price": 500
+      },
+      "timestamp": "2026-02-22T01:51:02.123Z"
+    },
+    {
+      "id": "tx_1771725073346_kzh1pr",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -300,
+      "balance_after": 737,
+      "metadata": {
+        "item_id": "dice_inspired",
+        "item_name": "Bardic Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:51:13.346Z"
+    },
+    {
+      "id": "tx_1771725124136_sdkwcb",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 300,
+      "balance_after": 1037,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_inspired",
+        "item_name": "Bardic Dice",
+        "quantity": 1,
+        "unit_price": 300
+      },
+      "timestamp": "2026-02-22T01:52:04.136Z"
+    },
+    {
+      "id": "tx_1771725137856_mwfrpb",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -750,
+      "balance_after": 287,
+      "metadata": {
+        "item_id": "dice_swrpg_set",
+        "item_name": "Obsidian Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:52:17.856Z"
+    },
+    {
+      "id": "tx_1771725146025_k1ck71",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 200,
+      "balance_after": 221,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_earth",
+        "item_name": "Earthen Dice",
+        "quantity": 1,
+        "unit_price": 200
+      },
+      "timestamp": "2026-02-22T01:52:26.025Z"
+    },
+    {
+      "id": "tx_1771725148718_a3vss5",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 300,
+      "balance_after": 521,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_inspired",
+        "item_name": "Bardic Dice",
+        "quantity": 1,
+        "unit_price": 300
+      },
+      "timestamp": "2026-02-22T01:52:28.719Z"
+    },
+    {
+      "id": "tx_1771725164179_khb2t9",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 750,
+      "balance_after": 1037,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_swrpg_set",
+        "item_name": "Obsidian Dice",
+        "quantity": 1,
+        "unit_price": 750
+      },
+      "timestamp": "2026-02-22T01:52:44.179Z"
+    },
+    {
+      "id": "tx_1771725176249_52cexe",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -750,
+      "balance_after": 287,
+      "metadata": {
+        "item_id": "dice_dragons",
+        "item_name": "Dragon Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:52:56.249Z"
+    },
+    {
+      "id": "tx_1771725195190_i2h426",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -300,
+      "balance_after": 221,
+      "metadata": {
+        "item_id": "dice_rainbow",
+        "item_name": "Prismatic Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:53:15.190Z"
+    },
+    {
+      "id": "tx_1771725206485_ebn52w",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -200,
+      "balance_after": 21,
+      "metadata": {
+        "item_id": "dice_fire",
+        "item_name": "Ember Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:53:26.485Z"
+    },
+    {
+      "id": "tx_1771725208881_d2pl72",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 750,
+      "balance_after": 1037,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_dragons",
+        "item_name": "Dragon Dice",
+        "quantity": 1,
+        "unit_price": 750
+      },
+      "timestamp": "2026-02-22T01:53:28.881Z"
+    },
+    {
+      "id": "tx_1771725226237_b3qash",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -500,
+      "balance_after": 537,
+      "metadata": {
+        "item_id": "dice_gold",
+        "item_name": "Golden Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:53:46.237Z"
+    },
+    {
+      "id": "tx_1771725308445_m0gjgz",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 500,
+      "balance_after": 1037,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_gold",
+        "item_name": "Golden Dice",
+        "quantity": 1,
+        "unit_price": 500
+      },
+      "timestamp": "2026-02-22T01:55:08.445Z"
+    },
+    {
+      "id": "tx_1771725325523_fj83s5",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -500,
+      "balance_after": 537,
+      "metadata": {
+        "item_id": "dice_birdup",
+        "item_name": "Phoenix Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:55:25.523Z"
+    },
+    {
+      "id": "tx_1771725410463_68kr1k",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 300,
+      "balance_after": 321,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_rainbow",
+        "item_name": "Prismatic Dice",
+        "quantity": 1,
+        "unit_price": 300
+      },
+      "timestamp": "2026-02-22T01:56:50.463Z"
+    },
+    {
+      "id": "tx_1771725415121_vqwexr",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 500,
+      "balance_after": 1037,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_birdup",
+        "item_name": "Phoenix Dice",
+        "quantity": 1,
+        "unit_price": 500
+      },
+      "timestamp": "2026-02-22T01:56:55.121Z"
+    },
+    {
+      "id": "tx_1771725427140_bfowwk",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -500,
+      "balance_after": 537,
+      "metadata": {
+        "item_id": "dice_birdup",
+        "item_name": "Phoenix Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:57:07.140Z"
+    },
+    {
+      "id": "tx_1771725455804_a0hxcd",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -300,
+      "balance_after": 21,
+      "metadata": {
+        "item_id": "dice_necrotic",
+        "item_name": "Necrotic Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:57:35.804Z"
+    },
+    {
+      "id": "tx_1771725512587_y45g03",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 300,
+      "balance_after": 321,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_necrotic",
+        "item_name": "Necrotic Dice",
+        "quantity": 1,
+        "unit_price": 300
+      },
+      "timestamp": "2026-02-22T01:58:32.587Z"
+    },
+    {
+      "id": "tx_1771725568496_uiy71u",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 300,
+      "balance_after": 621,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_psychic",
+        "item_name": "Psychic Dice",
+        "quantity": 1,
+        "unit_price": 300
+      },
+      "timestamp": "2026-02-22T01:59:28.496Z"
+    },
+    {
+      "id": "tx_1771725588565_bqefqa",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -200,
+      "balance_after": 421,
+      "metadata": {
+        "item_id": "dice_water",
+        "item_name": "Tidal Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:59:48.565Z"
+    },
+    {
+      "id": "tx_1771725596428_nvuqat",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -200,
+      "balance_after": 221,
+      "metadata": {
+        "item_id": "dice_acid",
+        "item_name": "Corrosive Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T01:59:56.428Z"
+    },
+    {
+      "id": "tx_1771725631419_qt77ww",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -200,
+      "balance_after": 21,
+      "metadata": {
+        "item_id": "dice_ice",
+        "item_name": "Frostbite Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T02:00:31.419Z"
+    },
+    {
+      "id": "tx_1771725924040_cbtrjb",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 200,
+      "balance_after": 221,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_water",
+        "item_name": "Tidal Dice",
+        "quantity": 1,
+        "unit_price": 200
+      },
+      "timestamp": "2026-02-22T02:05:24.040Z"
+    },
+    {
+      "id": "tx_1771725926044_m8qltj",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 200,
+      "balance_after": 421,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_ice",
+        "item_name": "Frostbite Dice",
+        "quantity": 1,
+        "unit_price": 200
+      },
+      "timestamp": "2026-02-22T02:05:26.044Z"
+    },
+    {
+      "id": "tx_1771725927231_ma2pvv",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 200,
+      "balance_after": 621,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_acid",
+        "item_name": "Corrosive Dice",
+        "quantity": 1,
+        "unit_price": 200
+      },
+      "timestamp": "2026-02-22T02:05:27.231Z"
+    },
+    {
+      "id": "tx_1771731008369_z5k0uc",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 562,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T03:30:08.369Z"
+    },
+    {
+      "id": "tx_1771731076668_9zxf5f",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 587,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-02-22T03:31:16.668Z"
+    },
+    {
+      "id": "tx_1771732996477_c8hfxu",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 612,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T04:03:16.477Z"
+    },
+    {
+      "id": "tx_1771735213140_18op6e",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 637,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T04:40:13.140Z"
+    },
+    {
+      "id": "tx_1771739063369_7kh10o",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 662,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T05:44:23.369Z"
+    },
+    {
+      "id": "tx_1771739700276_xtdfv9",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 687,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T05:55:00.276Z"
+    },
+    {
+      "id": "tx_1771740277983_suruya",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 712,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T06:04:37.983Z"
+    },
+    {
+      "id": "tx_1771740573288_4cy0t6",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 737,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T06:09:33.288Z"
+    },
+    {
+      "id": "tx_1771743073083_1ljh92",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 762,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T06:51:13.083Z"
+    },
+    {
+      "id": "tx_1771743876385_w82vg2",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "shop_sale",
+      "amount": 500,
+      "balance_after": 1262,
+      "metadata": {
+        "source": "shop_sale",
+        "item_id": "dice_birdup",
+        "item_name": "Phoenix Dice",
+        "quantity": 1,
+        "unit_price": 500
+      },
+      "timestamp": "2026-02-22T07:04:36.385Z"
+    },
+    {
+      "id": "tx_1771743922210_0h0yh9",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -500,
+      "balance_after": 762,
+      "metadata": {
+        "item_id": "dice_pinkdreams",
+        "item_name": "Pink Dreams Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T07:05:22.210Z"
+    },
+    {
+      "id": "tx_1771745076918_b4btrb",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 636,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T07:24:36.918Z"
+    },
+    {
+      "id": "tx_1771745077012_l0uj54",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 787,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T07:24:37.012Z"
+    },
+    {
+      "id": "tx_1771745089696_hqt3w5",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 646,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-02-22T07:24:49.696Z"
+    },
+    {
+      "id": "tx_1771745090449_pcoodf",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 651,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-02-22T07:24:50.449Z"
+    },
+    {
+      "id": "tx_1771745093103_8wnyx1",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 666,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-02-22T07:24:53.103Z"
+    },
+    {
+      "id": "tx_1771745911979_golqea",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 30,
+      "balance_after": 817,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T07:38:31.979Z"
+    },
+    {
+      "id": "tx_1771745912068_beloya",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 676,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T07:38:32.068Z"
+    },
+    {
+      "id": "tx_1771745912148_xkc57u",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 50,
+      "balance_after": 726,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "arena_champion"
+      },
+      "timestamp": "2026-02-22T07:38:32.148Z"
+    },
+    {
+      "id": "tx_1771746469154_zev8rn",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 23,
+      "balance_after": 840,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T07:47:49.154Z"
+    },
+    {
+      "id": "tx_1771746469230_x8yy5u",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 17,
+      "balance_after": 743,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T07:47:49.230Z"
+    },
+    {
+      "id": "tx_1771746484462_gg46zo",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 768,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-02-22T07:48:04.462Z"
+    },
+    {
+      "id": "tx_1771792073569_96heab",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 815,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-22T20:27:53.569Z"
+    },
+    {
+      "id": "tx_1771801292972_yykyh6",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 840,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-22T23:01:32.972Z"
+    },
+    {
+      "id": "tx_1771812934438_indoa3",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 9,
+      "balance_after": 849,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-23T02:15:34.438Z"
+    },
+    {
+      "id": "tx_1771812934505_eji9v9",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 31,
+      "balance_after": 799,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-23T02:15:34.505Z"
+    },
+    {
+      "id": "tx_1771812943014_r12z7k",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 804,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_crit"
+      },
+      "timestamp": "2026-02-23T02:15:43.014Z"
+    },
+    {
+      "id": "tx_1771812945757_uswqmd",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 859,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-02-23T02:15:45.757Z"
+    },
+    {
+      "id": "tx_1771813421617_by04o6",
+      "user_id": "424061511833747467",
+      "username": "The Architect",
+      "type": "achievement_reward",
+      "amount": 30,
+      "balance_after": 889,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-23T02:23:41.617Z"
+    },
+    {
+      "id": "tx_1771813421691_yl7vqv",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 814,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-23T02:23:41.691Z"
+    },
+    {
+      "id": "tx_1771813438017_xgfn0k",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 904,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-02-23T02:23:58.017Z"
+    },
+    {
+      "id": "tx_1771813483948_e3xdcj",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 839,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "level_5"
+      },
+      "timestamp": "2026-02-23T02:24:43.948Z"
+    },
+    {
+      "id": "tx_1771901231274_t1hbl3",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 929,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-24T02:47:11.274Z"
+    },
+    {
+      "id": "tx_1771901236588_9xj9o3",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 939,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-02-24T02:47:16.588Z"
+    },
+    {
+      "id": "tx_1771901237230_16yl3h",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 944,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-02-24T02:47:17.230Z"
+    },
+    {
+      "id": "tx_1771901237750_ofx1kt",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 949,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_crit"
+      },
+      "timestamp": "2026-02-24T02:47:17.750Z"
+    },
+    {
+      "id": "tx_1771901238300_2stzj6",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 964,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-02-24T02:47:18.300Z"
+    },
+    {
+      "id": "tx_1771901370427_6m5mfl",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -200,
+      "balance_after": 764,
+      "metadata": {
+        "item_id": "dice_acid",
+        "item_name": "Corrosive Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-24T02:49:30.427Z"
+    },
+    {
+      "id": "tx_1771907581046_4lxytb",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 50,
+      "balance_after": 814,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "high_roller"
+      },
+      "timestamp": "2026-02-24T04:33:01.046Z"
+    },
+    {
+      "id": "tx_1771916135072_g9j3zg",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 19,
+      "balance_after": 858,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-24T06:55:35.072Z"
+    },
+    {
+      "id": "tx_1771916135154_okyybn",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 21,
+      "balance_after": 835,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-24T06:55:35.154Z"
+    },
+    {
+      "id": "tx_1771916149340_3llazc",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 883,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "dice_goblin"
+      },
+      "timestamp": "2026-02-24T06:55:49.340Z"
+    },
+    {
+      "id": "tx_1771916154069_9d3cqa",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 845,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-02-24T06:55:54.069Z"
+    },
+    {
+      "id": "tx_1771916154935_lkqg0f",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 850,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_crit"
+      },
+      "timestamp": "2026-02-24T06:55:54.935Z"
+    },
+    {
+      "id": "tx_1771916161070_9z11ii",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 893,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-02-24T06:56:01.070Z"
+    },
+    {
+      "id": "tx_1771916163676_myw46t",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 898,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-02-24T06:56:03.676Z"
+    },
+    {
+      "id": "tx_1771916210885_f99atz",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 903,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-24T06:56:50.885Z"
+    },
+    {
+      "id": "tx_1771916218017_ddqnye",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 918,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-02-24T06:56:58.017Z"
+    },
+    {
+      "id": "tx_1771916401054_g30ezl",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 800,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-24T07:00:01.054Z"
+    },
+    {
+      "id": "tx_1771916402136_t00awm",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 750,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-24T07:00:02.136Z"
+    },
+    {
+      "id": "tx_1771916403301_8w2jcw",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 700,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-24T07:00:03.301Z"
+    },
+    {
+      "id": "tx_1771916455039_41k5r6",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 868,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-24T07:00:55.039Z"
+    },
+    {
+      "id": "tx_1771916456116_hq0i2r",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 818,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-24T07:00:56.116Z"
+    },
+    {
+      "id": "tx_1771916550756_z2o3n0",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 4,
+      "balance_after": 822,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-24T07:02:30.756Z"
+    },
+    {
+      "id": "tx_1771916550834_4a1fa5",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 6,
+      "balance_after": 706,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-24T07:02:30.834Z"
+    },
+    {
+      "id": "tx_1771916554924_3h9sih",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 847,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-02-24T07:02:34.924Z"
+    },
+    {
+      "id": "tx_1771916557674_cfleja",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 721,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-02-24T07:02:37.674Z"
+    },
+    {
+      "id": "tx_1771916642056_nak9o9",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 729,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-24T07:04:02.056Z"
+    },
+    {
+      "id": "tx_1771916646300_yb00rv",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 754,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-02-24T07:04:06.300Z"
+    },
+    {
+      "id": "tx_1771916646979_5hvrc6",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 759,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-02-24T07:04:06.979Z"
+    },
+    {
+      "id": "tx_1771953284993_2lmhrx",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 769,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-24T17:14:44.993Z"
+    },
+    {
+      "id": "tx_1771982030483_kv7mmc",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 13,
+      "balance_after": 860,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T01:13:50.483Z"
+    },
+    {
+      "id": "tx_1771982030574_3nckn5",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 13,
+      "balance_after": 782,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T01:13:50.574Z"
+    },
+    {
+      "id": "tx_1771982399667_yuu4qq",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 23,
+      "balance_after": 883,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T01:19:59.667Z"
+    },
+    {
+      "id": "tx_1771982399757_clmwkf",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 17,
+      "balance_after": 799,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T01:19:59.757Z"
+    },
+    {
+      "id": "tx_1771983268153_ala4xf",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 809,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T01:34:28.153Z"
+    },
+    {
+      "id": "tx_1772003231016_yanwdm",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 14,
+      "balance_after": 897,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:07:11.016Z"
+    },
+    {
+      "id": "tx_1772003231102_7vuddq",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 11,
+      "balance_after": 820,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:07:11.102Z"
+    },
+    {
+      "id": "tx_1772003496180_opk74k",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 828,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:11:36.180Z"
+    },
+    {
+      "id": "tx_1772003496276_7oagsq",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 17,
+      "balance_after": 914,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:11:36.276Z"
+    },
+    {
+      "id": "tx_1772003501543_3e5ugv",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 924,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-02-25T07:11:41.543Z"
+    },
+    {
+      "id": "tx_1772003501832_39o8q9",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 838,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-02-25T07:11:41.832Z"
+    },
+    {
+      "id": "tx_1772003504255_lsdxpe",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 843,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-02-25T07:11:44.255Z"
+    },
+    {
+      "id": "tx_1772003504786_bio1ax",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 858,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-02-25T07:11:44.786Z"
+    },
+    {
+      "id": "tx_1772003505950_0lirf4",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 939,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-02-25T07:11:45.950Z"
+    },
+    {
+      "id": "tx_1772003795806_ueh3yg",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 17,
+      "balance_after": 875,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:16:35.806Z"
+    },
+    {
+      "id": "tx_1772003795897_sjsfhf",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 947,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:16:35.897Z"
+    },
+    {
+      "id": "tx_1772003799604_zlmt6p",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 900,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-02-25T07:16:39.604Z"
+    },
+    {
+      "id": "tx_1772003800921_ho8s9w",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 972,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-02-25T07:16:40.921Z"
+    },
+    {
+      "id": "tx_1772005150639_vebfgm",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 12,
+      "balance_after": 984,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:39:10.639Z"
+    },
+    {
+      "id": "tx_1772005150748_zybzf2",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 13,
+      "balance_after": 913,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:39:10.748Z"
+    },
+    {
+      "id": "tx_1772005155791_35ri4u",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 989,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-02-25T07:39:15.791Z"
+    },
+    {
+      "id": "tx_1772005357975_dmgkby",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 9,
+      "balance_after": 922,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:42:37.975Z"
+    },
+    {
+      "id": "tx_1772005358041_b0jixx",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 16,
+      "balance_after": 1005,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:42:38.041Z"
+    },
+    {
+      "id": "tx_1772005585473_c6artf",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 12,
+      "balance_after": 934,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:46:25.473Z"
+    },
+    {
+      "id": "tx_1772005585538_xreujp",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 13,
+      "balance_after": 1018,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:46:25.538Z"
     }
   ]
 }

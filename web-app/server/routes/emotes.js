@@ -25,6 +25,17 @@ function getEmoteCatalog() {
   } catch { return { categories: [], emotes: [] }; }
 }
 
+function loadPlayers() {
+  try { return JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8')); }
+  catch { return {}; }
+}
+
+function savePlayers(players) {
+  const tmpPath = PLAYERS_PATH + '.tmp';
+  fs.writeFileSync(tmpPath, JSON.stringify(players, null, 2));
+  fs.renameSync(tmpPath, PLAYERS_PATH);
+}
+
 function getPlayerData(userId) {
   try {
     const players = JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8'));
@@ -101,6 +112,51 @@ router.post('/send', authRequired, (req, res) => {
     emoteImage: emote.image,
     emoteDescription: emote.description,
   });
+});
+
+// ============================================
+// GET /favorites
+// ============================================
+
+router.get('/favorites', authRequired, (req, res) => {
+  const players = loadPlayers();
+  const player = players[req.user.id] || {};
+  res.json({ favorites: player.favoriteEmotes || [] });
+});
+
+// ============================================
+// POST /favorites  — toggle an emote favorite
+// ============================================
+
+router.post('/favorites', authRequired, (req, res) => {
+  const { emoteId } = req.body;
+  if (!emoteId) {
+    return res.status(400).json({ error: 'emoteId is required' });
+  }
+
+  // Validate emote exists in catalog
+  const catalog = getEmoteCatalog();
+  if (!catalog.emotes.find(e => e.id === emoteId)) {
+    return res.status(404).json({ error: 'Emote not found' });
+  }
+
+  const players = loadPlayers();
+  if (!players[req.user.id]) players[req.user.id] = {};
+  const favs = players[req.user.id].favoriteEmotes || [];
+
+  const idx = favs.indexOf(emoteId);
+  if (idx !== -1) {
+    // Already favorited → remove
+    favs.splice(idx, 1);
+  } else if (favs.length >= 4) {
+    return res.status(400).json({ error: 'Maximum 4 favorites' });
+  } else {
+    favs.push(emoteId);
+  }
+
+  players[req.user.id].favoriteEmotes = favs;
+  savePlayers(players);
+  res.json({ favorites: favs });
 });
 
 module.exports = router;

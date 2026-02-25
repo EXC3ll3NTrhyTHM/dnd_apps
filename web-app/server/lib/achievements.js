@@ -2,7 +2,8 @@
  * Achievement System
  *
  * Definitions, storage, and check logic for player achievements.
- * Grants XP + gold on unlock. Stored in data/achievements.json.
+ * Achievements unlock → player claims rewards via Profile page.
+ * Stored in data/achievements.json.
  */
 
 const fs = require('fs');
@@ -660,6 +661,44 @@ const ACHIEVEMENTS = {
     hidden: false,
     check: (lt) => lt.pet_interactions >= 200,
   },
+
+  // -- Dice Collection --
+  new_set: {
+    name: 'New Set',
+    description: 'Buy your first dice set',
+    icon: '\u{1F3B2}',
+    xp: 15,
+    gold: 0,
+    hidden: false,
+    check: (lt) => lt.dice_sets_collected >= 1,
+  },
+  dice_hoarder: {
+    name: 'Dice Hoarder',
+    description: 'Collect 5 dice sets',
+    icon: '\u{1F9F0}',
+    xp: 40,
+    gold: 20,
+    hidden: false,
+    check: (lt) => lt.dice_sets_collected >= 5,
+  },
+  dice_collector: {
+    name: 'Dice Collector',
+    description: 'Collect 15 dice sets',
+    icon: '\u{2728}',
+    xp: 75,
+    gold: 40,
+    hidden: false,
+    check: (lt) => lt.dice_sets_collected >= 15,
+  },
+  dice_fanatic: {
+    name: 'Dice Fanatic',
+    description: 'Collect every dice set',
+    icon: '\u{1F48E}',
+    xp: 200,
+    gold: 100,
+    hidden: true,
+    check: (lt) => lt.dice_sets_collected >= 29,
+  },
 };
 
 // ============================================
@@ -681,6 +720,28 @@ function saveAchievements(data) {
 }
 
 // ============================================
+// HELPERS
+// ============================================
+
+/**
+ * Check if an achievement value represents a claimed achievement.
+ * Legacy string timestamps = auto-awarded before claimable system = treated as claimed.
+ * New object format: { at, claimed } where claimed is false or an ISO timestamp.
+ */
+function isClaimed(val) {
+  if (val == null) return false;
+  if (typeof val === 'string') return true; // legacy: auto-awarded
+  return !!val.claimed;
+}
+
+/** Extract the unlock timestamp regardless of format */
+function getUnlockedAt(val) {
+  if (val == null) return null;
+  if (typeof val === 'string') return val;
+  return val.at || null;
+}
+
+// ============================================
 // CHECK & AWARD
 // ============================================
 
@@ -695,7 +756,6 @@ function saveAchievements(data) {
  */
 function checkAchievements(userId, username, event, ctx = {}) {
   const xp = require('./xp');
-  const { awardGold } = require('./economy');
 
   const record = xp.getXpRecord(userId, username);
   xp.ensureLifetime(record);
@@ -724,18 +784,8 @@ function checkAchievements(userId, username, event, ctx = {}) {
       continue;
     }
 
-    // Unlock it
-    userUnlocked[id] = new Date().toISOString();
-
-    // Award XP
-    if (def.xp > 0) {
-      xp.dmAwardXp(userId, username, def.xp, `achievement:${id}`);
-    }
-
-    // Award gold
-    if (def.gold > 0) {
-      awardGold(userId, username, def.gold, { source: 'achievement', achievement: id });
-    }
+    // Unlock it (unclaimed — player must claim on Profile page)
+    userUnlocked[id] = { at: new Date().toISOString(), claimed: false };
 
     newAchievements.push({
       id,
@@ -766,7 +816,9 @@ function getUserAchievements(userId, viewerId) {
   const viewerUnlocked = viewerId ? (allUnlocked[viewerId] || {}) : userUnlocked;
 
   const achievements = Object.entries(ACHIEVEMENTS).map(([id, def]) => {
-    const unlockedAt = userUnlocked[id] || null;
+    const raw = userUnlocked[id] || null;
+    const unlockedAt = getUnlockedAt(raw);
+    const claimed = isClaimed(raw);
     const viewerHas = !!viewerUnlocked[id];
 
     // Mask hidden achievements the viewer hasn't unlocked
@@ -780,6 +832,7 @@ function getUserAchievements(userId, viewerId) {
         gold: def.gold,
         hidden: true,
         unlockedAt: null,
+        claimed: false,
       };
     }
 
@@ -792,6 +845,7 @@ function getUserAchievements(userId, viewerId) {
       gold: def.gold,
       hidden: def.hidden,
       unlockedAt,
+      claimed,
     };
   });
 
@@ -801,9 +855,50 @@ function getUserAchievements(userId, viewerId) {
   return { achievements, stats: { unlocked, total } };
 }
 
+/**
+ * Claim an unlocked achievement — awards XP + gold.
+ * @returns {{ xpAwarded: number, goldAwarded: number }}
+ */
+function claimAchievement(userId, username, achievementId) {
+  const xp = require('./xp');
+  const { awardGold } = require('./economy');
+
+  const def = ACHIEVEMENTS[achievementId];
+  if (!def) throw new Error('Unknown achievement');
+
+  const allUnlocked = loadAchievements();
+  const userUnlocked = allUnlocked[userId] || {};
+  const raw = userUnlocked[achievementId];
+
+  if (!raw) throw new Error('Achievement not unlocked');
+  if (isClaimed(raw)) throw new Error('Achievement already claimed');
+
+  // Award rewards
+  let xpAwarded = 0;
+  let goldAwarded = 0;
+
+  if (def.xp > 0) {
+    xp.dmAwardXp(userId, username, def.xp, `achievement:${achievementId}`);
+    xpAwarded = def.xp;
+  }
+
+  if (def.gold > 0) {
+    awardGold(userId, username, def.gold, { source: 'achievement', achievement: achievementId });
+    goldAwarded = def.gold;
+  }
+
+  // Mark as claimed
+  userUnlocked[achievementId] = { at: raw.at, claimed: new Date().toISOString() };
+  allUnlocked[userId] = userUnlocked;
+  saveAchievements(allUnlocked);
+
+  return { xpAwarded, goldAwarded };
+}
+
 module.exports = {
   ACHIEVEMENTS,
   checkAchievements,
   getUserAchievements,
+  claimAchievement,
   loadAchievements,
 };

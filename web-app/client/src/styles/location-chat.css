@@ -980,6 +980,104 @@
   font-size: 1.1rem;
 }
 
+/* ---- Shop Tab Bar (Buy / Sell) ---- */
+
+.menu-tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(90, 74, 50, 0.35);
+  padding-bottom: 10px;
+}
+
+.menu-tab {
+  flex: 1;
+  padding: 7px 0;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.menu-tab-active {
+  background: rgba(212, 168, 67, 0.15);
+  border-color: var(--color-gold-dim);
+  color: var(--color-gold);
+}
+
+/* ---- Sell Item Rows ---- */
+
+.sell-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sell-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(90, 74, 50, 0.25);
+  border-radius: 8px;
+}
+
+.sell-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sell-item-name {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sell-item-qty {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.btn-sell {
+  padding: 5px 14px;
+  border: 1px solid rgba(212, 168, 67, 0.4);
+  border-radius: 6px;
+  background: rgba(212, 168, 67, 0.12);
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.btn-sell:active {
+  transform: scale(0.95);
+  background: rgba(212, 168, 67, 0.25);
+}
+
+.btn-sell:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.sell-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 24px 0;
+}
+
 /* ---- Reaction Pills (below message text) ---- */
 
 .chat-bubble-reactions {

@@ -37,25 +37,32 @@
         "acquired_at": "2026-02-14T21:23:09.347Z"
       },
       {
-        "item_id": "dice_glitterparty",
-        "name": "Glitter Party Dice",
+        "item_id": "dice_poison",
+        "name": "Venom Dice",
         "type": "dice_set",
         "quantity": 1,
-        "acquired_at": "2026-02-17T03:28:33.408Z"
+        "acquired_at": "2026-02-18T22:41:16.934Z"
+      },
+      {
+        "item_id": "dice_pinkdreams",
+        "name": "Pink Dreams Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-02-22T07:05:22.214Z"
+      },
+      {
+        "item_id": "dice_acid",
+        "name": "Corrosive Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-02-24T02:49:30.431Z"
       },
       {
         "item_id": "potion_healing",
         "name": "Potion of Healing",
         "type": "potion",
         "quantity": 1,
-        "acquired_at": "2026-02-17T08:02:46.247Z"
-      },
-      {
-        "item_id": "dice_poison",
-        "name": "Venom Dice",
-        "type": "dice_set",
-        "quantity": 1,
-        "acquired_at": "2026-02-18T22:41:16.934Z"
+        "acquired_at": "2026-02-24T07:00:01.059Z"
       }
     ],
     "badges": [],
@@ -115,32 +122,18 @@
         "acquired_at": "2026-02-13T05:05:10.488Z"
       },
       {
-        "item_id": "item_blunt",
-        "name": "Blunt",
-        "type": "consumable",
-        "quantity": 4,
-        "acquired_at": "2026-02-14T21:21:05.576Z"
-      },
-      {
         "item_id": "basic_worm",
         "name": "Basic Worm",
         "type": "bait",
-        "quantity": 2,
+        "quantity": 8,
         "acquired_at": "2026-02-16T08:05:18.692Z"
       },
       {
-        "item_id": "potion_healing",
-        "name": "Potion of Healing",
-        "type": "potion",
-        "quantity": 2,
-        "acquired_at": "2026-02-17T03:30:26.140Z"
-      },
-      {
-        "item_id": "dice_ice",
-        "name": "Frostbite Dice",
+        "item_id": "dice_fire",
+        "name": "Ember Dice",
         "type": "dice_set",
         "quantity": 1,
-        "acquired_at": "2026-02-17T03:30:53.563Z"
+        "acquired_at": "2026-02-22T01:53:26.489Z"
       }
     ],
     "badges": [],

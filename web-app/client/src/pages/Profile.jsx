@@ -7,6 +7,8 @@ import { usePushNotifications } from '../hooks/usePushNotifications';
 import GoldBadge from '../components/GoldBadge';
 import PlayersList from '../components/PlayersList';
 import CharacterSheet from '../components/CharacterSheet';
+import DmAwardEffect from '../components/DmAwardEffect';
+import { DICE_COLORS } from '../data/diceColors';
 import '../styles/profile.css';
 import '../styles/leaderboard.css';
 
@@ -35,6 +37,8 @@ export default function Profile() {
   const [ownedDice, setOwnedDice] = useState(['default']);
   const [equippedDice, setEquippedDice] = useState('default');
   const [diceEquipping, setDiceEquipping] = useState(null);
+  const [claiming, setClaiming] = useState(null);
+  const [rewardEffect, setRewardEffect] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -131,18 +135,32 @@ export default function Profile() {
     }
   }
 
-  // Color preview map for dice sets
-  const DICE_COLORS = {
-    default: { bg: '#e7e5e4', border: '#a8a29e', label: 'Default' },
-    fire: { bg: '#f97316', border: '#ea580c', label: 'Ember' },
-    ice: { bg: '#38bdf8', border: '#0ea5e9', label: 'Frostbite' },
-    poison: { bg: '#4ade80', border: '#22c55e', label: 'Venom' },
-    bronze: { bg: '#d97706', border: '#b45309', label: 'Bronze' },
-    gold: { bg: '#fbbf24', border: '#f59e0b', label: 'Golden' },
-    breebaby: { bg: '#f0abfc', border: '#e879f9', label: 'Breebaby' },
-    glitterparty: { bg: '#c084fc', border: '#a855f7', label: 'Glitter Party' },
-    swrpg: { bg: '#1e1e2e', border: '#ef4444', label: 'Obsidian' },
-  };
+  async function claimAchievement(achId) {
+    if (claiming) return;
+    setClaiming(achId);
+    try {
+      const result = await api('/api/achievements/claim', {
+        method: 'POST',
+        body: JSON.stringify({ achievementId: achId }),
+      });
+      setAchievements(prev => prev.map(a =>
+        a.id === achId ? { ...a, claimed: true } : a
+      ));
+      refreshXp();
+
+      if (result.xpAwarded > 0 && result.goldAwarded > 0) {
+        setRewardEffect({ gold: result.goldAwarded, xp: result.xpAwarded, key: Date.now() });
+      } else if (result.goldAwarded > 0) {
+        setRewardEffect({ type: 'gold', amount: result.goldAwarded, key: Date.now() });
+      } else if (result.xpAwarded > 0) {
+        setRewardEffect({ type: 'xp', amount: result.xpAwarded, key: Date.now() });
+      }
+    } catch (err) {
+      console.error('Failed to claim achievement:', err);
+    } finally {
+      setClaiming(null);
+    }
+  }
 
   if (!user) return null;
 
@@ -262,6 +280,11 @@ export default function Profile() {
           {achievementsExpanded && (
             <div className="achievements-grid">
               {[...achievements].sort((a, b) => {
+                // Unclaimed first, then by unlock date, locked last
+                const aUnclaimed = a.unlockedAt && !a.claimed;
+                const bUnclaimed = b.unlockedAt && !b.claimed;
+                if (aUnclaimed && !bUnclaimed) return -1;
+                if (!aUnclaimed && bUnclaimed) return 1;
                 if (a.unlockedAt && b.unlockedAt) return b.unlockedAt.localeCompare(a.unlockedAt);
                 if (a.unlockedAt) return -1;
                 if (b.unlockedAt) return 1;
@@ -269,13 +292,24 @@ export default function Profile() {
               }).map(ach => (
                 <div
                   key={ach.id}
-                  className={`achievement-card ${ach.unlockedAt ? 'achievement-card-unlocked' : 'achievement-card-locked'}`}
+                  className={`achievement-card ${ach.unlockedAt ? 'achievement-card-unlocked' : 'achievement-card-locked'}${ach.unlockedAt && !ach.claimed ? ' achievement-card-claimable' : ''}`}
                 >
                   <span className="achievement-card-icon">{ach.icon}</span>
                   <div className="achievement-card-info">
                     <div className="achievement-card-name">{ach.name}</div>
                     <div className="achievement-card-desc">{ach.description}</div>
-                    {ach.unlockedAt && (ach.xp > 0 || ach.gold > 0) && (
+                    {ach.unlockedAt && !ach.claimed && (ach.xp > 0 || ach.gold > 0) && (
+                      <button
+                        className="achievement-claim-btn"
+                        disabled={claiming === ach.id}
+                        onClick={() => claimAchievement(ach.id)}
+                      >
+                        {claiming === ach.id ? 'Claiming...' : 'Claim'}
+                        {ach.xp > 0 && ` +${ach.xp} XP`}
+                        {ach.gold > 0 && ` +${ach.gold}G`}
+                      </button>
+                    )}
+                    {ach.unlockedAt && ach.claimed && (ach.xp > 0 || ach.gold > 0) && (
                       <div className="achievement-card-rewards">
                         {ach.xp > 0 && <span className="achievement-reward-xp">+{ach.xp} XP</span>}
                         {ach.gold > 0 && <span className="achievement-reward-gold">+{ach.gold}G</span>}
@@ -472,6 +506,17 @@ export default function Profile() {
           Log Out
         </button>
       </div>
+
+      {rewardEffect && (
+        <DmAwardEffect
+          key={rewardEffect.key}
+          type={rewardEffect.type}
+          amount={rewardEffect.amount}
+          gold={rewardEffect.gold}
+          xp={rewardEffect.xp}
+          onDone={() => setRewardEffect(null)}
+        />
+      )}
     </div>
   );
 }

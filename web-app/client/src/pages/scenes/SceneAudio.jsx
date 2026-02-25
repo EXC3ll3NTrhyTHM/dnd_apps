@@ -48,7 +48,7 @@ export function SceneAudio({ config, enabled = true }) {
     // Clean up previous
     audioRef.current.forEach(({ audio }) => {
       audio.pause();
-      audio.src = '';
+      audio.removeAttribute('src');
     });
     audioRef.current = [];
 
@@ -72,6 +72,7 @@ export function SceneAudio({ config, enabled = true }) {
     if (entries.length === 0) return;
 
     const timers = [];
+    let active = true;
 
     const audioElements = entries.map(({ src, volume, delay, irregular, irregularPause }, i) => {
       const audio = new Audio(src);
@@ -82,7 +83,7 @@ export function SceneAudio({ config, enabled = true }) {
     });
     audioRef.current = audioElements;
 
-    const shouldPlay = () => !mutedRef.current && !pausedRef.current;
+    const shouldPlay = () => active && !mutedRef.current && !pausedRef.current;
 
     // Schedule irregular playback: play once, pause for random interval, repeat
     function scheduleIrregular(entry) {
@@ -204,7 +205,7 @@ export function SceneAudio({ config, enabled = true }) {
         audioRef.current.forEach(({ audio }) => {
           audio.onended = null;
           audio.pause();
-          audio.src = '';
+          audio.removeAttribute('src');
         });
         audioRef.current = [];
         // Stash for recreation later
@@ -240,11 +241,13 @@ export function SceneAudio({ config, enabled = true }) {
     window.addEventListener('speech-recognition-change', onSpeechChange);
 
     return () => {
+      active = false;
       timers.forEach(clearTimeout);
       audioRef.current.forEach(({ audio }) => {
         audio.onended = null;
         audio.pause();
-        audio.src = '';
+        audio.removeAttribute('src');
+        audio.load();
       });
       audioRef.current = [];
       configKeyRef.current = '';

@@ -252,6 +252,35 @@
   color: var(--text-muted);
 }
 
+.achievement-card-claimable {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 8px rgba(212, 168, 67, 0.2);
+}
+
+.achievement-claim-btn {
+  background: linear-gradient(135deg, #d4a843 0%, #b8860b 100%);
+  color: #1a1510;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 12px;
+  margin-top: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.1s;
+}
+
+.achievement-claim-btn:active {
+  transform: scale(0.95);
+  opacity: 0.9;
+}
+
+.achievement-claim-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .achievement-card-rewards {
   display: flex;
   gap: 6px;
