@@ -19,7 +19,7 @@ const { getXpRecord, getLevelFromXp } = require('../lib/xp');
 
 const DM_USER_IDS = (process.env.DM_USER_IDS || '').split(',').filter(Boolean);
 
-const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
+const { PLAYERS_PATH } = require('../lib/dataPaths');
 
 function loadPlayers() {
   try { return JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8')); }
@@ -135,5 +135,34 @@ router.post('/logout', (req, res) => {
   res.clearCookie('token');
   res.json({ success: true });
 });
+
+// === TEST LOGIN (dev/test only — bypasses Discord OAuth) ===
+if (process.env.NODE_ENV !== 'production') {
+  router.post('/test-login', (req, res) => {
+    const { userId, username, characterName } = req.body;
+    if (!userId || !username) {
+      return res.status(400).json({ error: 'userId and username are required' });
+    }
+
+    const payload = {
+      id: userId,
+      username: username,
+      global_name: characterName || username,
+      avatar: null,
+      discriminator: '0000'
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
+    res.json({ token, user: payload });
+  });
+}
 
 module.exports = router;

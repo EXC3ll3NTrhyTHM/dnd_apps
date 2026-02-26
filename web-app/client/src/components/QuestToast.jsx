@@ -1,22 +1,27 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 /**
- * Daily quest completion banner — slides down from top, auto-dismisses after 5s.
- * Clicking navigates to the Quests page to claim rewards.
+ * Daily quest completion banner — slides down from top, auto-dismisses after 10s.
+ * Fades out before dismissing. Clicking navigates to the Quests page to claim rewards.
  */
 export default function QuestToast({ goal, onDismiss }) {
   const navigate = useNavigate();
+  const [fading, setFading] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(onDismiss, 5000);
-    return () => clearTimeout(timer);
+    const fadeTimer = setTimeout(() => setFading(true), 9000);
+    const dismissTimer = setTimeout(onDismiss, 10000);
+    return () => { clearTimeout(fadeTimer); clearTimeout(dismissTimer); };
   }, [onDismiss]);
 
   if (!goal) return null;
 
   return (
-    <div className="quest-toast" onClick={() => { onDismiss(); navigate('/quests'); }}>
+    <div
+      className={`quest-toast${fading ? ' quest-toast-fadeout' : ''}`}
+      onClick={() => { onDismiss(); navigate('/quests'); }}
+    >
       <span className="quest-toast-icon">{goal.icon}</span>
       <div className="quest-toast-body">
         <div className="quest-toast-label">Quest Complete!</div>

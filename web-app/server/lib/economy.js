@@ -8,11 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
-
-const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
-const ECONOMY_DIR = path.resolve(__dirname, '..', '..', '..', 'economy');
-const CHARACTERS_DIR = path.resolve(__dirname, '..', '..', '..', 'characters');
-const QUESTMASTER_DIR = path.resolve(__dirname, '..', '..', '..', 'questmaster');
+const { PLAYERS_PATH, ECONOMY_DIR, CHARACTERS_DIR, QUESTMASTER_DIR } = require('./dataPaths');
 
 const ENV = process.env.NODE_ENV === 'production' ? 'prod' : 'prod'; // Always use prod data
 

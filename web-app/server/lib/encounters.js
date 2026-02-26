@@ -3023,18 +3023,49 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
       }
     }
 
-    // Resolve offhand attack (same logic as main attack)
-    const attackRoll = typeof data.attackRoll === 'number' ? data.attackRoll : rollD20();
-    const totalAttack = attackRoll + player.attackBonus;
-    const isNat20 = attackRoll === 20;
-    const isNat1 = attackRoll === 1;
+    // 5e Advantage/Disadvantage (Vex, conditions, etc.)
+    const advantageType = resolveAttackAdvantage(player, encounter.monster);
+
+    let attackRoll, attackRoll2;
+    if (advantageType !== 'normal') {
+      attackRoll = typeof data.attackRoll === 'number' ? data.attackRoll : rollD20();
+      attackRoll2 = typeof data.attackRoll2 === 'number' ? data.attackRoll2 : rollD20();
+    } else {
+      attackRoll = typeof data.attackRoll === 'number' ? data.attackRoll : rollD20();
+      attackRoll2 = null;
+    }
+
+    let usedRoll = attackRoll;
+    if (advantageType === 'advantage' && attackRoll2 !== null) {
+      usedRoll = Math.max(attackRoll, attackRoll2);
+    } else if (advantageType === 'disadvantage' && attackRoll2 !== null) {
+      usedRoll = Math.min(attackRoll, attackRoll2);
+    }
+
+    const totalAttack = usedRoll + player.attackBonus;
+    const isNat20 = usedRoll === 20;
+    const isNat1 = usedRoll === 1;
+
+    // Clear advantage after use
+    if (player.advantageOnNextAttack) {
+      player.advantageOnNextAttack = false;
+    }
 
     let hit = false;
     let damage = 0;
     let text = '';
+    let sneakAttackApplied = false;
+    let sneakAttackDamage = 0;
+
+    // Sneak Attack data from client
+    if (data.sneakAttackData) {
+      player.sneakAttackData = data.sneakAttackData;
+    }
+
+    const advLabel = advantageType === 'advantage' ? ' *(with advantage)*' : advantageType === 'disadvantage' ? ' *(with disadvantage)*' : '';
 
     if (isNat1) {
-      text = `**${player.name}** swings their ${player.weaponName} (offhand)... **NAT 1!** A fumble!`;
+      text = `**${player.name}** swings their ${player.weaponName} (offhand)...${advLabel} **NAT 1!** A fumble!`;
     } else if (isNat20 || totalAttack >= encounter.monster.ac) {
       hit = true;
       if (typeof data.damageTotal === 'number') {
@@ -3047,26 +3078,60 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
           damage += critExtra.total;
         }
       }
+
+      // Sneak Attack — once per turn, finesse/ranged weapon, advantage or ally present
+      if (player.sneakAttackDice > 0 && !player.sneakAttackUsed) {
+        const isEligibleWeapon = wpn ? (wpn.finesse || wpn.ranged) : false;
+        if (isEligibleWeapon) {
+          const hasAlly = Object.entries(encounter.participants)
+            .some(([uid, p]) => uid !== userId && !p.knockedOut);
+          const eligible = advantageType === 'advantage' || (hasAlly && advantageType !== 'disadvantage');
+          if (eligible) {
+            if (player.sneakAttackData) {
+              // Client-driven: damage already included in damageTotal
+              sneakAttackDamage = player.sneakAttackData.sneakAttackDamage || 0;
+            } else {
+              // Server-driven fallback
+              const saDice = `${player.sneakAttackDice}d6`;
+              const saResult = rollDamage(saDice);
+              sneakAttackDamage = saResult.total;
+              if (isNat20) { sneakAttackDamage += rollDamage(saDice).total; }
+              damage += sneakAttackDamage;
+            }
+            sneakAttackApplied = true;
+            player.sneakAttackUsed = true;
+          }
+        }
+      }
+
       encounter.monster.currentHp = Math.max(0, encounter.monster.currentHp - damage);
       player.totalDamage = (player.totalDamage || 0) + damage;
 
       if (isNat20) {
-        text = `**${player.name}** strikes with their ${player.weaponName} (offhand)... **NAT 20! CRITICAL HIT!** Deals **${damage} ${player.damageType} damage!**`;
+        text = `**${player.name}** strikes with their ${player.weaponName} (offhand)...${advLabel} **NAT 20! CRITICAL HIT!** Deals **${damage} ${player.damageType} damage!**`;
       } else {
-        text = `**${player.name}** strikes with their ${player.weaponName} (offhand)... **${totalAttack}** vs AC ${encounter.monster.ac} — **Hit!** Deals **${damage} ${player.damageType} damage.**`;
+        text = `**${player.name}** strikes with their ${player.weaponName} (offhand)...${advLabel} **${totalAttack}** vs AC ${encounter.monster.ac} — **Hit!** Deals **${damage} ${player.damageType} damage.**`;
+      }
+
+      if (sneakAttackApplied) {
+        text += ` **SNEAK ATTACK!** (+${sneakAttackDamage} damage)`;
       }
     } else {
-      text = `**${player.name}** swings their ${player.weaponName} (offhand)... **${totalAttack}** vs AC ${encounter.monster.ac} — **Miss!**`;
+      text = `**${player.name}** swings their ${player.weaponName} (offhand)...${advLabel} **${totalAttack}** vs AC ${encounter.monster.ac} — **Miss!**`;
     }
 
+    // Clean up
+    delete player.sneakAttackData;
     player.bonusActionUsed = true;
 
     return {
       type: 'offhand_attack',
       userId, name: player.name,
       weaponName: player.weaponName,
-      attackRoll, totalAttack, isNat20, isNat1,
+      attackRoll: usedRoll, attackRoll2, totalAttack, isNat20, isNat1,
+      advantageType,
       hit, damage, damageType: player.damageType,
+      sneakAttackApplied, sneakAttackDamage,
       monsterHp: encounter.monster.currentHp,
       monsterMaxHp: encounter.monster.maxHp,
       text,
@@ -3156,6 +3221,9 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
       }
 
       strikes.push({ roll: atkRoll, total: totalAtk, hit, damage: dmg, isNat20, isNat1 });
+
+      // Monster killed — skip remaining strikes
+      if (encounter.monster.currentHp <= 0) break;
     }
 
     const strikeTexts = strikes.map((s, i) => {

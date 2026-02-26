@@ -8,9 +8,9 @@
 
 const fs = require('fs');
 const path = require('path');
+const { DATA_DIR, PLAYERS_PATH } = require('./dataPaths');
 
-const XP_PATH = path.resolve(__dirname, '..', '..', 'data', 'xp.json');
-const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
+const XP_PATH = path.join(DATA_DIR, 'xp.json');
 
 // ============================================
 // XP CONSTANTS

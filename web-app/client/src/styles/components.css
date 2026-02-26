@@ -522,6 +522,10 @@
   animation: quest-toast-slide 0.4s ease-out;
 }
 
+.quest-toast-fadeout {
+  animation: quest-toast-fade 1s ease-in forwards;
+}
+
 @keyframes quest-toast-slide {
   from {
     opacity: 0;
@@ -530,6 +534,13 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes quest-toast-fade {
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
   }
 }
 

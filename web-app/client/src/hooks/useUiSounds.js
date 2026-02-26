@@ -78,6 +78,24 @@ export function unlockAllAudio() {
   initOnInteraction();
 }
 
+/**
+ * Close the current AudioContext and create a fresh one.
+ * Used to reset iOS audio session routing after speech recognition.
+ * UI sound buffers are cleared so they re-decode against the new context.
+ */
+export function resetContext() {
+  if (_ctx) {
+    _ctx.close().catch(() => {});
+    _ctx = null;
+  }
+  // Clear decoded buffers — they belong to the old context
+  for (const key of Object.keys(_buffers)) delete _buffers[key];
+  _preloaded = false;
+  // Re-create context and preload
+  ensureContext();
+  preloadAll();
+}
+
 export function useUiSounds() {
   const muted = useAudioMuted();
   const mutedRef = useRef(muted);

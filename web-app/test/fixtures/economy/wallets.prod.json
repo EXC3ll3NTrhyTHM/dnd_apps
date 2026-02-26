@@ -1,0 +1,10 @@
+{
+  "test_user_001": {
+    "user_id": "test_user_001",
+    "username": "testhero",
+    "balance": 500,
+    "lifetime_earned": 1000,
+    "lifetime_spent": 500,
+    "last_updated": "2026-01-01T00:00:00.000Z"
+  }
+}

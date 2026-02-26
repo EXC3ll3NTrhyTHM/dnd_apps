@@ -1,0 +1,12 @@
+{
+  "test_user_001": {
+    "characterName": "TestHero",
+    "avatar": null,
+    "displayName": "testhero",
+    "username": "testhero",
+    "lastSeen": null,
+    "lastLocation": null,
+    "ownedDice": ["default"],
+    "equippedDice": "default"
+  }
+}

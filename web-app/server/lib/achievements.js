@@ -8,9 +8,10 @@
 
 const fs = require('fs');
 const path = require('path');
+const { DATA_DIR } = require('./dataPaths');
 
-const ACHIEVEMENTS_PATH = path.resolve(__dirname, '..', '..', 'data', 'achievements.json');
-const LOCATIONS_PATH = path.resolve(__dirname, '..', '..', 'data', 'locations.json');
+const ACHIEVEMENTS_PATH = path.join(DATA_DIR, 'achievements.json');
+const LOCATIONS_PATH = path.join(DATA_DIR, 'locations.json');
 
 function getAccessibleLocations(userId) {
   let locations;

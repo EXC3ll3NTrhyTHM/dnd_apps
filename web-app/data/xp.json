@@ -2,10 +2,10 @@
   "424061511833747467": {
     "user_id": "424061511833747467",
     "username": "excellentrhythm",
-    "total_xp": 28997,
-    "last_updated": "2026-02-25T07:46:25.465Z",
+    "total_xp": 33356,
+    "last_updated": "2026-02-26T06:44:43.444Z",
     "daily": {
-      "date": "2026-02-25",
+      "date": "2026-02-26",
       "messages_sent": 0,
       "reactions_given": 0,
       "locations_visited": [
@@ -13,15 +13,13 @@
       ],
       "login_claimed": true,
       "arena_wins": 6,
-      "arena_kills": 2,
-      "arena_crits": 0,
-      "arena_untouchable": 2,
+      "arena_kills": 6,
+      "arena_crits": 9,
+      "arena_untouchable": 3,
       "arena_potions": 1,
       "arena_goals_claimed": [
         "arena_win_1",
-        "arena_killing_blow",
-        "arena_untouchable",
-        "arena_win_3"
+        "arena_killing_blow"
       ],
       "gold_spend_xp": 0
     },
@@ -41,20 +39,20 @@
         "the_barracks",
         "marcel_dm_765978025937469481"
       ],
-      "gold_spent": 8595,
+      "gold_spent": 8745,
       "tavern_purchases": 1,
-      "shop_purchases": 75,
+      "shop_purchases": 78,
       "gifs_sent": 8,
       "images_sent": 1,
-      "dice_rolls": 404,
+      "dice_rolls": 571,
       "profiles_viewed": 40,
       "stats_inspected": 7,
-      "encounters_joined": 396,
-      "encounters_won": 135,
-      "monsters_killed": 101,
-      "total_combat_damage": 19336,
-      "combat_crits": 79,
-      "combat_fumbles": 39,
+      "encounters_joined": 414,
+      "encounters_won": 150,
+      "monsters_killed": 115,
+      "total_combat_damage": 23365,
+      "combat_crits": 102,
+      "combat_fumbles": 40,
       "times_knocked_out": 57,
       "fish_caught": 17,
       "fish_escaped": 3,
@@ -73,19 +71,19 @@
       "defeated_goblin": 9,
       "defeated_wolf": 4,
       "defeated_skeleton": 17,
-      "defeated_dire_wolf": 50,
+      "defeated_dire_wolf": 65,
       "defeated_ogre": 15,
       "defeated_owlbear": 0,
       "defeated_troll": 0,
-      "potions_used": 13,
+      "potions_used": 15,
       "dice_sets_collected": 0
     }
   },
   "228241331296665600": {
     "user_id": "228241331296665600",
     "username": "badbeachpeach",
-    "total_xp": 10797,
-    "last_updated": "2026-02-25T07:46:25.532Z",
+    "total_xp": 10928,
+    "last_updated": "2026-02-25T07:55:24.776Z",
     "daily": {
       "date": "2026-02-25",
       "messages_sent": 0,
@@ -94,8 +92,8 @@
         "the_arena"
       ],
       "login_claimed": true,
-      "arena_wins": 6,
-      "arena_kills": 2,
+      "arena_wins": 7,
+      "arena_kills": 3,
       "arena_crits": 0,
       "arena_untouchable": 5,
       "arena_potions": 1,
@@ -126,13 +124,13 @@
       "shop_purchases": 65,
       "gifs_sent": 1,
       "images_sent": 1,
-      "dice_rolls": 208,
+      "dice_rolls": 239,
       "profiles_viewed": 10,
       "stats_inspected": 3,
-      "encounters_joined": 79,
-      "encounters_won": 39,
-      "monsters_killed": 23,
-      "total_combat_damage": 4207,
+      "encounters_joined": 81,
+      "encounters_won": 40,
+      "monsters_killed": 24,
+      "total_combat_damage": 4338,
       "combat_crits": 3,
       "combat_fumbles": 2,
       "times_knocked_out": 3,
@@ -153,7 +151,7 @@
       "defeated_goblin": 2,
       "defeated_wolf": 4,
       "defeated_skeleton": 3,
-      "defeated_dire_wolf": 11,
+      "defeated_dire_wolf": 12,
       "defeated_ogre": 13,
       "defeated_owlbear": 0,
       "defeated_troll": 0,
@@ -164,10 +162,10 @@
   "1472286665417560167": {
     "user_id": "1472286665417560167",
     "username": "theminiarchitect",
-    "total_xp": 6349,
-    "last_updated": "2026-02-23T12:14:27.046Z",
+    "total_xp": 6389,
+    "last_updated": "2026-02-26T04:25:32.883Z",
     "daily": {
-      "date": "2026-02-23",
+      "date": "2026-02-25",
       "messages_sent": 0,
       "reactions_given": 0,
       "locations_visited": [
@@ -232,23 +230,31 @@
       "defeated_ogre": 4,
       "defeated_owlbear": 0,
       "defeated_troll": 0,
-      "potions_used": 1
+      "potions_used": 1,
+      "dice_sets_collected": 0
     }
   },
   "1073385140669128725": {
     "user_id": "1073385140669128725",
     "username": "smok3y8754",
-    "total_xp": 1003,
-    "last_updated": "2026-02-18T03:37:06.586Z",
+    "total_xp": 1058,
+    "last_updated": "2026-02-26T06:04:41.056Z",
     "daily": {
-      "date": "2026-02-18",
+      "date": "2026-02-26",
       "messages_sent": 0,
       "reactions_given": 0,
       "locations_visited": [
-        "the_arena",
+        "the_dojo",
         "dragons_hollow"
       ],
-      "login_claimed": true
+      "login_claimed": true,
+      "arena_wins": 0,
+      "arena_kills": 0,
+      "arena_crits": 0,
+      "arena_untouchable": 0,
+      "arena_potions": 0,
+      "arena_goals_claimed": [],
+      "gold_spend_xp": 0
     },
     "gold_conversion_done": false,
     "lifetime": {
@@ -297,7 +303,8 @@
       "pet_feeds": 0,
       "pet_plays": 0,
       "pet_interactions": 0,
-      "pet_names_given": 0
+      "pet_names_given": 0,
+      "dice_sets_collected": 0
     }
   },
   "1374906408046166036": {

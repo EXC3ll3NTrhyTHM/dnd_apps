@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { getAudioMuted } from '../hooks/useAudioSettings';
+import { preloadBuffers } from '../lib/sceneAudioEngine';
 import '../styles/location-transition.css';
 
 // Location-specific themes for the ink wash
@@ -115,17 +116,11 @@ export default function LocationTransition({ locationId, locationName, onComplet
 
   const theme = LOCATION_THEMES[locationId] || DEFAULT_THEME;
 
-  // Preload scene audio during transition so it's cached when SceneAudio mounts
+  // Preload scene audio into Web Audio API buffer cache during transition
+  // so playback starts instantly when SceneAudio mounts
   useEffect(() => {
     if (!theme.preloadAudio || theme.preloadAudio.length === 0) return;
-    const preloaded = theme.preloadAudio.map(src => {
-      const a = new Audio();
-      a.preload = 'auto';
-      a.src = src;
-      a.load();
-      return a;
-    });
-    return () => preloaded.forEach(a => { a.src = ''; });
+    preloadBuffers(theme.preloadAudio);
   }, [theme.preloadAudio]);
 
   // Play location-specific sound effect(s) — guarded so sounds only fire once

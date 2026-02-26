@@ -115,46 +115,6 @@ function trackedClearDice(box, label) {
   );
 }
 
-// Helper: aggressively clean up materials/textures from the scene
-function disposeMaterial(material) {
-  if (!material || typeof material.dispose !== 'function') return;
-  ['map', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'envMap', 'lightMap', 'aoMap'].forEach(key => {
-    if (material[key] && typeof material[key].dispose === 'function') {
-      material[key].dispose();
-    }
-  });
-  material.dispose();
-}
-
-function disposeSceneMaterials(box, includeGeometry = false) {
-  const target = box || _box;
-  if (!target || !target.scene) return;
-  try {
-    let disposedCount = 0;
-    target.scene.traverse((node) => {
-      if (node.isMesh) {
-        if (node.material) {
-          if (Array.isArray(node.material)) {
-            node.material.forEach(disposeMaterial);
-            disposedCount += node.material.length;
-          } else {
-            disposeMaterial(node.material);
-            disposedCount++;
-          }
-        }
-        // Only dispose geometry when the entire box is being destroyed (hard reset).
-        // Geometry is cached in DiceFactory.geometries by die shape and must stay
-        // intact while the singleton is alive.
-        if (includeGeometry && node.geometry) node.geometry.dispose();
-      }
-    });
-    console.log(`[DiceBox] Disposed ${disposedCount} materials from scene`);
-    try { target.renderer?.renderLists?.dispose(); } catch {}
-  } catch (e) {
-    console.warn('[DiceBox] Cleanup error:', e);
-  }
-}
-
 async function acquireBox(containerId, config) {
   if (_fatalError) throw new Error('DiceBox disabled due to previous error');
 
@@ -162,18 +122,6 @@ async function acquireBox(containerId, config) {
 
   _onRollComplete = onRollComplete;
   _onContextLost = onContextLost;
-
-  let deadBox = null;
-
-  // ── Hard Reset Check (iOS Memory Leak Protection) ──
-  // If we've rolled many times, the library might have leaked textures or physics bodies.
-  if (_box && _stats.rolls >= 25) {
-    console.warn('[DiceBox] Executing periodic hard reset (seamless)...');
-    deadBox = _box; // Keep it alive momentarily to avoid flash
-    _box = null;    // Clear global so we force new creation
-    _stats.rolls = 0;
-    _currentConfig = { colorset: null, material: null };
-  }
 
   // ── Reuse path: move canvas into new container, update colorset ──
   if (_box) {
@@ -245,15 +193,6 @@ async function acquireBox(containerId, config) {
 
   // ── First-time creation with Safety Timeout ──
   _initPromise = (async () => {
-    // If resetting seamlessly, attach the old canvas to the new container temporarily
-    if (deadBox) {
-      try {
-        const container = document.getElementById(containerId);
-        const oldCanvas = deadBox.renderer?.domElement;
-        if (container && oldCanvas) container.appendChild(oldCanvas);
-      } catch (e) { console.warn('Seamless transition error (ignoring):', e); }
-    }
-
     try {
       // Race creation against a 5s timeout to prevent hanging the app on mobile
       const boxPromise = new Promise(async (resolve, reject) => {
@@ -273,25 +212,6 @@ async function acquireBox(containerId, config) {
       );
 
       const box = await Promise.race([boxPromise, timeoutPromise]);
-
-      // If we did a seamless reset, now kill the old box
-      if (deadBox) {
-        const texBeforeDispose = deadBox.renderer?.info?.memory?.textures || 0;
-        console.log(`[DiceBox] New box ready. Disposing old box (textures: ${texBeforeDispose}).`);
-        // trackedClearDice handles mesh texture + cache disposal
-        trackedClearDice(deadBox, 'hard-reset-old-box');
-        try {
-          disposeSceneMaterials(deadBox, true);
-          deadBox.renderer?.dispose();
-          const oldCanvas = deadBox.renderer?.domElement;
-          if (oldCanvas && oldCanvas.parentNode) oldCanvas.parentNode.removeChild(oldCanvas);
-        } catch (e) { console.warn('Disposal error:', e); }
-        const texAfterDispose = box.renderer?.info?.memory?.textures || 0;
-        console.log(`[DiceBox] Hard reset complete. New box textures: ${texAfterDispose}`);
-        _prevTexCount = texAfterDispose;
-        _prevGeoCount = box.renderer?.info?.memory?.geometries || 0;
-        deadBox = null;
-      }
 
       box.eventCollide = handleDiceCollide;
 

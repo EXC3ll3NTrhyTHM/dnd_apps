@@ -4,3 +4,6 @@ client/dist/
 .env
 *.log
 data/vapid-keys.json
+test/.tmp-data/
+test-results/
+playwright-report/

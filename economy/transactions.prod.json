@@ -8541,6 +8541,266 @@
         "source": "combat_encounter"
       },
       "timestamp": "2026-02-25T07:46:25.538Z"
+    },
+    {
+      "id": "tx_1772006124708_7adfji",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 944,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:55:24.708Z"
+    },
+    {
+      "id": "tx_1772006124783_42tdc7",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 1033,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-25T07:55:24.783Z"
+    },
+    {
+      "id": "tx_1772049536594_j27shr",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 894,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-25T19:58:56.594Z"
+    },
+    {
+      "id": "tx_1772049537209_dloas3",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 844,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-25T19:58:57.209Z"
+    },
+    {
+      "id": "tx_1772049537697_ukgsfj",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -50,
+      "balance_after": 794,
+      "metadata": {
+        "item_id": "potion_healing",
+        "item_name": "Potion of Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-02-25T19:58:57.697Z"
+    },
+    {
+      "id": "tx_1772081163684_gdolqz",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 819,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T04:46:03.684Z"
+    },
+    {
+      "id": "tx_1772081350950_70c6uz",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 844,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T04:49:10.950Z"
+    },
+    {
+      "id": "tx_1772082238412_zsfms2",
+      "user_id": "424061511833747467",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 869,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T05:03:58.412Z"
+    },
+    {
+      "id": "tx_1772083219563_dhzidg",
+      "user_id": "424061511833747467",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 894,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T05:20:19.563Z"
+    },
+    {
+      "id": "tx_1772084183432_qljmaj",
+      "user_id": "424061511833747467",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 919,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T05:36:23.432Z"
+    },
+    {
+      "id": "tx_1772084478233_93h1df",
+      "user_id": "424061511833747467",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 944,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T05:41:18.233Z"
+    },
+    {
+      "id": "tx_1772085022457_3a0z2g",
+      "user_id": "424061511833747467",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 969,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T05:50:22.457Z"
+    },
+    {
+      "id": "tx_1772085410195_ss5p3n",
+      "user_id": "424061511833747467",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 994,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T05:56:50.195Z"
+    },
+    {
+      "id": "tx_1772085625537_xrincv",
+      "user_id": "424061511833747467",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 1019,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T06:00:25.537Z"
+    },
+    {
+      "id": "tx_1772085653585_0ciu7r",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 1029,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-02-26T06:00:53.585Z"
+    },
+    {
+      "id": "tx_1772085654213_0wau7f",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 1034,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-02-26T06:00:54.214Z"
+    },
+    {
+      "id": "tx_1772085889573_i69ff4",
+      "user_id": "424061511833747467",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 1059,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T06:04:49.573Z"
+    },
+    {
+      "id": "tx_1772086171221_ke6nmx",
+      "user_id": "424061511833747467",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 1084,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T06:09:31.221Z"
+    },
+    {
+      "id": "tx_1772087589866_2behqb",
+      "user_id": "424061511833747467",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 1109,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T06:33:09.866Z"
+    },
+    {
+      "id": "tx_1772087752832_pnb9hp",
+      "user_id": "424061511833747467",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 1134,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T06:35:52.832Z"
+    },
+    {
+      "id": "tx_1772088283451_1sni1z",
+      "user_id": "424061511833747467",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 1159,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-26T06:44:43.451Z"
     }
   ]
 }

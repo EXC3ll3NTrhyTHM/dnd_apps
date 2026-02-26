@@ -1,0 +1,82 @@
+{
+  "currency_name": "Gold",
+  "currency_symbol": "G",
+  "categories": {
+    "consumables": {
+      "display_name": "Consumables",
+      "emoji": "\ud83c\udf3f",
+      "items": [
+        { "id": "item_blunt", "name": "Blunt", "price": 25, "type": "consumable", "consumable": true, "one_time": false, "max_stack": 10, "use_message": "You light up and take a long drag... The world feels a little more chill.", "description": "A hand-rolled herbal smoke. Relaxing.", "shortcuts": ["!smoke", "!spark", "!burn", "!hit blunt", "!light up"] }
+      ]
+    },
+    "bait": {
+      "display_name": "Bait",
+      "emoji": "\ud83e\udeb1",
+      "items": [
+        { "id": "basic_worm", "name": "Basic Worm", "price": 5, "type": "bait", "consumable": true, "one_time": false, "max_stack": 20, "description": "A fat, wriggling worm. The old reliable for any angler." },
+        { "id": "enchanted_grub", "name": "Enchanted Grub", "price": 25, "type": "bait", "consumable": true, "one_time": false, "max_stack": 10, "description": "Pulsing with faint magic. Attracts rarer fish from the deep." },
+        { "id": "abyssal_lure", "name": "Abyssal Lure", "price": 75, "type": "bait", "consumable": true, "one_time": false, "max_stack": 5, "description": "Forged from deep-sea coral. Even legendary fish can't resist its call." }
+      ]
+    },
+    "rods": {
+      "display_name": "Fishing Rods",
+      "emoji": "\ud83c\udfa3",
+      "items": [
+        { "id": "iron_rod", "name": "Iron Rod", "price": 2500, "type": "rod", "consumable": false, "one_time": true, "max_stack": 1, "description": "A sturdy iron rod. Each reel tap pulls 1.5\u00d7 harder than a bare line." },
+        { "id": "mithril_rod", "name": "Mithril Rod", "price": 10000, "type": "rod", "consumable": false, "one_time": true, "max_stack": 1, "description": "Lightweight and impossibly strong. Each reel tap pulls 2\u00d7 harder." },
+        { "id": "dragonbone_rod", "name": "Dragonbone Rod", "price": 25000, "type": "rod", "consumable": false, "one_time": true, "max_stack": 1, "description": "Carved from the spine of a wyrm. Each reel tap pulls 3\u00d7 harder. The finest rod in Okhan." }
+      ]
+    },
+    "potions": {
+      "display_name": "Potions",
+      "emoji": "\ud83e\uddea",
+      "items": [
+        { "id": "potion_healing", "name": "Potion of Healing", "price": 50, "type": "potion", "consumable": true, "one_time": false, "max_stack": 5, "heal_dice": "2d4+2", "description": "A small vial of red liquid that shimmers when agitated. Restores 2d4+2 HP." },
+        { "id": "potion_greater_healing", "name": "Potion of Greater Healing", "price": 100, "type": "potion", "consumable": true, "one_time": false, "max_stack": 5, "heal_dice": "4d4+4", "description": "A larger flask of deep crimson liquid. Restores 4d4+4 HP." },
+        { "id": "potion_superior_healing", "name": "Potion of Superior Healing", "price": 500, "type": "potion", "consumable": true, "one_time": false, "max_stack": 5, "heal_dice": "8d4+8", "description": "A crystal bottle of radiant scarlet elixir. Restores 8d4+8 HP." }
+      ]
+    },
+    "dice_sets": {
+      "display_name": "Dice Sets",
+      "emoji": "\ud83c\udfb2",
+      "items": [
+        { "id": "dice_black", "name": "Midnight Dice", "price": 150, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "black", "description": "Pure black with stark white numbering. Simple. Timeless." },
+        { "id": "dice_white", "name": "Ivory Dice", "price": 150, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "white", "description": "Polished white bone with clean edges. The scholar's choice." },
+        { "id": "dice_fire", "name": "Ember Dice", "price": 300, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "fire", "description": "Forged in dragonfire. Deep reds and oranges with flickering embers." },
+        { "id": "dice_ice", "name": "Frostbite Dice", "price": 200, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "ice", "description": "Carved from enchanted ice. Deep blue with a crystalline shimmer." },
+        { "id": "dice_poison", "name": "Venom Dice", "price": 200, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "poison", "description": "Infused with basilisk venom. Dark purple with cloudy toxic swirls." },
+        { "id": "dice_acid", "name": "Corrosive Dice", "price": 200, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "acid", "description": "Etched by ooze. Vivid green with a marbled acid-wash sheen." },
+        { "id": "dice_lightning", "name": "Lightning Dice", "price": 200, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "lightning", "description": "Charged by storm giants. Amber and gold with crackling frost-lines." },
+        { "id": "dice_thunder", "name": "Thunder Dice", "price": 200, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "thunder", "description": "Rumbling stormcloud gray with golden numbering. You hear distant thunder." },
+        { "id": "dice_air", "name": "Zephyr Dice", "price": 200, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "air", "description": "Light as a breeze. Pale blue wisps swirl through cloudy resin." },
+        { "id": "dice_water", "name": "Tidal Dice", "price": 200, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "water", "description": "Pulled from the deep. Ocean teal with the shimmer of moving water." },
+        { "id": "dice_earth", "name": "Earthen Dice", "price": 200, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "earth", "description": "Hewn from living stone. Deep greens and browns with speckled grain." },
+        { "id": "dice_bronze", "name": "Bronze Dice", "price": 300, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "bronze", "description": "Cast in ancient Thylean bronze. A warrior's classic." },
+        { "id": "dice_radiant", "name": "Radiant Dice", "price": 300, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "radiant", "description": "Blessed by the dawn. Pure white with golden numbering that catches the light." },
+        { "id": "dice_necrotic", "name": "Necrotic Dice", "price": 300, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "necrotic", "description": "Carved from bone and shadow. Blood-dark crimson etched with tiny skulls." },
+        { "id": "dice_force", "name": "Force Dice", "price": 300, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "force", "description": "Pure magical energy given form. Hot pink and violet shimmer with starlight." },
+        { "id": "dice_psychic", "name": "Psychic Dice", "price": 300, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "psychic", "description": "They seem to shift when you're not looking. Deep indigo with neon purple speckles." },
+        { "id": "dice_inspired", "name": "Bardic Dice", "price": 300, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "inspired", "description": "Warm parchment tones with golden ink. Roll with inspiration." },
+        { "id": "dice_rainbow", "name": "Prismatic Dice", "price": 300, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "rainbow", "description": "Every face a different hue. Like rolling a tiny rainbow across the table." },
+        { "id": "dice_gold", "name": "Golden Dice", "price": 500, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "gold", "description": "Pure gold with polished faces. For those who spare no expense." },
+        { "id": "dice_breebaby", "name": "Breebaby Dice", "price": 500, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "breebaby", "description": "Pastel sunset swirls in pink, lavender, and soft blue marble. Deceptively cute." },
+        { "id": "dice_glitterparty", "name": "Glitter Party Dice", "price": 500, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "glitterparty", "description": "A chaotic explosion of pink, blue, and purple glitter. Party time." },
+        { "id": "dice_pinkdreams", "name": "Pink Dreams Dice", "price": 500, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "pinkdreams", "description": "Hot pink and magenta with tiny skull engravings. Sweet dreams aren't made of these." },
+        { "id": "dice_bloodmoon", "name": "Blood Moon Dice", "price": 500, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "bloodmoon", "description": "Dark crimson marble with gold numbering. Roll under a blood-red sky." },
+        { "id": "dice_starynight", "name": "Starry Night Dice", "price": 500, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "starynight", "description": "Deep midnight blue fading to silver. Like holding the night sky in your hand." },
+        { "id": "dice_astralsea", "name": "Astral Sea Dice", "price": 500, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "astralsea", "description": "Pearlescent white with swirling astral patterns. Plucked from another plane." },
+        { "id": "dice_birdup", "name": "Phoenix Dice", "price": 500, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "birdup", "description": "Vivid plumage colors \u2014 scarlet, gold, emerald, cerulean. Rise from the ashes." },
+        { "id": "dice_tigerking", "name": "Tiger King Dice", "price": 500, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "tigerking", "description": "Bold gold with wild animal-print patterns. Exotic and unapologetic." },
+        { "id": "dice_dragons", "name": "Dragon Dice", "price": 750, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "dragons", "description": "Each die bears a different dragon's scale. Chromatic chaos in your palm." },
+        { "id": "dice_swrpg_set", "name": "Obsidian Dice", "price": 750, "type": "dice_set", "consumable": false, "one_time": true, "max_stack": 1, "colorset": "swrpg_set", "description": "Dark as the void with a faint glitter. For those who walk in shadow." }
+      ]
+    },
+    "special": {
+      "display_name": "Special",
+      "emoji": "✨",
+      "items": [
+        { "id": "item_custom_emoji", "name": "Custom Emoji", "price": 100, "type": "cosmetic", "consumable": false, "one_time": false, "max_stack": 1, "no_inventory": true, "description": "A custom server emoji made just for you. DM The Architect to discuss your idea." }
+      ]
+    }
+  }
+}

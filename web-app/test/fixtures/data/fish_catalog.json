@@ -1,0 +1,178 @@
+{
+  "fish": [
+    {
+      "id": "mudcarp",
+      "name": "Mudcarp",
+      "rarity": "common",
+      "goldValue": 5,
+      "xp": 10,
+      "icon": "\ud83d\udc1f",
+      "description": "A bottom-feeder found in every pond in Okhan. Not much to look at, but it fills the belly.",
+      "biteWindow": 2000,
+      "reelDifficulty": 1,
+      "reelTaps": 8,
+      "weight": { "min": 0.5, "max": 2.0 }
+    },
+    {
+      "id": "silver_trout",
+      "name": "Silver Trout",
+      "rarity": "common",
+      "goldValue": 8,
+      "xp": 15,
+      "icon": "\ud83e\udd88",
+      "description": "A shimmering freshwater fish that darts through the shallows. Quick, but predictable.",
+      "biteWindow": 1800,
+      "reelDifficulty": 1,
+      "reelTaps": 10,
+      "weight": { "min": 1.0, "max": 3.5 }
+    },
+    {
+      "id": "ironjaw",
+      "name": "Ironjaw",
+      "rarity": "uncommon",
+      "goldValue": 15,
+      "xp": 25,
+      "icon": "\ud83d\udc20",
+      "description": "Named for its bone-crushing bite. Fishermen respect this one\u2014and their fingers.",
+      "biteWindow": 1500,
+      "reelDifficulty": 2,
+      "reelTaps": 16,
+      "weight": { "min": 2.0, "max": 6.0 }
+    },
+    {
+      "id": "glowfin",
+      "name": "Glowfin",
+      "rarity": "uncommon",
+      "goldValue": 20,
+      "xp": 30,
+      "icon": "\ud83d\udc20",
+      "description": "Bioluminescent fins pulse with faint arcane light. Prized by alchemists and collectors.",
+      "biteWindow": 1400,
+      "reelDifficulty": 2,
+      "reelTaps": 18,
+      "weight": { "min": 1.5, "max": 5.0 }
+    },
+    {
+      "id": "shadow_eel",
+      "name": "Shadow Eel",
+      "rarity": "rare",
+      "goldValue": 40,
+      "xp": 50,
+      "icon": "\ud83d\udc0d",
+      "description": "A serpentine creature that lurks in the deepest, darkest waters. Slippery and cunning.",
+      "biteWindow": 1200,
+      "reelDifficulty": 3,
+      "reelTaps": 24,
+      "weight": { "min": 3.0, "max": 8.0 }
+    },
+    {
+      "id": "ember_bass",
+      "name": "Ember Bass",
+      "rarity": "rare",
+      "goldValue": 50,
+      "xp": 60,
+      "icon": "\ud83d\udd25",
+      "description": "Scales that flicker like dying coals. Legend says they spawn near volcanic springs.",
+      "biteWindow": 1100,
+      "reelDifficulty": 3,
+      "reelTaps": 28,
+      "weight": { "min": 4.0, "max": 10.0 }
+    },
+    {
+      "id": "voidpike",
+      "name": "Voidpike",
+      "rarity": "epic",
+      "goldValue": 100,
+      "xp": 100,
+      "icon": "\ud83d\udc7e",
+      "description": "A predator from the abyssal depths. Its eyes reflect no light. Handle with extreme caution.",
+      "biteWindow": 900,
+      "reelDifficulty": 4,
+      "reelTaps": 35,
+      "weight": { "min": 8.0, "max": 20.0 }
+    },
+    {
+      "id": "leviathan_fry",
+      "name": "Leviathan Fry",
+      "rarity": "legendary",
+      "goldValue": 250,
+      "xp": 200,
+      "icon": "\ud83d\udc09",
+      "description": "The juvenile offspring of the great sea beast. Even this small, it thrums with ancient power.",
+      "biteWindow": 700,
+      "reelDifficulty": 5,
+      "reelTaps": 45,
+      "weight": { "min": 15.0, "max": 35.0 }
+    },
+    {
+      "id": "old_boot",
+      "name": "Old Boot",
+      "rarity": "junk",
+      "goldValue": 1,
+      "xp": 2,
+      "icon": "\ud83e\udd7e",
+      "description": "A waterlogged boot. Someone lost this ages ago. Not exactly a trophy catch.",
+      "biteWindow": 2500,
+      "reelDifficulty": 1,
+      "reelTaps": 4,
+      "weight": { "min": 1.0, "max": 2.0 }
+    },
+    {
+      "id": "soggy_log",
+      "name": "Soggy Log",
+      "rarity": "junk",
+      "goldValue": 1,
+      "xp": 2,
+      "icon": "\ud83e\udeb5",
+      "description": "A chunk of rotting driftwood. Heavy, useless, and vaguely disappointing.",
+      "biteWindow": 2500,
+      "reelDifficulty": 1,
+      "reelTaps": 5,
+      "weight": { "min": 3.0, "max": 5.0 }
+    },
+    {
+      "id": "tangled_seaweed",
+      "name": "Tangled Seaweed",
+      "rarity": "junk",
+      "goldValue": 0,
+      "xp": 1,
+      "icon": "\ud83c\udf3f",
+      "description": "A slimy clump of pond weed. At least it didn't put up a fight.",
+      "biteWindow": 3000,
+      "reelDifficulty": 1,
+      "reelTaps": 3,
+      "weight": { "min": 0.5, "max": 0.5 }
+    },
+    {
+      "id": "rusty_bucket",
+      "name": "Rusty Bucket",
+      "rarity": "junk",
+      "goldValue": 2,
+      "xp": 3,
+      "icon": "\ud83e\udea3",
+      "description": "A corroded iron pail. Whoever tossed this in clearly wasn't fishing.",
+      "biteWindow": 2000,
+      "reelDifficulty": 1,
+      "reelTaps": 6,
+      "weight": { "min": 2.0, "max": 4.0 }
+    }
+  ],
+  "baitWeights": {
+    "basic_worm": { "common": 60, "uncommon": 25, "rare": 12, "epic": 2.5, "legendary": 0.5 },
+    "enchanted_grub": { "common": 35, "uncommon": 30, "rare": 25, "epic": 8, "legendary": 2 },
+    "abyssal_lure": { "common": 10, "uncommon": 20, "rare": 35, "epic": 25, "legendary": 10 }
+  },
+  "junkChance": {
+    "basic_worm": 0.15,
+    "enchanted_grub": 0.10,
+    "abyssal_lure": 0.05
+  },
+  "rarityColors": {
+    "junk": "#6b5b45",
+    "common": "#a0a0a0",
+    "uncommon": "#4ade80",
+    "rare": "#60a5fa",
+    "epic": "#a855f7",
+    "legendary": "#f59e0b"
+  }
+}

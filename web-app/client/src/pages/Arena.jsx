@@ -47,7 +47,8 @@ function VictoryConfetti() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
+    // Cap DPR at 2 to avoid huge canvases on 3x iOS devices
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = window.innerWidth;
     const h = window.innerHeight;
     canvas.width = w * dpr;
@@ -55,6 +56,10 @@ function VictoryConfetti() {
     canvas.style.width = w + 'px';
     canvas.style.height = h + 'px';
     ctx.scale(dpr, dpr);
+
+    const startTime = Date.now();
+    const RAIN_DURATION = 30000; // confetti rains for 30s, then stops spawning
+    let draining = false;
 
     particlesRef.current = Array.from({ length: 60 }, () => ({
       x: Math.random() * w,
@@ -71,17 +76,25 @@ function VictoryConfetti() {
       life: Math.random() * Math.PI * 2,
       color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
       opacity: Math.random() * 0.3 + 0.7,
+      dead: false,
     }));
 
     function animate() {
+      if (!draining && Date.now() - startTime > RAIN_DURATION) draining = true;
+
       ctx.clearRect(0, 0, w, h);
+      let alive = 0;
       for (const p of particlesRef.current) {
+        if (p.dead) continue;
         p.life += p.wobbleSpeed;
         p.x += Math.sin(p.life) * p.wobbleAmp * 0.02;
         p.y += p.speedY;
         p.rotation += p.rotSpeed;
         p.flipPhase += p.flipSpeed;
-        if (p.y > h + 20) { p.y = -10; p.x = Math.random() * w; }
+        if (p.y > h + 20) {
+          if (draining) { p.dead = true; continue; }
+          p.y = -10; p.x = Math.random() * w;
+        }
 
         ctx.save();
         ctx.translate(p.x, p.y);
@@ -91,11 +104,24 @@ function VictoryConfetti() {
         ctx.fillStyle = p.color;
         ctx.fillRect(-p.width / 2, -p.height / 2, p.width, p.height);
         ctx.restore();
+        alive++;
+      }
+      // All confetti has fallen off — release canvas memory and stop
+      if (draining && alive === 0) {
+        canvas.width = 0;
+        canvas.height = 0;
+        animRef.current = null;
+        return;
       }
       animRef.current = requestAnimationFrame(animate);
     }
     animate();
-    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+      // Release canvas memory on unmount
+      canvas.width = 0;
+      canvas.height = 0;
+    };
   }, []);
 
   return <canvas ref={canvasRef} className="arena-victory-confetti" />;
@@ -262,6 +288,14 @@ export default function Arena() {
   // Hide result screen while dice are still animating
   const showResult = encounterResult && !diceRoll && !spectatorRoll;
 
+  // Once the result screen is showing (dice done), release the encounter data.
+  // The result overlay only reads from encounterResult, not activeEncounter.
+  useEffect(() => {
+    if (!showResult) return;
+    setActiveEncounter(null);
+    spectatorQueueRef.current = [];
+  }, [showResult]);
+
   // Achievement toast queue
   const [achievementQueue, setAchievementQueue] = useState([]);
   const dismissAchievement = useCallback(() => {
@@ -304,7 +338,6 @@ export default function Arena() {
   useEffect(() => {
     if (!encounterResult) return;
     if (encounterResult.type === 'victory') {
-      playArenaSoundRef.current('victorySting');
       playArenaSoundRef.current('crowdCheer');
       playArenaSoundRef.current('youWin');
     } else {
@@ -455,6 +488,7 @@ export default function Arena() {
           const payload = JSON.parse(event.data);
           if (payload.locationId !== locationId) return;
           if (payload.type?.startsWith('encounter_')) {
+
             try { handleEncounterEventRef.current(payload); } catch (e) { console.error('[ARENA WS] handler error:', e); }
           }
           // Bonus action phase detection — clear main action state so bonus UI shows
@@ -622,6 +656,8 @@ export default function Arena() {
 
   // ── Countdown timer (per-turn: 90s, pauses during dice rolls & result screens) ──
   useEffect(() => {
+    // Stop ticking once the encounter has ended (result screen showing)
+    if (encounterResult) return;
     if (!activeEncounter || activeEncounter.phase !== 'action' || !activeEncounter.turnDeadline) return;
     // Reset pause tracking on new turn
     timerPauseStartRef.current = null;
@@ -644,7 +680,7 @@ export default function Arena() {
     tick();
     timerRef.current = setInterval(tick, 250);
     return () => clearInterval(timerRef.current);
-  }, [activeEncounter?.turnDeadline, activeEncounter?.phase]);
+  }, [activeEncounter?.turnDeadline, activeEncounter?.phase, encounterResult]);
 
   // ── Turn announcement ("Tyren's Turn", "Goblin's Turn") ──
   // Waits for spectator dice from the previous turn to finish first.
@@ -2187,6 +2223,12 @@ export default function Arena() {
 
           // Optimistically update monster HP for next strike's overlay
           monsterData.currentHp = Math.max(0, monsterData.currentHp - damageTotal);
+
+          // Monster killed — skip remaining strikes
+          if (monsterData.currentHp <= 0) {
+            clientStrikes.push({ attackRoll: usedRoll, damageTotal });
+            break;
+          }
         }
 
         clientStrikes.push({ attackRoll: usedRoll, damageTotal });
@@ -2436,7 +2478,12 @@ export default function Arena() {
 
   const handleHealingWord = useCallback(async (targetId) => {
     setHealingWordTargetModal(false);
-    if (!activeEncounter) return;
+    if (!activeEncounter || rollActiveRef.current) return;
+
+    // Clear bonus action UI and show status text during rolls
+    setActionChosen('healing_word');
+    setBonusActionPhase(false);
+    setAvailableBonusActions([]);
 
     const myStats = activeEncounter.participants[user.id];
     const pName = myStats?.name || 'Player';
@@ -2487,9 +2534,6 @@ export default function Arena() {
           healRoll: healRoll - spellMod, // server adds spellcastingMod, so send raw dice roll
         }),
       });
-
-      setBonusActionPhase(false);
-      setAvailableBonusActions([]);
     } catch (err) {
       console.error('Failed Healing Word:', err);
     } finally {
@@ -2515,19 +2559,44 @@ export default function Arena() {
     setOffhandWeaponModal(false);
     if (!activeEncounter || rollActiveRef.current) return;
 
+    // Clear bonus action UI and show status text during rolls
+    setActionChosen('offhand_attack');
+    setBonusActionPhase(false);
+    setAvailableBonusActions([]);
+
     const myStats = activeEncounter.participants[user.id];
     const pName = myStats?.name || 'Player';
     const monsterData = activeEncounter.monster;
     const atkBonus = weapon.attackBonus;
 
+    // 5e Advantage/Disadvantage: Vex, monster conditions, etc.
+    const monsterGivesAdv = (monsterData.conditions || []).some(c =>
+      c.id === 'stunned' || c.id === 'restrained'
+    );
+    const hasAdvantage = myStats.advantageOnNextAttack || monsterGivesAdv;
+    const advantageType = hasAdvantage ? 'advantage' : 'normal';
+    const diceNotation = advantageType !== 'normal' ? '2d20' : '1d20';
+
     rollActiveRef.current = true;
     try {
       // Roll d20 to attack
       setRollPhase('attack_roll');
+      const advParam = advantageType !== 'normal' ? advantageType : undefined;
       const { rolls: atkRolls } = await requestServerRoll(
-        '1d20', atkBonus, '#eab308', `${pName} offhand attack (${weapon.name})`, myDiceColorset
+        diceNotation, atkBonus, '#eab308', `${pName} offhand attack (${weapon.name})`, myDiceColorset, undefined, advParam
       );
-      const usedRoll = atkRolls[0];
+
+      let roll, roll2, usedRoll;
+      if (advantageType !== 'normal' && atkRolls.length >= 2) {
+        roll = atkRolls[0];
+        roll2 = atkRolls[1];
+        usedRoll = advantageType === 'advantage' ? Math.max(roll, roll2) : Math.min(roll, roll2);
+      } else {
+        roll = atkRolls[0];
+        roll2 = null;
+        usedRoll = roll;
+      }
+
       const total = usedRoll + atkBonus;
       const isNat20 = usedRoll === 20;
       const isNat1 = usedRoll === 1;
@@ -2548,6 +2617,10 @@ export default function Arena() {
         breakdown: `${usedRoll} + ${atkBonus}`,
         targetAC: monsterData.ac,
         isHit, isCrit: isNat20, isFumble: isNat1,
+        advantageType: advParam,
+        roll1: advParam ? roll : undefined,
+        roll2: advParam && roll2 != null ? roll2 : undefined,
+        attackBonus: atkBonus,
         attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
         defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
         sounds: isNat20 ? ['attackCrit', 'crowdCheer'] : isNat1 ? ['attackFumble', 'crowdGasp', 'youSuck'] : isHit ? ['attackHit'] : ['attackMiss'],
@@ -2556,6 +2629,7 @@ export default function Arena() {
       await showRollResult(attackOverlay);
 
       let damageTotal = 0;
+      let sneakAttackData = undefined;
       if (isHit) {
         setRollPhase('damage_roll');
         const dmgMod = weapon.damageMod;
@@ -2567,6 +2641,26 @@ export default function Arena() {
           weaponNotation, dmgMod, '#eab308', critLabel, myDiceColorset
         );
         damageTotal = dmgTotal;
+
+        // Sneak Attack — auto-roll when eligible (Rogue feature)
+        if (myStats.sneakAttackDice > 0 && weapon && (weapon.finesse || weapon.ranged)) {
+          const hasAlly = Object.entries(activeEncounter.participants)
+            .some(([uid, p]) => uid !== user.id && !p.knockedOut);
+          const isEligible = advantageType === 'advantage' || hasAlly;
+          if (isEligible) {
+            setRollPhase('sneak_attack_roll');
+            let saDiceCount = myStats.sneakAttackDice;
+            if (isNat20) saDiceCount *= 2;
+            const saNotation = `${saDiceCount}d6`;
+            const { total: saTotal } = await requestServerRoll(
+              saNotation, 0, '#10b981', 'SNEAK ATTACK!', '#10b981', 'glass'
+            );
+            damageTotal += saTotal;
+            sneakAttackData = { sneakAttackDamage: saTotal };
+            playArenaSound('crowdCheer');
+          }
+        }
+
         playArenaSound('damageImpact');
         if (damageTotal >= 20 && damageTotal < 30) playArenaSound('bigDamage');
         if (damageTotal >= 30) playArenaSound('massiveDamage');
@@ -2574,10 +2668,12 @@ export default function Arena() {
         const offhandDmgSounds = ['damageImpact'];
         if (damageTotal >= 20 && damageTotal < 30) offhandDmgSounds.push('bigDamage');
         if (damageTotal >= 30) offhandDmgSounds.push('massiveDamage');
+        if (sneakAttackData) offhandDmgSounds.push('crowdCheer');
         const dmgOverlay = {
           type: 'damage',
           damage: damageTotal,
           isCrit: isNat20,
+          sneakAttackDamage: sneakAttackData?.sneakAttackDamage,
           monsterHp: monsterData.currentHp,
           newHp: Math.max(0, monsterData.currentHp - damageTotal),
           attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
@@ -2599,14 +2695,14 @@ export default function Arena() {
           bonusAction: 'offhand_attack',
           weaponId: weapon.id,
           attackRoll: usedRoll,
+          attackRoll2: roll2,
           damageTotal,
+          sneakAttackData,
         }),
       });
 
       setRollPhase(null);
       setAttackResult(null);
-      setBonusActionPhase(false);
-      setAvailableBonusActions([]);
     } catch (err) {
       console.error('Failed offhand attack:', err);
       setRollPhase(null);
@@ -2702,6 +2798,8 @@ export default function Arena() {
     if (rollPhase === 'spell_damage_roll') return `${castingSpell?.name || 'Spell'} — rolling damage...`;
     if (rollPhase === 'submitting') return 'Submitting action...';
     if (actionChosen === 'flurry_of_blows') return 'Rolling Flurry of Blows...';
+    if (actionChosen === 'offhand_attack') return 'Rolling offhand attack...';
+    if (actionChosen === 'healing_word') return 'Casting Healing Word...';
     if (actionChosen === 'cast_spell') return `Cast ${castingSpell?.name || 'spell'}.`;
     if (actionChosen === 'attack') {
       if (attackResult && !attackResult.isHit) {

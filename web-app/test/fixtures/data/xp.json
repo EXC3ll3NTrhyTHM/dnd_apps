@@ -1,0 +1,24 @@
+{
+  "test_user_001": {
+    "user_id": "test_user_001",
+    "username": "testhero",
+    "total_xp": 1000,
+    "last_updated": "2026-01-01T00:00:00.000Z",
+    "daily": {
+      "date": "2026-01-01",
+      "messages_sent": 0,
+      "reactions_given": 0,
+      "locations_visited": [],
+      "login_claimed": false,
+      "arena_wins": 0,
+      "arena_kills": 0,
+      "arena_crits": 0,
+      "arena_untouchable": 0,
+      "arena_potions": 0,
+      "arena_goals_claimed": [],
+      "gold_spend_xp": 0
+    },
+    "lifetime": {},
+    "gold_conversion_done": false
+  }
+}

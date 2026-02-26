@@ -7,10 +7,10 @@
 
 const fs = require('fs');
 const path = require('path');
+const { PLAYERS_PATH } = require('./dataPaths');
 
 const STALE_MS = 30 * 1000; // 30 seconds
 const PERSIST_INTERVAL_MS = 10 * 1000; // debounce disk writes to every 10s
-const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
 
 function loadPlayers() {
   try { return JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8')); }
