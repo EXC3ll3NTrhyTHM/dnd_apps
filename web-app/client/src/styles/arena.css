@@ -2611,6 +2611,13 @@
   animation: condition-pulse 1.5s ease-in-out infinite;
 }
 
+.arena-badge-inspiration {
+  background: rgba(192, 132, 252, 0.25);
+  color: #c084fc;
+  font-size: 0.65rem;
+  animation: condition-pulse 1.5s ease-in-out infinite;
+}
+
 @keyframes condition-pulse {
 
   0%,
@@ -3315,35 +3322,6 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
-/* ── Inspiration Badge on player sprite tiles ── */
-.arena-inspiration-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  font-size: 0.7rem;
-  background: rgba(168, 85, 247, 0.85);
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 6px rgba(168, 85, 247, 0.6);
-  animation: arena-inspire-glow 2s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes arena-inspire-glow {
-
-  0%,
-  100% {
-    box-shadow: 0 0 6px rgba(168, 85, 247, 0.4);
-  }
-
-  50% {
-    box-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
-  }
-}
 
 /* ══════════════════════════════════════════
    Spell Casting UI
@@ -3591,6 +3569,67 @@
 .rro-result.rro-failed {
   color: #ef4444;
   text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+/* Concentration save overlay */
+.rro-con-save-header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+.rro-con-save-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #a78bfa;
+}
+.rro-con-save-versus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.rro-con-save-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 80px;
+}
+.rro-con-save-big-number {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+  line-height: 1.1;
+}
+.rro-con-save-big-number.rro-spell-dc {
+  color: #c084fc;
+  text-shadow: 0 0 16px rgba(192, 132, 252, 0.4);
+}
+.rro-con-save-sub {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.rro-con-save-avatar-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.rro-con-save-avatar-center .rro-avatar {
+  width: 48px;
+  height: 48px;
+  border-color: rgba(167, 139, 250, 0.5);
+}
+.rro-con-save-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
 }
 
 /* ---- Resource Bar (Spell Slots & Channel Divinity) ---- */
@@ -4195,4 +4234,72 @@
   40%  { opacity: 1; transform: translate(-50%, -50%) scale(1.0); }
   80%  { opacity: 0.9; transform: translate(-50%, -50%) scale(1.0); }
   100% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+}
+
+/* ---- Concentration Banner ---- */
+
+.arena-concentration-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 8px;
+  color: #c4b5fd;
+  font-size: 0.75rem;
+  font-weight: 600;
+  animation: arena-concentration-pulse 2s ease-in-out infinite;
+}
+
+@keyframes arena-concentration-pulse {
+  0%, 100% { border-color: rgba(139, 92, 246, 0.4); }
+  50% { border-color: rgba(196, 181, 253, 0.7); }
+}
+
+/* ---- Concentration Conflict Modal ---- */
+
+.arena-concentration-modal {
+  max-width: 320px;
+}
+
+.arena-concentration-conflict-body {
+  padding: 12px 16px;
+  text-align: center;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.arena-concentration-conflict-body strong {
+  color: #c4b5fd;
+}
+
+.arena-concentration-conflict-actions {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px 16px;
+}
+
+.arena-concentration-btn-cancel {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.arena-concentration-btn-confirm {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(139, 92, 246, 0.3);
+  color: #c4b5fd;
+  font-weight: 600;
+  cursor: pointer;
 }

@@ -714,6 +714,26 @@ function submitAction(encounterId, userId, action, rollData) {
         player.mainActionWeaponId = chosen.id;
       }
     }
+    // Ensnaring Strike inline activation (toggle sent from client with attack)
+    if (rollData.ensnaringStrike) {
+      const esSpell = SPELL_DEFINITIONS.ensnaring_strike;
+      const esSlot = (player.spellSlots || []).find(s => s.level >= esSpell.level && s.used < s.total);
+      if (esSlot) {
+        esSlot.used++;
+        // Break existing concentration
+        if (player.concentration && player.concentration.conditionId) {
+          const oldTarget = player.concentration.targetId === 'monster'
+            ? encounter.monster
+            : encounter.participants[player.concentration.targetId];
+          if (oldTarget) removeCondition(oldTarget, player.concentration.conditionId);
+        }
+        player.huntersMarkActive = false;
+        player.ensnaringStrikeActive = true;
+        player.concentration = { spellId: 'ensnaring_strike', targetId: null, conditionId: null };
+        player.bonusActionUsed = true;
+        console.log('[ES_DEBUG] Ensnaring Strike CAST inline by', player.name);
+      }
+    }
     // Ensnaring Strike save roll (client rolls visible d20 for monster's STR save)
     if (typeof rollData.ensnaringStrikeSaveRoll === 'number') {
       player.ensnaringStrikeSaveRoll = rollData.ensnaringStrikeSaveRoll;
@@ -1535,6 +1555,7 @@ function resolveMonsterTurn(encounter) {
   const monster = encounter.monster;
   const results = [];
   const concentrationSaves = [];
+  const pendingConSaves = [];
 
   // Get monster attack modifiers from conditions (e.g., mockery → disadvantage)
   const monsterAttackMods = getAttackModifiers(monster);
@@ -1613,7 +1634,7 @@ function resolveMonsterTurn(encounter) {
           text += `\n**${targetPlayer.name}** has been knocked out!`;
         }
 
-        // Handle concentration breaking — push to separate array for clear narration
+        // Handle concentration — KO auto-breaks (no save), otherwise flag pending
         if (damageInfo.concentrationBroken && damageInfo.brokenConcentration) {
           const conc = damageInfo.brokenConcentration;
           const concTarget = conc.targetId === 'monster' ? monster : encounter.participants[conc.targetId];
@@ -1624,16 +1645,20 @@ function resolveMonsterTurn(encounter) {
           concentrationSaves.push({
             playerName: targetPlayer.name,
             spellName,
-            conSave: damageInfo.conSave || null,
+            conSave: null,
             broken: true,
           });
-        } else if (damageInfo.conSave) {
+        } else if (damageInfo.conSave?.pending) {
           const spellName = SPELL_DEFINITIONS[targetPlayer.concentration?.spellId]?.name || 'a spell';
-          concentrationSaves.push({
+          pendingConSaves.push({
+            userId: targetId,
             playerName: targetPlayer.name,
             spellName,
-            conSave: damageInfo.conSave,
-            broken: false,
+            spellId: targetPlayer.concentration?.spellId,
+            dc: damageInfo.conSave.dc,
+            conMod: damageInfo.conSave.conMod,
+            avatar: targetPlayer.avatar,
+            concentration: { ...targetPlayer.concentration },
           });
         }
       } else {
@@ -1674,7 +1699,7 @@ function resolveMonsterTurn(encounter) {
       saveBonus: c.saveBonus ?? ((monster.savingThrows && monster.savingThrows[c.saveAbility]) || 0),
     }));
 
-  return { results, monsterConditionEffects, concentrationSaves, pendingSaves };
+  return { results, monsterConditionEffects, concentrationSaves, pendingConSaves, pendingSaves };
 }
 
 /**
@@ -1744,6 +1769,7 @@ function resolveMonsterWithRolls(encounterId, rollData) {
     'conditions:', (monster.conditions || []).map(c => `${c.id}(${c.durationType}, DC:${c.saveDC}, bonus:${c.saveBonus})`).join(', ') || 'none');
   const results = [];
   const concentrationSaves = [];
+  const pendingConSaves = [];
 
   // Apply DoT damage BEFORE attacks (e.g. ensnared 1d6 piercing at start of turn)
   // so that if DoT kills the monster, we skip attacks entirely.
@@ -1829,12 +1855,12 @@ function resolveMonsterWithRolls(encounterId, rollData) {
         text += `\n**${targetPlayer.name}** has been knocked out!`;
       }
 
-      // Handle concentration breaking — push to separate array for clear narration
+      // Handle concentration — KO auto-breaks (no save), otherwise flag pending
       if (damageInfo.concentrationBroken && damageInfo.brokenConcentration) {
+        // KO auto-break — no save needed
         const conc = damageInfo.brokenConcentration;
-        console.log('[ES_DEBUG] CONCENTRATION BROKEN by monster attack on', targetPlayer.name,
-          'spell:', conc.spellId, 'conditionId:', conc.conditionId, 'targetId:', conc.targetId,
-          'conSave:', JSON.stringify(damageInfo.conSave));
+        console.log('[ES_DEBUG] CONCENTRATION BROKEN (KO) by monster attack on', targetPlayer.name,
+          'spell:', conc.spellId, 'conditionId:', conc.conditionId, 'targetId:', conc.targetId);
         const concTarget = conc.targetId === 'monster' ? monster : encounter.participants[conc.targetId];
         if (concTarget && conc.conditionId) {
           removeCondition(concTarget, conc.conditionId);
@@ -1843,16 +1869,21 @@ function resolveMonsterWithRolls(encounterId, rollData) {
         concentrationSaves.push({
           playerName: targetPlayer.name,
           spellName,
-          conSave: damageInfo.conSave || null,
+          conSave: null,
           broken: true,
         });
-      } else if (damageInfo.conSave) {
+      } else if (damageInfo.conSave?.pending) {
+        // Pending CON save — client will roll visibly
         const spellName = SPELL_DEFINITIONS[targetPlayer.concentration?.spellId]?.name || 'a spell';
-        concentrationSaves.push({
+        pendingConSaves.push({
+          userId: setup.targetId,
           playerName: targetPlayer.name,
           spellName,
-          conSave: damageInfo.conSave,
-          broken: false,
+          spellId: targetPlayer.concentration?.spellId,
+          dc: damageInfo.conSave.dc,
+          conMod: damageInfo.conSave.conMod,
+          avatar: targetPlayer.avatar,
+          concentration: { ...targetPlayer.concentration },
         });
       }
     } else {
@@ -1916,6 +1947,7 @@ function resolveMonsterWithRolls(encounterId, rollData) {
       results,
       monsterConditionEffects,
       concentrationSaves,
+      pendingConSaves,
       pendingSaves,
       defeat: true,
       defeatText: monster.fleeText || 'The monster escapes as the last fighter falls.',
@@ -1928,6 +1960,7 @@ function resolveMonsterWithRolls(encounterId, rollData) {
     results,
     monsterConditionEffects,
     concentrationSaves,
+    pendingConSaves,
     pendingSaves,
     rollerId,
   };
@@ -1977,6 +2010,53 @@ function resolveMonsterSaves(encounterId, saveRolls) {
   }
 
   return { savedConditions, locationId: encounter.locationId };
+}
+
+/**
+ * Resolve player concentration CON saves using client-provided dice rolls.
+ * Called after a concentrating player rolls their visible d20 save.
+ * saveRolls: [{ userId, roll }]
+ */
+function resolveConcentrationSaves(encounterId, saveRolls) {
+  const encounter = activeEncounters.get(encounterId);
+  if (!encounter) return { error: 'Encounter not found.' };
+
+  const pendingConSaves = encounter.pendingConSaves || [];
+  const results = [];
+  const monster = encounter.monster;
+
+  for (const sr of saveRolls) {
+    const pending = pendingConSaves.find(p => p.userId === sr.userId);
+    if (!pending) continue;
+
+    const roll = typeof sr.roll === 'number' ? sr.roll : rollD20();
+    const total = roll + pending.conMod;
+    const saved = total >= pending.dc;
+
+    const player = encounter.participants[sr.userId];
+
+    if (!saved && player && player.concentration) {
+      const conc = player.concentration;
+      const concTarget = conc.targetId === 'monster' ? monster : encounter.participants[conc.targetId];
+      if (concTarget && conc.conditionId) {
+        removeCondition(concTarget, conc.conditionId);
+      }
+      player.concentration = null;
+      player.ensnaringStrikeActive = false;
+      player.huntersMarkActive = false;
+    }
+
+    results.push({
+      userId: sr.userId,
+      playerName: pending.playerName,
+      spellName: pending.spellName,
+      conSave: { roll, conMod: pending.conMod, total, dc: pending.dc, saved },
+      broken: !saved,
+    });
+  }
+
+  delete encounter.pendingConSaves;
+  return { results, locationId: encounter.locationId };
 }
 
 // ============================================
@@ -2138,21 +2218,11 @@ function applyDamageToPlayer(player, damage) {
   }
 
   // CON save for concentration (DC = max of 10 or half damage taken)
+  // Don't roll server-side — flag as pending so the client can roll visibly
   if (player.concentration) {
     const dc = Math.max(10, Math.floor(damage / 2));
-    const roll = rollD20();
     const conMod = player.conMod || 0;
-    const total = roll + conMod;
-    const saved = total >= dc;
-    conSave = { roll, conMod, total, dc, saved };
-
-    if (!saved) {
-      concentrationBroken = true;
-      brokenConcentration = { ...player.concentration };
-      player.concentration = null;
-      player.ensnaringStrikeActive = false;
-      player.huntersMarkActive = false;
-    }
+    conSave = { dc, conMod, pending: true };
   }
 
   return { knocked: false, concentrationBroken, brokenConcentration, conSave };
@@ -2487,6 +2557,11 @@ function checkTimeouts() {
     // Monster roll timeout — auto-roll if client didn't respond in time — paused during DM deliberation
     if (!hasPendingDmRoll && encounter.phase === 'monster_rolling' && encounter.monsterRollDeadline && now > encounter.monsterRollDeadline) {
       timedOut.push({ encounter, reason: 'monster_roll_timeout' });
+    }
+
+    // Concentration save timeout — auto-resolve if player didn't roll in time
+    if (!hasPendingDmRoll && encounter.phase === 'con_saving' && encounter.conSaveDeadline && now > encounter.conSaveDeadline) {
+      timedOut.push({ encounter, reason: 'con_save_timeout' });
     }
 
     // Monster save timeout — auto-resolve if client didn't respond in time
@@ -3391,6 +3466,7 @@ module.exports = {
   resolveRound,
   resolveMonsterWithRolls,
   resolveMonsterSaves,
+  resolveConcentrationSaves,
   resolveMonsterTurn,
   prepareMonsterAttacks,
   distributeRewards,

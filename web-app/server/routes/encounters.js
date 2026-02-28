@@ -22,6 +22,7 @@ const {
   resolveRound,
   resolveMonsterWithRolls,
   resolveMonsterSaves,
+  resolveConcentrationSaves,
   resolveMonsterTurn,
   distributeRewards,
   getEncounter,
@@ -430,7 +431,7 @@ router.post('/:encounterId/initiative', authRequired, (req, res) => {
  */
 router.post('/:encounterId/action', authRequired, (req, res) => {
   const userId = req.user.id;
-  const { action, attackRoll, attackRoll2, damageTotal, potionId, targetId, healRoll, helpTargetId, smiteData, sneakAttackData, inspirationData, huntersMarkData, healAmount, spellId, saveRoll, weaponId, subAction, ensnaringStrikeSaveRoll, stunningStrike, stunningStrikeSaveRoll } = req.body;
+  const { action, attackRoll, attackRoll2, damageTotal, potionId, targetId, healRoll, helpTargetId, smiteData, sneakAttackData, inspirationData, huntersMarkData, healAmount, spellId, saveRoll, weaponId, subAction, ensnaringStrike, ensnaringStrikeSaveRoll, stunningStrike, stunningStrikeSaveRoll } = req.body;
 
   if (!action) {
     return res.status(400).json({ error: 'action is required.' });
@@ -454,6 +455,7 @@ router.post('/:encounterId/action', authRequired, (req, res) => {
   if (typeof saveRoll === 'number') rollData.saveRoll = saveRoll;
   if (weaponId) rollData.weaponId = weaponId;
   if (subAction) rollData.subAction = subAction;
+  if (ensnaringStrike) rollData.ensnaringStrike = true;
   if (typeof ensnaringStrikeSaveRoll === 'number') rollData.ensnaringStrikeSaveRoll = ensnaringStrikeSaveRoll;
   if (stunningStrike) rollData.stunningStrike = true;
   if (typeof stunningStrikeSaveRoll === 'number') rollData.stunningStrikeSaveRoll = stunningStrikeSaveRoll;
@@ -692,6 +694,53 @@ router.post('/:encounterId/pre-bonus-action', authRequired, (req, res) => {
 });
 
 /**
+ * POST /api/encounters/:encounterId/drop-concentration
+ * Voluntarily drop concentration on Hunter's Mark or Ensnaring Strike.
+ * No turn required — can be done any time during combat.
+ */
+router.post('/:encounterId/drop-concentration', authRequired, (req, res) => {
+  const userId = req.user.id;
+  const encounter = getEncounter(req.params.encounterId);
+  if (!encounter) return res.status(404).json({ error: 'Encounter not found.' });
+
+  const player = encounter.participants?.[userId];
+  if (!player) return res.status(403).json({ error: 'Not a participant.' });
+
+  if (!player.concentration) {
+    return res.status(400).json({ error: 'Not concentrating on anything.' });
+  }
+
+  const spellId = player.concentration.spellId;
+  const conditionId = player.concentration.conditionId;
+
+  // Remove any condition applied by the concentration spell
+  if (conditionId) {
+    const target = player.concentration.targetId === 'monster'
+      ? encounter.monster
+      : encounter.participants[player.concentration.targetId];
+    if (target) {
+      const { removeCondition } = require('../lib/conditions');
+      removeCondition(target, conditionId);
+    }
+  }
+
+  // Clear concentration and associated flags
+  player.concentration = null;
+  player.huntersMarkActive = false;
+  player.ensnaringStrikeActive = false;
+
+  // Broadcast updated state
+  broadcastToLocation(req, encounter.locationId, {
+    type: 'encounter_update',
+    locationId: encounter.locationId,
+    encounterId: encounter.id,
+    encounter: getPublicState(encounter),
+  });
+
+  res.json({ success: true, dropped: spellId });
+});
+
+/**
  * POST /api/encounters/:encounterId/monster-rolls
  * Submit dice roll results for monster attacks.
  * Called by the designated roller client after rolling 3D dice.
@@ -736,8 +785,23 @@ router.post('/:encounterId/monster-rolls', authRequired, (req, res) => {
     });
   }
 
-  // If monster has pending end-of-turn saves, enter save phase instead of advancing
-  if (encounter && !result.defeat && result.pendingSaves && result.pendingSaves.length > 0) {
+  // Phase ordering: con_saving → monster_saving → advance turn
+  if (encounter && !result.defeat && result.pendingConSaves && result.pendingConSaves.length > 0) {
+    // Player(s) need to roll CON saves for concentration
+    encounter.phase = 'con_saving';
+    encounter.conSaveDeadline = Date.now() + 30_000;
+    encounter.pendingConSaves = result.pendingConSaves;
+    // Stash monster saves for after con saves resolve
+    encounter.stashedPendingSaves = result.pendingSaves || [];
+    encounter.stashedRollerId = result.rollerId || Object.keys(encounter.participants)[0];
+    broadcastToLocation(req, locationId, {
+      type: 'encounter_con_save_needed',
+      locationId,
+      encounterId: req.params.encounterId,
+      pendingConSaves: result.pendingConSaves,
+      encounter: getPublicState(encounter),
+    });
+  } else if (encounter && !result.defeat && result.pendingSaves && result.pendingSaves.length > 0) {
     encounter.phase = 'monster_saving';
     encounter.monsterSaveDeadline = Date.now() + 30_000;
     const rollerId = result.rollerId || Object.keys(encounter.participants)[0];
@@ -805,6 +869,67 @@ router.post('/:encounterId/monster-saves', authRequired, (req, res) => {
   // Now advance turn
   const turnResult = advanceTurn(encounter);
   handleTurnAdvance(req, encounter, turnResult);
+
+  res.json({ success: true });
+});
+
+/**
+ * POST /api/encounters/:encounterId/con-saves
+ * Submit client-rolled CON save results for player concentration saves.
+ * Body: { saveRolls: [{ userId, roll }, ...] }
+ */
+router.post('/:encounterId/con-saves', authRequired, (req, res) => {
+  const { saveRolls } = req.body;
+  if (!Array.isArray(saveRolls)) {
+    return res.status(400).json({ error: 'saveRolls array is required.' });
+  }
+
+  const encounter = getEncounter(req.params.encounterId);
+  if (!encounter) return res.status(404).json({ error: 'Encounter not found.' });
+  if (encounter.phase !== 'con_saving') return res.json({ success: true, alreadyResolved: true });
+
+  const result = resolveConcentrationSaves(req.params.encounterId, saveRolls);
+  if (result.error) return res.status(400).json({ error: result.error });
+
+  delete encounter.conSaveDeadline;
+  encounter.phase = 'action';
+
+  // Broadcast concentration save results
+  broadcastToLocation(req, encounter.locationId, {
+    type: 'encounter_con_save_results',
+    locationId: encounter.locationId,
+    encounterId: req.params.encounterId,
+    conSaveResults: result.results,
+    encounter: getPublicState(encounter),
+  });
+
+  // Check for stashed monster saves → enter monster_saving phase
+  const stashedSaves = encounter.stashedPendingSaves || [];
+  const stashedRollerId = encounter.stashedRollerId || Object.keys(encounter.participants)[0];
+  delete encounter.stashedPendingSaves;
+  delete encounter.stashedRollerId;
+
+  if (stashedSaves.length > 0) {
+    encounter.phase = 'monster_saving';
+    encounter.monsterSaveDeadline = Date.now() + 30_000;
+    encounter.monsterSaveSetup = {
+      pendingSaves: stashedSaves,
+      rollerId: stashedRollerId,
+    };
+    broadcastToLocation(req, encounter.locationId, {
+      type: 'encounter_monster_save_needed',
+      locationId: encounter.locationId,
+      encounterId: req.params.encounterId,
+      rollerId: stashedRollerId,
+      pendingSaves: stashedSaves,
+      monsterName: encounter.monster.name,
+      encounter: getPublicState(encounter),
+    });
+  } else {
+    // No monster saves — advance turn
+    const turnResult = advanceTurn(encounter);
+    handleTurnAdvance(req, encounter, turnResult);
+  }
 
   res.json({ success: true });
 });
@@ -1545,7 +1670,22 @@ function startTimeoutChecker(app) {
           } else {
             const enc = getEncounter(encounter.id);
             if (enc) {
-              // Auto-resolve pending saves server-side (no client to roll)
+              // Auto-resolve pending con saves server-side (no client to roll)
+              if (result.pendingConSaves && result.pendingConSaves.length > 0) {
+                enc.pendingConSaves = result.pendingConSaves;
+                const autoConRolls = result.pendingConSaves.map(p => ({ userId: p.userId }));
+                const conResult = resolveConcentrationSaves(encounter.id, autoConRolls);
+                if (conResult.results) {
+                  broadcastToLocation(fakeReq, locationId, {
+                    type: 'encounter_con_save_results',
+                    locationId,
+                    encounterId: encounter.id,
+                    conSaveResults: conResult.results,
+                    encounter: getPublicState(enc),
+                  });
+                }
+              }
+              // Auto-resolve pending monster saves server-side (no client to roll)
               if (result.pendingSaves && result.pendingSaves.length > 0) {
                 const autoSaveRolls = result.pendingSaves.map(s => ({ conditionId: s.conditionId }));
                 const saveResult = resolveMonsterSaves(encounter.id, autoSaveRolls);
@@ -1564,6 +1704,49 @@ function startTimeoutChecker(app) {
               handleTurnAdvance(fakeReq, enc, turnResult);
             }
           }
+        }
+      } else if (reason === 'con_save_timeout') {
+        // Player didn't roll CON save in time — auto-resolve server-side
+        const fakeReq = { app };
+        const pendingCon = encounter.pendingConSaves || [];
+        const autoConRolls = pendingCon.map(p => ({ userId: p.userId }));
+        const conResult = resolveConcentrationSaves(encounter.id, autoConRolls);
+
+        delete encounter.conSaveDeadline;
+        encounter.phase = 'action';
+
+        if (conResult.results) {
+          broadcastToLocation(fakeReq, encounter.locationId, {
+            type: 'encounter_con_save_results',
+            locationId: encounter.locationId,
+            encounterId: encounter.id,
+            conSaveResults: conResult.results,
+            encounter: getPublicState(encounter),
+          });
+        }
+
+        // Check stashed monster saves
+        const stashedSaves = encounter.stashedPendingSaves || [];
+        const stashedRollerId = encounter.stashedRollerId || Object.keys(encounter.participants)[0];
+        delete encounter.stashedPendingSaves;
+        delete encounter.stashedRollerId;
+
+        if (stashedSaves.length > 0) {
+          encounter.phase = 'monster_saving';
+          encounter.monsterSaveDeadline = Date.now() + 30_000;
+          encounter.monsterSaveSetup = { pendingSaves: stashedSaves, rollerId: stashedRollerId };
+          broadcastToLocation(fakeReq, encounter.locationId, {
+            type: 'encounter_monster_save_needed',
+            locationId: encounter.locationId,
+            encounterId: encounter.id,
+            rollerId: stashedRollerId,
+            pendingSaves: stashedSaves,
+            monsterName: encounter.monster.name,
+            encounter: getPublicState(encounter),
+          });
+        } else {
+          const turnResult = advanceTurn(encounter);
+          handleTurnAdvance(fakeReq, encounter, turnResult);
         }
       } else if (reason === 'monster_save_timeout') {
         // Client didn't roll saves in time — auto-resolve server-side

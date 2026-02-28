@@ -9291,6 +9291,325 @@
         "source": "web_app"
       },
       "timestamp": "2026-02-28T01:15:03.565Z"
+    },
+    {
+      "id": "tx_1772247313401_xrw4rv",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 519,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T02:55:13.401Z"
+    },
+    {
+      "id": "tx_1772248201104_d8f4kc",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 544,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T03:10:01.104Z"
+    },
+    {
+      "id": "tx_1772248288039_5srb1d",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 552,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T03:11:28.039Z"
+    },
+    {
+      "id": "tx_1772248495850_0t8di3",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 560,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T03:14:55.850Z"
+    },
+    {
+      "id": "tx_1772248805660_jylhoe",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 568,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T03:20:05.660Z"
+    },
+    {
+      "id": "tx_1772249218676_ilv0da",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 576,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T03:26:58.676Z"
+    },
+    {
+      "id": "tx_1772249555073_jjvmm6",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 584,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T03:32:35.073Z"
+    },
+    {
+      "id": "tx_1772250224324_6o3raw",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 592,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T03:43:44.324Z"
+    },
+    {
+      "id": "tx_1772251189517_h40sx2",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 600,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T03:59:49.517Z"
+    },
+    {
+      "id": "tx_1772254372989_m6lztk",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 625,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T04:52:52.989Z"
+    },
+    {
+      "id": "tx_1772255605272_3ezr0u",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 650,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T05:13:25.272Z"
+    },
+    {
+      "id": "tx_1772265076573_a3vczy",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 350,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T07:51:16.573Z"
+    },
+    {
+      "id": "tx_1772265117642_xt9b4e",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 360,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-02-28T07:51:57.642Z"
+    },
+    {
+      "id": "tx_1772265217413_mgb0qo",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 365,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T07:53:37.413Z"
+    },
+    {
+      "id": "tx_1772265228351_ad2xld",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 370,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-02-28T07:53:48.351Z"
+    },
+    {
+      "id": "tx_1772265329835_75ph3i",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 380,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T07:55:29.835Z"
+    },
+    {
+      "id": "tx_1772265337240_xcphu9",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 405,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-02-28T07:55:37.240Z"
+    },
+    {
+      "id": "tx_1772265339692_8ck443",
+      "user_id": "1073385140669128725",
+      "username": "smok3y8754",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 420,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-02-28T07:55:39.692Z"
+    },
+    {
+      "id": "tx_1772265526780_bg7hw8",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 430,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T07:58:46.780Z"
+    },
+    {
+      "id": "tx_1772265618268_t6pvv5",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 435,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T08:00:18.268Z"
+    },
+    {
+      "id": "tx_1772265932900_8ur1a7",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 445,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T08:05:32.900Z"
+    },
+    {
+      "id": "tx_1772266267724_itrema",
+      "user_id": "1073385140669128725",
+      "username": "Nalyd",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 470,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T08:11:07.724Z"
+    },
+    {
+      "id": "tx_1772267248855_s045e0",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 675,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T08:27:28.855Z"
+    },
+    {
+      "id": "tx_1772267263351_aakoi0",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 680,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_crit"
+      },
+      "timestamp": "2026-02-28T08:27:43.351Z"
+    },
+    {
+      "id": "tx_1772267263903_sq9nmb",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 685,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-02-28T08:27:43.903Z"
+    },
+    {
+      "id": "tx_1772267264417_af2g7j",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 695,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-02-28T08:27:44.417Z"
     }
   ]
 }

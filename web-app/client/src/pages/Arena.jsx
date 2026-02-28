@@ -38,6 +38,11 @@ const EMOTE_SOUND_MAP = {
   ember_laugh: 'emoteGoblinLaugh',
 };
 
+const CONCENTRATION_SPELL_NAMES = {
+  hunters_mark: "Hunter's Mark",
+  ensnaring_strike: 'Ensnaring Strike',
+};
+
 // ── Confetti canvas for victory screen (same effect as arena location transition) ──
 const CONFETTI_COLORS = [
   '#ef4444', '#f97316', '#eab308', '#22c55e',
@@ -135,10 +140,10 @@ function VictoryConfetti() {
 
 const ARENA_AUDIO_CONFIGS = {
   crowd: { ambient: [{ src: '/sounds/arena/crowd-ambient.mp3', volume: 0.4 }] },
-  battle: { music: { src: '/sounds/arena/battle-music.mp3', volume: 0.15 }, ambient: [{ src: '/sounds/arena/crowd-ambient.mp3', volume: 0.4 }] },
-  battleIntense: { music: { src: '/sounds/arena/battle-music-intense.mp3', volume: 0.22 }, ambient: [{ src: '/sounds/arena/crowd-ambient.mp3', volume: 0.45 }] },
-  victory: { music: { src: '/sounds/arena/victory-music.mp3', volume: 0.4 } },
-  defeat: { music: { src: '/sounds/arena/defeat-music.mp3', volume: 0.35 } },
+  battle: { music: { src: '/sounds/arena/battle-music.mp3', volume: 0.15 } },
+  battleIntense: { music: { src: '/sounds/arena/battle-music-intense.mp3', volume: 0.22 } },
+  victory: { music: { src: '/sounds/arena/victory.mp3', volume: 0.4 } },
+  defeat: { music: { src: '/sounds/arena/defeat.mp3', volume: 0.35 } },
 };
 
 export default function Arena() {
@@ -183,6 +188,8 @@ export default function Arena() {
     clearMonsterSaveRequest,
     monsterEscapeRequest,
     clearMonsterEscapeRequest,
+    conSaveRequest,
+    clearConSaveRequest,
     initiativeResults,
     setInitiativeResults,
     currentTurn,
@@ -206,6 +213,7 @@ export default function Arena() {
   const monsterRollActiveRef = useRef(false);
   const monsterSaveActiveRef = useRef(false);
   const monsterEscapeActiveRef = useRef(false);
+  const conSaveActiveRef = useRef(false);
   const combatLogRef = useRef(null);
   const [logOpen, setLogOpen] = useState(false);
   const [turnAnnouncement, setTurnAnnouncement] = useState(null);
@@ -242,6 +250,12 @@ export default function Arena() {
   const [vineEffect, setVineEffect] = useState(false);
   // Stunning Strike toggle (Monk)
   const [stunningStrikeToggle, setStunningStrikeToggle] = useState(false);
+  // Ensnaring Strike toggle (Ranger — client-side until attack resolves)
+  const [ensnaringStrikeToggle, setEnsnaringStrikeToggle] = useState(false);
+  const ensnaringStrikeToggleRef = useRef(false);
+  useEffect(() => { ensnaringStrikeToggleRef.current = ensnaringStrikeToggle; }, [ensnaringStrikeToggle]);
+  // Concentration conflict confirmation
+  const [concentrationConflict, setConcentrationConflict] = useState(null);
   // Weapon picker state
   const [weaponModalOpen, setWeaponModalOpen] = useState(false);
   const [availableWeapons, setAvailableWeapons] = useState([]);
@@ -670,6 +684,7 @@ export default function Arena() {
         setSpellModalOpen(false);
         setHealingWordTargetModal(false);
         setStunningStrikeToggle(false);
+        setEnsnaringStrikeToggle(false);
       }
     }
     // Reset initiative state when entering a fresh encounter
@@ -1142,11 +1157,11 @@ export default function Arena() {
           const { dice, modifier } = parseDamageNotation(attack.damageDice);
           const mCritLabel = isNat20 ? `${monsterRollRequest.monsterName} crits!` : `${monsterRollRequest.monsterName} rolls damage`;
 
+          playArenaSoundRef.current('monsterHit');
           const { total: dmgTotal } = await requestServerRoll(
             isNat20 ? doubleDice(dice) : dice, modifier, '#ef4444', mCritLabel, '#ef4444'
           );
           damageTotal = dmgTotal;
-          playArenaSoundRef.current('monsterHit');
           if (damageTotal >= 20 && damageTotal < 30) playArenaSoundRef.current('bigDamage');
           if (damageTotal >= 30) playArenaSoundRef.current('massiveDamage');
           // Show damage result overlay (track accumulated damage for multi-attacks)
@@ -1155,7 +1170,7 @@ export default function Arena() {
           const priorDmg = accumulatedDmg[attack.targetId] || 0;
           const effectiveHp = Math.max(0, baseHp - priorDmg);
           accumulatedDmg[attack.targetId] = priorDmg + damageTotal;
-          const monsterDmgSounds = ['monsterHit'];
+          const monsterDmgSounds = [];
           if (damageTotal >= 20 && damageTotal < 30) monsterDmgSounds.push('bigDamage');
           if (damageTotal >= 30) monsterDmgSounds.push('massiveDamage');
           const monsterDmgOverlay = {
@@ -1269,6 +1284,87 @@ export default function Arena() {
 
     rollMonsterSaves();
   }, [monsterSaveRequest, user?.id, requestServerRoll, clearMonsterSaveRequest, broadcastRollResult, showRollResult]);
+
+  // ── Player CON save rolling (concentration) ──
+  useEffect(() => {
+    if (!conSaveRequest || conSaveActiveRef.current) return;
+
+    // Only the affected player rolls their own save
+    const myPendingSaves = (conSaveRequest.pendingConSaves || []).filter(s => s.userId === user?.id);
+    if (myPendingSaves.length === 0) return;
+
+    conSaveActiveRef.current = true;
+    setRollPhase('con_saving');
+
+    async function rollConSaves() {
+      // Wait for any active spectator or roll overlays to finish
+      let settled = false;
+      while (!settled) {
+        while (spectatorQueueRef.current.length > 0 || spectatorRollRef.current || rollResultOverlayRef.current) {
+          await new Promise(r => setTimeout(r, 300));
+        }
+        await new Promise(r => setTimeout(r, 500));
+        if (spectatorQueueRef.current.length === 0 && !spectatorRollRef.current && !rollResultOverlayRef.current) {
+          settled = true;
+        }
+      }
+      await new Promise(r => setTimeout(r, 800));
+
+      const saveResults = [];
+
+      for (const save of myPendingSaves) {
+        const saveLabel = `${save.playerName} CON save vs DC ${save.dc}`;
+        setMonsterRollStatus(`${save.playerName} rolls CON save...`);
+
+        const { rolls } = await requestServerRoll(
+          '1d20', save.conMod, '#eab308', saveLabel, myDiceColorset,
+          undefined, undefined, { rollingLabel: saveLabel }
+        );
+        const saveRoll = rolls[0];
+        const total = saveRoll + save.conMod;
+        const saved = total >= save.dc;
+
+        const playerParticipant = activeEncounterRef.current?.participants?.[save.userId];
+        const playerAvatar = playerParticipant?.avatar || (playerParticipant?.sprite && `/players/${playerParticipant.sprite}`);
+
+        const saveOverlay = {
+          type: 'spell_save',
+          isConcentration: true,
+          spellName: save.spellName,
+          saveAbility: 'CON',
+          saveRoll, saveBonus: save.conMod, saveTotal: total,
+          saveDC: save.dc, saved,
+          attacker: { name: save.spellName, avatar: playerAvatar },
+          defender: { name: save.playerName, avatar: playerAvatar },
+          sounds: saved ? ['crowdCheer'] : ['spellFail'],
+        };
+        broadcastRollResult(saveOverlay);
+        await showRollResult(saveOverlay);
+
+        saveResults.push({ userId: save.userId, roll: saveRoll });
+        await new Promise(r => setTimeout(r, 400));
+      }
+
+      // Submit to server
+      if (saveResults.length > 0) {
+        try {
+          await api(`/api/encounters/${conSaveRequest.encounterId}/con-saves`, {
+            method: 'POST',
+            body: JSON.stringify({ saveRolls: saveResults }),
+          });
+        } catch (err) {
+          console.error('Failed to submit con saves:', err);
+        }
+      }
+
+      setRollPhase(null);
+      setMonsterRollStatus(null);
+      conSaveActiveRef.current = false;
+      clearConSaveRequest?.();
+    }
+
+    rollConSaves();
+  }, [conSaveRequest, user?.id, requestServerRoll, clearConSaveRequest, broadcastRollResult, showRollResult, myDiceColorset]);
 
   // ── Monster escape check rolling ──
   useEffect(() => {
@@ -1568,11 +1664,11 @@ export default function Arena() {
           const weaponNotation = isNat20 ? doubleDice(baseDmgNotation) : baseDmgNotation;
           const critLabel = isNat20 ? `${pName} crits!` : `${pName} rolls damage`;
 
+          playArenaSound('damageImpact');
           const { total: dmgTotal } = await requestServerRoll(
             weaponNotation, dmgMod, '#eab308', critLabel, myDiceColorset
           );
           damageTotal = dmgTotal;
-          playArenaSound('damageImpact');
 
           // Roll smite dice separately (gold metal) if smite was chosen
           if (smiteChoice) {
@@ -1584,11 +1680,12 @@ export default function Arena() {
             if (isNat20) totalSmiteDice *= 2;
             const smiteNotation = `${totalSmiteDice}d8`;
 
+            playArenaSound('divineSmite');
             const { total: smiteTotal } = await requestServerRoll(
               smiteNotation, 0, '#FFD700', 'DIVINE SMITE!', '#FFD700', 'perfectmetal'
             );
             damageTotal += smiteTotal;
-            playArenaSound('divineSmite'); playArenaSound('crowdCheer');
+            playArenaSound('crowdCheer');
             smiteData = { slotLevel: smiteChoice.slotLevel, smiteDamage: smiteTotal };
           }
 
@@ -1612,10 +1709,12 @@ export default function Arena() {
           }
 
           // Hunter's Mark — auto-roll 1d6 bonus damage when active
-          if (myStats.huntersMarkActive) {
+          // Skip if Ensnaring Strike toggled — casting it drops Hunter's Mark concentration
+          if (myStats.huntersMarkActive && !ensnaringStrikeToggleRef.current) {
             setRollPhase('hunters_mark_roll');
+            playArenaSound('damageImpact');
             const { total: hmTotal } = await requestServerRoll(
-              '1d6', 0, '#22c55e', "HUNTER'S MARK!", myDiceColorset, 'glass'
+              '1d6', 0, '#a855f7', "HUNTER'S MARK!", '#a855f7', 'glass'
             );
             damageTotal += hmTotal;
             huntersMarkData = { damage: hmTotal };
@@ -1624,7 +1723,7 @@ export default function Arena() {
           // Show damage result overlay
           if (damageTotal >= 20 && damageTotal < 30) playArenaSound('bigDamage');
           if (damageTotal >= 30) playArenaSound('massiveDamage');
-          const dmgSounds = ['damageImpact'];
+          const dmgSounds = [];
           if (damageTotal >= 20 && damageTotal < 30) dmgSounds.push('bigDamage');
           if (damageTotal >= 30) dmgSounds.push('massiveDamage');
           if (smiteData) dmgSounds.push('divineSmite', 'crowdCheer');
@@ -1645,10 +1744,10 @@ export default function Arena() {
           broadcastRollResult(damageOverlayData);
           await showRollResult(damageOverlayData);
 
-          // Ensnaring Strike — if active and monster survives, roll visible STR save
+          // Ensnaring Strike — if toggled and monster survives, roll visible STR save
           // Skip if damage kills the monster (no point saving against vines on a corpse)
           const monsterSurvives = activeEncounter.monster.currentHp - damageTotal > 0;
-          if (myStats.ensnaringStrikeActive && monsterSurvives) {
+          if (ensnaringStrikeToggleRef.current && monsterSurvives) {
             // Optimistically update HP so the bar reflects damage while save rolls
             setActiveEncounter(prev => prev ? {
               ...prev,
@@ -1666,7 +1765,7 @@ export default function Arena() {
           // Stunning Strike — if toggled and monster survives, roll visible CON save
           if (stunningStrikeToggle && monsterSurvives && myStats.hasKiPoints && myStats.kiPointsUsed < myStats.kiPointsMax) {
             // Optimistically update HP so the bar reflects damage while save rolls
-            if (!myStats.ensnaringStrikeActive) {
+            if (!ensnaringStrikeToggleRef.current) {
               setActiveEncounter(prev => prev ? {
                 ...prev,
                 monster: { ...prev.monster, currentHp: Math.max(0, prev.monster.currentHp - damageTotal) },
@@ -1682,8 +1781,14 @@ export default function Arena() {
           }
         }
 
-        // Reset toggle after use
+        // Capture toggle values before clearing
+        const wasEnsnaringStrike = ensnaringStrikeToggleRef.current;
+        const wasStunningStrike = stunningStrikeToggle;
+
+        // Reset toggles after use
         setStunningStrikeToggle(false);
+        setEnsnaringStrikeToggle(false);
+        ensnaringStrikeToggleRef.current = false;
 
         setRollPhase('submitting');
         await api(`/api/encounters/${activeEncounter.id}/action`, {
@@ -1698,8 +1803,9 @@ export default function Arena() {
             huntersMarkData,
             inspirationData,
             weaponId: wpn?.id,
+            ensnaringStrike: wasEnsnaringStrike || undefined,
             ensnaringStrikeSaveRoll,
-            stunningStrike: stunningStrikeToggle || undefined,
+            stunningStrike: wasStunningStrike || undefined,
             stunningStrikeSaveRoll,
           }),
         });
@@ -1753,6 +1859,9 @@ export default function Arena() {
     stunning_strike: 'Toggle ON before attacking. On hit, spend 1 Ki to force a CON save. On fail, the target is Stunned until your next turn (can\'t act, auto-fail STR/DEX saves, attacks against it have advantage).',
     patient_defense: 'Spend 1 Ki as a bonus action to take the Dodge action. All attacks against you have disadvantage until your next turn.',
     fist_of_unbroken_air: 'Spend 2 Ki to blast a creature with compressed air. STR save vs Ki DC. On fail: 3d10 bludgeoning + knocked prone. On save: half damage.',
+    concentration: "You can only concentrate on one spell at a time. Taking damage forces a CON save (DC 10 or half damage taken). Casting another concentration spell ends this one.",
+    hunters_mark: "Hunter's Mark (1st level, Concentration). Mark a target — deal +1d6 bonus damage on every hit. Lasts the whole encounter. Casting another concentration spell (like Ensnaring Strike) ends it.",
+    ensnaring_strike: "Ensnaring Strike (1st level, Concentration). On your next hit, thorny vines erupt — the target must make a STR save or become Ensnared (restrained, takes 1d6 piercing/turn). Tap to cancel before attacking.",
   };
 
   const tooltipShownRef = useRef(false);
@@ -2111,6 +2220,18 @@ export default function Arena() {
   // ── Hunter's Mark handler (works as both pre-bonus and post-action bonus) ──
   const handleHuntersMark = useCallback(async () => {
     if (!activeEncounter) return;
+    // Concentration conflict check
+    const myS = activeEncounter.participants[user.id];
+    if (myS?.concentration && myS.concentration.spellId !== 'hunters_mark') {
+      const currentName = CONCENTRATION_SPELL_NAMES[myS.concentration.spellId] || myS.concentration.spellId;
+      setConcentrationConflict({
+        currentSpell: currentName,
+        newSpell: "Hunter's Mark",
+        onConfirm: () => handleHuntersMark(),
+      });
+      return;
+    }
+    setEnsnaringStrikeToggle(false);
     const endpoint = bonusActionPhase
       ? `/api/encounters/${activeEncounter.id}/bonus-action`
       : `/api/encounters/${activeEncounter.id}/pre-bonus-action`;
@@ -2132,6 +2253,22 @@ export default function Arena() {
     }
   }, [activeEncounter, bonusActionPhase]);
 
+  // ── Drop Concentration handler (voluntarily end Hunter's Mark / Ensnaring Strike) ──
+  const handleDropConcentration = useCallback(async () => {
+    if (!activeEncounter) return;
+    try {
+      playSound('buttonTap');
+      const res = await api(`/api/encounters/${activeEncounter.id}/drop-concentration`, {
+        method: 'POST',
+      });
+      if (res.error) {
+        console.error('Drop concentration failed:', res.error);
+      }
+    } catch (err) {
+      console.error('Failed to drop concentration:', err);
+    }
+  }, [activeEncounter]);
+
   // ── Fist of Unbroken Air handler (Way of the Four Elements, main action, 2 ki) ──
   const handleFistOfUnbrokenAir = useCallback(async () => {
     if (actionChosen || !activeEncounter || rollActiveRef.current) return;
@@ -2152,12 +2289,11 @@ export default function Arena() {
 
       // Roll 3d10 damage (visible dice — golden ki color)
       setRollPhase('damage_roll');
+      playArenaSound('fistOfUnbrokenAir');
       const { total: rawDamage } = await requestServerRoll(
         '3d10', 0, '#f0c040', saved ? `${pName} — half damage` : `${pName} — full damage!`, myDiceColorset
       );
       const damageTotal = saved ? Math.floor(rawDamage / 2) : rawDamage;
-
-      playArenaSound('fistOfUnbrokenAir');
       if (damageTotal >= 20) playArenaSound('bigDamage');
 
       const dmgOverlay = {
@@ -2168,7 +2304,7 @@ export default function Arena() {
         newHp: Math.max(0, monsterData.currentHp - damageTotal),
         attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
         defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
-        sounds: damageTotal >= 20 ? ['fistOfUnbrokenAir', 'bigDamage'] : ['fistOfUnbrokenAir'],
+        sounds: damageTotal >= 20 ? ['bigDamage'] : [],
       };
       broadcastRollResult(dmgOverlay);
       await showRollResult(dmgOverlay);
@@ -2270,11 +2406,11 @@ export default function Arena() {
           const weaponNotation = isNat20 ? doubleDice(baseDmgNotation) : baseDmgNotation;
           const critLabel = isNat20 ? `${pName} crits!` : `${pName} rolls damage`;
 
+          playArenaSound('damageImpact');
           const { total: dmgTotal } = await requestServerRoll(
             weaponNotation, unarmed.damageMod, '#f0c040', critLabel, myDiceColorset
           );
           damageTotal = dmgTotal;
-          playArenaSound('damageImpact');
 
           const dmgOverlay = {
             type: 'damage',
@@ -2284,7 +2420,7 @@ export default function Arena() {
             newHp: Math.max(0, monsterData.currentHp - damageTotal),
             attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
             defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
-            sounds: ['damageImpact'],
+            sounds: [],
           };
           broadcastRollResult(dmgOverlay);
           await showRollResult(dmgOverlay);
@@ -2463,6 +2599,18 @@ export default function Arena() {
 
   const handleCastSpell = useCallback(async (spell) => {
     if (!activeEncounter || rollActiveRef.current) return;
+    // Concentration conflict check
+    const myS = activeEncounter.participants[user.id];
+    if (spell.concentration && myS?.concentration && myS.concentration.spellId !== spell.id) {
+      setSpellModalOpen(false);
+      const currentName = CONCENTRATION_SPELL_NAMES[myS.concentration.spellId] || myS.concentration.spellId;
+      setConcentrationConflict({
+        currentSpell: currentName,
+        newSpell: spell.name,
+        onConfirm: () => handleCastSpell(spell),
+      });
+      return;
+    }
     setSpellModalOpen(false);
     setCastingSpell(spell);
     setActionChosen('cast_spell');
@@ -2493,17 +2641,17 @@ export default function Arena() {
       // Step 3: If save failed, roll damage
       if (!saved) {
         setRollPhase('spell_damage_roll');
+        // Electric sound plays on damage; mockery already played on save result
+        playArenaSound(isElectric ? 'electricSpell' : 'damageImpact');
         const { total: dmgTotal } = await requestServerRoll(
           spell.damageDice, 0, '#eab308', `${spell.name} damage`, myDiceColorset
         );
         damageTotal = dmgTotal;
-        // Electric sound plays on damage; mockery already played on save result
-        playArenaSound(isElectric ? 'electricSpell' : 'damageImpact');
         if (damageTotal >= 20 && damageTotal < 30) playArenaSound('bigDamage');
         if (damageTotal >= 30) playArenaSound('massiveDamage');
 
         // Show damage overlay
-        const spellDmgSounds = [isElectric ? 'electricSpell' : 'damageImpact'];
+        const spellDmgSounds = [];
         if (damageTotal >= 20 && damageTotal < 30) spellDmgSounds.push('bigDamage');
         if (damageTotal >= 30) spellDmgSounds.push('massiveDamage');
         const dmgOverlay = {
@@ -2705,6 +2853,7 @@ export default function Arena() {
         const weaponNotation = isNat20 ? doubleDice(baseDmgNotation) : baseDmgNotation;
         const critLabel = isNat20 ? `${pName} crits!` : `${pName} rolls damage`;
 
+        playArenaSound('damageImpact');
         const { total: dmgTotal } = await requestServerRoll(
           weaponNotation, dmgMod, '#eab308', critLabel, myDiceColorset
         );
@@ -2728,12 +2877,10 @@ export default function Arena() {
             playArenaSound('crowdCheer');
           }
         }
-
-        playArenaSound('damageImpact');
         if (damageTotal >= 20 && damageTotal < 30) playArenaSound('bigDamage');
         if (damageTotal >= 30) playArenaSound('massiveDamage');
 
-        const offhandDmgSounds = ['damageImpact'];
+        const offhandDmgSounds = [];
         if (damageTotal >= 20 && damageTotal < 30) offhandDmgSounds.push('bigDamage');
         if (damageTotal >= 30) offhandDmgSounds.push('massiveDamage');
         if (sneakAttackData) offhandDmgSounds.push('crowdCheer');
@@ -2819,7 +2966,20 @@ export default function Arena() {
       className: 'arena-ability-btn-ensnaring',
       icon: '\u{1FAB4}',
       label: 'Ensnaring Strike',
-      onClick: () => { playSound('buttonTap'); handleEnsnaringStrike(); },
+      onClick: () => {
+        playSound('buttonTap');
+        const myS = activeEncounter?.participants[user?.id];
+        if (myS?.concentration && myS.concentration.spellId !== 'ensnaring_strike') {
+          const currentName = CONCENTRATION_SPELL_NAMES[myS.concentration.spellId] || myS.concentration.spellId;
+          setConcentrationConflict({
+            currentSpell: currentName,
+            newSpell: 'Ensnaring Strike',
+            onConfirm: () => { setEnsnaringStrikeToggle(true); setAbilitiesOpen(false); },
+          });
+          return;
+        }
+        setEnsnaringStrikeToggle(true); setAbilitiesOpen(false);
+      },
     },
     hunters_mark: {
       className: 'arena-ability-btn-hunters-mark',
@@ -3172,6 +3332,11 @@ export default function Arena() {
                       {c.icon}
                     </span>
                   ))}
+                  {p.inspirationDie && !p.knockedOut && (
+                    <span className="arena-badge arena-badge-inspiration" title={`Bardic Inspiration (${p.inspirationDie})`}>
+                      {'\uD83C\uDFB5'}
+                    </span>
+                  )}
                 </div>
               );
             })}
@@ -3195,7 +3360,7 @@ export default function Arena() {
                   {c.icon}
                 </span>
               ))}
-              {activeEncounter?.participants && Object.values(activeEncounter.participants).some(p => p.huntersMarkActive) && (
+              {myStats?.huntersMarkActive && !(ensnaringStrikeToggle && actionChosen) && (
                 <span className="arena-badge arena-badge-hunters-mark" title="Hunter's Mark — taking +1d6 bonus damage">
                   {'\uD83C\uDFAF'}
                 </span>
@@ -3322,7 +3487,6 @@ export default function Arena() {
                   ) : (
                     (p.name || '?')[0].toUpperCase()
                   )}
-                  {p.inspirationDie && <span className="arena-inspiration-badge">{'\uD83C\uDFB5'}</span>}
                 </div>
               );
             })}
@@ -3595,14 +3759,55 @@ export default function Arena() {
                   </button>
                 </div>
 
-                {/* Active Ensnaring Strike buff indicator (always visible, outside drawer) */}
-                {myStats?.ensnaringStrikeActive && (
-                  <div className="arena-buff-indicator">
-                    {'\u{1FAB4}'} Ensnaring Strike active — next hit will trigger!
+                {/* Concentration banner */}
+                {myStats?.concentration && !ensnaringStrikeToggle && (
+                  <div
+                    className="arena-concentration-banner"
+                    onTouchStart={() => startTooltip(myStats.concentration.spellId === 'hunters_mark' ? 'hunters_mark' : myStats.concentration.spellId === 'ensnaring_strike' ? 'ensnaring_strike' : 'concentration')}
+                    onTouchEnd={cancelTooltip}
+                    onTouchCancel={cancelTooltip}
+                    onMouseDown={() => startTooltip(myStats.concentration.spellId === 'hunters_mark' ? 'hunters_mark' : myStats.concentration.spellId === 'ensnaring_strike' ? 'ensnaring_strike' : 'concentration')}
+                    onMouseUp={cancelTooltip}
+                    onMouseLeave={cancelTooltip}
+                  >
+                    {'\uD83D\uDD2E'} Concentrating: {CONCENTRATION_SPELL_NAMES[myStats.concentration.spellId] || myStats.concentration.spellId}{myStats.concentration.spellId === 'hunters_mark' ? ' — +1d6 per hit' : ''}
                   </div>
                 )}
-                {myStats?.huntersMarkActive && (
-                  <div className="arena-buff-indicator arena-buff-indicator-hunters-mark">
+
+                {/* Ensnaring Strike buff indicator — client toggle (pre-attack) or server state (post-attack) */}
+                {(ensnaringStrikeToggle || myStats?.ensnaringStrikeActive) && (
+                  <div
+                    className="arena-buff-indicator"
+                    onClick={() => {
+                      if (tooltipShownRef.current) return;
+                      playSound('buttonTap');
+                      if (ensnaringStrikeToggle) {
+                        setEnsnaringStrikeToggle(false);
+                      } else {
+                        handleDropConcentration();
+                      }
+                    }}
+                    onTouchStart={() => startTooltip('ensnaring_strike')}
+                    onTouchEnd={cancelTooltip}
+                    onTouchCancel={cancelTooltip}
+                    onMouseDown={() => startTooltip('ensnaring_strike')}
+                    onMouseUp={cancelTooltip}
+                    onMouseLeave={cancelTooltip}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {'\u{1FAB4}'} Ensnaring Strike active — tap to cancel
+                  </div>
+                )}
+                {myStats?.huntersMarkActive && !ensnaringStrikeToggle && !myStats?.concentration && (
+                  <div
+                    className="arena-buff-indicator arena-buff-indicator-hunters-mark"
+                    onTouchStart={() => startTooltip('hunters_mark')}
+                    onTouchEnd={cancelTooltip}
+                    onTouchCancel={cancelTooltip}
+                    onMouseDown={() => startTooltip('hunters_mark')}
+                    onMouseUp={cancelTooltip}
+                    onMouseLeave={cancelTooltip}
+                  >
                     {'\uD83C\uDFAF'} Hunter's Mark active — +1d6 damage per hit
                   </div>
                 )}
@@ -3724,6 +3929,8 @@ export default function Arena() {
                     {(myStats?.availablePreBonusActions || []).map(action => {
                       const config = preBonusActionConfig[action.type];
                       if (!config) return null;
+                      // Hide Ensnaring Strike when already toggled on
+                      if (action.type === 'ensnaring_strike' && ensnaringStrikeToggle) return null;
                       return (
                         <button key={action.type} className={`arena-ability-btn ${config.className}`}
                           onClick={config.onClick}
@@ -4027,6 +4234,30 @@ export default function Arena() {
                     <div className="arena-spell-card-desc">{spell.description}</div>
                   </button>
                 ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Concentration Conflict Modal */}
+        {concentrationConflict && (
+          <div className="arena-potion-overlay" onClick={() => setConcentrationConflict(null)}>
+            <div className="arena-potion-modal arena-concentration-modal" onClick={e => e.stopPropagation()}>
+              <div className="arena-potion-header">
+                <span>{'\uD83D\uDD2E'} Concentration Conflict</span>
+                <button className="arena-potion-close" onClick={() => setConcentrationConflict(null)}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+              <div className="arena-concentration-conflict-body">
+                <p>You're concentrating on <strong>{concentrationConflict.currentSpell}</strong>.</p>
+                <p>Casting <strong>{concentrationConflict.newSpell}</strong> will end it.</p>
+              </div>
+              <div className="arena-concentration-conflict-actions">
+                <button className="arena-concentration-btn-cancel" onClick={() => setConcentrationConflict(null)}>Cancel</button>
+                <button className="arena-concentration-btn-confirm" onClick={() => { setConcentrationConflict(null); concentrationConflict.onConfirm(); }}>Cast Anyway</button>
               </div>
             </div>
           </div>

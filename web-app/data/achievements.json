@@ -44,7 +44,7 @@
     "high_roller": "2026-02-24T04:33:01.039Z",
     "new_set": {
       "at": "2026-02-26T06:56:31.849Z",
-      "claimed": false
+      "claimed": "2026-02-28T08:37:43.063Z"
     }
   },
   "228241331296665600": {
@@ -143,6 +143,22 @@
     "finishing_blow": "2026-02-18T03:06:57.886Z",
     "wolf_hunter": "2026-02-18T03:06:57.916Z",
     "bone_breaker": "2026-02-18T03:28:26.954Z",
-    "alpha_predator": "2026-02-18T03:37:06.585Z"
+    "alpha_predator": "2026-02-18T03:37:06.585Z",
+    "roll_initiative": {
+      "at": "2026-02-28T07:51:16.641Z",
+      "claimed": false
+    },
+    "gladiator": {
+      "at": "2026-02-28T07:51:16.641Z",
+      "claimed": false
+    },
+    "dice_goblin": {
+      "at": "2026-02-28T08:04:30.079Z",
+      "claimed": false
+    },
+    "monster_slayer": {
+      "at": "2026-02-28T08:05:33.030Z",
+      "claimed": false
+    }
   }
 }

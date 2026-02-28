@@ -114,11 +114,45 @@ function AttackResult({ data, onDismiss }) {
 }
 
 function SpellSaveResult({ data, onDismiss }) {
-  const { spellName, saveAbility, saveRoll, saveBonus, saveTotal, saveDC, saved, attacker, defender } = data;
+  const { spellName, saveAbility, saveRoll, saveBonus, saveTotal, saveDC, saved, attacker, defender, isConcentration } = data;
+
+  const bonusStr = saveBonus >= 0 ? `+${saveBonus}` : `${saveBonus}`;
+
+  if (isConcentration) {
+    const resultText = saved ? 'MAINTAINED!' : 'BROKEN!';
+    const resultClass = saved ? 'rro-saved' : 'rro-failed';
+
+    return (
+      <div className={`rro-backdrop ${saved ? '' : 'rro-backdrop-spell'}`} onClick={onDismiss}>
+        <div className="rro-content">
+          <div className="rro-con-save-header">
+            <div className="rro-con-save-label">Concentration</div>
+            <div className="rro-spell-name">{spellName}</div>
+          </div>
+          <div className="rro-con-save-versus">
+            <div className="rro-con-save-side rro-fly-left">
+              <div className="rro-con-save-big-number rro-spell-dc">DC {saveDC}</div>
+              <div className="rro-con-save-sub">{saveAbility} Save</div>
+            </div>
+            <div className="rro-con-save-avatar-center">
+              <Avatar src={defender?.avatar} name={defender?.name} />
+              <div className="rro-con-save-name">{defender?.name}</div>
+            </div>
+            <div className="rro-con-save-side rro-fly-right">
+              <div className="rro-con-save-big-number">{saveTotal}</div>
+              <div className="rro-con-save-sub">{saveRoll} {bonusStr} {saveAbility}</div>
+            </div>
+          </div>
+          <div className={`rro-result ${resultClass}`}>
+            {resultText}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const resultText = saved ? 'SAVED!' : 'FAILED!';
   const resultClass = saved ? 'rro-saved' : 'rro-failed';
-  const bonusStr = saveBonus >= 0 ? `+${saveBonus}` : `${saveBonus}`;
 
   return (
     <div className={`rro-backdrop ${!saved ? 'rro-backdrop-spell' : ''}`} onClick={onDismiss}>
@@ -167,7 +201,7 @@ function DamageResult({ data, onDismiss }) {
 
   // Result banner text and style
   const bannerClass = hasSmite ? 'rro-smite' : hasSneakAttack ? 'rro-sneak-attack' : hasHuntersMark ? 'rro-hunters-mark' : isCrit ? 'rro-crit' : 'rro-hit';
-  const bannerText = hasSmite ? 'DIVINE SMITE!' : hasSneakAttack ? 'SNEAK ATTACK!' : hasHuntersMark ? "HUNTER'S MARK!" : isCrit ? 'CRITICAL DAMAGE!' : `${damage} DAMAGE`;
+  const bannerText = hasSmite ? 'DIVINE SMITE!' : hasSneakAttack ? 'SNEAK ATTACK!' : isCrit ? 'CRITICAL DAMAGE!' : `${damage} DAMAGE`;
   const backdropClass = hasSmite ? 'rro-backdrop-smite' : hasSneakAttack ? 'rro-backdrop-sneak' : hasHuntersMark ? 'rro-backdrop-hunters-mark' : '';
 
   return (

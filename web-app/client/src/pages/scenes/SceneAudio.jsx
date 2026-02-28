@@ -20,6 +20,7 @@ export function SceneAudio({ config, enabled = true }) {
   const cleanupRef = useRef(null);
   const configRef = useRef(config);
   configRef.current = config;
+  const activeRef = useRef(true);
 
   // Stable key so the effect only re-runs when config *content* changes
   const configKey = config ? JSON.stringify(config) : '';
@@ -29,16 +30,21 @@ export function SceneAudio({ config, enabled = true }) {
     setSceneMuted(muted);
   }, [muted]);
 
-  // Main config effect — plays new config when content changes
+  // Main config effect — plays new config when content changes.
+  // playSceneConfig already handles stopping old audio with crossfade internally,
+  // so this cleanup does NOT call stopAll/clearBufferCache — that only happens
+  // on unmount (see separate effect below). This prevents the race condition where
+  // cleanup kills audio that the next config's playSceneConfig is trying to start.
   useEffect(() => {
-    if (!configKey || !enabled) return;
+    console.warn('[SceneAudio] Effect fired', { configKey, enabled });
+    if (!configKey || !enabled) { console.warn('[SceneAudio] Skipping — no config or disabled'); return; }
 
-    let active = true;
+    activeRef.current = true;
 
     // Play the new config (engine handles stopping old audio with crossfade)
     playSceneConfig(configRef.current, { muted: mutedRef.current })
       .then(cleanup => {
-        if (!active) { cleanup(); return; }
+        if (!activeRef.current) { console.warn('[SceneAudio] Effect cleanup ran before play resolved — stopping'); cleanup(); return; }
         cleanupRef.current = cleanup;
       })
       .catch(err => console.warn('[SceneAudio] Play error:', err));
@@ -67,10 +73,10 @@ export function SceneAudio({ config, enabled = true }) {
       } else {
         // Mic off — wait for iOS to release the audio session, then replay
         const t = setTimeout(() => {
-          if (!active) return;
+          if (!activeRef.current) return;
           playSceneConfig(configRef.current, { muted: mutedRef.current })
             .then(cleanup => {
-              if (!active) { cleanup(); return; }
+              if (!activeRef.current) { cleanup(); return; }
               cleanupRef.current = cleanup;
             })
             .catch(() => {});
@@ -85,22 +91,38 @@ export function SceneAudio({ config, enabled = true }) {
     window.addEventListener('speech-recognition-change', onSpeechChange);
 
     return () => {
-      active = false;
+      console.warn('[SceneAudio] Config change cleanup', { configKey });
+      activeRef.current = false;
       timers.forEach(clearTimeout);
-      stopAll(300);
-      // Free decoded AudioBuffers from this location's scene audio.
-      // Each decoded buffer is uncompressed PCM (20-150MB). Without this,
-      // visiting multiple locations accumulates 1GB+ of audio in memory
-      // which crashes iPhones. Buffers are re-loaded during the next
-      // location's transition via preloadAudio, so no cold-start penalty.
-      clearBufferCache();
       cleanupRef.current = null;
+      // Free old buffers but keep any URLs the incoming config needs.
+      // configRef.current already points to the NEW config (refs update
+      // during render, before cleanup runs), so we preserve those buffers
+      // to avoid re-fetching. This prevents buffer accumulation without
+      // the race condition that stopAll + clearBufferCache caused.
+      const keepUrls = [];
+      const next = configRef.current;
+      if (next?.music) keepUrls.push(next.music.src);
+      if (next?.ambient) next.ambient.forEach(a => keepUrls.push(a.src));
+      clearBufferCache(keepUrls);
       document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('blur', onBlur);
       window.removeEventListener('focus', onFocus);
       window.removeEventListener('speech-recognition-change', onSpeechChange);
     };
   }, [configKey, enabled]);
+
+  // Unmount-only cleanup: free buffer memory.
+  // Don't call stopAll here — it increments _generation which can make
+  // the NEXT SceneAudio's in-flight playSceneConfig go stale (e.g. arena
+  // unmounts while dojo's SceneAudio is loading buffers). playSceneConfig
+  // already calls stopAll internally, so old sources get cleaned up.
+  useEffect(() => {
+    return () => {
+      console.warn('[SceneAudio] Unmount cleanup — clearing buffer cache');
+      clearBufferCache();
+    };
+  }, []);
 
   return null;
 }

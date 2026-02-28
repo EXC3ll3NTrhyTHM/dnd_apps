@@ -4,18 +4,18 @@
     "avatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
     "displayName": "excellentrhythm",
     "lastReadTimestamps": {
-      "dragons_hollow": "2026-02-28T01:15:16.293Z",
+      "dragons_hollow": "2026-02-28T09:01:30.630Z",
       "the_barracks": "2026-02-27T03:37:04.445Z",
       "the_veil": "2026-02-27T05:02:23.597Z",
       "the_collective": "2026-02-26T07:30:34.131Z",
-      "the_dojo": "2026-02-28T01:08:01.618Z",
+      "the_dojo": "2026-02-28T03:49:11.400Z",
       "the_cottage": "2026-02-27T05:01:40.930Z",
       "marcel_dm_424061511833747467": "2026-02-27T05:01:52.276Z",
       "marcel_dm_228241331296665600": "2026-02-18T02:30:01.606Z",
       "marcel_dm_765978025937469481": "2026-02-13T19:44:42.005Z"
     },
     "pushDesired": true,
-    "lastSeen": "2026-02-28T01:15:15.338Z",
+    "lastSeen": "2026-02-28T09:03:10.220Z",
     "lastLocation": "dragons_hollow",
     "sprite": "the_architect_sprite.webp",
     "ownedDice": [
@@ -28,7 +28,7 @@
       "fire",
       "psychic"
     ],
-    "equippedDice": "black",
+    "equippedDice": "psychic",
     "favoriteEmotes": [
       "flexed_biceps",
       "screaming",
@@ -45,7 +45,7 @@
       "the_dojo": "2026-02-28T01:08:03.962Z",
       "the_collective": "2026-02-28T01:03:10.332Z",
       "the_veil": "2026-02-28T01:03:21.936Z",
-      "dragons_hollow": "2026-02-28T01:15:20.505Z",
+      "dragons_hollow": "2026-02-28T02:41:55.076Z",
       "marcel_dm_228241331296665600": "2026-02-28T01:25:55.537Z"
     },
     "mutedChannels": [
@@ -53,8 +53,8 @@
       "the_dojo",
       "dragons_hollow"
     ],
-    "lastSeen": "2026-02-28T01:25:53.231Z",
-    "lastLocation": "marcel_dm_228241331296665600",
+    "lastSeen": "2026-02-28T02:41:55.018Z",
+    "lastLocation": "dragons_hollow",
     "sprite": "acacia_sprite.webp",
     "pushDesired": true,
     "ownedDice": [
@@ -73,13 +73,13 @@
     "characterName": "Nalyd",
     "avatar": "https://cdn.discordapp.com/avatars/1073385140669128725/51ac15ff7014507f61f37b076668f847.png",
     "sprite": "nalyd_sprite.webp?v=20260217",
-    "lastSeen": "2026-02-26T06:04:51.057Z",
+    "lastSeen": "2026-02-28T08:12:19.285Z",
     "lastLocation": "dragons_hollow",
     "lastReadTimestamps": {
       "the_dojo": "2026-02-26T06:02:40.638Z",
       "the_barracks": "2026-02-14T19:28:44.597Z",
       "the_collective": "2026-02-14T19:29:02.620Z",
-      "dragons_hollow": "2026-02-26T06:04:41.188Z"
+      "dragons_hollow": "2026-02-28T08:12:22.933Z"
     },
     "displayName": "Smok3y"
   },
@@ -99,8 +99,8 @@
   },
   "1472286665417560167": {
     "avatar": "https://cdn.discordapp.com/embed/avatars/5.png",
-    "lastSeen": "2026-02-27T03:49:38.163Z",
-    "lastLocation": "the_cottage",
+    "lastSeen": "2026-02-28T09:01:13.760Z",
+    "lastLocation": "the_arena",
     "lastReadTimestamps": {
       "dragons_hollow": "2026-02-27T02:52:44.231Z",
       "the_dojo": "2026-02-26T07:07:52.285Z",

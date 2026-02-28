@@ -441,6 +441,7 @@ export function useEncounterEvents(locationId, userId) {
   const [monsterRollRequest, setMonsterRollRequest] = useState(null);
   const [monsterSaveRequest, setMonsterSaveRequest] = useState(null);
   const [monsterEscapeRequest, setMonsterEscapeRequest] = useState(null);
+  const [conSaveRequest, setConSaveRequest] = useState(null);
   // monsterId → { encounterId, participantCount, currentHp, maxHp }
   const [encounterMap, setEncounterMap] = useState({});
   // Initiative tracking
@@ -535,6 +536,7 @@ export function useEncounterEvents(locationId, userId) {
         break;
 
       case 'encounter_action':
+      case 'encounter_update':
         if (isMyEncounter) setEncounter(payload.encounter);
         break;
 
@@ -595,6 +597,7 @@ export function useEncounterEvents(locationId, userId) {
           setMonsterRollRequest(null);
           setMonsterSaveRequest(null);
           setMonsterEscapeRequest(null);
+          setConSaveRequest(null);
         }
         break;
 
@@ -701,6 +704,7 @@ export function useEncounterEvents(locationId, userId) {
         setMonsterRollRequest(null);
         setMonsterSaveRequest(null);
         setMonsterEscapeRequest(null);
+        setConSaveRequest(null);
         const monsterMsgs = (payload.attacks || []).map((a, i) => ({
           id: `enc_monster_${i}_${Date.now()}`,
           role: 'system',
@@ -811,6 +815,40 @@ export function useEncounterEvents(locationId, userId) {
         break;
       }
 
+      case 'encounter_con_save_needed':
+        if (isMyEncounter) {
+          if (payload.encounter) setEncounter(payload.encounter);
+          setConSaveRequest({
+            encounterId: payload.encounterId,
+            pendingConSaves: payload.pendingConSaves,
+          });
+        }
+        break;
+
+      case 'encounter_con_save_results': {
+        updateMapFromEncounter(payload.encounter);
+        if (!isMyEncounter) break;
+        if (payload.encounter) setEncounter(payload.encounter);
+        setConSaveRequest(null);
+        // Narrate concentration save results
+        const conSaveMsgs = (payload.conSaveResults || []).map((cs, i) => ({
+          id: `enc_consave_result_${i}_${Date.now()}`,
+          role: 'system',
+          type: 'encounter',
+          subtype: 'combat',
+          text: cs.conSave
+            ? (cs.broken
+              ? `${cs.playerName} CON save: **${cs.conSave.total}** (${cs.conSave.roll}+${cs.conSave.conMod}) vs DC ${cs.conSave.dc} — **Failed!** Concentration on **${cs.spellName}** is broken!`
+              : `${cs.playerName} CON save: **${cs.conSave.total}** (${cs.conSave.roll}+${cs.conSave.conMod}) vs DC ${cs.conSave.dc} — **Saved!** Maintains concentration on **${cs.spellName}**.`)
+            : `${cs.playerName}'s concentration on **${cs.spellName}** is broken!`,
+          timestamp: new Date().toISOString(),
+        }));
+        if (conSaveMsgs.length > 0) {
+          setNarrations(prev => [...prev, ...conSaveMsgs]);
+        }
+        break;
+      }
+
       case 'encounter_new_round':
         updateMapFromEncounter(payload.encounter);
         if (isMyEncounter) {
@@ -818,6 +856,7 @@ export function useEncounterEvents(locationId, userId) {
           setMonsterRollRequest(null);
           setMonsterSaveRequest(null);
           setMonsterEscapeRequest(null);
+          setConSaveRequest(null);
         }
         break;
 
@@ -905,6 +944,7 @@ export function useEncounterEvents(locationId, userId) {
         setMonsterRollRequest(null);
         setMonsterSaveRequest(null);
         setMonsterEscapeRequest(null);
+        setConSaveRequest(null);
         setInitiativeResults({});
         setCurrentTurn(null);
         // Keep encounter alive for victory/defeat so the battle screen
@@ -982,6 +1022,10 @@ export function useEncounterEvents(locationId, userId) {
     setMonsterEscapeRequest(null);
   }, []);
 
+  const clearConSaveRequest = useCallback(() => {
+    setConSaveRequest(null);
+  }, []);
+
   return {
     encounter, setEncounter,
     encounterMap, initEncounterMap,
@@ -990,6 +1034,7 @@ export function useEncounterEvents(locationId, userId) {
     monsterRollRequest, clearMonsterRollRequest,
     monsterSaveRequest, clearMonsterSaveRequest,
     monsterEscapeRequest, clearMonsterEscapeRequest,
+    conSaveRequest, clearConSaveRequest,
     initiativeResults, setInitiativeResults,
     currentTurn, setCurrentTurn,
   };

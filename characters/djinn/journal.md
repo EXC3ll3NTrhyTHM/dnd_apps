@@ -29,3 +29,5 @@
 [2026-02-11] Today, I had the honor of bowing before Nalyd, our Grand Master, as we acknowledged his wisdom. Tyren's respectful gesture towards the Warriors reminded us of the strength within our community, and I wished him a safe journey as he departed, eager for the tales he would bring back.
 
 [2026-02-12] Today, I had the honor of joining Grand Master Nalyd for a splendid squid and seafood feast. Surrounded by laughter and shared stories, I felt the warmth of camaraderie envelop us, a reminder of the bonds we forge through our journeys together.
+
+[2026-02-28] Today, I spoke with Nalyd about his plans and the looming threat of a demon targeting Ximena. I assured him of my commitment to keep her safe, though I anticipate her displeasure when she learns of the decision I must make to protect her.

@@ -70,6 +70,7 @@ function MentionToast({ mention, onDismiss }) {
 export default function App() {
   const { user, loading, fetchMe } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const playSound = useUiSounds();
   const [toast, setToast] = useState(null);
   const [levelUp, setLevelUp] = useState(null);
@@ -78,6 +79,15 @@ export default function App() {
   const toastTimer = useRef(null);
   const reconnectTimer = useRef(null);
   const locationRef = useRef(null);
+
+  // Always open to map on fresh app launch (not a location route left over
+  // from a previous session — the hash persists across PWA restarts on iOS).
+  useEffect(() => {
+    if (location.pathname.startsWith('/location/')) {
+      navigate('/map', { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Keep locationRef in sync so WS callbacks always have current value
   const getCurrentLocation = useCallback(() => {
