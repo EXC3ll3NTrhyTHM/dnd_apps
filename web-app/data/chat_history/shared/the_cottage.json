@@ -606,5 +606,108 @@
     "text": "*My eyes widen in playful disbelief* An ogre? Just another day, huh? I overheard some merchants grumbling about the Gilded Chain and their latest schemes. You know how they love to twist the knife. But seriously, Ace, you're fighting ogres now? What's next, dragons?",
     "emotion": "surprised",
     "timestamp": "2026-02-19T06:54:28.023Z"
+  },
+  {
+    "id": "a4caef05-4974-4568-ad27-a09101886a1d",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "1472286665417560167",
+    "playerName": "The mini Architect",
+    "playerAvatar": "https://cdn.discordapp.com/embed/avatars/5.png",
+    "notation": "1d6+1d8+1d10+1d20",
+    "rolls": [
+      5,
+      4,
+      7,
+      14
+    ],
+    "total": 30,
+    "kept": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-27T02:47:19.443Z"
+  },
+  {
+    "id": "c47f1405-c552-472b-b666-0bb0c4081134",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "1472286665417560167",
+    "playerName": "The mini Architect",
+    "playerAvatar": "https://cdn.discordapp.com/embed/avatars/5.png",
+    "notation": "1d6+1d8+1d10+1d20",
+    "rolls": [
+      2,
+      1,
+      4,
+      8
+    ],
+    "total": 15,
+    "kept": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-27T02:47:28.571Z"
+  },
+  {
+    "id": "86c45724-fe63-4fc4-b63c-b4a97959ff6b",
+    "role": "player",
+    "type": "dice_roll",
+    "userId": "1472286665417560167",
+    "playerName": "The mini Architect",
+    "playerAvatar": "https://cdn.discordapp.com/embed/avatars/5.png",
+    "notation": "1d4+1d6+1d8+1d10+1d12+1d20",
+    "rolls": [
+      2,
+      5,
+      4,
+      3,
+      5,
+      18
+    ],
+    "total": 37,
+    "kept": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "modifier": 0,
+    "timestamp": "2026-02-27T02:47:41.862Z"
+  },
+  {
+    "id": "560a1062-3d73-4ad0-976c-5c4be54c61b2",
+    "role": "player",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "text": "Hi",
+    "timestamp": "2026-02-27T03:31:18.838Z",
+    "reactions": {
+      "👍": [
+        "424061511833747467"
+      ]
+    }
+  },
+  {
+    "id": "5a7698ff-f381-4775-b2a0-7fd58da090df",
+    "role": "player",
+    "type": "gif",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "gifUrl": "https://media1.giphy.com/media/zg6Bl65sbA7upxJkO5/200w.gif?cid=08b926b021kg8pn7mla4yhqauhlssojismy02835yqkyubmc&ep=v1_gifs_search&rid=200w.gif&ct=g",
+    "gifWidth": 200,
+    "gifHeight": 289,
+    "text": "Martial Arts Karate GIF by Norwalk Brew House",
+    "timestamp": "2026-02-27T03:31:55.324Z"
   }
 ]

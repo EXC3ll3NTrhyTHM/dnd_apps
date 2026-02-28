@@ -64,6 +64,16 @@ const SPELL_DEFINITIONS = {
     description: 'Thorny vines surround your weapon. On your next hit, the target must save or be restrained.',
     classes: ['Paladin', 'Ranger'],
   },
+  hunters_mark: {
+    name: "Hunter's Mark",
+    level: 1,
+    actionType: 'bonus',
+    effectType: 'buff_self',
+    concentration: true,
+    damageDice: '1d6',
+    description: 'You mark a creature as your quarry. You deal an extra 1d6 damage each time you hit it with a weapon attack.',
+    classes: ['Ranger'],
+  },
 };
 
 // ============================================
@@ -252,6 +262,7 @@ function joinEncounter(encounterId, userId, username, avatar, sprite) {
       // Concentration tracking
       concentration: null,
       ensnaringStrikeActive: false,
+      huntersMarkActive: false,
       // CON mod for concentration saves
       conMod: (() => {
         const con = sheet.stats?.find(s => s.abbr === 'CON');
@@ -427,6 +438,7 @@ function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll)
       // Concentration tracking
       concentration: null,
       ensnaringStrikeActive: false,
+      huntersMarkActive: false,
       // CON mod for concentration saves
       conMod: (() => {
         const con = sheet.stats?.find(s => s.abbr === 'CON');
@@ -685,6 +697,10 @@ function submitAction(encounterId, userId, action, rollData) {
     // Bardic Inspiration data (client decides to use after seeing roll)
     if (rollData.inspirationData) {
       player.inspirationData = rollData.inspirationData;
+    }
+    // Hunter's Mark bonus damage (client rolls 1d6 on hit)
+    if (rollData.huntersMarkData) {
+      player.huntersMarkData = rollData.huntersMarkData;
     }
     // Weapon selection — client sends weaponId to pick which weapon to use
     if (rollData.weaponId && player.weapons) {
@@ -947,6 +963,8 @@ function resolveSingleAction(encounter, userId) {
     let smiteDamage = 0;
     let sneakAttackApplied = false;
     let sneakAttackDamage = 0;
+    let huntersMarkApplied = false;
+    let huntersMarkDamage = 0;
     let ensnaringStrikeResult = null;
     let stunningStrikeResult = null;
 
@@ -1007,6 +1025,20 @@ function resolveSingleAction(encounter, userId) {
         }
       }
 
+      // Hunter's Mark bonus damage — extra 1d6 on each hit against marked target
+      if (player.huntersMarkActive && player.concentration?.spellId === 'hunters_mark') {
+        if (player.huntersMarkData && typeof player.huntersMarkData.damage === 'number') {
+          // Client-driven roll (from 3D dice overlay)
+          huntersMarkDamage = player.huntersMarkData.damage;
+        } else {
+          // Server-driven fallback
+          const hmResult = rollDamage('1d6');
+          huntersMarkDamage = hmResult.total;
+        }
+        damage += huntersMarkDamage;
+        huntersMarkApplied = true;
+      }
+
       encounter.monster.currentHp -= damage;
       player.totalDamage += damage;
 
@@ -1023,6 +1055,9 @@ function resolveSingleAction(encounter, userId) {
       }
       if (smiteApplied) {
         text += ` **DIVINE SMITE!** Holy radiant energy erupts from the blade!`;
+      }
+      if (huntersMarkApplied) {
+        text += ` **HUNTER'S MARK!** (+${huntersMarkDamage} damage)`;
       }
 
       // Ensnaring Strike trigger — on hit, force STR save, apply ensnared condition
@@ -1136,6 +1171,7 @@ function resolveSingleAction(encounter, userId) {
     delete player.inspirationData;
     delete player.ensnaringStrikeSaveRoll;
     delete player.stunningStrikeSaveRoll;
+    delete player.huntersMarkData;
 
     return {
       type: 'attack', userId, name: player.name,
@@ -1143,6 +1179,7 @@ function resolveSingleAction(encounter, userId) {
       total: totalAttack, hit, damage, isNat20, isNat1, text,
       smiteApplied, smiteDamage,
       sneakAttackApplied, sneakAttackDamage,
+      huntersMarkApplied, huntersMarkDamage,
       inspirationBonus, inspirationDie,
       ensnaringStrikeResult,
       stunningStrikeResult,
@@ -2095,6 +2132,7 @@ function applyDamageToPlayer(player, damage) {
       brokenConcentration = { ...player.concentration };
       player.concentration = null;
       player.ensnaringStrikeActive = false;
+      player.huntersMarkActive = false;
     }
     return { knocked: true, concentrationBroken, brokenConcentration, conSave };
   }
@@ -2113,6 +2151,7 @@ function applyDamageToPlayer(player, damage) {
       brokenConcentration = { ...player.concentration };
       player.concentration = null;
       player.ensnaringStrikeActive = false;
+      player.huntersMarkActive = false;
     }
   }
 
@@ -2529,8 +2568,9 @@ function getPublicState(encounter) {
       channelDivinityMax: p.channelDivinityMax || 0,
       channelDivinityUsed: p.channelDivinityUsed || 0,
       hasNaturesWrath: p.hasNaturesWrath || false,
-      // Concentration & Ensnaring Strike
+      // Concentration & buff states
       ensnaringStrikeActive: p.ensnaringStrikeActive || false,
+      huntersMarkActive: p.huntersMarkActive || false,
       concentration: p.concentration ? { spellId: p.concentration.spellId } : null,
       // Ki Points (Monk)
       hasKiPoints: p.hasKiPoints || false,
@@ -2948,6 +2988,19 @@ function getAvailableBonusActions(encounter, userId) {
     }
   }
 
+  // Hunter's Mark (Ranger bonus action concentration spell)
+  const hm = SPELL_DEFINITIONS.hunters_mark;
+  if (hm.classes.some(c => (player.classNames || []).includes(c)) && !player.huntersMarkActive) {
+    const hasSlot = (player.spellSlots || []).some(s => s.level >= hm.level && s.used < s.total);
+    if (hasSlot) {
+      actions.push({
+        type: 'hunters_mark',
+        spellName: hm.name,
+        description: hm.description,
+      });
+    }
+  }
+
   // Flurry of Blows (Monk, post-attack only — requires ki)
   if (player.hasKiPoints && player.kiPointsUsed < player.kiPointsMax && player.action === 'attack') {
     actions.push({
@@ -3104,6 +3157,19 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
         }
       }
 
+      // Hunter's Mark bonus damage on offhand hit
+      let huntersMarkApplied = false;
+      let huntersMarkDamage = 0;
+      if (player.huntersMarkActive && player.concentration?.spellId === 'hunters_mark') {
+        if (data.huntersMarkData && typeof data.huntersMarkData.damage === 'number') {
+          huntersMarkDamage = data.huntersMarkData.damage;
+        } else {
+          huntersMarkDamage = rollDamage('1d6').total;
+        }
+        damage += huntersMarkDamage;
+        huntersMarkApplied = true;
+      }
+
       encounter.monster.currentHp = Math.max(0, encounter.monster.currentHp - damage);
       player.totalDamage = (player.totalDamage || 0) + damage;
 
@@ -3115,6 +3181,9 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
 
       if (sneakAttackApplied) {
         text += ` **SNEAK ATTACK!** (+${sneakAttackDamage} damage)`;
+      }
+      if (huntersMarkApplied) {
+        text += ` **HUNTER'S MARK!** (+${huntersMarkDamage} damage)`;
       }
     } else {
       text = `**${player.name}** swings their ${player.weaponName} (offhand)...${advLabel} **${totalAttack}** vs AC ${encounter.monster.ac} — **Miss!**`;
@@ -3132,6 +3201,7 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
       advantageType,
       hit, damage, damageType: player.damageType,
       sneakAttackApplied, sneakAttackDamage,
+      huntersMarkApplied, huntersMarkDamage,
       monsterHp: encounter.monster.currentHp,
       monsterMaxHp: encounter.monster.maxHp,
       text,
@@ -3159,7 +3229,8 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
       }
     }
 
-    // Set the buff
+    // Clear old concentration buffs and set the new buff
+    player.huntersMarkActive = false;
     player.ensnaringStrikeActive = true;
     player.concentration = { spellId: 'ensnaring_strike', targetId: null, conditionId: null };
     player.bonusActionUsed = true;
@@ -3171,6 +3242,44 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
       name: player.name,
       spellName: spell.name,
       text: `**${player.name}** casts **Ensnaring Strike!** Thorny vines coil around their weapon, ready to ensnare the next target they hit.`,
+    };
+  }
+
+  // Hunter's Mark (Ranger — mark target for +1d6 per hit, concentration)
+  if (bonusAction === 'hunters_mark') {
+    const spell = SPELL_DEFINITIONS.hunters_mark;
+    if (!spell.classes.some(c => (player.classNames || []).includes(c))) {
+      return { error: "Your class cannot cast Hunter's Mark." };
+    }
+
+    // Consume spell slot
+    const slot = (player.spellSlots || []).find(s => s.level >= spell.level && s.used < s.total);
+    if (!slot) return { error: 'No spell slots remaining.' };
+    slot.used++;
+
+    // Break existing concentration (drop old condition from target)
+    if (player.concentration && player.concentration.conditionId) {
+      const oldTarget = player.concentration.targetId === 'monster'
+        ? encounter.monster
+        : encounter.participants[player.concentration.targetId];
+      if (oldTarget) {
+        removeCondition(oldTarget, player.concentration.conditionId);
+      }
+    }
+    // Clear old concentration buffs
+    player.ensnaringStrikeActive = false;
+
+    // Set the mark
+    player.huntersMarkActive = true;
+    player.concentration = { spellId: 'hunters_mark', targetId: 'monster', conditionId: null };
+    player.bonusActionUsed = true;
+
+    return {
+      type: 'hunters_mark',
+      userId,
+      name: player.name,
+      spellName: spell.name,
+      text: `**${player.name}** casts **Hunter's Mark!** A mystical brand marks **${encounter.monster.name}** as their quarry. All weapon attacks deal an extra 1d6 damage.`,
     };
   }
 

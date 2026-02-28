@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { getAudioMuted } from '../hooks/useAudioSettings';
-import { preloadBuffers } from '../lib/sceneAudioEngine';
+import { ensureContext } from '../hooks/useUiSounds';
+import { loadBuffer, preloadBuffers } from '../lib/sceneAudioEngine';
 import '../styles/location-transition.css';
 
 // Location-specific themes for the ink wash
@@ -14,6 +15,10 @@ const LOCATION_THEMES = {
     characterImage: '/images/kumo_gate.webp',
     characterPosition: 'right', // which side the character sits on
     sound: '/sounds/dojo/gong.mp3',
+    preloadAudio: [
+      '/sounds/dojo/shakuhachi.mp3',
+      '/sounds/dojo/wind-chimes.mp3',
+    ],
   },
   dragons_hollow: {
     inkColor: '#0c0a07',
@@ -42,6 +47,10 @@ const LOCATION_THEMES = {
     characterOffsetY: 200,
     sound: '/sounds/barracks/horn-of-gondor.mp3',
     soundVolume: 0.15,
+    preloadAudio: [
+      '/sounds/barracks/rohan-suite.mp3',
+      '/sounds/barracks/campfire.mp3',
+    ],
   },
   the_veil: {
     inkColor: '#08070a',
@@ -52,6 +61,9 @@ const LOCATION_THEMES = {
     sounds: [
       { src: '/sounds/veil/transition.mp3', volume: 0.6 },
       { src: '/sounds/veil/stone-slide-2.mp3', volume: 0.4, delay: 1400 },
+    ],
+    preloadAudio: [
+      '/sounds/veil/veil-ambient.mp3',
     ],
   },
   the_collective: {
@@ -66,6 +78,7 @@ const LOCATION_THEMES = {
     ],
     preloadAudio: [
       '/sounds/collective/throne-room-v2.mp3',
+      '/sounds/collective/quill-writing.mp3',
     ],
   },
   the_arena: {
@@ -90,6 +103,10 @@ const LOCATION_THEMES = {
       { src: '/sounds/cottage/birds.mp3', volume: 0.35 },
       { src: '/sounds/cottage/creek.mp3', volume: 0.2 },
     ],
+    preloadAudio: [
+      '/sounds/cottage/cottage-ambient.mp3',
+      '/sounds/cottage/fireplace.mp3',
+    ],
   },
 };
 
@@ -103,6 +120,20 @@ const DEFAULT_THEME = {
   characterPosition: 'right',
   sound: null,
 };
+
+/**
+ * Get all audio URLs that should be preloaded for a location's transition.
+ * Call this from the Map when user taps a marker so buffers are ready
+ * before they click Enter.
+ */
+export function getTransitionSoundUrls(locationId) {
+  const theme = LOCATION_THEMES[locationId];
+  if (!theme) return [];
+  const urls = [];
+  if (theme.sounds) theme.sounds.forEach(s => urls.push(s.src));
+  else if (theme.sound) urls.push(theme.sound);
+  return urls;
+}
 
 export default function LocationTransition({ locationId, locationName, onComplete }) {
   const [phase, setPhase] = useState('darken'); // darken -> reveal -> fade-out
@@ -123,83 +154,96 @@ export default function LocationTransition({ locationId, locationName, onComplet
     preloadBuffers(theme.preloadAudio);
   }, [theme.preloadAudio]);
 
-  // Play location-specific sound effect(s) — guarded so sounds only fire once
-  const soundPlayedRef = useRef(false);
-  useEffect(() => {
-    if (getAudioMuted()) return;
-    if (soundPlayedRef.current) return;
-    soundPlayedRef.current = true;
-
-    // Build list: support both single `sound` and layered `sounds` array
+  // Collect all transition sound URLs for this location
+  const soundEntries = (() => {
     const entries = [];
     if (theme.sounds) {
       theme.sounds.forEach(s => entries.push({ src: s.src, volume: s.volume ?? 0.3, delay: s.delay ?? 0 }));
     } else if (theme.sound) {
-      entries.push({ src: theme.sound, volume: theme.soundVolume ?? 0.3 });
+      entries.push({ src: theme.sound, volume: theme.soundVolume ?? 0.3, delay: 0 });
     }
-    if (entries.length === 0) return;
+    return entries;
+  })();
+
+  // Preload transition sounds into the buffer cache immediately on mount.
+  // loadBuffer() caches, so the play effect below gets instant cache hits.
+  useEffect(() => {
+    if (soundEntries.length === 0) return;
+    soundEntries.forEach(({ src }) => loadBuffer(src));
+  }, []);
+
+  // Play transition sound(s) via Web Audio API once buffers are ready.
+  // Uses the shared AudioContext from useUiSounds (already unlocked by user gesture)
+  // instead of new Audio() which Edge and iOS block.
+  const soundPlayedRef = useRef(false);
+  const sourceNodesRef = useRef([]);
+  useEffect(() => {
+    if (getAudioMuted()) return;
+    if (soundPlayedRef.current) return;
+    if (soundEntries.length === 0) return;
+    soundPlayedRef.current = true;
 
     const fadeIn = theme.soundFadeIn || 0;
     const fadeOut = theme.soundFadeOut || 0;
-    const FADE_STEP = 30; // ms per volume tick
+    let cancelled = false;
 
-    entries.forEach(({ src, volume, delay }) => {
-      const audio = new Audio();
-      const startVol = fadeIn > 0 ? 0 : volume;
-      audio.volume = startVol;
+    async function playEntry({ src, volume, delay }) {
+      const ctx = ensureContext();
+      if (!ctx || cancelled) return;
 
-      const startPlayback = () => {
-        audio.play().catch(() => {});
+      try {
+        const buffer = await loadBuffer(src);
+        if (!buffer || cancelled) return;
 
-        // Fade in
-        if (fadeIn > 0) {
-          const steps = Math.ceil(fadeIn / FADE_STEP);
-          const increment = volume / steps;
-          let step = 0;
-          const fadeInInterval = setInterval(() => {
-            step++;
-            audio.volume = Math.min(volume, increment * step);
-            if (step >= steps) clearInterval(fadeInInterval);
-          }, FADE_STEP);
-          timersRef.current.push(fadeInInterval);
-        }
-
-        // Fade out — schedule based on clip duration
-        if (fadeOut > 0) {
-          audio.addEventListener('durationchange', () => {
-            const fadeOutStart = Math.max(0, (audio.duration * 1000) - fadeOut);
-            const t = setTimeout(() => {
-              const steps = Math.ceil(fadeOut / FADE_STEP);
-              const decrement = audio.volume / steps;
-              let currentVol = audio.volume;
-              const fadeOutInterval = setInterval(() => {
-                currentVol = Math.max(0, currentVol - decrement);
-                audio.volume = currentVol;
-                if (currentVol <= 0) clearInterval(fadeOutInterval);
-              }, FADE_STEP);
-              timersRef.current.push(fadeOutInterval);
-            }, fadeOutStart);
-            timersRef.current.push(t);
-          }, { once: true });
-        }
-      };
-
-      audio.addEventListener('canplaythrough', () => {
         if (delay > 0) {
-          const t = setTimeout(startPlayback, delay);
-          timersRef.current.push(t);
-        } else {
-          startPlayback();
+          await new Promise(r => {
+            const t = setTimeout(r, delay);
+            timersRef.current.push(t);
+          });
         }
-      }, { once: true });
+        if (cancelled) return;
 
-      audio.addEventListener('error', (e) => {
-        console.warn('Transition sound failed to load:', src, e);
-      });
+        const source = ctx.createBufferSource();
+        const gainNode = ctx.createGain();
+        source.buffer = buffer;
 
-      audio.src = src;
-      audio.load();
-    });
+        // Fade in: start at 0 and ramp to target volume
+        if (fadeIn > 0) {
+          gainNode.gain.setValueAtTime(0, ctx.currentTime);
+          gainNode.gain.linearRampToValueAtTime(volume, ctx.currentTime + fadeIn / 1000);
+        } else {
+          gainNode.gain.value = volume;
+        }
+
+        source.connect(gainNode).connect(ctx.destination);
+        source.start(0);
+        sourceNodesRef.current.push({ source, gainNode });
+
+        // Fade out before clip ends
+        if (fadeOut > 0 && buffer.duration > 0) {
+          const fadeOutStart = Math.max(0, buffer.duration - fadeOut / 1000);
+          const t = setTimeout(() => {
+            if (cancelled) return;
+            gainNode.gain.setValueAtTime(gainNode.gain.value, ctx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + fadeOut / 1000);
+          }, fadeOutStart * 1000);
+          timersRef.current.push(t);
+        }
+      } catch {
+        // Buffer load/decode failed — skip silently
+      }
+    }
+
+    soundEntries.forEach(entry => playEntry(entry));
+
+    return () => {
+      cancelled = true;
+      // Reset the guard so a StrictMode remount can play sounds
+      soundPlayedRef.current = false;
+      // Don't stop sources — let transition sounds play to completion
+      // even after the overlay unmounts. They're one-shot, not looping.
+      sourceNodesRef.current = [];
+    };
   }, [theme.sound, theme.sounds]);
 
   // Tap to skip transition

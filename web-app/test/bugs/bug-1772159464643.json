@@ -1,0 +1,50 @@
+{
+  "id": "bug-1772159464643",
+  "title": "Scene audio plays even when muted",
+  "priority": "normal",
+  "testFile": "scene-audio.spec.js",
+  "testName": "scene audio does not play when muted",
+  "timestamp": "2026-02-27T02:31:04.643Z",
+  "pageUrl": "http://localhost:3421/#/location/dragons_hollow",
+  "failure": {
+    "steps": "Mute audio, enter Dragon's Hollow, observe audio playback",
+    "expected": "No scene audio plays when muted",
+    "actual": "Expected no scene audio playback when muted, but 2 BufferSource.start() calls occurred\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m2\u001b[39m"
+  },
+  "diagnostics": {
+    "consoleErrors": [
+      {
+        "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "location": {
+          "url": "http://localhost:3421/api/campaign/state",
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "timestamp": 1772159454608
+      }
+    ],
+    "networkErrors": [],
+    "audioEvents": [
+      {
+        "type": "web-audio-buffer-start",
+        "state": "running",
+        "timestamp": 1772159458985
+      },
+      {
+        "type": "web-audio-buffer-start",
+        "state": "running",
+        "timestamp": 1772159458985
+      }
+    ],
+    "screenshot": "scene-audio-plays-even-when-muted-1772159464506.png"
+  },
+  "suspectedFiles": [
+    "client/src/hooks/useUiSounds.js",
+    "client/src/hooks/useArenaSounds.js",
+    "client/src/lib/sceneAudioEngine.js",
+    "client/src/pages/scenes/SceneAudio.jsx"
+  ],
+  "forAgent": {
+    "task": "Fix bug: Scene audio plays even when muted\n## Steps to reproduce\nMute audio, enter Dragon's Hollow, observe audio playback\n## Expected\nNo scene audio plays when muted\n## Actual\nExpected no scene audio playback when muted, but 2 BufferSource.start() calls occurred\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m2\u001b[39m\n## Suspected files\n- client/src/hooks/useUiSounds.js\n- client/src/hooks/useArenaSounds.js\n- client/src/lib/sceneAudioEngine.js\n- client/src/pages/scenes/SceneAudio.jsx\n## Console errors\n- Failed to load resource: the server responded with a status of 401 (Unauthorized)\n## Test file: scene-audio.spec.js\nRe-run with: npx playwright test --grep \"scene audio does not play when muted\""
+  }
+}

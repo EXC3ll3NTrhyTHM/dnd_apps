@@ -1194,6 +1194,7 @@ export default function ChatInputCustom({
             </svg>
           </button>
           <div
+            data-testid="chat-input"
             className="cki-wrapper"
             onPointerDown={handleWrapperPointerDown}
             onPointerMove={handleWrapperPointerMove}
@@ -1284,6 +1285,7 @@ export default function ChatInputCustom({
           {text.trim() && (
             <button
               type="button"
+              data-testid="chat-send-btn"
               className="chat-send-btn"
               disabled={disabled}
               aria-label="Send message"

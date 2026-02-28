@@ -1,0 +1,49 @@
+{
+  "id": "bug-1772165371553",
+  "title": "Audio buffers not freed when leaving location",
+  "priority": "high",
+  "testFile": "scene-audio.spec.js",
+  "testName": "audio buffer cache is cleared when leaving a location",
+  "timestamp": "2026-02-27T04:09:31.553Z",
+  "pageUrl": "http://localhost:3421/#/location/dragons_hollow",
+  "failure": {
+    "steps": "Enter Dragon's Hollow, leave to map, enter The Dojo, leave to map. Check memory — audio buffers from previous locations should be freed.",
+    "expected": "Buffer cache is cleared on location exit; re-entering requires re-fetch",
+    "actual": "page.waitForTimeout: Test timeout of 30000ms exceeded."
+  },
+  "diagnostics": {
+    "consoleErrors": [
+      {
+        "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "location": {
+          "url": "http://localhost:3421/api/campaign/state",
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "timestamp": 1772165345485
+      },
+      {
+        "text": "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/html\". Strict MIME type checking is enforced for module scripts per HTML spec.",
+        "location": {
+          "url": "http://localhost:3421/src/lib/sceneAudioEngine.js",
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "timestamp": 1772165355409
+      }
+    ],
+    "networkErrors": [],
+    "audioEvents": [],
+    "screenshot": null
+  },
+  "suspectedFiles": [
+    "client/src/hooks/useUiSounds.js",
+    "client/src/hooks/useArenaSounds.js",
+    "client/src/lib/sceneAudioEngine.js",
+    "client/src/pages/LocationChat.jsx",
+    "server/routes/locations.js"
+  ],
+  "forAgent": {
+    "task": "Fix bug: Audio buffers not freed when leaving location\n## Steps to reproduce\nEnter Dragon's Hollow, leave to map, enter The Dojo, leave to map. Check memory — audio buffers from previous locations should be freed.\n## Expected\nBuffer cache is cleared on location exit; re-entering requires re-fetch\n## Actual\npage.waitForTimeout: Test timeout of 30000ms exceeded.\n## Suspected files\n- client/src/hooks/useUiSounds.js\n- client/src/hooks/useArenaSounds.js\n- client/src/lib/sceneAudioEngine.js\n- client/src/pages/LocationChat.jsx\n- server/routes/locations.js\n## Console errors\n- Failed to load resource: the server responded with a status of 401 (Unauthorized)\n- Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/html\". Strict MIME type checking is enforced for module scripts per HTML spec.\n## Test file: scene-audio.spec.js\nRe-run with: npx playwright test --grep \"audio buffer cache is cleared when leaving a location\""
+  }
+}

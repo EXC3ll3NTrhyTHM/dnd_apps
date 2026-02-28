@@ -148,26 +148,27 @@ function SpellSaveResult({ data, onDismiss }) {
 }
 
 function DamageResult({ data, onDismiss }) {
-  const { damage, isCrit, monsterHp, newHp, attacker, defender, smiteDamage, sneakAttackDamage } = data;
+  const { damage, isCrit, monsterHp, newHp, attacker, defender, smiteDamage, sneakAttackDamage, huntersMarkDamage } = data;
   const hasSmite = smiteDamage > 0;
   const hasSneakAttack = sneakAttackDamage > 0;
-  const bonusDmg = (smiteDamage || 0) + (sneakAttackDamage || 0);
+  const hasHuntersMark = huntersMarkDamage > 0;
+  const bonusDmg = (smiteDamage || 0) + (sneakAttackDamage || 0) + (huntersMarkDamage || 0);
   const weaponDmg = bonusDmg > 0 ? damage - bonusDmg : damage;
 
   // Build breakdown label
+  const parts = [];
+  if (hasSmite) parts.push(`${smiteDamage} radiant`);
+  if (hasSneakAttack) parts.push(`${sneakAttackDamage} sneak`);
+  if (hasHuntersMark) parts.push(`${huntersMarkDamage} mark`);
   let breakdownLabel = 'damage';
-  if (hasSmite && hasSneakAttack) {
-    breakdownLabel = `${weaponDmg} + ${smiteDamage} radiant + ${sneakAttackDamage} sneak`;
-  } else if (hasSmite) {
-    breakdownLabel = `${weaponDmg} + ${smiteDamage} radiant`;
-  } else if (hasSneakAttack) {
-    breakdownLabel = `${weaponDmg} + ${sneakAttackDamage} sneak`;
+  if (parts.length > 0) {
+    breakdownLabel = `${weaponDmg} + ${parts.join(' + ')}`;
   }
 
   // Result banner text and style
-  const bannerClass = hasSmite ? 'rro-smite' : hasSneakAttack ? 'rro-sneak-attack' : isCrit ? 'rro-crit' : 'rro-hit';
-  const bannerText = hasSmite ? 'DIVINE SMITE!' : hasSneakAttack ? 'SNEAK ATTACK!' : isCrit ? 'CRITICAL DAMAGE!' : `${damage} DAMAGE`;
-  const backdropClass = hasSmite ? 'rro-backdrop-smite' : hasSneakAttack ? 'rro-backdrop-sneak' : '';
+  const bannerClass = hasSmite ? 'rro-smite' : hasSneakAttack ? 'rro-sneak-attack' : hasHuntersMark ? 'rro-hunters-mark' : isCrit ? 'rro-crit' : 'rro-hit';
+  const bannerText = hasSmite ? 'DIVINE SMITE!' : hasSneakAttack ? 'SNEAK ATTACK!' : hasHuntersMark ? "HUNTER'S MARK!" : isCrit ? 'CRITICAL DAMAGE!' : `${damage} DAMAGE`;
+  const backdropClass = hasSmite ? 'rro-backdrop-smite' : hasSneakAttack ? 'rro-backdrop-sneak' : hasHuntersMark ? 'rro-backdrop-hunters-mark' : '';
 
   return (
     <div className={`rro-backdrop ${backdropClass}`} onClick={onDismiss}>

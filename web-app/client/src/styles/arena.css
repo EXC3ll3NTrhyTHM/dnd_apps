@@ -2604,6 +2604,13 @@
   color: #f9a8d4;
 }
 
+.arena-badge-hunters-mark {
+  background: rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+  font-size: 0.65rem;
+  animation: condition-pulse 1.5s ease-in-out infinite;
+}
+
 @keyframes condition-pulse {
 
   0%,
@@ -3041,6 +3048,20 @@
 .rro-result.rro-sneak-attack {
   color: #10b981;
   text-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+  font-size: 1.3rem;
+}
+
+/* ══════════════════════════════════════════
+   ROLL RESULT OVERLAY — HUNTER'S MARK
+   ══════════════════════════════════════════ */
+
+.rro-backdrop-hunters-mark {
+  background: radial-gradient(ellipse at center, rgba(34, 197, 94, 0.15) 0%, rgba(0, 0, 0, 0.85) 70%);
+}
+
+.rro-result.rro-hunters-mark {
+  color: #22c55e;
+  text-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
   font-size: 1.3rem;
 }
 
@@ -3655,6 +3676,16 @@
   background: linear-gradient(135deg, #4d7c0f 0%, #3f6212 100%) !important;
 }
 
+/* Hunter's Mark (Ranger) */
+.arena-btn-hunters-mark {
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%) !important;
+  border-color: #22c55e !important;
+}
+
+.arena-btn-hunters-mark:active {
+  background: linear-gradient(135deg, #047857 0%, #064e3b 100%) !important;
+}
+
 /* Flurry of Blows (Monk) */
 .arena-btn-flurry {
   background: linear-gradient(135deg, #78350f 0%, #713f12 100%) !important;
@@ -3812,6 +3843,22 @@
   background: rgba(240, 192, 64, 0.15);
   border-color: rgba(240, 192, 64, 0.4);
   color: #f0c040;
+}
+
+.arena-buff-indicator-hunters-mark {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #4ade80;
+}
+
+.arena-bonus-hunters-mark {
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.arena-ability-btn-hunters-mark {
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+  border-color: #22c55e;
 }
 
 @keyframes arena-buff-pulse {

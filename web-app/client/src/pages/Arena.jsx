@@ -16,14 +16,20 @@ import AchievementToast from '../components/AchievementToast';
 import QuestToast from '../components/QuestToast';
 import LevelUpOverlay from '../components/LevelUpOverlay';
 import { useUiSounds } from '../hooks/useUiSounds';
-import { useArenaSounds } from '../hooks/useArenaSounds';
+import { useArenaSounds, clearArenaBuffers } from '../hooks/useArenaSounds';
 import SceneAudio from './scenes/SceneAudio';
+import { reportMetric } from '../lib/memoryTracker';
 
 const DiceOverlay = lazy(() => import('../components/DiceOverlay'));
 import EmotePopup from '../components/EmotePopup';
 import ArenaEmoteGrid from '../components/ArenaEmoteGrid';
 import DmRollControl from '../components/DmRollControl';
 import FateOverlay from '../components/FateOverlay';
+import { clearDiceBuffers, preloadDiceSounds } from '../lib/diceAudio';
+import { createLogger } from '../utils/debug';
+
+const logArena = createLogger('arena');
+const logWs = createLogger('ws');
 
 const EMOTE_SOUND_MAP = {
   crying: 'emoteCrying',
@@ -143,6 +149,18 @@ export default function Arena() {
   const playArenaSoundRef = useRef(playArenaSound);
   playArenaSoundRef.current = playArenaSound;
   const locationId = 'the_arena';
+
+  // Free arena + dice audio buffers when leaving the arena.
+  // These are module-level singletons that persist across mounts —
+  // without cleanup they accumulate ~35MB of decoded AudioBuffers.
+  // On mount, re-preload dice sounds (they may have been cleared on previous exit).
+  useEffect(() => {
+    preloadDiceSounds();
+    return () => {
+      clearArenaBuffers();
+      clearDiceBuffers();
+    };
+  }, []);
 
   // Monster selection state
   const [monsters, setMonsters] = useState(null);
@@ -285,15 +303,28 @@ export default function Arena() {
   const [favoriteEmotes, setFavoriteEmotes] = useState([]);
   const emoteCooldownRef = useRef(false);
 
+  // ── Memory tracking ──
+  useEffect(() => {
+    reportMetric('arena.emotes', activeEmotes.length);
+  }, [activeEmotes.length]);
+
   // Hide result screen while dice are still animating
   const showResult = encounterResult && !diceRoll && !spectatorRoll;
 
-  // Once the result screen is showing (dice done), release the encounter data.
-  // The result overlay only reads from encounterResult, not activeEncounter.
+  // Once the result screen is showing (dice done), release the encounter data
+  // and free combat audio buffers — the result screen only needs victory/defeat music.
+  // This prevents the ~35MB of arena SFX + dice buffers from competing with the
+  // confetti canvas + achievement overlays for memory on iPhones.
+  // Delay buffer cleanup by 4s so victory/defeat stings finish playing first.
   useEffect(() => {
     if (!showResult) return;
     setActiveEncounter(null);
     spectatorQueueRef.current = [];
+    const timer = setTimeout(() => {
+      clearArenaBuffers();
+      clearDiceBuffers();
+    }, 4000);
+    return () => clearTimeout(timer);
   }, [showResult]);
 
   // Achievement toast queue
@@ -489,7 +520,7 @@ export default function Arena() {
           if (payload.locationId !== locationId) return;
           if (payload.type?.startsWith('encounter_')) {
 
-            try { handleEncounterEventRef.current(payload); } catch (e) { console.error('[ARENA WS] handler error:', e); }
+            try { handleEncounterEventRef.current(payload); } catch (e) { console.error('[Arena WS] handler error:', e); logWs('arena handler error:', e); }
           }
           // Bonus action phase detection — clear main action state so bonus UI shows
           if (payload.type === 'encounter_bonus_phase' && payload.userId === userIdRef.current) {
@@ -510,8 +541,8 @@ export default function Arena() {
           if (payload.type === 'encounter_bonus_result' && payload.result?.type === 'bardic_inspiration' && payload.result?.userId !== userIdRef.current) {
             playArenaSoundRef.current('bardicInspiration');
           }
-          // Show brief banner for Patient Defense result
-          if (payload.type === 'encounter_bonus_result' && payload.result?.type === 'patient_defense') {
+          // Show brief banner for Patient Defense / Hunter's Mark result
+          if (payload.type === 'encounter_bonus_result' && (payload.result?.type === 'patient_defense' || payload.result?.type === 'hunters_mark')) {
             setBonusResultBanner(payload.result);
             if (bonusResultTimerRef.current) clearTimeout(bonusResultTimerRef.current);
             bonusResultTimerRef.current = setTimeout(() => setBonusResultBanner(null), 3000);
@@ -572,7 +603,7 @@ export default function Arena() {
           if (payload.type === 'fate_deliberation_end') {
             setFateOverlayVisible(false);
           }
-        } catch (wsErr) { console.error('[ARENA WS] Error handling message:', wsErr); }
+        } catch (wsErr) { console.error('[Arena WS] message error:', wsErr); logWs('arena message error:', wsErr); }
       };
       ws.onclose = () => {
         if (!active) return;
@@ -757,7 +788,7 @@ export default function Arena() {
       // fall back to forced values (if available) or random rolls
       setTimeout(() => {
         if (encounterDiceRef.current?.resolve === resolve) {
-          console.warn('[Arena] Dice roll timed out, generating fallback rolls');
+          logArena('dice roll timed out, generating fallback rolls');
           encounterDiceRef.current = null;
           setDiceRoll(null);
           if (forcedValues) {
@@ -967,7 +998,7 @@ export default function Arena() {
   useEffect(() => {
     if (!spectatorRoll) return;
     const timeout = setTimeout(() => {
-      console.warn('[Arena] Spectator roll timed out, auto-dismissing');
+      logArena('spectator roll timed out, auto-dismissing');
       setSpectatorRoll(null);
     }, 5000);
     return () => clearTimeout(timeout);
@@ -1508,6 +1539,7 @@ export default function Arena() {
         let damageTotal = 0;
         let smiteData = undefined;
         let sneakAttackData = undefined;
+        let huntersMarkData = undefined;
         let ensnaringStrikeSaveRoll;
         let stunningStrikeSaveRoll;
 
@@ -1579,6 +1611,16 @@ export default function Arena() {
             }
           }
 
+          // Hunter's Mark — auto-roll 1d6 bonus damage when active
+          if (myStats.huntersMarkActive) {
+            setRollPhase('hunters_mark_roll');
+            const { total: hmTotal } = await requestServerRoll(
+              '1d6', 0, '#22c55e', "HUNTER'S MARK!", myDiceColorset, 'glass'
+            );
+            damageTotal += hmTotal;
+            huntersMarkData = { damage: hmTotal };
+          }
+
           // Show damage result overlay
           if (damageTotal >= 20 && damageTotal < 30) playArenaSound('bigDamage');
           if (damageTotal >= 30) playArenaSound('massiveDamage');
@@ -1593,6 +1635,7 @@ export default function Arena() {
             isCrit: isNat20,
             smiteDamage: smiteData?.smiteDamage,
             sneakAttackDamage: sneakAttackData?.sneakAttackDamage,
+            huntersMarkDamage: huntersMarkData?.damage,
             monsterHp: activeEncounter.monster.currentHp,
             newHp: Math.max(0, activeEncounter.monster.currentHp - damageTotal),
             attacker: { name: pName, avatar: myStats.avatar || (myStats.sprite && `/players/${myStats.sprite}`) },
@@ -1652,6 +1695,7 @@ export default function Arena() {
             damageTotal,
             smiteData,
             sneakAttackData,
+            huntersMarkData,
             inspirationData,
             weaponId: wpn?.id,
             ensnaringStrikeSaveRoll,
@@ -2061,6 +2105,30 @@ export default function Arena() {
       }
     } catch (err) {
       console.error('Failed Ensnaring Strike:', err);
+    }
+  }, [activeEncounter, bonusActionPhase]);
+
+  // ── Hunter's Mark handler (works as both pre-bonus and post-action bonus) ──
+  const handleHuntersMark = useCallback(async () => {
+    if (!activeEncounter) return;
+    const endpoint = bonusActionPhase
+      ? `/api/encounters/${activeEncounter.id}/bonus-action`
+      : `/api/encounters/${activeEncounter.id}/pre-bonus-action`;
+    try {
+      playArenaSound('spellCast');
+      const res = await api(endpoint, {
+        method: 'POST',
+        body: JSON.stringify({ bonusAction: 'hunters_mark' }),
+      });
+      if (res.error) {
+        console.error("Hunter's Mark failed:", res.error);
+      }
+      if (bonusActionPhase) {
+        setBonusActionPhase(false);
+        setAvailableBonusActions([]);
+      }
+    } catch (err) {
+      console.error("Failed Hunter's Mark:", err);
     }
   }, [activeEncounter, bonusActionPhase]);
 
@@ -2753,6 +2821,12 @@ export default function Arena() {
       label: 'Ensnaring Strike',
       onClick: () => { playSound('buttonTap'); handleEnsnaringStrike(); },
     },
+    hunters_mark: {
+      className: 'arena-ability-btn-hunters-mark',
+      icon: '\uD83C\uDFAF',
+      label: "Hunter's Mark",
+      onClick: () => { playSound('buttonTap'); handleHuntersMark(); },
+    },
     patient_defense: {
       className: 'arena-ability-btn-patient-defense',
       icon: '\uD83D\uDEE1',
@@ -2828,7 +2902,7 @@ export default function Arena() {
               <VictoryConfetti />
             </>
           )}
-          <div className="arena-result-card">
+          <div className="arena-result-card" data-testid="arena-result-card">
             {encounterResult.type === 'victory' ? (
               <>
                 <div className="arena-result-icon">{'\u2694\uFE0F'}</div>
@@ -2987,6 +3061,7 @@ export default function Arena() {
 
           {!myInitRoll ? (
             <button
+              data-testid="arena-initiative-btn"
               className="arena-btn arena-btn-initiative"
               onClick={() => { playSound('buttonTap'); handleInitiativeRoll(); }}
               disabled={initiativeRollRef.current}
@@ -3120,6 +3195,11 @@ export default function Arena() {
                   {c.icon}
                 </span>
               ))}
+              {activeEncounter?.participants && Object.values(activeEncounter.participants).some(p => p.huntersMarkActive) && (
+                <span className="arena-badge arena-badge-hunters-mark" title="Hunter's Mark — taking +1d6 bonus damage">
+                  {'\uD83C\uDFAF'}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -3258,12 +3338,20 @@ export default function Arena() {
           </div>
         )}
 
-        {/* Bonus action result banner (Patient Defense) */}
+        {/* Bonus action result banner (Patient Defense / Hunter's Mark) */}
         {bonusResultBanner && bonusResultBanner.type === 'patient_defense' && (
           <div className="arena-bonus-result-banner" onClick={() => setBonusResultBanner(null)}>
             <div className="arena-bonus-result-content arena-bonus-patient">
               <div className="arena-bonus-result-title">{'\uD83D\uDEE1'} Patient Defense</div>
               <div className="arena-bonus-result-desc">Attacks have disadvantage until next turn</div>
+            </div>
+          </div>
+        )}
+        {bonusResultBanner && bonusResultBanner.type === 'hunters_mark' && (
+          <div className="arena-bonus-result-banner" onClick={() => setBonusResultBanner(null)}>
+            <div className="arena-bonus-result-content arena-bonus-hunters-mark">
+              <div className="arena-bonus-result-title">{'\uD83C\uDFAF'} Hunter's Mark</div>
+              <div className="arena-bonus-result-desc">{bonusResultBanner.name} marks their quarry — +1d6 damage per hit!</div>
             </div>
           </div>
         )}
@@ -3403,6 +3491,15 @@ export default function Arena() {
                       <span className="arena-action-tag arena-action-tag-bonus">BONUS</span>
                     </button>
                   )}
+                  {availableBonusActions.find(a => a.type === 'hunters_mark') && (
+                    <button
+                      className="arena-btn arena-btn-hunters-mark"
+                      onClick={() => { playSound('buttonTap'); handleHuntersMark(); }}
+                    >
+                      {'\uD83C\uDFAF'} Hunter's Mark
+                      <span className="arena-action-tag arena-action-tag-bonus">BONUS</span>
+                    </button>
+                  )}
                   {availableBonusActions.find(a => a.type === 'flurry_of_blows') && (
                     <button
                       className="arena-btn arena-btn-flurry"
@@ -3441,6 +3538,7 @@ export default function Arena() {
                 {/* ── Core Actions Grid ── */}
                 <div className="arena-core-actions">
                   <button
+                    data-testid="arena-attack-btn"
                     className="arena-core-btn arena-core-btn-attack"
                     onClick={() => { playSound('buttonTap'); handleAttackClick(); }}
                     onTouchStart={() => startTooltip('attack')}
@@ -3501,6 +3599,11 @@ export default function Arena() {
                 {myStats?.ensnaringStrikeActive && (
                   <div className="arena-buff-indicator">
                     {'\u{1FAB4}'} Ensnaring Strike active — next hit will trigger!
+                  </div>
+                )}
+                {myStats?.huntersMarkActive && (
+                  <div className="arena-buff-indicator arena-buff-indicator-hunters-mark">
+                    {'\uD83C\uDFAF'} Hunter's Mark active — +1d6 damage per hit
                   </div>
                 )}
 
@@ -4310,6 +4413,7 @@ export default function Arena() {
               )}
 
               <button
+                data-testid="arena-join-btn"
                 className="arena-join-btn"
                 onClick={activeFight
                   ? () => { playSound('buttonTap'); handleJoinExisting(activeFight.encounterId); }
@@ -4324,7 +4428,7 @@ export default function Arena() {
         );
       })()}
 
-      <div className="arena-monster-grid">
+      <div className="arena-monster-grid" data-testid="arena-monster-grid">
         {!monsters ? (
           <div className="arena-loading">Loading monsters...</div>
         ) : monsters.length === 0 ? (
@@ -4335,6 +4439,7 @@ export default function Arena() {
             return (
               <button
                 key={m.id}
+                data-testid="arena-monster-card"
                 className={`arena-monster-card ${selectedMonster?.id === m.id ? 'arena-monster-card-selected' : ''} ${activeFight ? 'arena-monster-card-active' : ''}`}
                 onClick={(e) => {
                   e.stopPropagation();

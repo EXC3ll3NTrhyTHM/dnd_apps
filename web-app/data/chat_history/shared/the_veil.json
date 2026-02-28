@@ -25,5 +25,31 @@
     "text": "You already asking the wrong questions. It's not about what you can hear; it's about what you're willing to act on. The Blackthorn Clan's got their claws in the city — best be ready for trouble. Keep your head on a swivel.",
     "emotion": "suspicious",
     "timestamp": "2026-02-09T07:05:48.342Z"
+  },
+  {
+    "id": "db6eac29-013d-452c-b7ce-946e65dae2d3",
+    "role": "player",
+    "type": "gif",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "gifUrl": "https://media2.giphy.com/media/BDQmMy3ZM8sgRNFkhe/200w.gif?cid=08b926b0rvxujryjheuiq3cwcc0ht4t2ojvvgylj35rwhk97&ep=v1_gifs_trending&rid=200w.gif&ct=g",
+    "gifWidth": 200,
+    "gifHeight": 150,
+    "text": "New York Waiting GIF by Muppet Wiki",
+    "timestamp": "2026-02-27T03:35:11.482Z"
+  },
+  {
+    "id": "a4f6e1ff-7652-40b1-8ea5-466fc6747db1",
+    "role": "player",
+    "type": "gif",
+    "userId": "228241331296665600",
+    "playerName": "Acacia",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
+    "gifUrl": "https://media3.giphy.com/media/RTjNAFC4JMc0/200w.gif?cid=08b926b021kg8pn7mla4yhqauhlssojismy02835yqkyubmc&ep=v1_gifs_search&rid=200w.gif&ct=g",
+    "gifWidth": 200,
+    "gifHeight": 112,
+    "text": "kids karate GIF",
+    "timestamp": "2026-02-27T03:35:54.972Z"
   }
 ]

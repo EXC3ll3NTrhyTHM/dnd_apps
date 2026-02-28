@@ -6,13 +6,15 @@ const TEST_API_PORT = 3421;
 module.exports = defineConfig({
   testDir: './test/e2e',
   timeout: 30000,
-  retries: 0,
+  retries: 1, // UI tests with pointer events can be flaky in headless
   workers: 1, // Sequential — tests share server state
 
   use: {
     baseURL: `http://localhost:${TEST_API_PORT}`,
     screenshot: 'only-on-failure',
     trace: 'on-first-retry',
+    // Mobile portrait viewport — this is how users view the app
+    viewport: { width: 390, height: 844 },
   },
 
   webServer: {

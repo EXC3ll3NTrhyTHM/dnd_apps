@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { useUiSounds } from './hooks/useUiSounds';
 import LevelUpOverlay from './components/LevelUpOverlay';
 import DmAwardEffect from './components/DmAwardEffect';
 import AudioConsentOverlay from './components/AudioConsentOverlay';
+
+const MemoryOverlay = lazy(() => import('./components/MemoryOverlay'));
 import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import AuthCallback from './pages/AuthCallback';
@@ -172,6 +174,9 @@ export default function App() {
 
   return (
     <>
+      {localStorage.getItem('dh_memory_overlay') === 'true' && (
+        <Suspense fallback={null}><MemoryOverlay /></Suspense>
+      )}
       <AudioConsentOverlay />
       {toast && <MentionToast mention={toast} onDismiss={dismissToast} />}
       {dmAward && (

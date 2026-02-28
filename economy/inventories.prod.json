@@ -58,11 +58,32 @@
         "acquired_at": "2026-02-24T02:49:30.431Z"
       },
       {
+        "item_id": "dice_black",
+        "name": "Midnight Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-02-26T06:56:31.803Z"
+      },
+      {
+        "item_id": "dice_fire",
+        "name": "Ember Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-02-26T06:56:36.872Z"
+      },
+      {
+        "item_id": "dice_psychic",
+        "name": "Psychic Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-02-26T06:56:46.269Z"
+      },
+      {
         "item_id": "potion_healing",
         "name": "Potion of Healing",
         "type": "potion",
-        "quantity": 2,
-        "acquired_at": "2026-02-25T19:58:56.597Z"
+        "quantity": 1,
+        "acquired_at": "2026-02-27T17:04:57.397Z"
       }
     ],
     "badges": [],
@@ -125,7 +146,7 @@
         "item_id": "basic_worm",
         "name": "Basic Worm",
         "type": "bait",
-        "quantity": 8,
+        "quantity": 5,
         "acquired_at": "2026-02-16T08:05:18.692Z"
       },
       {
@@ -134,6 +155,13 @@
         "type": "dice_set",
         "quantity": 1,
         "acquired_at": "2026-02-22T01:53:26.489Z"
+      },
+      {
+        "item_id": "potion_healing",
+        "name": "Potion of Healing",
+        "type": "potion",
+        "quantity": 3,
+        "acquired_at": "2026-02-28T01:15:01.618Z"
       }
     ],
     "badges": [],

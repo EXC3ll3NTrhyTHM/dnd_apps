@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { getAudioMuted } from '../hooks/useAudioSettings';
+import { ensureContext } from '../hooks/useUiSounds';
 import '../styles/dm-award.css';
 
 const PARTICLE_COUNT = 15;
@@ -75,8 +76,8 @@ export default function DmAwardEffect({ type, amount, gold, xp, onDone }) {
     if (getAudioMuted()) return;
 
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      if (ctx.state === 'suspended') ctx.resume();
+      const ctx = ensureContext();
+      if (!ctx) return;
 
       const t = ctx.currentTime + 0.05;
 
@@ -89,7 +90,6 @@ export default function DmAwardEffect({ type, amount, gold, xp, onDone }) {
         playXpSound(ctx, t);
       }
 
-      setTimeout(() => ctx.close().catch(() => {}), 2000);
     } catch {
       // Web Audio not available
     }

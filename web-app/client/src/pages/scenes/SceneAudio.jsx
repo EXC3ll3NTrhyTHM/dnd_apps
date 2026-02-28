@@ -10,34 +10,33 @@ import { useEffect, useRef } from 'react';
 import { useAudioMuted } from '../../hooks/useAudioSettings';
 import {
   playSceneConfig, stopAll, setSceneMuted,
-  suspendScene, resumeScene,
+  suspendScene, resumeScene, clearBufferCache,
 } from '../../lib/sceneAudioEngine';
 
 export function SceneAudio({ config, enabled = true }) {
   const muted = useAudioMuted();
   const mutedRef = useRef(muted);
   mutedRef.current = muted;
-  const configKeyRef = useRef('');
   const cleanupRef = useRef(null);
-  const speechResetRef = useRef(false);
+  const configRef = useRef(config);
+  configRef.current = config;
+
+  // Stable key so the effect only re-runs when config *content* changes
+  const configKey = config ? JSON.stringify(config) : '';
 
   // Mute/unmute without re-creating audio
   useEffect(() => {
     setSceneMuted(muted);
   }, [muted]);
 
-  // Main config effect — plays new config when it changes
+  // Main config effect — plays new config when content changes
   useEffect(() => {
-    if (!config || !enabled) return;
-
-    const key = JSON.stringify(config);
-    if (key === configKeyRef.current) return;
-    configKeyRef.current = key;
+    if (!configKey || !enabled) return;
 
     let active = true;
 
     // Play the new config (engine handles stopping old audio with crossfade)
-    playSceneConfig(config, { muted: mutedRef.current })
+    playSceneConfig(configRef.current, { muted: mutedRef.current })
       .then(cleanup => {
         if (!active) { cleanup(); return; }
         cleanupRef.current = cleanup;
@@ -64,15 +63,12 @@ export function SceneAudio({ config, enabled = true }) {
     const onSpeechChange = (e) => {
       if (e.detail) {
         // Mic on — stop all audio
-        speechResetRef.current = true;
         stopAll(0);
       } else {
         // Mic off — wait for iOS to release the audio session, then replay
         const t = setTimeout(() => {
           if (!active) return;
-          speechResetRef.current = false;
-          configKeyRef.current = ''; // force re-trigger
-          playSceneConfig(config, { muted: mutedRef.current })
+          playSceneConfig(configRef.current, { muted: mutedRef.current })
             .then(cleanup => {
               if (!active) { cleanup(); return; }
               cleanupRef.current = cleanup;
@@ -92,14 +88,19 @@ export function SceneAudio({ config, enabled = true }) {
       active = false;
       timers.forEach(clearTimeout);
       stopAll(300);
+      // Free decoded AudioBuffers from this location's scene audio.
+      // Each decoded buffer is uncompressed PCM (20-150MB). Without this,
+      // visiting multiple locations accumulates 1GB+ of audio in memory
+      // which crashes iPhones. Buffers are re-loaded during the next
+      // location's transition via preloadAudio, so no cold-start penalty.
+      clearBufferCache();
       cleanupRef.current = null;
-      configKeyRef.current = '';
       document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('blur', onBlur);
       window.removeEventListener('focus', onFocus);
       window.removeEventListener('speech-recognition-change', onSpeechChange);
     };
-  }, [config, enabled]);
+  }, [configKey, enabled]);
 
   return null;
 }

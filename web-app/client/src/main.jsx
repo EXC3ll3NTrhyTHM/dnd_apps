@@ -27,5 +27,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 const splash = document.getElementById('splash');
 if (splash) {
   splash.style.opacity = '0';
+  splash.style.pointerEvents = 'none'; // Stop blocking clicks immediately
   splash.addEventListener('transitionend', () => splash.remove());
+  // Fallback: remove after 1s in case transitionend never fires (headless browsers)
+  setTimeout(() => { if (splash.parentNode) splash.remove(); }, 1000);
 }

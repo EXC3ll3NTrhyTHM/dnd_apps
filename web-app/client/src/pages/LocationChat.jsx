@@ -31,6 +31,8 @@ import EmotePickerSheet from '../components/EmotePickerSheet';
 import SceneAudio from './scenes/SceneAudio';
 import { getSceneComponent } from './scenes';
 import { useUiSounds } from '../hooks/useUiSounds';
+import { reportMetric } from '../lib/memoryTracker';
+import { createLogger } from '../utils/debug';
 import '../styles/location-chat.css';
 import '../styles/location-scene.css';
 import '../styles/custom-keyboard.css';
@@ -40,6 +42,9 @@ const USE_CUSTOM_KEYBOARD = true;
 
 // Admin IDs who can use edit mode
 const ADMIN_IDS = ['424061511833747467'];
+
+const logWs = createLogger('ws');
+const logChat = createLogger('chat');
 
 export default function LocationChat() {
   const { locationId } = useParams();
@@ -120,6 +125,23 @@ export default function LocationChat() {
   const isMarcelDm = locationId?.startsWith('marcel_dm_');
   const marcelDmUserId = isMarcelDm ? locationId.replace('marcel_dm_', '') : null;
 
+  // ── Memory tracking + message windowing ──
+  const MAX_VISIBLE_MESSAGES = 200;
+  useEffect(() => {
+    reportMetric('chat.messages', messages.length);
+    if (messages.length > MAX_VISIBLE_MESSAGES) {
+      setMessages(prev => {
+        if (prev.length <= MAX_VISIBLE_MESSAGES) return prev;
+        const trimmed = prev.slice(prev.length - MAX_VISIBLE_MESSAGES);
+        // Prune knownIds to match
+        const kept = new Set(trimmed.map(m => m.id).filter(Boolean));
+        knownIdsRef.current.forEach(id => { if (!kept.has(id)) knownIdsRef.current.delete(id); });
+        return trimmed;
+      });
+      setHasMore(true);
+    }
+  }, [messages.length]);
+
   // ── WebSocket: Real-time typing and messages ──
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -132,11 +154,11 @@ export default function LocationChat() {
     let reconnectTimer;
 
     function connect() {
-      console.log(`[LocationChat] Connecting to WS: ${wsUrl}`);
+      logWs('connecting', wsUrl);
       ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
-        console.log('[LocationChat] WS Connected');
+        logWs('connected');
         ws.send(JSON.stringify({ type: 'identify', userId: user?.id, currentLocation: locationId }));
       };
 
@@ -221,11 +243,11 @@ export default function LocationChat() {
       };
 
       ws.onclose = () => {
-        console.warn('[LocationChat] WS Disconnected, reconnecting in 3s...');
+        logWs('disconnected, reconnecting in 3s');
         reconnectTimer = setTimeout(connect, 3000);
       };
 
-      ws.onerror = (err) => console.error('[LocationChat] WS Error:', err);
+      ws.onerror = (err) => logWs('error', err);
     }
 
     connect();
@@ -1184,7 +1206,7 @@ export default function LocationChat() {
         /* Chat View */
         <div className="location-chat">
           {/* Header */}
-          <div className="chat-header">
+          <div className="chat-header" data-testid="chat-header">
             <button className="chat-back-btn" onClick={() => { playSound('buttonTap'); (hasScene && !isMarcelDm) ? handleBackToScene() : navigate('/map'); }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
@@ -1213,7 +1235,7 @@ export default function LocationChat() {
 
           {/* Chat Messages — column-reverse so browser natively anchors to bottom */}
           <div className="chat-messages-container">
-            <div className="chat-messages" ref={chatAreaRef}>
+            <div className="chat-messages" data-testid="chat-messages" ref={chatAreaRef}>
               <div className="chat-messages-inner">
                 {messages.length === 0 ? (
                   <div className="chat-messages-empty">

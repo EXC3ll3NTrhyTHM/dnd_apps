@@ -97,7 +97,7 @@ export default function DicePanel({ onRoll, onBack }) {
   const activeModifier = lastDiceGroup?.modifier || null;
 
   return (
-    <div className="dice-panel">
+    <div className="dice-panel" data-testid="dice-panel">
       {/* Header */}
       <div className="dice-panel-header">
         <button className="dice-panel-back" type="button" onClick={onBack}>

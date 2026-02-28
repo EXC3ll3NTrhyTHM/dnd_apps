@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import DiceBox from '@3d-dice/dice-box-threejs';
 import { preloadDiceSounds, handleDiceCollide } from '../lib/diceAudio';
+import { registerProbe } from '../lib/memoryTracker';
 import '../styles/dice-overlay.css';
 
 // ── Persistent DiceBox singleton ───────────────────────────────────────
@@ -33,6 +34,23 @@ function logStats(action, detail) {
     'color: #888', 'color: #f5a623; font-weight: bold', 'color: #ccc'
   );
 }
+
+/**
+ * Get WebGL/dice memory stats for memory monitoring overlay.
+ */
+export function getDiceWebGLStats() {
+  const ri = _box?.renderer?.info;
+  return {
+    textures: ri?.memory?.textures || 0,
+    geometries: ri?.memory?.geometries || 0,
+    totalCreated: _totalTexturesCreated,
+    totalDisposed: _totalTexturesDisposed,
+    rolls: _stats.rolls,
+    contextLost: _stats.lost,
+    fatalError: _fatalError,
+  };
+}
+registerProbe('webgl', getDiceWebGLStats);
 
 function logMemoryDelta(label) {
   const ri = _box?.renderer?.info;
@@ -646,13 +664,13 @@ export default function DiceOverlay({
   }, []);
 
   return (
-    <div className="dice-overlay">
+    <div className="dice-overlay" data-testid="dice-overlay">
       <div id={canvasId} ref={containerRef} className={`dice-overlay-canvas${canvasReady ? ' dice-canvas-visible' : ''}`} />
       {label && resultTotal == null && (
         <div className="dice-rolling-label">{label}</div>
       )}
       {resultTotal != null && (
-        <div className="dice-result-banner">
+        <div className="dice-result-banner" data-testid="dice-result-banner">
           {label && <span className="dice-result-label">{label}</span>}
           {advantageType && resultRolls && resultRolls.length >= 2 ? (
             <>
@@ -670,10 +688,10 @@ export default function DiceOverlay({
               {modifier ? (
                 <>
                   <span className="dice-result-breakdown">{resultTotal} + {modifier}</span>
-                  <span className="dice-result-total">{resultTotal + modifier}</span>
+                  <span className="dice-result-total" data-testid="dice-result-total">{resultTotal + modifier}</span>
                 </>
               ) : (
-                <span className="dice-result-total">{resultTotal}</span>
+                <span className="dice-result-total" data-testid="dice-result-total">{resultTotal}</span>
               )}
             </>
           ) : (
@@ -682,10 +700,10 @@ export default function DiceOverlay({
               {modifier ? (
                 <>
                   <span className="dice-result-breakdown">{resultTotal} + {modifier}</span>
-                  <span className="dice-result-total">{resultTotal + modifier}</span>
+                  <span className="dice-result-total" data-testid="dice-result-total">{resultTotal + modifier}</span>
                 </>
               ) : (
-                <span className="dice-result-total">{resultTotal}</span>
+                <span className="dice-result-total" data-testid="dice-result-total">{resultTotal}</span>
               )}
             </>
           )}

@@ -6,3 +6,7 @@
 [2026-02-24] Today, Nalyd dropped by, and we had a good chat while I offered him one of my snacks. He mentioned his dojo duties, and I reminded him to keep things balanced with some chill time—after all, it’s all about the vibes, maaaan!
 
 [2026-02-24] Today was pretty rad—Nalyd and I had a chill conversation, and he tossed me some rare chocolate that totally amped up the vibes. I felt like the luckiest bony dude, grinning wide as I offered to share the awesome treat back with him! ✌️
+
+[2026-02-26] I had a conversation with Nalyd today, and he shared some wild stories about fighting giant squids and feeding the slums. I marveled at how he’s become a legend in their eyes—what a heavy, yet uplifting vibe!
+
+[2026-02-26] Today, I had a groovy moment with Nalyd—his eyes were shining with happiness, and I reminded him to keep riding that good vibe wave. But as I passed by the dojo, an uneasy feeling settled in; there’s definitely some bad energy lurking around.

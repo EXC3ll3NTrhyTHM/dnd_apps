@@ -11,6 +11,9 @@
  */
 import { ensureContext } from '../hooks/useUiSounds';
 import { getAudioMuted } from '../hooks/useAudioSettings';
+import { createLogger } from '../utils/debug';
+
+const log = createLogger('dice');
 
 const ASSET_BASE = '/assets/dice-box-threejs/';
 const DICE_HIT_COUNT = 15;   // dicehit_plastic1..15.mp3
@@ -43,11 +46,11 @@ async function loadBuffer(ctx, url) {
 export async function preloadDiceSounds() {
   if (_loaded || _loading) return;
   _loading = true;
-  console.log('[DiceAudio] Starting preload...');
+  log('starting preload');
 
   const ctx = ensureContext();
   if (!ctx) {
-    console.error('[DiceAudio] No AudioContext available!');
+    log('no AudioContext available!');
     _loading = false;
     return;
   }
@@ -93,6 +96,30 @@ function playBuffer(buffer, volume) {
 
 function randomFrom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/**
+ * Get stats about dice audio buffers for memory monitoring.
+ */
+export function getDiceBufferStats() {
+  let totalBytes = 0;
+  [..._diceBuffers, ..._surfaceBuffers].forEach(buf => {
+    totalBytes += buf.numberOfChannels * buf.length * 4;
+  });
+  return { count: _diceBuffers.length + _surfaceBuffers.length, bytes: totalBytes };
+}
+
+/**
+ * Clear all dice audio buffers to free memory.
+ * Called when leaving the arena.
+ */
+export function clearDiceBuffers() {
+  const count = _diceBuffers.length + _surfaceBuffers.length;
+  _diceBuffers.length = 0;
+  _surfaceBuffers.length = 0;
+  _loaded = false;
+  _loading = false;
+  return count;
 }
 
 /**

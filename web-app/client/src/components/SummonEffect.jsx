@@ -20,15 +20,25 @@ export default function SummonEffect({ onComplete, onPickPlayer, gesturePoints =
   onCompleteRef.current = onComplete;
 
   // Play sparkle sound + haptic feedback
+  const sparkleAudioRef = useRef(null);
   useEffect(() => {
     if (!getAudioMuted()) {
       const audio = new Audio('/sounds/cottage/sparkle.mp3');
       audio.volume = 0.4;
       audio.play().catch(() => {});
+      sparkleAudioRef.current = audio;
     }
     if (navigator.vibrate) {
       navigator.vibrate([50, 80, 50, 80, 200]);
     }
+    return () => {
+      if (sparkleAudioRef.current) {
+        sparkleAudioRef.current.pause();
+        sparkleAudioRef.current.removeAttribute('src');
+        sparkleAudioRef.current.load();
+        sparkleAudioRef.current = null;
+      }
+    };
   }, []);
 
   // Phase timing

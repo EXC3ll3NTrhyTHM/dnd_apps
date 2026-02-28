@@ -1,6 +1,9 @@
 import { useRef, useCallback } from 'react';
 import { useAudioMuted } from './useAudioSettings';
 import { preloadDiceSounds } from '../lib/diceAudio';
+import { createLogger } from '../utils/debug';
+
+const log = createLogger('audio');
 
 const UI_SOUNDS = {
   messageSent: '/sounds/ui/message-sent.wav',
@@ -27,14 +30,55 @@ const VOLUMES = {
 // Web Audio API — pre-decoded buffers for instant playback
 let _ctx = null;
 const _buffers = {};
+let _backgroundSuspended = false; // true when suspended due to page hidden/blur
 
 export function ensureContext() {
   if (!_ctx) {
+    log('creating AudioContext');
     _ctx = new (window.AudioContext || window.webkitAudioContext)();
   }
-  if (_ctx.state === 'suspended') _ctx.resume();
+  // Don't auto-resume if the page is hidden — audio should stay suspended in background
+  if (_ctx.state === 'suspended' && !document.hidden && !_backgroundSuspended) {
+    log('resuming suspended context');
+    _ctx.resume();
+  }
   return _ctx;
 }
+
+// ── Global background audio suspension ──────────────────────────────────
+// Single handler that suspends the shared AudioContext when the app goes
+// to background (homescreen, tab switch, app switcher). This catches ALL
+// audio (scene, arena, dice, UI) since they all share the same context.
+function _onGlobalVisibility() {
+  if (!_ctx) return;
+  if (document.hidden) {
+    _backgroundSuspended = true;
+    _ctx.suspend().catch(() => {});
+    log('global suspend (page hidden)');
+  } else {
+    _backgroundSuspended = false;
+    _ctx.resume().catch(() => {});
+    log('global resume (page visible)');
+  }
+}
+
+function _onGlobalBlur() {
+  if (!_ctx) return;
+  _backgroundSuspended = true;
+  _ctx.suspend().catch(() => {});
+  log('global suspend (window blur)');
+}
+
+function _onGlobalFocus() {
+  if (!_ctx || document.hidden) return;
+  _backgroundSuspended = false;
+  _ctx.resume().catch(() => {});
+  log('global resume (window focus)');
+}
+
+document.addEventListener('visibilitychange', _onGlobalVisibility);
+window.addEventListener('blur', _onGlobalBlur);
+window.addEventListener('focus', _onGlobalFocus);
 
 function preloadAll() {
   const ctx = ensureContext();
@@ -94,6 +138,21 @@ export function resetContext() {
   // Re-create context and preload
   ensureContext();
   preloadAll();
+}
+
+/**
+ * Get stats about UI sound buffers for memory monitoring.
+ */
+export function getUiBufferStats() {
+  let totalBytes = 0;
+  let count = 0;
+  for (const buf of Object.values(_buffers)) {
+    if (buf) {
+      totalBytes += buf.numberOfChannels * buf.length * 4;
+      count++;
+    }
+  }
+  return { count, bytes: totalBytes };
 }
 
 export function useUiSounds() {

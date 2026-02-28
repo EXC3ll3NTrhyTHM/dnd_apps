@@ -146,8 +146,8 @@ app.get('/api/health', (req, res) => {
 // STATIC FILES (production)
 // ============================================
 
-// In production, serve the built React app
-if (process.env.NODE_ENV === 'production') {
+// In production or test, serve the built React app
+if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
   const clientDist = path.join(__dirname, '..', 'client', 'dist');
   app.use(express.static(clientDist));
   // Images already served above via /images route

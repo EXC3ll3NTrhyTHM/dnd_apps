@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { getAudioMuted } from '../hooks/useAudioSettings';
+import { ensureContext } from '../hooks/useUiSounds';
 import { EMOJI_CATEGORIES } from '../data/emojiData';
 import { api } from '../hooks/useApi';
 import NpcPortrait from './NpcPortrait';
@@ -23,28 +24,31 @@ const SYMBOLS_ROWS = [
 
 const COMPACT_H = 254;
 
-// Low-latency key tap sound using Web Audio API (pre-decoded buffer)
-let _audioCtx = null;
+// Low-latency key tap sound using shared Web Audio context (pre-decoded buffer)
 let _tapBuffer = null;
+let _tapBufferLoading = false;
 
-function initKeyTapAudio() {
-  if (_audioCtx) return;
-  _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function loadKeyTapBuffer() {
+  if (_tapBuffer || _tapBufferLoading) return;
+  _tapBufferLoading = true;
+  const ctx = ensureContext();
+  if (!ctx) return;
   fetch('/sounds/ui/button-tap.wav')
     .then(r => r.arrayBuffer())
-    .then(buf => _audioCtx.decodeAudioData(buf))
+    .then(buf => ctx.decodeAudioData(buf))
     .then(decoded => { _tapBuffer = decoded; })
     .catch(() => {});
 }
 
 function playKeyTap() {
-  if (!_audioCtx || !_tapBuffer || getAudioMuted()) return;
-  if (_audioCtx.state === 'suspended') _audioCtx.resume();
-  const src = _audioCtx.createBufferSource();
-  const gain = _audioCtx.createGain();
+  if (getAudioMuted()) return;
+  const ctx = ensureContext();
+  if (!ctx || !_tapBuffer) return;
+  const src = ctx.createBufferSource();
+  const gain = ctx.createGain();
   gain.gain.value = 0.3;
   src.buffer = _tapBuffer;
-  src.connect(gain).connect(_audioCtx.destination);
+  src.connect(gain).connect(ctx.destination);
   src.start(0);
 }
 
@@ -134,7 +138,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
 
   // Init low-latency audio on first open
   useEffect(() => {
-    if (open) initKeyTapAudio();
+    if (open) loadKeyTapBuffer();
   }, [open]);
 
   // Cache letter key bounding rects so we don't force layout reflow on every tap.
@@ -695,6 +699,46 @@ const CustomKeyboard = memo(function CustomKeyboard({
     }
   }, [mode]);
 
+  // Unload off-screen GIF images to prevent Safari memory crash on iOS
+  useEffect(() => {
+    if (mode !== 'gifs') return;
+    const grid = gifsGridRef.current;
+    if (!grid) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const img = entry.target;
+          if (entry.isIntersecting) {
+            const real = img.dataset.src;
+            if (real && img.src !== real) img.src = real;
+          } else {
+            if (img.src && !img.dataset.src) img.dataset.src = img.src;
+            img.removeAttribute('src');
+          }
+        }
+      },
+      { root: grid, rootMargin: '200px 0px' }
+    );
+
+    const observeAll = () => {
+      grid.querySelectorAll('img').forEach((img) => {
+        if (img.src && !img.dataset.src) img.dataset.src = img.src;
+        observer.observe(img);
+      });
+    };
+
+    observeAll();
+
+    const mutObs = new MutationObserver(observeAll);
+    mutObs.observe(grid, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      mutObs.disconnect();
+    };
+  }, [mode, gifResults, gifSearchActive]);
+
   const showPreview = (btn, char) => {
     const el = previewRef.current;
     if (!el) return;
@@ -998,6 +1042,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
       setGifSearchActive(true);
     } else if (action === 'deactivate-gif-search') {
       playKeyTap();
+      setExpanded(true);
       setGifSearchActive(false);
     } else if (action === 'clear-gif-search') {
       playKeyTap();
@@ -1276,7 +1321,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
   );
 
   return (
-    <div className="ck-container">
+    <div className="ck-container" data-testid="keyboard-panel">
       <div
         ref={boardRef}
         className="ck-board"
@@ -1579,7 +1624,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
                         data-gif-id={gif.id}
                         type="button"
                       >
-                        <img src={gif.preview} alt={gif.title} loading="lazy" />
+                        <img data-src={gif.preview} alt={gif.title} />
                       </button>
                     ))
                   )}
@@ -1605,7 +1650,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
                       data-gif-id={gif.id}
                       type="button"
                     >
-                      <img src={gif.preview} alt={gif.title} loading="lazy" />
+                      <img data-src={gif.preview} alt={gif.title} />
                     </button>
                   ))
                 )}

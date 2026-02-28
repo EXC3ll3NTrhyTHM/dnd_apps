@@ -53,4 +53,57 @@ async function getTestAuthHeaders({
   return { Authorization: `Bearer ${token}` };
 }
 
-module.exports = { loginAsTestUser, getTestAuthHeaders };
+/**
+ * Login and navigate to a specific location.
+ * Handles the scene-view → chat-view transition if the location has a scene.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} locationId - e.g. 'dragons_hollow', 'the_arena'
+ * @param {object} opts - login options
+ */
+async function loginAndNavigate(page, locationId, opts = {}) {
+  // Visit the app root so localStorage is available for this origin
+  await page.goto('/');
+  await page.waitForLoadState('domcontentloaded');
+
+  // Set the token in localStorage
+  const token = await loginAsTestUser(page, opts);
+
+  // Reload so the React app re-mounts and picks up the token from localStorage.
+  // Use 'load' instead of 'networkidle' — the app uses WebSockets and polling
+  // which prevent networkidle from ever resolving.
+  await page.reload({ waitUntil: 'load' });
+  // Wait until auth completes and we land on the map
+  await page.waitForSelector('.map-page, .map-container', { timeout: 15000 });
+
+  // App uses HashRouter — navigate by changing the hash
+  await page.evaluate((loc) => {
+    window.location.hash = `/location/${loc}`;
+  }, locationId);
+
+  // Locations with scenes render in scene view first — click a gathering spot or NPC to enter chat
+  // (the_arena doesn't have a scene, it renders Arena directly)
+  try {
+    const scene = page.locator('.location-scene');
+    await scene.waitFor({ timeout: 5000 });
+    // Click the gathering spot via JS to bypass overlay issues
+    await page.evaluate(() => {
+      const spot = document.querySelector('.scene-gathering-spot');
+      if (spot) { spot.click(); return; }
+      // Fallback: click any NPC sprite
+      const npc = document.querySelector('.npc-sprite');
+      if (npc) { npc.click(); return; }
+    });
+  } catch {
+    // No scene view — already in chat/arena (e.g., the_arena)
+  }
+
+  // Wait for the main content to load
+  await page.waitForSelector('[data-testid="chat-header"], .arena, .chat-header', {
+    timeout: 15000,
+  });
+
+  return token;
+}
+
+module.exports = { loginAsTestUser, getTestAuthHeaders, loginAndNavigate };

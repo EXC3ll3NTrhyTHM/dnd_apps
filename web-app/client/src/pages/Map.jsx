@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../hooks/useApi';
 import { useAuth } from '../hooks/useAuth';
 import NpcPortrait from '../components/NpcPortrait';
-import LocationTransition from '../components/LocationTransition';
+import LocationTransition, { getTransitionSoundUrls } from '../components/LocationTransition';
+import { preloadBuffers } from '../lib/sceneAudioEngine';
 import SummonEffect from '../components/SummonEffect';
 import FishingOverlay from '../components/FishingOverlay';
 import { pauseAmbientAudio } from '../components/Layout';
@@ -207,6 +208,8 @@ export default function Map() {
     e.stopPropagation();
     playSound('mapMarker');
     setSelectedLocation(prev => prev === locId ? null : locId);
+    // Preload transition sounds so they're instant when user clicks Enter
+    preloadBuffers(getTransitionSoundUrls(locId));
   }, [playSound]);
 
   const handleEnterLocation = useCallback((e, locId) => {
@@ -466,6 +469,7 @@ export default function Map() {
             <div
               key={loc.id}
               className={`map-marker ${isSelected ? 'selected' : ''}${loc.id === 'the_arena' ? ' arena-pin' : ''}`}
+              data-testid={`map-marker-${loc.id}`}
               style={{
                 left: `${loc.mapCoords.x}%`,
                 top: `${loc.mapCoords.y}%`,
@@ -556,6 +560,7 @@ export default function Map() {
 
             <button
               className="map-popup-enter"
+              data-testid="map-popup-enter"
               onClick={(e) => handleEnterLocation(e, selectedLoc.id)}
             >
               Enter

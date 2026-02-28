@@ -100,6 +100,32 @@ function preloadArenaSounds() {
   }
 }
 
+/**
+ * Get stats about arena sound buffers for memory monitoring.
+ */
+export function getArenaBufferStats() {
+  let totalBytes = 0;
+  let count = 0;
+  for (const buf of Object.values(_arenaBuffers)) {
+    if (buf) {
+      totalBytes += buf.numberOfChannels * buf.length * 4;
+      count++;
+    }
+  }
+  return { count, bytes: totalBytes, preloaded: _arenaPreloaded };
+}
+
+/**
+ * Clear all arena audio buffers to free memory.
+ * Called when leaving the arena.
+ */
+export function clearArenaBuffers() {
+  const count = Object.keys(_arenaBuffers).length;
+  _arenaBuffers = {};
+  _arenaPreloaded = false;
+  return count;
+}
+
 export function useArenaSounds() {
   const muted = useAudioMuted();
   const mutedRef = useRef(muted);
@@ -107,18 +133,9 @@ export function useArenaSounds() {
 
   useEffect(() => {
     preloadArenaSounds();
-
-    const onVisibility = () => {
-      const ctx = ensureContext();
-      if (!ctx) return;
-      if (document.hidden) {
-        ctx.suspend();
-      } else {
-        ctx.resume();
-      }
-    };
-    document.addEventListener('visibilitychange', onVisibility);
-    return () => document.removeEventListener('visibilitychange', onVisibility);
+    // Visibility/focus suspension is handled globally by useUiSounds.js
+    // (the _onGlobalVisibility / _onGlobalBlur / _onGlobalFocus handlers),
+    // so no additional handlers are needed here.
   }, []);
 
   const play = useCallback((key) => {

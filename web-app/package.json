@@ -12,7 +12,13 @@
     "start:prod": "cross-env NODE_ENV=production node server/server.js",
     "postinstall": "node scripts/patch-dice-box.js",
     "test": "npx playwright test",
-    "test:headed": "npx playwright test --headed"
+    "test:headed": "npx playwright test --headed",
+    "test:e2e": "npx playwright test",
+    "test:e2e:ui": "npx playwright test --ui",
+    "test:unit": "node --test test/unit/",
+    "fix-bugs": "node scripts/fix-bugs.js",
+    "test:nightly": "node scripts/run-tests-scheduled.js --auto-fix --notify",
+    "test:full": "node scripts/run-tests-scheduled.js --notify"
   },
   "dependencies": {
     "@3d-dice/dice-box-threejs": "^0.0.12",

@@ -550,9 +550,10 @@ participant.spellSlots = {
 | 15 | Nalyd — Stunning Strike (uses Stunned condition) | Next |
 | 16 | Nalyd — Homebrew: Ignition Form (uses Burning condition) | Next |
 | 17 | Aly — Cleric spells + abilities | Next |
-| 18 | Tyren — Ranger spells + abilities | Next |
+| 18 | Tyren — Hunter's Mark | ✅ Done |
+| 18b | Tyren — Remaining Ranger abilities (Favored Enemy, Cure Wounds) | Next |
 | 19 | Saving Throw Framework (player saves) | Planned |
-| 20 | Concentration | Planned |
+| 20 | Concentration | ✅ Done (via Ensnaring Strike + Hunter's Mark) |
 
 ### Ad-hoc Fields Kept (not migrated to conditions)
 
@@ -597,3 +598,4 @@ client/
 |------|--------|
 | 2026-02-16 | Initial plan created |
 | 2026-02-18 | Conditions framework implemented (Phase 5). Migrated Vicious Mockery. Updated priority order to reflect completed work (Phases 1-2 partial + conditions). |
+| 2026-02-27 | Hunter's Mark implemented for Tyren (Ranger). Concentration system confirmed working (CON saves on damage, auto-break on KO, break when casting new concentration spell). Added unit tests. |

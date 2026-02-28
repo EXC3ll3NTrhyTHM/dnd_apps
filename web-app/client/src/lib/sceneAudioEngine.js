@@ -9,28 +9,52 @@
  * Plain JS singleton (like diceAudio.js) — survives React mount/unmount.
  */
 import { ensureContext } from '../hooks/useUiSounds';
+import { createLogger } from '../utils/debug';
 
-// URL → AudioBuffer cache (persists across config changes)
+const log = createLogger('audio');
+
+// URL → AudioBuffer cache (persists across config changes, capped to limit memory)
 const _bufferCache = new Map();
+const BUFFER_CACHE_MAX = 10;
 
 // Currently active playback entries
 let _activeEntries = [];
 let _muted = false;
 let _suspended = false;
+// Generation counter — incremented on every playSceneConfig/stopAll call.
+// After the async buffer load, we check if the generation has changed;
+// if so, another call has superseded us and we bail out.
+let _generation = 0;
 
 /**
  * Fetch and decode an audio file. Returns cached buffer if available.
  */
-async function loadBuffer(url) {
-  if (_bufferCache.has(url)) return _bufferCache.get(url);
+export async function loadBuffer(url) {
+  if (_bufferCache.has(url)) { log('buffer cache hit', url); return _bufferCache.get(url); }
   const ctx = ensureContext();
-  if (!ctx) return null;
+  if (!ctx) { log('no AudioContext, skipping load', url); return null; }
   try {
+    log('loading buffer', url);
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const arrayBuf = await resp.arrayBuffer();
+    // Guard against huge files that would crash mobile devices when decoded
+    // (a 5MB MP3 ≈ 100MB decoded AudioBuffer — safe; 30MB+ will crash iOS)
+    const MAX_BYTES = 8 * 1024 * 1024; // 8MB compressed
+    if (arrayBuf.byteLength > MAX_BYTES) {
+      console.warn('[SceneAudioEngine] Skipping oversized audio', url,
+        `(${(arrayBuf.byteLength / 1024 / 1024).toFixed(1)}MB > ${MAX_BYTES / 1024 / 1024}MB limit)`);
+      return null;
+    }
     const decoded = await ctx.decodeAudioData(arrayBuf);
     _bufferCache.set(url, decoded);
+    // Evict oldest entries when cache exceeds cap
+    if (_bufferCache.size > BUFFER_CACHE_MAX) {
+      const it = _bufferCache.keys();
+      while (_bufferCache.size > BUFFER_CACHE_MAX) {
+        _bufferCache.delete(it.next().value);
+      }
+    }
     return decoded;
   } catch (err) {
     console.warn('[SceneAudioEngine] Failed to load', url, err);
@@ -135,6 +159,8 @@ function fadeOutGain(gainNode, durationSec = 0.4) {
  * Stop all active scene audio with optional fade-out.
  */
 export function stopAll(fadeMs = 400) {
+  log('stopAll', { active: _activeEntries.length, fadeMs });
+  _generation++; // Invalidate any in-flight playSceneConfig calls
   const fadeSec = fadeMs / 1000;
   _activeEntries.forEach(entry => {
     if (entry.type === 'irregular') {
@@ -189,12 +215,27 @@ export function resumeScene() {
  * Returns a cleanup function.
  */
 export async function playSceneConfig(config, { muted = false } = {}) {
+  log('playSceneConfig', { music: config?.music?.src, ambient: config?.ambient?.length, muted });
   _muted = muted;
 
-  // Stop previous audio with a short crossfade
+  // Ensure the AudioContext is running — it may have been suspended by the
+  // global background audio handler. Without this, sources start but produce
+  // no audible output because the context is paused.
+  const ctx = ensureContext();
+  if (ctx && ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
+
+  // Stop previous audio with a short crossfade.
+  // stopAll increments _generation, which also invalidates any earlier
+  // in-flight playSceneConfig that hasn't finished loading buffers yet.
   stopAll(500);
 
   if (!config) return () => {};
+
+  // Capture the generation at call time so we can detect if another
+  // playSceneConfig or stopAll ran while we were loading buffers.
+  const myGeneration = _generation;
 
   // Collect all URLs to load
   const loadTasks = [];
@@ -218,6 +259,13 @@ export async function playSceneConfig(config, { muted = false } = {}) {
   // Load all buffers in parallel
   const buffers = await Promise.all(loadTasks.map(t => loadBuffer(t.src)));
 
+  // After the async gap: if another playSceneConfig or stopAll was called
+  // while we were loading, this call is stale — don't start any sources.
+  if (_generation !== myGeneration) {
+    log('playSceneConfig stale after buffer load, bailing', { myGeneration, current: _generation });
+    return () => {};
+  }
+
   const newEntries = [];
 
   loadTasks.forEach((task, i) => {
@@ -237,4 +285,36 @@ export async function playSceneConfig(config, { muted = false } = {}) {
 
   // Return cleanup function
   return () => stopAll(300);
+}
+
+/**
+ * Clear the audio buffer cache to free memory.
+ * Called when leaving a location so decoded AudioBuffers (which can be
+ * 20-100MB each in uncompressed PCM) don't linger on memory-constrained
+ * devices like iPhones. Buffers are re-loaded via preloadAudio during
+ * the next location's transition, so there's no cold-start penalty.
+ *
+ * @param {string[]} [keepUrls] - URLs to keep in cache (e.g. currently playing)
+ */
+export function clearBufferCache(keepUrls = []) {
+  const keepSet = new Set(keepUrls);
+  let cleared = 0;
+  for (const url of [..._bufferCache.keys()]) {
+    if (!keepSet.has(url)) {
+      _bufferCache.delete(url);
+      cleared++;
+    }
+  }
+  log('clearBufferCache', { cleared, kept: keepSet.size, remaining: _bufferCache.size });
+}
+
+/**
+ * Get stats about the audio buffer cache for memory monitoring.
+ */
+export function getBufferCacheStats() {
+  let totalBytes = 0;
+  _bufferCache.forEach((buf) => {
+    totalBytes += buf.numberOfChannels * buf.length * 4;
+  });
+  return { count: _bufferCache.size, bytes: totalBytes };
 }

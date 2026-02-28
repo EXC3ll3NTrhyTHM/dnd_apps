@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../hooks/useApi';
 import { useAuth } from '../hooks/useAuth';
@@ -507,6 +507,9 @@ export default function Profile() {
         </button>
       </div>
 
+      {/* Version footer — triple-tap toggles memory overlay */}
+      <VersionFooter />
+
       {rewardEffect && (
         <DmAwardEffect
           key={rewardEffect.key}
@@ -518,5 +521,33 @@ export default function Profile() {
         />
       )}
     </div>
+  );
+}
+
+function VersionFooter() {
+  const tapsRef = useRef([]);
+
+  function handleTap() {
+    const now = Date.now();
+    tapsRef.current = [...tapsRef.current.filter(t => now - t < 800), now];
+    if (tapsRef.current.length >= 3) {
+      tapsRef.current = [];
+      const current = localStorage.getItem('dh_memory_overlay') === 'true';
+      if (current) {
+        localStorage.removeItem('dh_memory_overlay');
+      } else {
+        localStorage.setItem('dh_memory_overlay', 'true');
+      }
+      window.location.reload();
+    }
+  }
+
+  return (
+    <p
+      onClick={handleTap}
+      style={{ textAlign: 'center', color: '#555', fontSize: '0.7rem', margin: '16px 0 8px', userSelect: 'none' }}
+    >
+      Dragon's Hollow v1.0
+    </p>
   );
 }

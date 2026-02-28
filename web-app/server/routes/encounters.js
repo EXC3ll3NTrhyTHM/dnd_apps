@@ -430,7 +430,7 @@ router.post('/:encounterId/initiative', authRequired, (req, res) => {
  */
 router.post('/:encounterId/action', authRequired, (req, res) => {
   const userId = req.user.id;
-  const { action, attackRoll, attackRoll2, damageTotal, potionId, targetId, healRoll, helpTargetId, smiteData, sneakAttackData, inspirationData, healAmount, spellId, saveRoll, weaponId, subAction, ensnaringStrikeSaveRoll, stunningStrike, stunningStrikeSaveRoll } = req.body;
+  const { action, attackRoll, attackRoll2, damageTotal, potionId, targetId, healRoll, helpTargetId, smiteData, sneakAttackData, inspirationData, huntersMarkData, healAmount, spellId, saveRoll, weaponId, subAction, ensnaringStrikeSaveRoll, stunningStrike, stunningStrikeSaveRoll } = req.body;
 
   if (!action) {
     return res.status(400).json({ error: 'action is required.' });
@@ -448,6 +448,7 @@ router.post('/:encounterId/action', authRequired, (req, res) => {
   if (smiteData) rollData.smiteData = smiteData;
   if (sneakAttackData) rollData.sneakAttackData = sneakAttackData;
   if (inspirationData) rollData.inspirationData = inspirationData;
+  if (huntersMarkData) rollData.huntersMarkData = huntersMarkData;
   if (typeof healAmount === 'number') rollData.healAmount = healAmount;
   if (spellId) rollData.spellId = spellId;
   if (typeof saveRoll === 'number') rollData.saveRoll = saveRoll;

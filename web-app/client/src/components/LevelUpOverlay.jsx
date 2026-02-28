@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { getAudioMuted } from '../hooks/useAudioSettings';
+import { ensureContext } from '../hooks/useUiSounds';
 import '../styles/level-up.css';
 
 /**
@@ -38,8 +39,8 @@ export default function LevelUpOverlay({ level, onDismiss }) {
     if (getAudioMuted()) return;
 
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      if (ctx.state === 'suspended') ctx.resume();
+      const ctx = ensureContext();
+      if (!ctx) return;
 
       // Ascending arpeggio: 4 quick notes
       const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
@@ -77,8 +78,6 @@ export default function LevelUpOverlay({ level, onDismiss }) {
       shimmer.start(shimmerStart);
       shimmer.stop(shimmerStart + 1.3);
 
-      // Clean up context after sounds finish
-      setTimeout(() => ctx.close().catch(() => {}), 3000);
     } catch {
       // Web Audio not available — silent fallback
     }

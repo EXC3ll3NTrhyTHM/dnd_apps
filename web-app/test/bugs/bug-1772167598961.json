@@ -1,0 +1,37 @@
+{
+  "id": "bug-1772167598961",
+  "title": "Dice rolls leak DOM nodes (memory)",
+  "priority": "high",
+  "testFile": "dice.spec.js",
+  "testName": "multiple dice rolls do not leak DOM nodes",
+  "timestamp": "2026-02-27T04:46:38.961Z",
+  "pageUrl": "http://localhost:3421/#/location/dragons_hollow",
+  "failure": {
+    "steps": "Perform 5 dice rolls in sequence",
+    "expected": "DOM node count stays within 50% of baseline",
+    "actual": "locator.click: Test timeout of 120000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.dice-btn').first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"dice-btn\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not stable\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div id=\"splash\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    221 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m        - element is visible, enabled and stable\u001b[22m\n\u001b[2m        - scrolling into view if needed\u001b[22m\n\u001b[2m        - done scrolling\u001b[22m\n\u001b[2m        - <div id=\"splash\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m      - retrying click action\u001b[22m\n\u001b[2m        - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n"
+  },
+  "diagnostics": {
+    "consoleErrors": [
+      {
+        "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "location": {
+          "url": "http://localhost:3421/api/campaign/state",
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "timestamp": 1772167477818
+      }
+    ],
+    "networkErrors": [],
+    "audioEvents": [],
+    "screenshot": null
+  },
+  "suspectedFiles": [
+    "client/src/components/DiceOverlay.jsx",
+    "client/src/components/DicePanel.jsx"
+  ],
+  "forAgent": {
+    "task": "Fix bug: Dice rolls leak DOM nodes (memory)\n## Steps to reproduce\nPerform 5 dice rolls in sequence\n## Expected\nDOM node count stays within 50% of baseline\n## Actual\nlocator.click: Test timeout of 120000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.dice-btn').first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"dice-btn\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not stable\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div id=\"splash\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    221 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m        - element is visible, enabled and stable\u001b[22m\n\u001b[2m        - scrolling into view if needed\u001b[22m\n\u001b[2m        - done scrolling\u001b[22m\n\u001b[2m        - <div id=\"splash\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m      - retrying click action\u001b[22m\n\u001b[2m        - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\n## Suspected files\n- client/src/components/DiceOverlay.jsx\n- client/src/components/DicePanel.jsx\n## Console errors\n- Failed to load resource: the server responded with a status of 401 (Unauthorized)\n## Test file: dice.spec.js\nRe-run with: npx playwright test --grep \"multiple dice rolls do not leak DOM nodes\""
+  }
+}

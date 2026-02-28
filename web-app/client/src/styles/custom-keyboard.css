@@ -1091,6 +1091,10 @@
   pointer-events: none;
 }
 
+.ck-gif-cell img:not([src]) {
+  visibility: hidden;
+}
+
 .ck-gif-cell.ck-key-pressed {
   opacity: 0.7;
   transform: scale(0.97);

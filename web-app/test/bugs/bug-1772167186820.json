@@ -1,0 +1,67 @@
+{
+  "id": "bug-1772167186820",
+  "title": "Dice audio buffers not freed when leaving arena",
+  "priority": "high",
+  "testFile": "arena-audio.spec.js",
+  "testName": "dice audio buffers are cleared when leaving the arena",
+  "timestamp": "2026-02-27T04:39:46.820Z",
+  "pageUrl": "http://localhost:3421/#/location/the_arena",
+  "failure": {
+    "steps": "Enter The Arena, interact to trigger dice sound preload, leave to map, re-enter. On re-entry, dice sounds should be re-fetched.",
+    "expected": "Dice audio buffers cleared on arena exit; re-entering re-fetches sounds",
+    "actual": "Dice sounds should be re-fetched on second visit (proving buffers were cleared). First visit: 22 fetches, second visit: 0 fetches\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m"
+  },
+  "diagnostics": {
+    "consoleErrors": [
+      {
+        "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "location": {
+          "url": "http://localhost:3421/api/campaign/state",
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "timestamp": 1772167175095
+      }
+    ],
+    "networkErrors": [],
+    "audioEvents": [
+      {
+        "type": "html-audio-play",
+        "src": "http://localhost:3421/sounds/bustling-city.mp3",
+        "timestamp": 1772167175348
+      },
+      {
+        "type": "html-audio-play",
+        "src": "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=",
+        "timestamp": 1772167175594
+      },
+      {
+        "type": "web-audio-buffer-start",
+        "state": "running",
+        "timestamp": 1772167175939
+      },
+      {
+        "type": "html-audio-play",
+        "src": "http://localhost:3421/sounds/bustling-city.mp3",
+        "timestamp": 1772167180616
+      },
+      {
+        "type": "web-audio-buffer-start",
+        "state": "running",
+        "timestamp": 1772167182060
+      }
+    ],
+    "screenshot": "dice-audio-buffers-not-freed-when-leaving-arena-1772167186751.png"
+  },
+  "suspectedFiles": [
+    "client/src/components/DiceOverlay.jsx",
+    "client/src/components/DicePanel.jsx",
+    "client/src/pages/Arena.jsx",
+    "client/src/hooks/useUiSounds.js",
+    "client/src/hooks/useArenaSounds.js",
+    "client/src/lib/sceneAudioEngine.js"
+  ],
+  "forAgent": {
+    "task": "Fix bug: Dice audio buffers not freed when leaving arena\n## Steps to reproduce\nEnter The Arena, interact to trigger dice sound preload, leave to map, re-enter. On re-entry, dice sounds should be re-fetched.\n## Expected\nDice audio buffers cleared on arena exit; re-entering re-fetches sounds\n## Actual\nDice sounds should be re-fetched on second visit (proving buffers were cleared). First visit: 22 fetches, second visit: 0 fetches\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n## Suspected files\n- client/src/components/DiceOverlay.jsx\n- client/src/components/DicePanel.jsx\n- client/src/pages/Arena.jsx\n- client/src/hooks/useUiSounds.js\n- client/src/hooks/useArenaSounds.js\n- client/src/lib/sceneAudioEngine.js\n## Console errors\n- Failed to load resource: the server responded with a status of 401 (Unauthorized)\n## Test file: arena-audio.spec.js\nRe-run with: npx playwright test --grep \"dice audio buffers are cleared when leaving the arena\""
+  }
+}

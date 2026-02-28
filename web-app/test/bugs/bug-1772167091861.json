@@ -1,0 +1,45 @@
+{
+  "id": "bug-1772167091861",
+  "title": "Arena audio buffers not freed when leaving",
+  "priority": "high",
+  "testFile": "arena-audio.spec.js",
+  "testName": "arena audio buffers are cleared when leaving the arena",
+  "timestamp": "2026-02-27T04:38:11.861Z",
+  "pageUrl": "http://localhost:3421/#/map",
+  "failure": {
+    "steps": "Enter The Arena, wait for SFX preload, leave to map, re-enter. On re-entry, arena sounds should be re-fetched (proving cache was cleared).",
+    "expected": "Arena audio buffers cleared on exit; re-entering re-fetches sounds",
+    "actual": "page.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"map-popup-enter\"]') to be visible\u001b[22m\n"
+  },
+  "diagnostics": {
+    "consoleErrors": [
+      {
+        "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "location": {
+          "url": "http://localhost:3421/api/campaign/state",
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        "timestamp": 1772167085510
+      }
+    ],
+    "networkErrors": [],
+    "audioEvents": [
+      {
+        "type": "html-audio-play",
+        "src": "http://localhost:3421/sounds/bustling-city.mp3",
+        "timestamp": 1772167085897
+      }
+    ],
+    "screenshot": "arena-audio-buffers-not-freed-when-leaving-1772167091744.png"
+  },
+  "suspectedFiles": [
+    "client/src/pages/Arena.jsx",
+    "client/src/hooks/useUiSounds.js",
+    "client/src/hooks/useArenaSounds.js",
+    "client/src/lib/sceneAudioEngine.js"
+  ],
+  "forAgent": {
+    "task": "Fix bug: Arena audio buffers not freed when leaving\n## Steps to reproduce\nEnter The Arena, wait for SFX preload, leave to map, re-enter. On re-entry, arena sounds should be re-fetched (proving cache was cleared).\n## Expected\nArena audio buffers cleared on exit; re-entering re-fetches sounds\n## Actual\npage.waitForSelector: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"map-popup-enter\"]') to be visible\u001b[22m\n\n## Suspected files\n- client/src/pages/Arena.jsx\n- client/src/hooks/useUiSounds.js\n- client/src/hooks/useArenaSounds.js\n- client/src/lib/sceneAudioEngine.js\n## Console errors\n- Failed to load resource: the server responded with a status of 401 (Unauthorized)\n## Test file: arena-audio.spec.js\nRe-run with: npx playwright test --grep \"arena audio buffers are cleared when leaving the arena\""
+  }
+}
