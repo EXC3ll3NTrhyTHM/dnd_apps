@@ -2,10 +2,10 @@
   "424061511833747467": {
     "user_id": "424061511833747467",
     "username": "Tyren",
-    "balance": 720,
-    "lifetime_earned": 10895,
+    "balance": 897,
+    "lifetime_earned": 11072,
     "lifetime_spent": 10175,
-    "last_updated": "2026-02-28T19:33:26.210Z"
+    "last_updated": "2026-03-01T03:41:25.686Z"
   },
   "1374906408046166036": {
     "user_id": "1374906408046166036",
@@ -50,9 +50,9 @@
   "1472286665417560167": {
     "user_id": "1472286665417560167",
     "username": "Acacia",
-    "balance": 191,
-    "lifetime_earned": 841,
-    "lifetime_spent": 650,
-    "last_updated": "2026-02-21T22:06:49.811Z"
+    "balance": 165,
+    "lifetime_earned": 1015,
+    "lifetime_spent": 850,
+    "last_updated": "2026-03-01T03:41:25.758Z"
   }
 }

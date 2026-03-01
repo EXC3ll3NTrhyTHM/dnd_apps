@@ -10,3 +10,11 @@
 [2026-02-26] I had a conversation with Nalyd today, and he shared some wild stories about fighting giant squids and feeding the slums. I marveled at how he’s become a legend in their eyes—what a heavy, yet uplifting vibe!
 
 [2026-02-26] Today, I had a groovy moment with Nalyd—his eyes were shining with happiness, and I reminded him to keep riding that good vibe wave. But as I passed by the dojo, an uneasy feeling settled in; there’s definitely some bad energy lurking around.
+
+[2026-03-01] Today was a blast! Nalyd returned with some epic gifts, including a golden necklace with an eternal flame and a massive katana for Kumo, which really set the vibes for our upcoming party. I can't wait to celebrate with everyone and enjoy the snacks I've prepared!
+
+[2026-03-01] Tonight was an absolute blast! We devoured giant squid pizza while reminiscing about life and telling stories. I shared my encounter with a ghost in a haunted grove, and it felt nice connecting over shared experiences. Who knew discussing the afterlife could feel so chill?
+
+[2026-03-01] Today was a glorious break from the troubles of our journey. We indulged in mead and shared a joint, reveling in the camaraderie and the sweet gift of peace after our battles. I felt the weight lift as we toasted to joy and laughter, embracing the moments that make all the struggles worthwhile.
+
+[2026-03-01] Tonight was a blast! We shared some laughs about fire threats and soaked in the good vibes while enjoying pizza, all set to Raku’s enchanting lute tunes. I felt a deep joy surrounded by friends, celebrating a night full of laughter and music—truly a treasure!

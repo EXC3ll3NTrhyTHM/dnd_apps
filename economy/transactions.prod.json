@@ -9622,6 +9622,340 @@
         "source": "combat_encounter"
       },
       "timestamp": "2026-02-28T19:33:26.218Z"
+    },
+    {
+      "id": "tx_1772332981123_eiuezk",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 7,
+      "balance_after": 198,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T02:43:01.123Z"
+    },
+    {
+      "id": "tx_1772332981219_g32t1n",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 18,
+      "balance_after": 738,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T02:43:01.219Z"
+    },
+    {
+      "id": "tx_1772332997233_dzv2lq",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 208,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-03-01T02:43:17.233Z"
+    },
+    {
+      "id": "tx_1772332998483_7tt25l",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 223,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-03-01T02:43:18.483Z"
+    },
+    {
+      "id": "tx_1772333229704_nh751z",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 16,
+      "balance_after": 239,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T02:47:09.704Z"
+    },
+    {
+      "id": "tx_1772333229780_tkycj8",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 9,
+      "balance_after": 747,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T02:47:09.780Z"
+    },
+    {
+      "id": "tx_1772333242989_a3c5qo",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 772,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-03-01T02:47:22.989Z"
+    },
+    {
+      "id": "tx_1772333243573_a9tfqu",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 787,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-03-01T02:47:23.573Z"
+    },
+    {
+      "id": "tx_1772333820177_q8g0kn",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 12,
+      "balance_after": 799,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T02:57:00.177Z"
+    },
+    {
+      "id": "tx_1772333820256_mu2dnt",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 13,
+      "balance_after": 252,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T02:57:00.256Z"
+    },
+    {
+      "id": "tx_1772333824808_dw9ncn",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 277,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-03-01T02:57:04.808Z"
+    },
+    {
+      "id": "tx_1772333825924_md5x7f",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 282,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-03-01T02:57:05.924Z"
+    },
+    {
+      "id": "tx_1772334066281_do1ap8",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 21,
+      "balance_after": 820,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T03:01:06.281Z"
+    },
+    {
+      "id": "tx_1772334066405_2k8lrr",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 4,
+      "balance_after": 286,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T03:01:06.405Z"
+    },
+    {
+      "id": "tx_1772334077281_ua2obk",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 311,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "dice_goblin"
+      },
+      "timestamp": "2026-03-01T03:01:17.281Z"
+    },
+    {
+      "id": "tx_1772334238328_sdi4gz",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 7,
+      "balance_after": 827,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T03:03:58.329Z"
+    },
+    {
+      "id": "tx_1772334238411_vozy5c",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 19,
+      "balance_after": 330,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T03:03:58.411Z"
+    },
+    {
+      "id": "tx_1772334248872_u1qcsn",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 335,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_crit"
+      },
+      "timestamp": "2026-03-01T03:04:08.872Z"
+    },
+    {
+      "id": "tx_1772334761037_h8vh93",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 19,
+      "balance_after": 846,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T03:12:41.037Z"
+    },
+    {
+      "id": "tx_1772334761136_q1gvk0",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 6,
+      "balance_after": 341,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T03:12:41.136Z"
+    },
+    {
+      "id": "tx_1772334978839_7485du",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 9,
+      "balance_after": 350,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T03:16:18.839Z"
+    },
+    {
+      "id": "tx_1772334978917_az35aa",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 16,
+      "balance_after": 862,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T03:16:18.917Z"
+    },
+    {
+      "id": "tx_1772335190096_blslah",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 17,
+      "balance_after": 879,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T03:19:50.096Z"
+    },
+    {
+      "id": "tx_1772335190202_wt0cfm",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 358,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T03:19:50.202Z"
+    },
+    {
+      "id": "tx_1772335786151_q8u7yp",
+      "user_id": "1472286665417560167",
+      "username": "theminiarchitect",
+      "type": "purchase",
+      "amount": -200,
+      "balance_after": 158,
+      "metadata": {
+        "item_id": "dice_thunder",
+        "item_name": "Thunder Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-03-01T03:29:46.151Z"
+    },
+    {
+      "id": "tx_1772336485694_yaks68",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 18,
+      "balance_after": 897,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T03:41:25.694Z"
+    },
+    {
+      "id": "tx_1772336485762_bll5mp",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 7,
+      "balance_after": 165,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T03:41:25.762Z"
     }
   ]
 }

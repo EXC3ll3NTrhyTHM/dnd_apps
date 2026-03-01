@@ -40,14 +40,21 @@ function logStats(action, detail) {
  */
 export function getDiceWebGLStats() {
   const ri = _box?.renderer?.info;
+  const gl = _box?.renderer?.getContext?.();
+  const world = _box?.world;
   return {
     textures: ri?.memory?.textures || 0,
     geometries: ri?.memory?.geometries || 0,
+    programs: ri?.programs?.length || 0,
     totalCreated: _totalTexturesCreated,
     totalDisposed: _totalTexturesDisposed,
     rolls: _stats.rolls,
     contextLost: _stats.lost,
+    contextAlive: gl ? !gl.isContextLost() : false,
     fatalError: _fatalError,
+    worldBodies: world?.bodies?.length || 0,
+    worldContactMaterials: world?.contactmaterials?.length || 0,
+    sceneChildren: _box?.scene?.children?.length || 0,
   };
 }
 registerProbe('webgl', getDiceWebGLStats);
@@ -117,20 +124,147 @@ function disposeMatCache(target) {
   return disposed;
 }
 
+function disposeDiceMeshGeometries(target) {
+  if (!target?.scene) return 0;
+  // Collect shared geometry references from the DiceFactory cache — never dispose those
+  const sharedGeos = new Set();
+  const geoCache = target.DiceFactory?.geometries;
+  if (geoCache) {
+    Object.values(geoCache).forEach(g => { if (g) sharedGeos.add(g); });
+  }
+  let disposed = 0;
+  target.scene.traverse((node) => {
+    if (!node.isMesh) return;
+    // Skip the floor plane (≤4 vertices)
+    if ((node.geometry?.attributes?.position?.count || 0) <= 4) return;
+    if (node.geometry && !sharedGeos.has(node.geometry)) {
+      node.geometry.dispose();
+      disposed++;
+    }
+  });
+  return disposed;
+}
+
 function trackedClearDice(box, label) {
   const target = box || _box;
   if (!target) return;
   const texBefore = target.renderer?.info?.memory?.textures || 0;
-  // Dispose textures BEFORE clearDice removes meshes from scene
+  // Dispose textures and cloned geometries BEFORE clearDice removes meshes from scene
   const meshTexDisposed = disposeDiceMeshTextures(target);
   const cacheDisposed = disposeMatCache(target);
+  const geosDisposed = disposeDiceMeshGeometries(target);
   _totalTexturesDisposed += meshTexDisposed + cacheDisposed;
   try { target.clearDice(); } catch (e) { console.warn('[DiceBox] clearDice error:', e); }
   const texAfter = target.renderer?.info?.memory?.textures || 0;
   console.log(
     `[DiceBox] clearDice (${label}): textures ${texBefore}→${texAfter} (freed ${texBefore - texAfter}), ` +
-    `mesh-tex: ${meshTexDisposed}, cache: ${cacheDisposed}`
+    `mesh-tex: ${meshTexDisposed}, cache: ${cacheDisposed}, geos: ${geosDisposed}`
   );
+}
+
+/**
+ * Full teardown of the DiceBox singleton — releases the Three.js renderer,
+ * physics world, all GPU resources. The next roll will lazily create a fresh instance.
+ */
+export function destroyBox() {
+  if (!_box) return;
+  logStats('DESTROY', 'Full teardown starting');
+
+  try {
+    // 1. Stop animations
+    _box.running = false;
+    _box.rolling = false;
+
+    // 2. Dispose dice mesh textures and materials cache
+    disposeDiceMeshTextures(_box);
+    disposeMatCache(_box);
+
+    // 3. Clear dice (removes meshes from scene, bodies from physics world)
+    try { _box.clearDice(); } catch (e) { console.warn('[DiceBox] clearDice in destroy:', e); }
+
+    // 4. Traverse remaining scene children (floor plane, lights, etc.) and dispose
+    if (_box.scene) {
+      const toRemove = [];
+      _box.scene.traverse((node) => {
+        if (node.geometry) node.geometry.dispose();
+        if (node.material) {
+          const mats = Array.isArray(node.material) ? node.material : [node.material];
+          mats.forEach(m => {
+            if (!m) return;
+            if (m.map) m.map.dispose();
+            if (m.bumpMap) m.bumpMap.dispose();
+            if (m.normalMap) m.normalMap.dispose();
+            if (m.envMap) m.envMap.dispose();
+            m.dispose();
+          });
+        }
+        if (node !== _box.scene) toRemove.push(node);
+      });
+      toRemove.forEach(node => {
+        try { node.parent?.remove(node); } catch {}
+      });
+    }
+
+    // 5. Dispose DiceFactory shared geometry templates
+    const geoCache = _box.DiceFactory?.geometries;
+    if (geoCache) {
+      Object.keys(geoCache).forEach(key => {
+        try { geoCache[key]?.dispose(); } catch {}
+      });
+      _box.DiceFactory.geometries = {};
+    }
+
+    // 6. Dispose renderer
+    if (_box.renderer) {
+      try { _box.renderer.renderLists?.dispose(); } catch {}
+      try { _box.renderer.dispose(); } catch {}
+      // Remove canvas from DOM
+      try { _box.renderer.domElement?.remove(); } catch {}
+    }
+  } catch (e) {
+    console.warn('[DiceBox] Error during destroy:', e);
+  }
+
+  // 7. Reset all module-level state
+  _box = null;
+  _initPromise = null;
+  _currentConfig = { colorset: null, material: null };
+  _stats.rolls = 0;
+  _prevTexCount = 0;
+  _prevGeoCount = 0;
+  _totalTexturesCreated = 0;
+  _totalTexturesDisposed = 0;
+
+  logStats('DESTROY', 'Complete — next roll will create fresh instance');
+}
+
+/**
+ * Thorough GPU cleanup WITHOUT destroying the DiceBox singleton.
+ * Disposes all dice meshes, textures, geometries, and renderer caches
+ * while keeping the renderer + DiceColors alive (avoids library texture bug).
+ */
+export function deepCleanBox() {
+  if (!_box) return;
+  logStats('DEEP CLEAN', 'Thorough GPU cleanup (keeping singleton)');
+
+  // Dispose dice mesh textures + materials cache + cloned geometries
+  const meshTex = disposeDiceMeshTextures(_box);
+  const cacheTex = disposeMatCache(_box);
+  const geos = disposeDiceMeshGeometries(_box);
+  _totalTexturesDisposed += meshTex + cacheTex;
+
+  // Clear dice (removes meshes from scene, bodies from physics world)
+  try { _box.clearDice(); } catch (e) { console.warn('[DiceBox] clearDice in deep clean:', e); }
+
+  // Flush renderer internal caches
+  try { _box.renderer?.renderLists?.dispose(); } catch {}
+
+  // Reset tracking counters
+  _stats.rolls = 0;
+  _prevTexCount = _box.renderer?.info?.memory?.textures || 0;
+  _prevGeoCount = _box.renderer?.info?.memory?.geometries || 0;
+
+  logStats('DEEP CLEAN', `Done — mesh-tex: ${meshTex}, cache: ${cacheTex}, geos: ${geos}`);
 }
 
 async function acquireBox(containerId, config) {
@@ -142,6 +276,15 @@ async function acquireBox(containerId, config) {
   _onContextLost = onContextLost;
 
   // ── Reuse path: move canvas into new container, update colorset ──
+  if (_box) {
+    // Proactive context health check — if context is lost, tear down and recreate
+    const gl = _box.renderer?.getContext();
+    if (!gl || gl.isContextLost()) {
+      logStats('CONTEXT DEAD', 'Proactive destroy on stale context');
+      destroyBox();
+    }
+  }
+
   if (_box) {
     const container = document.getElementById(containerId);
     const canvas = _box.renderer?.domElement;
@@ -237,9 +380,17 @@ async function acquireBox(containerId, config) {
       if (canvas) {
         canvas.addEventListener('webglcontextlost', (e) => {
           e.preventDefault();
-          _box = null;
           _stats.lost++;
-          logStats('CONTEXT LOST', 'WebGL context was killed');
+          logStats('CONTEXT LOST', 'WebGL context was killed — cleaning up');
+          // Dispose renderer internals before abandoning the dead context
+          const renderer = _box?.renderer;
+          if (renderer) {
+            try { renderer.renderLists?.dispose(); } catch {}
+            try { renderer.dispose(); } catch {}
+          }
+          _box = null;
+          _initPromise = null;
+          _currentConfig = { colorset: null, material: null };
           _onContextLost?.();
         });
       }
@@ -521,6 +672,8 @@ export default function DiceOverlay({
             clearTimerRef.current = setTimeout(() => {
               if (mountedRef.current) {
                 trackedClearDice(diceBoxRef.current, 'post-roll-dismiss');
+                // Flush renderer render-list cache to prevent accumulation across rolls
+                try { diceBoxRef.current?.renderer?.renderLists?.dispose(); } catch {}
                 propsRef.current.onDone?.();
               }
             }, 1200);
@@ -567,7 +720,17 @@ export default function DiceOverlay({
         diceBoxRef.current = box;
         if (!mountedRef.current) return;
 
-        // debugDiceState('AFTER acquireBox', box);
+        debugDiceState('AFTER acquireBox', box);
+
+        // Log colorset texture data to diagnose texture loading issues
+        const cd = box.colorData || box.DiceFactory?.colordata;
+        if (cd) {
+          const texInfo = cd.texture;
+          const texSummary = Array.isArray(texInfo)
+            ? texInfo.map((t, i) => `[${i}]: name=${t?.name}, hasTexture=${!!t?.texture}, hasBump=${!!t?.bump}, src=${t?.source?.split('/').pop() || 'none'}`)
+            : `name=${texInfo?.name}, hasTexture=${!!texInfo?.texture}, hasBump=${!!texInfo?.bump}, src=${texInfo?.source?.split('/').pop() || 'none'}`;
+          console.log(`[DiceDiag] Colorset texture data:`, texSummary, 'colorset:', cd.name || _currentConfig.colorset);
+        }
 
         // Pre-compile shaders so the first rendered frame has valid materials
         try { box.renderer?.compile?.(box.scene, box.camera); } catch {}
@@ -612,14 +775,14 @@ export default function DiceOverlay({
             }
           });
 
-          // debugDiceState('AFTER roll()', box);
+          debugDiceState('AFTER roll()', box);
 
           // Wait a few frames for Three.js to upload textures to the GPU,
           // then reveal the canvas so the user never sees unloaded dice.
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
               requestAnimationFrame(() => {
-                // debugDiceState('BEFORE reveal (3 frames after roll)', box);
+                debugDiceState('BEFORE reveal (3 frames after roll)', box);
                 if (mountedRef.current) setCanvasReady(true);
               });
             });

@@ -26,6 +26,7 @@ import ArenaEmoteGrid from '../components/ArenaEmoteGrid';
 import DmRollControl from '../components/DmRollControl';
 import FateOverlay from '../components/FateOverlay';
 import { clearDiceBuffers, preloadDiceSounds } from '../lib/diceAudio';
+import { deepCleanBox as cleanDiceBox } from '../components/DiceOverlay';
 import { createLogger } from '../utils/debug';
 
 const logArena = createLogger('arena');
@@ -335,6 +336,9 @@ export default function Arena() {
     if (!showResult) return;
     setActiveEncounter(null);
     spectatorQueueRef.current = [];
+    // Thorough GPU cleanup between battles — disposes textures/geometries/render caches
+    // while keeping the DiceBox singleton alive (avoids library texture-loading bug).
+    cleanDiceBox();
     const timer = setTimeout(() => {
       clearArenaBuffers();
       clearDiceBuffers();
@@ -833,8 +837,25 @@ export default function Arena() {
     if (encounterDiceRef.current) {
       const { resolve, rolls } = encounterDiceRef.current;
       encounterDiceRef.current = null;
+      const currentRoll = diceRollRef.current;
       setDiceRoll(null);
-      if (resolve) resolve(rolls || []);
+      if (resolve) {
+        // If rolls are empty (e.g. WebGL context loss killed the animation before
+        // onResult fired), generate fallback values so callers don't get undefined/NaN.
+        if (!rolls || rolls.length === 0) {
+          if (currentRoll?.forcedValues) {
+            resolve(currentRoll.forcedValues);
+          } else {
+            const match = currentRoll?.notation?.match(/(\d+)d(\d+)/i);
+            const count = match ? parseInt(match[1]) : 1;
+            const sides = match ? parseInt(match[2]) : 20;
+            const fallback = Array.from({ length: count }, () => Math.floor(Math.random() * sides) + 1);
+            resolve(fallback);
+          }
+        } else {
+          resolve(rolls);
+        }
+      }
       return;
     }
     setDiceRoll(null);

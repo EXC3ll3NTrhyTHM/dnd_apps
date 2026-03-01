@@ -181,8 +181,15 @@
         "item_id": "potion_healing",
         "name": "Potion of Healing",
         "type": "potion",
-        "quantity": 2,
+        "quantity": 1,
         "acquired_at": "2026-02-18T16:09:27.481Z"
+      },
+      {
+        "item_id": "dice_thunder",
+        "name": "Thunder Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-01T03:29:46.156Z"
       }
     ],
     "badges": [],

@@ -15,7 +15,7 @@
       "marcel_dm_765978025937469481": "2026-02-13T19:44:42.005Z"
     },
     "pushDesired": true,
-    "lastSeen": "2026-02-28T20:27:10.585Z",
+    "lastSeen": "2026-03-01T03:42:47.628Z",
     "lastLocation": "the_arena",
     "sprite": "the_architect_sprite.webp",
     "ownedDice": [
@@ -73,10 +73,10 @@
     "characterName": "Nalyd",
     "avatar": "https://cdn.discordapp.com/avatars/1073385140669128725/51ac15ff7014507f61f37b076668f847.png",
     "sprite": "nalyd_sprite.webp?v=20260217",
-    "lastSeen": "2026-02-28T08:12:19.285Z",
-    "lastLocation": "dragons_hollow",
+    "lastSeen": "2026-03-01T02:59:06.339Z",
+    "lastLocation": "the_dojo",
     "lastReadTimestamps": {
-      "the_dojo": "2026-02-26T06:02:40.638Z",
+      "the_dojo": "2026-03-01T02:58:16.639Z",
       "the_barracks": "2026-02-14T19:28:44.597Z",
       "the_collective": "2026-02-14T19:29:02.620Z",
       "dragons_hollow": "2026-02-28T08:12:22.933Z"
@@ -99,10 +99,10 @@
   },
   "1472286665417560167": {
     "avatar": "https://cdn.discordapp.com/embed/avatars/5.png",
-    "lastSeen": "2026-02-28T09:01:13.760Z",
+    "lastSeen": "2026-03-01T03:42:47.067Z",
     "lastLocation": "the_arena",
     "lastReadTimestamps": {
-      "dragons_hollow": "2026-02-27T02:52:44.231Z",
+      "dragons_hollow": "2026-03-01T03:29:47.629Z",
       "the_dojo": "2026-02-26T07:07:52.285Z",
       "marcel_dm_1472286665417560167": "2026-02-17T01:10:55.439Z",
       "the_barracks": "2026-02-15T08:05:02.591Z",
@@ -112,7 +112,12 @@
     },
     "displayName": "The mini Architect",
     "sprite": "tyren_sprite.webp",
-    "pushDesired": true
+    "pushDesired": true,
+    "ownedDice": [
+      "default",
+      "thunder"
+    ],
+    "equippedDice": "thunder"
   },
   "test_user_001": {
     "lastReadTimestamps": {
