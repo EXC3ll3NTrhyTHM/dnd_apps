@@ -201,7 +201,7 @@ function DamageResult({ data, onDismiss }) {
 
   // Result banner text and style
   const bannerClass = hasSmite ? 'rro-smite' : hasSneakAttack ? 'rro-sneak-attack' : hasHuntersMark ? 'rro-hunters-mark' : isCrit ? 'rro-crit' : 'rro-hit';
-  const bannerText = hasSmite ? 'DIVINE SMITE!' : hasSneakAttack ? 'SNEAK ATTACK!' : isCrit ? 'CRITICAL DAMAGE!' : `${damage} DAMAGE`;
+  const bannerText = hasSmite ? 'DIVINE SMITE!' : hasSneakAttack ? `${damage} DAMAGE` : isCrit ? 'CRITICAL DAMAGE!' : `${damage} DAMAGE`;
   const backdropClass = hasSmite ? 'rro-backdrop-smite' : hasSneakAttack ? 'rro-backdrop-sneak' : hasHuntersMark ? 'rro-backdrop-hunters-mark' : '';
 
   return (

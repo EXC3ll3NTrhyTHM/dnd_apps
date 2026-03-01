@@ -1728,6 +1728,7 @@ export default function Arena() {
             const isEligible = advantageType === 'advantage' || hasAlly;
             if (isEligible) {
               setRollPhase('sneak_attack_roll');
+              playArenaSound('damageImpact');
               let saDiceCount = myStats.sneakAttackDice;
               if (isNat20) saDiceCount *= 2;
               const saNotation = `${saDiceCount}d6`;
@@ -1759,7 +1760,6 @@ export default function Arena() {
           if (damageTotal >= 20 && damageTotal < 30) dmgSounds.push('bigDamage');
           if (damageTotal >= 30) dmgSounds.push('massiveDamage');
           if (smiteData) dmgSounds.push('divineSmite', 'crowdCheer');
-          if (sneakAttackData) dmgSounds.push('crowdCheer');
           const damageOverlayData = {
             type: 'damage',
             damage: damageTotal,
@@ -3000,6 +3000,7 @@ export default function Arena() {
           const isEligible = advantageType === 'advantage' || hasAlly;
           if (isEligible) {
             setRollPhase('sneak_attack_roll');
+            playArenaSound('damageImpact');
             let saDiceCount = myStats.sneakAttackDice;
             if (isNat20) saDiceCount *= 2;
             const saNotation = `${saDiceCount}d6`;
@@ -3017,7 +3018,6 @@ export default function Arena() {
         const offhandDmgSounds = ['damageImpact'];
         if (damageTotal >= 20 && damageTotal < 30) offhandDmgSounds.push('bigDamage');
         if (damageTotal >= 30) offhandDmgSounds.push('massiveDamage');
-        if (sneakAttackData) offhandDmgSounds.push('crowdCheer');
         const dmgOverlay = {
           type: 'damage',
           damage: damageTotal,

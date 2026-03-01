@@ -291,6 +291,14 @@ async function acquireBox(containerId, config) {
     if (container && canvas) {
       container.appendChild(canvas);
       _box.container = container;
+      // Fix: sync the WebGL render buffer to the new container's dimensions.
+      // Without this, the canvas keeps whatever size it had at first creation,
+      // which can be 0x0 if the container wasn't laid out yet (common on Android).
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
+        _box.setDimensions({ x: w, y: h });
+      }
     }
 
     // Determine target config
@@ -719,6 +727,14 @@ export default function DiceOverlay({
         const box = await acquireBox(canvasId, config);
         diceBoxRef.current = box;
         if (!mountedRef.current) return;
+
+        // Safety: if the canvas render buffer is still 0x0 (container wasn't laid out
+        // when DiceBox initialized), force a resize now that the DOM is settled.
+        const diceCanvas = box.renderer?.domElement;
+        const ctr = containerRef.current;
+        if (diceCanvas && ctr && diceCanvas.width === 0 && ctr.clientWidth > 0) {
+          box.setDimensions({ x: ctr.clientWidth, y: ctr.clientHeight });
+        }
 
         debugDiceState('AFTER acquireBox', box);
 
