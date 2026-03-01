@@ -18,7 +18,8 @@
     "test:unit": "node --test test/unit/",
     "fix-bugs": "node scripts/fix-bugs.js",
     "test:nightly": "node scripts/run-tests-scheduled.js --auto-fix --notify",
-    "test:full": "node scripts/run-tests-scheduled.js --notify"
+    "test:full": "node scripts/run-tests-scheduled.js --notify",
+    "generate:sheets": "node scripts/generate-character-sheets.js"
   },
   "dependencies": {
     "@3d-dice/dice-box-threejs": "^0.0.12",

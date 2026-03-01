@@ -16,7 +16,7 @@ import AchievementToast from '../components/AchievementToast';
 import QuestToast from '../components/QuestToast';
 import LevelUpOverlay from '../components/LevelUpOverlay';
 import { useUiSounds } from '../hooks/useUiSounds';
-import { useArenaSounds, clearArenaBuffers } from '../hooks/useArenaSounds';
+import { useArenaSounds, clearArenaBuffers, preloadArenaSounds } from '../hooks/useArenaSounds';
 import SceneAudio from './scenes/SceneAudio';
 import { reportMetric } from '../lib/memoryTracker';
 
@@ -749,6 +749,7 @@ export default function Arena() {
     // Skip if we already announced this exact turn
     const turnKey = `${activeEncounter.id}_${activeEncounter.round}_${activeEncounter.currentTurnIndex}`;
     if (lastAnnouncedTurnRef.current === turnKey) return;
+    lastAnnouncedTurnRef.current = turnKey;
 
     let cancelled = false;
     (async () => {
@@ -766,7 +767,6 @@ export default function Arena() {
         }
       }
       if (cancelled) return;
-      lastAnnouncedTurnRef.current = turnKey;
       setTurnAnnouncement({ name: entry.name, type: entry.type });
       // Play turn announcement sound
       if (entry.id === userIdRef.current) playArenaSoundRef.current('yourTurn');
@@ -1023,6 +1023,10 @@ export default function Arena() {
         if (next.data.sounds) next.data.sounds.forEach(s => playArenaSoundRef.current(s));
         setRollResultOverlay(next.data);
       } else {
+        // Play damage impact sound when spectator dice start rolling (not on result screen)
+        if (next.label && (next.label.includes('rolls damage') || next.label.includes('crits'))) {
+          playArenaSoundRef.current('damageImpact');
+        }
         setSpectatorRoll(next);
       }
     }
@@ -1168,7 +1172,7 @@ export default function Arena() {
           roll1: d20,
           roll2: d20b,
           attackBonus: attack.bonus,
-          sounds: isNat20 ? ['attackCrit', 'crowdGasp'] : isNat1 ? ['attackFumble', 'crowdCheer'] : isHit ? ['attackHit'] : ['attackMiss'],
+          sounds: ['monsterGrowl', ...(isNat20 ? ['attackCrit', 'crowdGasp'] : isNat1 ? ['attackFumble', 'crowdCheer'] : isHit ? ['attackHit'] : ['attackMiss'])],
         };
         broadcastRollResult(monsterAtkOverlay);
         await showRollResult(monsterAtkOverlay);
@@ -1194,7 +1198,7 @@ export default function Arena() {
           const priorDmg = accumulatedDmg[attack.targetId] || 0;
           const effectiveHp = Math.max(0, baseHp - priorDmg);
           accumulatedDmg[attack.targetId] = priorDmg + damageTotal;
-          const monsterDmgSounds = [];
+          const monsterDmgSounds = ['monsterHit'];
           if (damageTotal >= 20 && damageTotal < 30) monsterDmgSounds.push('bigDamage');
           if (damageTotal >= 30) monsterDmgSounds.push('massiveDamage');
           const monsterDmgOverlay = {
@@ -1874,6 +1878,9 @@ export default function Arena() {
     setRollResultOverlay(null);
     setSpectatorRoll(null);
     spectatorQueueRef.current = [];
+    // Re-preload arena + dice sounds (cleared when the result screen appeared)
+    preloadArenaSounds();
+    preloadDiceSounds();
   }, [clearEncounterResult]);
 
   // ── Action tooltip (long-press) ──
@@ -2332,7 +2339,7 @@ export default function Arena() {
         newHp: Math.max(0, monsterData.currentHp - damageTotal),
         attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
         defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
-        sounds: damageTotal >= 20 ? ['bigDamage'] : [],
+        sounds: ['fistOfUnbrokenAir', ...(damageTotal >= 20 ? ['bigDamage'] : [])],
       };
       broadcastRollResult(dmgOverlay);
       await showRollResult(dmgOverlay);
@@ -2448,7 +2455,7 @@ export default function Arena() {
             newHp: Math.max(0, monsterData.currentHp - damageTotal),
             attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
             defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
-            sounds: [],
+            sounds: ['damageImpact'],
           };
           broadcastRollResult(dmgOverlay);
           await showRollResult(dmgOverlay);
@@ -2710,7 +2717,7 @@ export default function Arena() {
         if (damageTotal >= 30) playArenaSound('massiveDamage');
 
         // Show damage overlay
-        const spellDmgSounds = [];
+        const spellDmgSounds = [isElectric ? 'electricSpell' : 'damageImpact'];
         if (damageTotal >= 20 && damageTotal < 30) spellDmgSounds.push('bigDamage');
         if (damageTotal >= 30) spellDmgSounds.push('massiveDamage');
         const dmgOverlay = {
@@ -3007,7 +3014,7 @@ export default function Arena() {
         if (damageTotal >= 20 && damageTotal < 30) playArenaSound('bigDamage');
         if (damageTotal >= 30) playArenaSound('massiveDamage');
 
-        const offhandDmgSounds = [];
+        const offhandDmgSounds = ['damageImpact'];
         if (damageTotal >= 20 && damageTotal < 30) offhandDmgSounds.push('bigDamage');
         if (damageTotal >= 30) offhandDmgSounds.push('massiveDamage');
         if (sneakAttackData) offhandDmgSounds.push('crowdCheer');

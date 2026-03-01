@@ -11,6 +11,8 @@ const fs = require('fs');
 const path = require('path');
 
 const STAT_DIR = path.join(__dirname, '..', '..', 'players_stat');
+const PARSED_DIR = path.join(STAT_DIR, 'parsed');
+const RAW_DIR = path.join(STAT_DIR, 'raw');
 const OVERRIDES_FILE = path.join(__dirname, '..', '..', 'data', 'character_overrides.json');
 const ALIASES_FILE = path.join(__dirname, '..', '..', 'data', 'character_aliases.json');
 
@@ -330,14 +332,23 @@ const sheetsCache = {};
 
 for (const [discordId, filename] of Object.entries(CHARACTER_MAP)) {
   try {
-    const filePath = path.join(STAT_DIR, filename);
-    const content = fs.readFileSync(filePath, 'utf8');
-    if (!content || content.trim().length === 0) {
-      sheetsCache[discordId] = null;
-      continue;
+    const parsedPath = path.join(PARSED_DIR, filename);
+    if (fs.existsSync(parsedPath)) {
+      // Prefer pre-parsed file (small, fast)
+      const content = fs.readFileSync(parsedPath, 'utf8');
+      sheetsCache[discordId] = JSON.parse(content);
+    } else {
+      // Fallback: parse from raw export
+      const rawPath = path.join(RAW_DIR, filename);
+      const filePath = fs.existsSync(rawPath) ? rawPath : path.join(STAT_DIR, filename);
+      const content = fs.readFileSync(filePath, 'utf8');
+      if (!content || content.trim().length === 0) {
+        sheetsCache[discordId] = null;
+        continue;
+      }
+      const raw = JSON.parse(content);
+      sheetsCache[discordId] = parseSheet(raw);
     }
-    const raw = JSON.parse(content);
-    sheetsCache[discordId] = parseSheet(raw);
   } catch {
     sheetsCache[discordId] = null;
   }
@@ -423,4 +434,4 @@ function updateCharacterSheet(discordUserId, updates) {
   return getCharacterSheet(discordUserId);
 }
 
-module.exports = { getCharacterSheet, updateCharacterSheet, getAvailableAliases, getActiveAlias, setActiveAlias };
+module.exports = { getCharacterSheet, updateCharacterSheet, getAvailableAliases, getActiveAlias, setActiveAlias, parseSheet, CHARACTER_MAP };

@@ -85,7 +85,7 @@ const ARENA_FADE_IN = {
 let _arenaBuffers = {};
 let _arenaPreloaded = false;
 
-function preloadArenaSounds() {
+export function preloadArenaSounds() {
   if (_arenaPreloaded) return;
   _arenaPreloaded = true;
   const ctx = ensureContext();
@@ -141,6 +141,8 @@ export function useArenaSounds() {
   const play = useCallback((key) => {
     if (mutedRef.current) return;
     if (document.hidden) return;
+    // Lazily re-preload if buffers were cleared between encounters
+    if (!_arenaPreloaded) preloadArenaSounds();
     const ctx = ensureContext();
     if (!ctx || !_arenaBuffers[key]) return;
     if (ctx.state === 'suspended') ctx.resume();

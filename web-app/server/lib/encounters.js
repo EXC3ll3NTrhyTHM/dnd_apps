@@ -82,7 +82,7 @@ const SPELL_DEFINITIONS = {
     healDice: '2d8',
     range: 'touch',
     description: 'A creature you touch regains hit points',
-    classes: ['Ranger', 'Cleric', 'Bard', 'Paladin'],
+    classes: ['Ranger'],
   },
 };
 
@@ -3196,6 +3196,8 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
     let text = '';
     let sneakAttackApplied = false;
     let sneakAttackDamage = 0;
+    let huntersMarkApplied = false;
+    let huntersMarkDamage = 0;
 
     // Sneak Attack data from client
     if (data.sneakAttackData) {
@@ -3245,8 +3247,6 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
       }
 
       // Hunter's Mark bonus damage on offhand hit
-      let huntersMarkApplied = false;
-      let huntersMarkDamage = 0;
       if (player.huntersMarkActive && player.concentration?.spellId === 'hunters_mark') {
         if (data.huntersMarkData && typeof data.huntersMarkData.damage === 'number') {
           huntersMarkDamage = data.huntersMarkData.damage;

@@ -1,0 +1,128 @@
+{
+  "name": "Acacia Tidal Lumiona",
+  "race": "Half-Elf",
+  "classes": [
+    {
+      "name": "Bard",
+      "level": 2,
+      "subclass": null
+    },
+    {
+      "name": "Rogue",
+      "level": 1,
+      "subclass": null
+    }
+  ],
+  "totalLevel": 3,
+  "background": "Criminal / Spy",
+  "stats": [
+    {
+      "id": 1,
+      "abbr": "STR",
+      "name": "Strength",
+      "score": 10,
+      "modifier": 0
+    },
+    {
+      "id": 2,
+      "abbr": "DEX",
+      "name": "Dexterity",
+      "score": 14,
+      "modifier": 2
+    },
+    {
+      "id": 3,
+      "abbr": "CON",
+      "name": "Constitution",
+      "score": 13,
+      "modifier": 1
+    },
+    {
+      "id": 4,
+      "abbr": "INT",
+      "name": "Intelligence",
+      "score": 8,
+      "modifier": -1
+    },
+    {
+      "id": 5,
+      "abbr": "WIS",
+      "name": "Wisdom",
+      "score": 12,
+      "modifier": 1
+    },
+    {
+      "id": 6,
+      "abbr": "CHA",
+      "name": "Charisma",
+      "score": 17,
+      "modifier": 3
+    }
+  ],
+  "hp": 18,
+  "ac": 13,
+  "profBonus": 2,
+  "traits": {
+    "personalityTraits": "I am incredibly slow to trust. Those who seem the fairest often have the most to hide.\n\nI blow up at the slightest insult.",
+    "ideals": "Charity. I steal from the wealthy so that I can help people in need.",
+    "bonds": "Something important was taken from me, and I aim to steal it back.",
+    "flaws": "If there’s a plan, I’ll forget it. If I don’t forget it, I’ll ignore it."
+  },
+  "physical": {
+    "age": 25,
+    "gender": "Woman",
+    "hair": "Dark brown",
+    "eyes": "Lavender",
+    "skin": "Brown",
+    "height": "5'8\"",
+    "weight": "140 lbs"
+  },
+  "backstory": "Born of a brief romance between two half-elves—one a noble—you were the castle’s black sheep, never noble enough for high society, never rough enough for the slums. From your mother, you inherited a mysterious artifact, eyes that shimmered with something not quite mortal, and a song that haunts your dreams.\n\nYou are the daughter of King Sythrall, whose legacy you’ve come to despise. Not born to rule, but to unshackle, the world has already begun to tremble at your arrival—even before you fully understand your purpose.\n\nAs a teen, you overheard a damning conversation about the king’s rule. After a fierce argument, he punished you by taking your mother’s artifact—the last piece you had of her. That betrayal drove you to flee the castle.\n\nOn the run, you survived by charm, trickery, and your gift for music. You wandered until a performance by a rogue troupe called The Masked Melody ensnared you. Their humor, rebellion, and worship of Olidammara—the god of mischief and joy—drew you in. You never left.\n\nFrom then on, your cons served a cause. Masked and laughing, you robbed corrupt nobles, fed the poor, and inspired rebellion with your music. Your coin of Olidammara—identical on both sides—has won you many a wager. You turned faith into a melody of resistance.\n\nYou found allies: Father Bren Taldrin, a disillusioned cleric-turned-puppeteer who gave you your first lute; and Mira “Quickhands” Vell, a thief with a blade-sharp tongue who once took a knife for you. And you made enemies: Captain Darric Thornblade, a humiliated city guard who hunts you still; and the Gilded Chain, a slaver cabal desperate to seize your head—and your lute.\n\nDespite the joy, you’ve always felt something missing. Believing the artifact held the key, you returned to the castle, slipping through familiar halls to your childhood room—where it lay, just as you left it.\n\nThe artifact doesn’t burn you. It sings. As if it remembers you. You’ve always lived for freedom—now, others might depend on how far you’ll go to defend it.",
+  "enemies": "Captain Darric Thornblade – A scorned city guard\nThe Gilded Chain – A corrupt merchant guild",
+  "organizations": "The Masked Melody — A secret society of bardic performers",
+  "equipment": [
+    {
+      "name": "Leather",
+      "type": "Light Armor",
+      "filterType": "Armor"
+    },
+    {
+      "name": "Dagger",
+      "type": "Dagger",
+      "filterType": "Weapon"
+    },
+    {
+      "name": "Rapier",
+      "type": "Rapier",
+      "filterType": "Weapon"
+    }
+  ],
+  "spellcasting": {
+    "className": "Bard",
+    "abilityId": 6,
+    "abilityName": "Charisma",
+    "abilityModifier": 3,
+    "spellSaveDC": 13,
+    "spellAttackBonus": 5,
+    "slots": [
+      {
+        "level": 1,
+        "total": 3
+      }
+    ]
+  },
+  "classFeatures": [
+    "Spellcasting",
+    "Bardic Inspiration",
+    "Jack of All Trades",
+    "Song of Rest",
+    "Proficiencies",
+    "Hit Points",
+    "Core Rogue Traits",
+    "Expertise",
+    "Sneak Attack",
+    "Thieves’ Cant",
+    "Weapon Mastery"
+  ],
+  "channelDivinityMax": 0
+}

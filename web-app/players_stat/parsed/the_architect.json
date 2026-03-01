@@ -1,0 +1,127 @@
+{
+  "name": "Thalor Brightshield",
+  "race": "Variant Aasimar",
+  "classes": [
+    {
+      "name": "Paladin",
+      "level": 3,
+      "subclass": "Oath of the Ancients"
+    }
+  ],
+  "totalLevel": 3,
+  "background": "Noble",
+  "stats": [
+    {
+      "id": 1,
+      "abbr": "STR",
+      "name": "Strength",
+      "score": 13,
+      "modifier": 1
+    },
+    {
+      "id": 2,
+      "abbr": "DEX",
+      "name": "Dexterity",
+      "score": 10,
+      "modifier": 0
+    },
+    {
+      "id": 3,
+      "abbr": "CON",
+      "name": "Constitution",
+      "score": 15,
+      "modifier": 2
+    },
+    {
+      "id": 4,
+      "abbr": "INT",
+      "name": "Intelligence",
+      "score": 8,
+      "modifier": -1
+    },
+    {
+      "id": 5,
+      "abbr": "WIS",
+      "name": "Wisdom",
+      "score": 13,
+      "modifier": 1
+    },
+    {
+      "id": 6,
+      "abbr": "CHA",
+      "name": "Charisma",
+      "score": 16,
+      "modifier": 3
+    }
+  ],
+  "hp": 22,
+  "ac": 16,
+  "profBonus": 2,
+  "traits": {
+    "personalityTraits": "The common folk love me for my kindness and generosity.\nDespite my noble birth, I do not place myself above other folk.",
+    "ideals": "Noble Obligation. It is my duty to protect and care for the people beneath me. (Good)\nResponsibility. It is my duty to respect the authority of those above me, just as those below me must respect mine. (Lawful)",
+    "bonds": "My loyalty to my sovereign is unwavering.\nThe common folk must see me as a hero of the people.",
+    "flaws": "I hide a truly scandalous secret that could ruin my family forever."
+  },
+  "physical": {
+    "age": 26,
+    "gender": "Man",
+    "hair": "Jet Black with glowing silver roots",
+    "eyes": "Glowing pale blue",
+    "skin": "Pale gold",
+    "height": "6'0\"",
+    "weight": "205 lbs"
+  },
+  "backstory": "You were born under a rare comet — a celestial omen said to mark those touched by Bahamut himself. Your parents were humble smiths, but from a young age, you were different: your pale blue eyes glowed in the dark, and your presence stirred awe or unease wherever you walked.\n\nAt age 10, you were found by Sir Alric Dawnvale, a wandering paladin of the Order of the Platinum Scale. He took you to the Sanctum of the Silver Flame, where you were raised not only in combat but in compassion, discipline, and divine justice. You trained beside many, but none more closely than Darian Vex — a fellow orphan and your closest companion.\n\nBut where your heart burned for justice, Darian’s burned for power. He grew bitter, frustrated with the Order’s reluctance to wield its strength ruthlessly. When he betrayed the Order and joined the cult known as the Hollow Brand, you were sent to bring him back. Instead, you found him leading the burning of a peaceful village — and he warned you that mercy would be your undoing.\n\nYou hesitated, and he escaped.\n\nNow, you walk the world as a knight of Bahamut — a beacon of hope and judgment. You have vowed to protect the innocent, bring light to shadowed lands, and stop Darian before he helps Tiamat’s faithful rise in flame and tyranny.\n\nYou bear a holy symbol etched into a silver scale, a gift from Sir Alric. You still wear it daily — not just to honor Bahamut, but to remind yourself why you fight.",
+  "enemies": "High Inquisitor Varnyx – Corrupt Priest of Tiamat\nDarian Vex – Fallen Knight of the Platinum Scale\nThe Crimson Court – Noble Vampire Syndicate\nThe Hollow Brand – Cult of Tyranny and Fire",
+  "organizations": "Order of the Platinum Scale",
+  "equipment": [
+    {
+      "name": "Chain Mail",
+      "type": "Heavy Armor",
+      "filterType": "Armor"
+    },
+    {
+      "name": "Halberd",
+      "type": "Halberd",
+      "filterType": "Weapon"
+    }
+  ],
+  "spellcasting": {
+    "className": "Paladin",
+    "abilityId": 6,
+    "abilityName": "Charisma",
+    "abilityModifier": 3,
+    "spellSaveDC": 13,
+    "spellAttackBonus": 5,
+    "slots": [
+      {
+        "level": 1,
+        "total": 3
+      }
+    ]
+  },
+  "classFeatures": [
+    "Divine Sense",
+    "Lay on Hands",
+    "Fighting Style",
+    "Spellcasting",
+    "Divine Smite",
+    "Divine Health",
+    "Sacred Oath",
+    "Proficiencies",
+    "Hit Points",
+    "Channel Divinity",
+    "Oath Spells",
+    "Divine Sense",
+    "Lay on Hands",
+    "Fighting Style",
+    "Spellcasting",
+    "Divine Smite",
+    "Divine Health",
+    "Sacred Oath",
+    "Proficiencies",
+    "Hit Points"
+  ],
+  "channelDivinityMax": 1
+}

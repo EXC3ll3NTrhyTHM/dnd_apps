@@ -9956,6 +9956,54 @@
         "source": "combat_encounter"
       },
       "timestamp": "2026-03-01T03:41:25.762Z"
+    },
+    {
+      "id": "tx_1772339870482_pg034e",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 917,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T04:37:50.482Z"
+    },
+    {
+      "id": "tx_1772339870585_k89ur4",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 170,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T04:37:50.585Z"
+    },
+    {
+      "id": "tx_1772344151610_t5ltw0",
+      "user_id": "1472286665417560167",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 180,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T05:49:11.610Z"
+    },
+    {
+      "id": "tx_1772344151700_3pdwwl",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 932,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T05:49:11.700Z"
     }
   ]
 }

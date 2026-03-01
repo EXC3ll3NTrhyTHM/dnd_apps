@@ -599,53 +599,58 @@ router.get('/:encounterId/weapons', authRequired, (req, res) => {
  * Body: { bonusAction: 'skip' | 'potion_self' | 'bardic_inspiration', potionId?, healRoll?, targetId? }
  */
 router.post('/:encounterId/bonus-action', authRequired, (req, res) => {
-  const userId = req.user.id;
-  const encounter = getEncounter(req.params.encounterId);
-  if (!encounter) return res.status(404).json({ error: 'Encounter not found.' });
+  try {
+    const userId = req.user.id;
+    const encounter = getEncounter(req.params.encounterId);
+    if (!encounter) return res.status(404).json({ error: 'Encounter not found.' });
 
-  const player = encounter.participants?.[userId];
-  if (!player) return res.status(403).json({ error: 'Not a participant.' });
+    const player = encounter.participants?.[userId];
+    if (!player) return res.status(403).json({ error: 'Not a participant.' });
 
-  // Validate it's this player's turn
-  const currentTurn = encounter.initiativeOrder[encounter.currentTurnIndex];
-  if (!currentTurn || currentTurn.id !== userId) {
-    return res.status(400).json({ error: 'It is not your turn.' });
-  }
+    // Validate it's this player's turn
+    const currentTurn = encounter.initiativeOrder[encounter.currentTurnIndex];
+    if (!currentTurn || currentTurn.id !== userId) {
+      return res.status(400).json({ error: 'It is not your turn.' });
+    }
 
-  if (!encounter.bonusActionPhase) {
-    return res.status(400).json({ error: 'Not in bonus action phase.' });
-  }
+    if (!encounter.bonusActionPhase) {
+      return res.status(400).json({ error: 'Not in bonus action phase.' });
+    }
 
-  const { bonusAction, potionId, healRoll, targetId, weaponId, attackRoll, damageTotal, strikes } = req.body;
+    const { bonusAction, potionId, healRoll, targetId, weaponId, attackRoll, attackRoll2, damageTotal, strikes, sneakAttackData, huntersMarkData } = req.body;
 
-  if (bonusAction === 'skip') {
+    if (bonusAction === 'skip') {
+      encounter.bonusActionPhase = false;
+      const turnResult = advanceTurn(encounter);
+      handleTurnAdvance(req, encounter, turnResult);
+      return res.json({ success: true });
+    }
+
+    const result = resolveBonusAction(encounter, userId, bonusAction, { potionId, healRoll, targetId, weaponId, attackRoll, attackRoll2, damageTotal, strikes, sneakAttackData, huntersMarkData });
+    if (result.error) {
+      return res.status(400).json({ error: result.error });
+    }
+
     encounter.bonusActionPhase = false;
+
+    // Broadcast the bonus action result
+    broadcastToLocation(req, encounter.locationId, {
+      type: 'encounter_bonus_result',
+      locationId: encounter.locationId,
+      encounterId: encounter.id,
+      result,
+      encounter: getPublicState(encounter),
+    });
+
+    // Advance turn
     const turnResult = advanceTurn(encounter);
     handleTurnAdvance(req, encounter, turnResult);
-    return res.json({ success: true });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[bonus-action] Crash:', err.stack || err);
+    res.status(500).json({ error: 'Internal server error' });
   }
-
-  const result = resolveBonusAction(encounter, userId, bonusAction, { potionId, healRoll, targetId, weaponId, attackRoll, damageTotal, strikes });
-  if (result.error) {
-    return res.status(400).json({ error: result.error });
-  }
-
-  encounter.bonusActionPhase = false;
-
-  // Broadcast the bonus action result
-  broadcastToLocation(req, encounter.locationId, {
-    type: 'encounter_bonus_result',
-    locationId: encounter.locationId,
-    encounterId: encounter.id,
-    result,
-    encounter: getPublicState(encounter),
-  });
-
-  // Advance turn
-  const turnResult = advanceTurn(encounter);
-  handleTurnAdvance(req, encounter, turnResult);
-
-  res.json({ success: true });
 });
 
 /**

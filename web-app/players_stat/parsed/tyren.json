@@ -1,0 +1,127 @@
+{
+  "name": "Tryen Henvar",
+  "race": "Half-Elf",
+  "classes": [
+    {
+      "name": "Ranger",
+      "level": 2,
+      "subclass": null
+    },
+    {
+      "name": "Barbarian",
+      "level": 1,
+      "subclass": null
+    }
+  ],
+  "totalLevel": 3,
+  "background": "Soldier",
+  "stats": [
+    {
+      "id": 1,
+      "abbr": "STR",
+      "name": "Strength",
+      "score": 15,
+      "modifier": 2
+    },
+    {
+      "id": 2,
+      "abbr": "DEX",
+      "name": "Dexterity",
+      "score": 12,
+      "modifier": 1
+    },
+    {
+      "id": 3,
+      "abbr": "CON",
+      "name": "Constitution",
+      "score": 13,
+      "modifier": 1
+    },
+    {
+      "id": 4,
+      "abbr": "INT",
+      "name": "Intelligence",
+      "score": 8,
+      "modifier": -1
+    },
+    {
+      "id": 5,
+      "abbr": "WIS",
+      "name": "Wisdom",
+      "score": 14,
+      "modifier": 2
+    },
+    {
+      "id": 6,
+      "abbr": "CHA",
+      "name": "Charisma",
+      "score": 12,
+      "modifier": 1
+    }
+  ],
+  "hp": 23,
+  "ac": 13,
+  "profBonus": 2,
+  "traits": {
+    "personalityTraits": "I’ve lost too many friends, and I’m slow to make new ones.\nI can stare down a hell hound without flinching.",
+    "ideals": "Greater Good. Our lot is to lay down our lives in defense of others. (Good)",
+    "bonds": "I fight for those who cannot fight for themselves.",
+    "flaws": "My hatred of my enemies is blind and unreasoning."
+  },
+  "physical": {
+    "age": 72,
+    "gender": "Man",
+    "hair": "Brown Hair with weathered grey",
+    "eyes": "Icy Blue",
+    "skin": "Tan",
+    "height": "6'3\"",
+    "weight": "215 lbs"
+  },
+  "backstory": "Tyren Henvar, known by many as Stone Mane, walked away from his family name long ago. Born of a stern human father and a loving yet overbearing elven mother, Tyren was raised in a home of strict control and conflicting affection. His father—unyielding, cruel, and obsessed with dominance—meant well in his own way, but left scars deeper than steel. Tyren’s mother tried to balance the scales with love, though her smothering nature only deepened his need for freedom.\n\nHe severed ties and left without looking back, his family name unspoken and deliberately forgotten. Now, he wears no crest but the lion, etched into the lining of his cloak and into his skin through fierce tattoos.\n\nTyren roams as a ranger, not as a lost soul, but as a force of balance. He doesn’t fight for vengeance—he fights for justice. Not the kind written into law, but the kind carved by instinct and experience. Every scar he bears, every silent stare, is a memory reminding him that the world only turns toward peace when someone stands firm against the weight of its chaos.\n\nHe carries a greatsword named Ashril, forged from two legacies—one ancient, one modern—its blade etched with the words “Remember who you are.”\n\nTo those who meet him, Tyren is quiet, composed, and cold—but never cruel. He is the storm on the horizon and the stillness after. The name Stone Mane is spoken in reverence, though never in his presence. He won’t say much. But when he speaks, it’s final.",
+  "enemies": "Once bound by duty, now divided by belief—Tyren Henvar and Hunter Drayen trained side by side under the disciplined code of the Ashen Vow, a ranger order sworn to uphold justice with restraint and clarity. Tyren was measured, thoughtful, and slow to draw steel—Hunter was instinctive, ruthless, and born with a blade in hand.\n\nTheir uneasy alliance shattered when a mission demanded mercy. Tyren pleaded for time, for truth. Hunter answered with blood. That single, irreversible act broke the Vow—and with it, the order.\n\nHunter rose quickly, gathering those disillusioned by the old ways. Under his command, the Ashen Vow was reforged into the Iron Howl Legion: a mobile, militarized force that enforced control through fear and domination, leaving chaos and doubt where order once stood.\n\nTyren walked away from the ashes, carrying the weight of the oath they broke and the sword—Ashril—that now stands in quiet defiance of everything Hunter became.",
+  "organizations": "“The Ashen Vow” (Rangers Union) falls into “The Iron Howl Legion”  ",
+  "equipment": [
+    {
+      "name": "Studded Leather",
+      "type": "Light Armor",
+      "filterType": "Armor"
+    },
+    {
+      "name": "Longsword",
+      "type": "Longsword",
+      "filterType": "Weapon"
+    },
+    {
+      "name": "Javelin",
+      "type": "Javelin",
+      "filterType": "Weapon"
+    }
+  ],
+  "spellcasting": {
+    "className": "Ranger",
+    "abilityId": 5,
+    "abilityName": "Wisdom",
+    "abilityModifier": 2,
+    "spellSaveDC": 12,
+    "spellAttackBonus": 4,
+    "slots": [
+      {
+        "level": 1,
+        "total": 2
+      }
+    ]
+  },
+  "classFeatures": [
+    "Core Ranger Traits",
+    "Spellcasting",
+    "Favored Enemy",
+    "Weapon Mastery",
+    "Deft Explorer",
+    "Fighting Style",
+    "Rage",
+    "Unarmored Defense",
+    "Weapon Mastery",
+    "Core Barbarian Traits"
+  ],
+  "channelDivinityMax": 0
+}

@@ -1,0 +1,134 @@
+{
+  "name": "Aly Archer",
+  "race": "Wood Elf",
+  "classes": [
+    {
+      "name": "Cleric",
+      "level": 3,
+      "subclass": "Life Domain"
+    }
+  ],
+  "totalLevel": 3,
+  "background": "Acolyte",
+  "stats": [
+    {
+      "id": 1,
+      "abbr": "STR",
+      "name": "Strength",
+      "score": 8,
+      "modifier": -1
+    },
+    {
+      "id": 2,
+      "abbr": "DEX",
+      "name": "Dexterity",
+      "score": 17,
+      "modifier": 3
+    },
+    {
+      "id": 3,
+      "abbr": "CON",
+      "name": "Constitution",
+      "score": 14,
+      "modifier": 2
+    },
+    {
+      "id": 4,
+      "abbr": "INT",
+      "name": "Intelligence",
+      "score": 10,
+      "modifier": 0
+    },
+    {
+      "id": 5,
+      "abbr": "WIS",
+      "name": "Wisdom",
+      "score": 14,
+      "modifier": 2
+    },
+    {
+      "id": 6,
+      "abbr": "CHA",
+      "name": "Charisma",
+      "score": 12,
+      "modifier": 1
+    }
+  ],
+  "hp": 18,
+  "ac": 7,
+  "profBonus": 2,
+  "traits": {
+    "personalityTraits": "I see omens in every event and action. The gods try to speak to us, we just need to listen.\nI am tolerant (or intolerant) of other faiths and respect (or condemn) the worship of other gods.",
+    "ideals": "Change. We must help bring about the changes the gods are constantly working in the world. (Chaotic)",
+    "bonds": "I will do anything to protect the temple where I served.",
+    "flaws": "I am suspicious of strangers and expect the worst of them."
+  },
+  "physical": {
+    "age": 194,
+    "gender": "Woman",
+    "hair": "Auburn",
+    "eyes": "Green",
+    "skin": "Olive",
+    "height": "6'0\"",
+    "weight": "150 lbs"
+  },
+  "backstory": null,
+  "enemies": null,
+  "organizations": null,
+  "equipment": [
+    {
+      "name": "Shield",
+      "type": "Shield",
+      "filterType": "Armor"
+    },
+    {
+      "name": "Leather",
+      "type": "Light Armor",
+      "filterType": "Armor"
+    },
+    {
+      "name": "Mace",
+      "type": "Mace",
+      "filterType": "Weapon"
+    },
+    {
+      "name": "Crossbow, Light",
+      "type": "Crossbow, Light",
+      "filterType": "Weapon"
+    }
+  ],
+  "spellcasting": {
+    "className": "Cleric",
+    "abilityId": 5,
+    "abilityName": "Wisdom",
+    "abilityModifier": 2,
+    "spellSaveDC": 12,
+    "spellAttackBonus": 4,
+    "slots": [
+      {
+        "level": 1,
+        "total": 4
+      },
+      {
+        "level": 2,
+        "total": 2
+      }
+    ]
+  },
+  "classFeatures": [
+    "Spellcasting",
+    "Divine Domain",
+    "Channel Divinity",
+    "Proficiencies",
+    "Hit Points",
+    "Bonus Proficiency",
+    "Disciple of Life",
+    "Channel Divinity: Preserve Life",
+    "Spellcasting",
+    "Divine Domain",
+    "Channel Divinity",
+    "Proficiencies",
+    "Hit Points"
+  ],
+  "channelDivinityMax": 1
+}

@@ -2,6 +2,7 @@
   "ignore": [
     "data/*",
     "client/*",
+    "players_stat/*",
     "*.test.js",
     "node_modules"
   ],
