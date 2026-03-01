@@ -9610,6 +9610,18 @@
         "goal": "arena_win_1"
       },
       "timestamp": "2026-02-28T08:27:44.417Z"
+    },
+    {
+      "id": "tx_1772307206218_jbh2dy",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 720,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-02-28T19:33:26.218Z"
     }
   ]
 }

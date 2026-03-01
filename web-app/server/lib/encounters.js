@@ -74,6 +74,16 @@ const SPELL_DEFINITIONS = {
     description: 'You mark a creature as your quarry. You deal an extra 1d6 damage each time you hit it with a weapon attack.',
     classes: ['Ranger'],
   },
+  cure_wounds: {
+    name: 'Cure Wounds',
+    level: 1,
+    actionType: 'action',
+    effectType: 'heal',
+    healDice: '2d8',
+    range: 'touch',
+    description: 'A creature you touch regains hit points',
+    classes: ['Ranger', 'Cleric', 'Bard', 'Paladin'],
+  },
 };
 
 // ============================================
@@ -2618,7 +2628,9 @@ function getPublicState(encounter) {
       classFeatures: p.classFeatures || [],
       hasAvailableSpells: (p.classFeatures || []).includes('Spellcasting') &&
         Object.values(SPELL_DEFINITIONS).some(spell =>
-          spell.actionType === 'action' && spell.classes?.some(c => (p.classNames || []).includes(c))
+          spell.actionType === 'action' &&
+          spell.classes?.some(c => (p.classNames || []).includes(c)) &&
+          (spell.level === 0 || (p.spellSlots || []).some(s => s.level >= spell.level && s.used < s.total))
         ),
       layOnHandsPool: p.layOnHandsPool || 0,
       layOnHandsUsed: p.layOnHandsUsed || 0,

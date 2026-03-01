@@ -247,6 +247,7 @@ export default function Arena() {
   const [availableSpells, setAvailableSpells] = useState([]);
   const [castingSpell, setCastingSpell] = useState(null);
   const [healingWordTargetModal, setHealingWordTargetModal] = useState(false);
+  const [healSpellTargetModal, setHealSpellTargetModal] = useState(null);
   const [vineEffect, setVineEffect] = useState(false);
   // Stunning Strike toggle (Monk)
   const [stunningStrikeToggle, setStunningStrikeToggle] = useState(false);
@@ -550,6 +551,7 @@ export default function Arena() {
             setAvailableBonusActions([]);
             setInspirationTargetModal(false);
             setHealingWordTargetModal(false);
+            setHealSpellTargetModal(null);
           }
           // Play bardic inspiration sound for other players
           if (payload.type === 'encounter_bonus_result' && payload.result?.type === 'bardic_inspiration' && payload.result?.userId !== userIdRef.current) {
@@ -683,6 +685,7 @@ export default function Arena() {
         setCastingSpell(null);
         setSpellModalOpen(false);
         setHealingWordTargetModal(false);
+        setHealSpellTargetModal(null);
         setStunningStrikeToggle(false);
         setEnsnaringStrikeToggle(false);
       }
@@ -1324,6 +1327,10 @@ export default function Arena() {
         const total = saveRoll + save.conMod;
         const saved = total >= save.dc;
 
+        // Concentration result sounds
+        if (saved) playArenaSound('crowdCheer');
+        else playArenaSound('attackFumble');
+
         const playerParticipant = activeEncounterRef.current?.participants?.[save.userId];
         const playerAvatar = playerParticipant?.avatar || (playerParticipant?.sprite && `/players/${playerParticipant.sprite}`);
 
@@ -1336,7 +1343,7 @@ export default function Arena() {
           saveDC: save.dc, saved,
           attacker: { name: save.spellName, avatar: playerAvatar },
           defender: { name: save.playerName, avatar: playerAvatar },
-          sounds: saved ? ['crowdCheer'] : ['spellFail'],
+          sounds: saved ? ['crowdCheer'] : ['attackFumble'],
         };
         broadcastRollResult(saveOverlay);
         await showRollResult(saveOverlay);
@@ -2585,17 +2592,41 @@ export default function Arena() {
   // ── Spell casting handlers ──
 
   const handleSpellClick = useCallback(async () => {
-    if (!activeEncounter) return;
+    const enc = activeEncounterRef.current;
+    if (!enc) return;
     try {
-      const data = await api(`/api/encounters/${activeEncounter.id}/spells`);
+      const data = await api(`/api/encounters/${enc.id}/spells`);
       const spells = data.spells || [];
-      if (spells.length === 0) return; // no spells available for this class
-      setAvailableSpells(spells);
+
+      // Inject pre-bonus spells (Ensnaring Strike, Hunter's Mark) into spell list
+      const myS = enc.participants[user?.id];
+      const preBonusSpells = [];
+      const preBonusActions = myS?.availablePreBonusActions || [];
+      if (preBonusActions.find(a => a.type === 'ensnaring_strike') && !ensnaringStrikeToggle) {
+        preBonusSpells.push({
+          id: 'ensnaring_strike', name: 'Ensnaring Strike', level: 1,
+          actionType: 'bonus', damageDice: '1d6', damageType: 'piercing',
+          description: 'The next creature you hit with a weapon attack becomes restrained by magical vines.',
+          isBonusAbility: true,
+        });
+      }
+      if (preBonusActions.find(a => a.type === 'hunters_mark')) {
+        preBonusSpells.push({
+          id: 'hunters_mark', name: "Hunter's Mark", level: 1,
+          actionType: 'bonus', damageDice: '1d6', damageType: 'per hit',
+          description: 'Mark a creature as your quarry, dealing extra 1d6 damage on weapon hits.',
+          isBonusAbility: true,
+        });
+      }
+
+      const allSpells = [...preBonusSpells, ...spells];
+      if (allSpells.length === 0) return;
+      setAvailableSpells(allSpells);
       setSpellModalOpen(true);
     } catch (err) {
       console.error('Failed to load spells:', err);
     }
-  }, [activeEncounter?.id]);
+  }, [user?.id, ensnaringStrikeToggle]);
 
   const handleCastSpell = useCallback(async (spell) => {
     if (!activeEncounter || rollActiveRef.current) return;
@@ -2611,6 +2642,13 @@ export default function Arena() {
       });
       return;
     }
+    // Heal spells open a target picker instead of rolling damage
+    if (spell.effectType === 'heal') {
+      setSpellModalOpen(false);
+      setHealSpellTargetModal(spell);
+      return;
+    }
+
     setSpellModalOpen(false);
     setCastingSpell(spell);
     setActionChosen('cast_spell');
@@ -2684,6 +2722,74 @@ export default function Arena() {
       setCastingSpell(null);
     } catch (err) {
       console.error('Failed to cast spell:', err);
+      setActionChosen(null);
+      setRollPhase(null);
+      setCastingSpell(null);
+    } finally {
+      rollActiveRef.current = false;
+    }
+  }, [activeEncounter, user?.id, requestServerRoll, broadcastRollResult, showRollResult]);
+
+  const handleHealSpellCast = useCallback(async (spell, targetId) => {
+    setHealSpellTargetModal(null);
+    if (!activeEncounter || rollActiveRef.current) return;
+
+    setCastingSpell(spell);
+    setActionChosen('cast_spell');
+    rollActiveRef.current = true;
+
+    const myStats = activeEncounter.participants[user.id];
+    const pName = myStats?.name || 'Player';
+    const spellMod = myStats?.spellcastingMod || 0;
+
+    try {
+      // Roll heal dice
+      const { total: healRoll } = await requestServerRoll(
+        spell.healDice, spellMod, '#4ade80', `${pName} casts ${spell.name}`, '#4ade80'
+      );
+
+      const healAmount = healRoll;
+      const rawDice = healRoll - spellMod;
+      const target = activeEncounter.participants[targetId];
+      const targetName = target?.name || 'Ally';
+      playArenaSound(target?.knockedOut ? 'revive' : 'healShimmer');
+      if (target?.knockedOut) playArenaSound('crowdCheer');
+
+      // Show heal overlay
+      const healOverlay = {
+        type: 'heal',
+        healAmount,
+        potionName: spell.name,
+        isSpell: true,
+        diceNotation: spell.healDice,
+        diceRoll: rawDice,
+        spellMod,
+        healer: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
+        target: { name: targetName, avatar: target?.avatar || (target?.sprite && `/players/${target.sprite}`) },
+        newHp: Math.min(target?.maxHp || 0, (target?.currentHp || 0) + healAmount),
+        maxHp: target?.maxHp || 0,
+        revived: target?.knockedOut || false,
+        sounds: target?.knockedOut ? ['revive', 'crowdCheer'] : ['healShimmer'],
+      };
+      broadcastRollResult(healOverlay);
+      await showRollResult(healOverlay);
+
+      // Submit to main action endpoint
+      setRollPhase('submitting');
+      await api(`/api/encounters/${activeEncounter.id}/action`, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'cast_spell',
+          spellId: spell.id,
+          targetId,
+          healRoll: rawDice, // server adds spellcastingMod
+        }),
+      });
+
+      setRollPhase(null);
+      setCastingSpell(null);
+    } catch (err) {
+      console.error(`Failed ${spell.name}:`, err);
       setActionChosen(null);
       setRollPhase(null);
       setCastingSpell(null);
@@ -3029,7 +3135,7 @@ export default function Arena() {
     }
     if (rollPhase === 'inspiration_roll') return 'Rolling Bardic Inspiration...';
     if (rollPhase === 'spell_save_roll') return `${castingSpell?.name || 'Spell'} — rolling ${monster?.name || 'monster'}'s save...`;
-    if (rollPhase === 'spell_damage_roll') return `${castingSpell?.name || 'Spell'} — rolling damage...`;
+    if (rollPhase === 'spell_damage_roll') return `${castingSpell?.name || 'Spell'} — rolling ${castingSpell?.effectType === 'heal' ? 'healing' : 'damage'}...`;
     if (rollPhase === 'submitting') return 'Submitting action...';
     if (actionChosen === 'flurry_of_blows') return 'Rolling Flurry of Blows...';
     if (actionChosen === 'offhand_attack') return 'Rolling offhand attack...';
@@ -3835,7 +3941,9 @@ export default function Arena() {
                 {/* ── Abilities Drawer ── */}
                 <div className={`arena-abilities-drawer ${abilitiesOpen ? 'open' : ''}`}>
                   <div className="arena-abilities-grid">
-                    {myStats?.hasAvailableSpells && (
+                    {(myStats?.hasAvailableSpells
+                      || (myStats?.availablePreBonusActions || []).some(a => a.type === 'ensnaring_strike' || a.type === 'hunters_mark')
+                    ) && (
                       <button
                         className="arena-ability-btn arena-ability-btn-spell"
                         onClick={() => { playSound('buttonTap'); handleSpellClick(); }}
@@ -3844,11 +3952,6 @@ export default function Arena() {
                           {'\u2728'} Cast Spell
                           <span className="arena-ability-btn-tag arena-ability-btn-tag-action">ACTION</span>
                         </span>
-                        {myStats?.spellSlots?.length > 0 && (
-                          <span className="arena-ability-btn-detail">
-                            {myStats.spellSlots.reduce((sum, s) => sum + s.total - s.used, 0)} slots
-                          </span>
-                        )}
                       </button>
                     )}
                     {(myStats?.classFeatures || []).includes('Lay on Hands') && ((myStats?.layOnHandsPool || 0) - (myStats?.layOnHandsUsed || 0)) > 0 && (
@@ -3929,8 +4032,8 @@ export default function Arena() {
                     {(myStats?.availablePreBonusActions || []).map(action => {
                       const config = preBonusActionConfig[action.type];
                       if (!config) return null;
-                      // Hide Ensnaring Strike when already toggled on
-                      if (action.type === 'ensnaring_strike' && ensnaringStrikeToggle) return null;
+                      // Ensnaring Strike & Hunter's Mark are now in the Cast Spell modal
+                      if (action.type === 'ensnaring_strike' || action.type === 'hunters_mark') return null;
                       return (
                         <button key={action.type} className={`arena-ability-btn ${config.className}`}
                           onClick={config.onClick}
@@ -4214,7 +4317,29 @@ export default function Arena() {
                   <button
                     key={spell.id}
                     className={`arena-spell-card ${spell.level === 0 ? 'arena-spell-card-cantrip' : 'arena-spell-card-level1'}`}
-                    onClick={() => { playSound('buttonTap'); handleCastSpell(spell); }}
+                    onClick={() => {
+                      playSound('buttonTap');
+                      if (spell.isBonusAbility) {
+                        setSpellModalOpen(false);
+                        if (spell.id === 'ensnaring_strike') {
+                          const myS = activeEncounter?.participants[user?.id];
+                          if (myS?.concentration && myS.concentration.spellId !== 'ensnaring_strike') {
+                            const currentName = CONCENTRATION_SPELL_NAMES[myS.concentration.spellId] || myS.concentration.spellId;
+                            setConcentrationConflict({
+                              currentSpell: currentName,
+                              newSpell: 'Ensnaring Strike',
+                              onConfirm: () => { setEnsnaringStrikeToggle(true); setAbilitiesOpen(false); },
+                            });
+                          } else {
+                            setEnsnaringStrikeToggle(true); setAbilitiesOpen(false);
+                          }
+                        } else if (spell.id === 'hunters_mark') {
+                          handleHuntersMark();
+                        }
+                      } else {
+                        handleCastSpell(spell);
+                      }
+                    }}
                   >
                     <div className="arena-spell-card-header">
                       <span className="arena-spell-card-name">{spell.name}</span>
@@ -4290,6 +4415,39 @@ export default function Arena() {
                     <div className="arena-potion-item-name">{t.name}</div>
                     <div className="arena-potion-item-detail">
                       {`${t.currentHp}/${t.maxHp} HP`}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Heal Spell Target Modal (Cure Wounds etc.) */}
+        {healSpellTargetModal && (
+          <div className="arena-potion-overlay" onClick={() => setHealSpellTargetModal(null)}>
+            <div className="arena-potion-modal" onClick={e => e.stopPropagation()}>
+              <div className="arena-potion-header">
+                <span>{'\u2728'} {healSpellTargetModal.name} — Choose Target</span>
+                <button className="arena-potion-close" onClick={() => setHealSpellTargetModal(null)}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+              <div className="arena-potion-list">
+                {Object.entries(activeEncounter?.participants || {})
+                  .map(([uid, p]) => ({ id: uid, name: p.name, currentHp: p.currentHp, maxHp: p.maxHp, knockedOut: p.knockedOut }))
+                  .map(t => (
+                  <button
+                    key={t.id}
+                    className="arena-potion-item arena-potion-target"
+                    onClick={() => { playSound('buttonTap'); handleHealSpellCast(healSpellTargetModal, t.id); }}
+                  >
+                    <div className="arena-potion-target-avatar arena-potion-target-avatar-fallback">{(t.name || '?')[0]}</div>
+                    <div className="arena-potion-item-name">{t.name}{t.knockedOut ? ' (KO)' : ''}</div>
+                    <div className="arena-potion-item-detail">
+                      {t.knockedOut ? 'Knocked Out' : `${t.currentHp}/${t.maxHp} HP`}
                     </div>
                   </button>
                 ))}
