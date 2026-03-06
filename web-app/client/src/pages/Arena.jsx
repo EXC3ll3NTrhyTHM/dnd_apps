@@ -21,6 +21,7 @@ import SceneAudio from './scenes/SceneAudio';
 import { reportMetric } from '../lib/memoryTracker';
 
 const DiceOverlay = lazy(() => import('../components/DiceOverlay'));
+const ChestOpenOverlay = lazy(() => import('../components/ChestOpenOverlay'));
 import EmotePopup from '../components/EmotePopup';
 import ArenaEmoteGrid from '../components/ArenaEmoteGrid';
 import DmRollControl from '../components/DmRollControl';
@@ -258,6 +259,7 @@ export default function Arena() {
   useEffect(() => { ensnaringStrikeToggleRef.current = ensnaringStrikeToggle; }, [ensnaringStrikeToggle]);
   // Concentration conflict confirmation
   const [concentrationConflict, setConcentrationConflict] = useState(null);
+  const [rageConcentrationWarning, setRageConcentrationWarning] = useState(false);
   // Weapon picker state
   const [weaponModalOpen, setWeaponModalOpen] = useState(false);
   const [availableWeapons, setAvailableWeapons] = useState([]);
@@ -361,6 +363,9 @@ export default function Arena() {
   // Level-up overlay state
   const [levelUp, setLevelUp] = useState(null);
 
+  // Treasure chest state
+  const [chestData, setChestData] = useState(null);
+
   // Queue only this player's achievements when result screen appears
   useEffect(() => {
     if (!encounterResult?.achievements || !user?.id) return;
@@ -381,6 +386,15 @@ export default function Arena() {
     const myReward = encounterResult.rewards[user.id];
     if (myReward?.levelUp?.newLevel) {
       setLevelUp(prev => Math.max(prev || 0, myReward.levelUp.newLevel));
+    }
+  }, [encounterResult?.rewards, user?.id]);
+
+  // Extract chest from encounter rewards for this player
+  useEffect(() => {
+    if (!encounterResult?.rewards || !user?.id) return;
+    const myReward = encounterResult.rewards[user.id];
+    if (myReward?.chest) {
+      setChestData(myReward.chest);
     }
   }, [encounterResult?.rewards, user?.id]);
 
@@ -561,11 +575,22 @@ export default function Arena() {
           if (payload.type === 'encounter_bonus_result' && payload.result?.type === 'bardic_inspiration' && payload.result?.userId !== userIdRef.current) {
             playArenaSoundRef.current('bardicInspiration');
           }
-          // Show brief banner for Patient Defense / Hunter's Mark result
-          if (payload.type === 'encounter_bonus_result' && (payload.result?.type === 'patient_defense' || payload.result?.type === 'hunters_mark')) {
+          // Show brief banner for Patient Defense / Hunter's Mark / Rage result
+          if (payload.type === 'encounter_bonus_result' && (payload.result?.type === 'patient_defense' || payload.result?.type === 'hunters_mark' || payload.result?.type === 'rage')) {
             setBonusResultBanner(payload.result);
             if (bonusResultTimerRef.current) clearTimeout(bonusResultTimerRef.current);
             bonusResultTimerRef.current = setTimeout(() => setBonusResultBanner(null), 3000);
+          }
+          // Show banner when rage ends (no attack + no damage)
+          if (payload.type === 'encounter_condition_tick' && payload.conditionEffects?.rageExpired) {
+            const reason = payload.conditionEffects.rageExpiredReason;
+            setBonusResultBanner({
+              type: 'rage_ended',
+              name: payload.conditionEffects.rageExpiredName,
+              reason,
+            });
+            if (bonusResultTimerRef.current) clearTimeout(bonusResultTimerRef.current);
+            bonusResultTimerRef.current = setTimeout(() => setBonusResultBanner(null), 3500);
           }
           // Show banner when monster turn is skipped (stunned)
           if (payload.type === 'encounter_monster_turn_skipped') {
@@ -895,8 +920,8 @@ export default function Arena() {
   }, [locationId]);
 
   // ── Request server-generated dice roll, broadcast to spectators, animate locally ──
-  const requestServerRoll = useCallback(async (notation, modifier, color, label, colorset, material, advantageType, { rollingLabel } = {}) => {
-    const rollConfig = { notation, modifier, color, label, locationId, colorset: colorset || 'white', material: material || 'plastic', advantageType: advantageType || undefined };
+  const requestServerRoll = useCallback(async (notation, modifier, color, label, colorset, material, advantageType, { rollingLabel, sound } = {}) => {
+    const rollConfig = { notation, modifier, color, label, locationId, colorset: colorset || 'white', material: material || 'plastic', advantageType: advantageType || undefined, sound: sound || undefined };
     const data = await api('/api/encounters/roll-broadcast', {
       method: 'POST',
       body: JSON.stringify(rollConfig),
@@ -1023,10 +1048,8 @@ export default function Arena() {
         if (next.data.sounds) next.data.sounds.forEach(s => playArenaSoundRef.current(s));
         setRollResultOverlay(next.data);
       } else {
-        // Play damage impact sound when spectator dice start rolling (not on result screen)
-        if (next.label && (next.label.includes('rolls damage') || next.label.includes('crits'))) {
-          playArenaSoundRef.current('damageImpact');
-        }
+        // Play sound when spectator dice start rolling (e.g. damageImpact for damage rolls)
+        if (next.sound) playArenaSoundRef.current(next.sound);
         setSpectatorRoll(next);
       }
     }
@@ -1187,26 +1210,35 @@ export default function Arena() {
 
           playArenaSoundRef.current('monsterHit');
           const { total: dmgTotal } = await requestServerRoll(
-            isNat20 ? doubleDice(dice) : dice, modifier, '#ef4444', mCritLabel, '#ef4444'
+            isNat20 ? doubleDice(dice) : dice, modifier, '#ef4444', mCritLabel, '#ef4444', undefined, undefined, { sound: 'monsterHit' }
           );
           damageTotal = dmgTotal;
           if (damageTotal >= 20 && damageTotal < 30) playArenaSoundRef.current('bigDamage');
           if (damageTotal >= 30) playArenaSoundRef.current('massiveDamage');
-          // Show damage result overlay (track accumulated damage for multi-attacks)
+          // Rage resistance: halve bludgeoning, piercing, slashing damage
           const dmgTargetP = activeEncounterRef.current?.participants?.[attack.targetId];
+          let displayDamage = damageTotal;
+          const rageResisted = dmgTargetP?.raging && attack.damageType && ['bludgeoning', 'piercing', 'slashing'].includes(attack.damageType);
+          if (rageResisted) {
+            displayDamage = Math.floor(damageTotal / 2);
+          }
+
+          // Show damage result overlay (track accumulated damage for multi-attacks)
           const baseHp = dmgTargetP?.currentHp || 0;
           const priorDmg = accumulatedDmg[attack.targetId] || 0;
           const effectiveHp = Math.max(0, baseHp - priorDmg);
-          accumulatedDmg[attack.targetId] = priorDmg + damageTotal;
-          const monsterDmgSounds = ['monsterHit'];
-          if (damageTotal >= 20 && damageTotal < 30) monsterDmgSounds.push('bigDamage');
-          if (damageTotal >= 30) monsterDmgSounds.push('massiveDamage');
+          accumulatedDmg[attack.targetId] = priorDmg + displayDamage;
+          const monsterDmgSounds = [];
+          if (displayDamage >= 20 && displayDamage < 30) monsterDmgSounds.push('bigDamage');
+          if (displayDamage >= 30) monsterDmgSounds.push('massiveDamage');
           const monsterDmgOverlay = {
             type: 'damage',
-            damage: damageTotal,
+            damage: displayDamage,
             isCrit: isNat20,
+            rageResisted: rageResisted || undefined,
+            originalDamage: rageResisted ? damageTotal : undefined,
             monsterHp: effectiveHp,
-            newHp: Math.max(0, effectiveHp - damageTotal),
+            newHp: Math.max(0, effectiveHp - displayDamage),
             attacker: { name: monsterRollRequest.monsterName, avatar: monsterImg && `/monsters/${monsterImg}` },
             defender: { name: attack.targetName, avatar: dmgTargetP?.avatar },
             sounds: monsterDmgSounds,
@@ -1698,7 +1730,7 @@ export default function Arena() {
 
           playArenaSound('damageImpact');
           const { total: dmgTotal } = await requestServerRoll(
-            weaponNotation, dmgMod, '#eab308', critLabel, myDiceColorset
+            weaponNotation, dmgMod, '#eab308', critLabel, myDiceColorset, undefined, undefined, { sound: 'damageImpact' }
           );
           damageTotal = dmgTotal;
 
@@ -1733,7 +1765,7 @@ export default function Arena() {
               if (isNat20) saDiceCount *= 2;
               const saNotation = `${saDiceCount}d6`;
               const { total: saTotal } = await requestServerRoll(
-                saNotation, 0, '#10b981', 'SNEAK ATTACK!', '#10b981', 'glass'
+                saNotation, 0, '#10b981', 'SNEAK ATTACK!', '#10b981', 'glass', undefined, { sound: 'damageImpact' }
               );
               damageTotal += saTotal;
               sneakAttackData = { sneakAttackDamage: saTotal };
@@ -1747,10 +1779,17 @@ export default function Arena() {
             setRollPhase('hunters_mark_roll');
             playArenaSound('damageImpact');
             const { total: hmTotal } = await requestServerRoll(
-              '1d6', 0, '#a855f7', "HUNTER'S MARK!", '#a855f7', 'glass'
+              '1d6', 0, '#a855f7', "HUNTER'S MARK!", '#a855f7', 'glass', undefined, { sound: 'damageImpact' }
             );
             damageTotal += hmTotal;
             huntersMarkData = { damage: hmTotal };
+          }
+
+          // Rage bonus — STR-based melee attacks only
+          let rageDamage = 0;
+          if (myStats.raging && myStats.rageDamageBonus && wpn && !wpn.ranged) {
+            rageDamage = myStats.rageDamageBonus;
+            damageTotal += rageDamage;
           }
 
           // Show damage result overlay
@@ -1767,6 +1806,7 @@ export default function Arena() {
             smiteDamage: smiteData?.smiteDamage,
             sneakAttackDamage: sneakAttackData?.sneakAttackDamage,
             huntersMarkDamage: huntersMarkData?.damage,
+            rageDamage: rageDamage || undefined,
             monsterHp: activeEncounter.monster.currentHp,
             newHp: Math.max(0, activeEncounter.monster.currentHp - damageTotal),
             attacker: { name: pName, avatar: myStats.avatar || (myStats.sprite && `/players/${myStats.sprite}`) },
@@ -2326,7 +2366,7 @@ export default function Arena() {
       setRollPhase('damage_roll');
       playArenaSound('fistOfUnbrokenAir');
       const { total: rawDamage } = await requestServerRoll(
-        '3d10', 0, '#f0c040', saved ? `${pName} — half damage` : `${pName} — full damage!`, myDiceColorset
+        '3d10', 0, '#f0c040', saved ? `${pName} — half damage` : `${pName} — full damage!`, myDiceColorset, undefined, undefined, { sound: 'fistOfUnbrokenAir' }
       );
       const damageTotal = saved ? Math.floor(rawDamage / 2) : rawDamage;
       if (damageTotal >= 20) playArenaSound('bigDamage');
@@ -2339,7 +2379,7 @@ export default function Arena() {
         newHp: Math.max(0, monsterData.currentHp - damageTotal),
         attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
         defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
-        sounds: ['fistOfUnbrokenAir', ...(damageTotal >= 20 ? ['bigDamage'] : [])],
+        sounds: [...(damageTotal >= 20 ? ['bigDamage'] : [])],
       };
       broadcastRollResult(dmgOverlay);
       await showRollResult(dmgOverlay);
@@ -2443,7 +2483,7 @@ export default function Arena() {
 
           playArenaSound('damageImpact');
           const { total: dmgTotal } = await requestServerRoll(
-            weaponNotation, unarmed.damageMod, '#f0c040', critLabel, myDiceColorset
+            weaponNotation, unarmed.damageMod, '#f0c040', critLabel, myDiceColorset, undefined, undefined, { sound: 'damageImpact' }
           );
           damageTotal = dmgTotal;
 
@@ -2455,7 +2495,7 @@ export default function Arena() {
             newHp: Math.max(0, monsterData.currentHp - damageTotal),
             attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
             defender: { name: monsterData.name, avatar: monsterData.image && `/monsters/${monsterData.image}` },
-            sounds: ['damageImpact'],
+            sounds: [],
           };
           broadcastRollResult(dmgOverlay);
           await showRollResult(dmgOverlay);
@@ -2491,6 +2531,44 @@ export default function Arena() {
       rollActiveRef.current = false;
     }
   }, [activeEncounter, user?.id, requestServerRoll, broadcastRollResult, showRollResult, myDiceColorset]);
+
+  // ── Rage handler (Barbarian, pre or post bonus action) ──
+  const executeRage = useCallback(async () => {
+    if (!activeEncounter) return;
+    const endpoint = bonusActionPhase
+      ? `/api/encounters/${activeEncounter.id}/bonus-action`
+      : `/api/encounters/${activeEncounter.id}/pre-bonus-action`;
+    try {
+      const res = await api(endpoint, {
+        method: 'POST',
+        body: JSON.stringify({ bonusAction: 'rage' }),
+      });
+      if (res.error) {
+        console.error('Rage failed:', res.error);
+      }
+      if (bonusActionPhase) {
+        setBonusActionPhase(false);
+        setAvailableBonusActions([]);
+      }
+    } catch (err) {
+      console.error('Failed Rage:', err);
+    }
+  }, [activeEncounter, bonusActionPhase]);
+
+  const handleRage = useCallback(() => {
+    if (!activeEncounter) return;
+    const stats = activeEncounter.participants?.[user?.id];
+    if (stats?.concentration) {
+      setRageConcentrationWarning(true);
+      return;
+    }
+    executeRage();
+  }, [activeEncounter, user?.id, executeRage]);
+
+  const confirmRage = useCallback(() => {
+    setRageConcentrationWarning(false);
+    executeRage();
+  }, [executeRage]);
 
   // ── Patient Defense handler (Monk, pre or post bonus action) ──
   const handlePatientDefense = useCallback(async () => {
@@ -2708,16 +2786,17 @@ export default function Arena() {
       if (!saved) {
         setRollPhase('spell_damage_roll');
         // Electric sound plays on damage; mockery already played on save result
-        playArenaSound(isElectric ? 'electricSpell' : 'damageImpact');
+        const spellImpactSound = isElectric ? 'electricSpell' : 'damageImpact';
+        playArenaSound(spellImpactSound);
         const { total: dmgTotal } = await requestServerRoll(
-          spell.damageDice, 0, '#eab308', `${spell.name} damage`, myDiceColorset
+          spell.damageDice, 0, '#eab308', `${spell.name} damage`, myDiceColorset, undefined, undefined, { sound: spellImpactSound }
         );
         damageTotal = dmgTotal;
         if (damageTotal >= 20 && damageTotal < 30) playArenaSound('bigDamage');
         if (damageTotal >= 30) playArenaSound('massiveDamage');
 
         // Show damage overlay
-        const spellDmgSounds = [isElectric ? 'electricSpell' : 'damageImpact'];
+        const spellDmgSounds = [];
         if (damageTotal >= 20 && damageTotal < 30) spellDmgSounds.push('bigDamage');
         if (damageTotal >= 30) spellDmgSounds.push('massiveDamage');
         const dmgOverlay = {
@@ -2989,7 +3068,7 @@ export default function Arena() {
 
         playArenaSound('damageImpact');
         const { total: dmgTotal } = await requestServerRoll(
-          weaponNotation, dmgMod, '#eab308', critLabel, myDiceColorset
+          weaponNotation, dmgMod, '#eab308', critLabel, myDiceColorset, undefined, undefined, { sound: 'damageImpact' }
         );
         damageTotal = dmgTotal;
 
@@ -3005,17 +3084,24 @@ export default function Arena() {
             if (isNat20) saDiceCount *= 2;
             const saNotation = `${saDiceCount}d6`;
             const { total: saTotal } = await requestServerRoll(
-              saNotation, 0, '#10b981', 'SNEAK ATTACK!', '#10b981', 'glass'
+              saNotation, 0, '#10b981', 'SNEAK ATTACK!', '#10b981', 'glass', undefined, { sound: 'damageImpact' }
             );
             damageTotal += saTotal;
             sneakAttackData = { sneakAttackDamage: saTotal };
             playArenaSound('crowdCheer');
           }
         }
+        // Rage bonus — offhand is always melee
+        let rageDamage = 0;
+        if (myStats.raging && myStats.rageDamageBonus) {
+          rageDamage = myStats.rageDamageBonus;
+          damageTotal += rageDamage;
+        }
+
         if (damageTotal >= 20 && damageTotal < 30) playArenaSound('bigDamage');
         if (damageTotal >= 30) playArenaSound('massiveDamage');
 
-        const offhandDmgSounds = ['damageImpact'];
+        const offhandDmgSounds = [];
         if (damageTotal >= 20 && damageTotal < 30) offhandDmgSounds.push('bigDamage');
         if (damageTotal >= 30) offhandDmgSounds.push('massiveDamage');
         const dmgOverlay = {
@@ -3023,6 +3109,7 @@ export default function Arena() {
           damage: damageTotal,
           isCrit: isNat20,
           sneakAttackDamage: sneakAttackData?.sneakAttackDamage,
+          rageDamage: rageDamage || undefined,
           monsterHp: monsterData.currentHp,
           newHp: Math.max(0, monsterData.currentHp - damageTotal),
           attacker: { name: pName, avatar: myStats?.avatar || (myStats?.sprite && `/players/${myStats.sprite}`) },
@@ -3129,6 +3216,13 @@ export default function Arena() {
       detail: () => '1 ki',
       tooltip: 'patient_defense',
     },
+    rage: {
+      className: 'arena-ability-btn-rage',
+      icon: '\uD83D\uDD25',
+      label: 'Rage',
+      onClick: () => { playSound('buttonTap'); handleRage(); },
+      detail: (action) => `${action.usesLeft} left`,
+    },
   };
 
   // ── Auto-close abilities drawer when action chosen or turn changes ──
@@ -3207,7 +3301,8 @@ export default function Arena() {
                     <div key={uid} className="arena-reward-row">
                       <span className="arena-reward-name">{r.name}</span>
                       <span className="arena-reward-values">
-                        +{r.xp} XP &middot; +{r.gold} gold
+                        +{r.xp} XP
+                        {r.chest ? ' \u00b7 Treasure Chest' : ` \u00b7 +${r.gold} gold`}
                         {r.share ? ` (${r.share}%)` : ''}
                       </span>
                       {r.killingBlow && <span className="arena-reward-badge">Killing Blow</span>}
@@ -3255,6 +3350,33 @@ export default function Arena() {
           />
         )}
       </div>
+    );
+  }
+
+  // ── Chest open overlay (shown after dismissing result screen) ──
+  if (chestData && !encounterResult) {
+    const handleChestClaim = async (id) => {
+      await api('/api/chests/claim', { method: 'POST', body: JSON.stringify({ chestId: id }) });
+    };
+    const handleChestDismiss = () => {
+      setChestData(null);
+      // Ensure encounter state is fully cleared so we return to monster selection
+      setActiveEncounter(null);
+      preloadArenaSounds();
+      preloadDiceSounds();
+    };
+    return (
+      <Suspense fallback={null}>
+        <ChestOpenOverlay
+          chestId={chestData.chestId}
+          rarity={chestData.rarity}
+          gold={chestData.gold}
+          items={chestData.items}
+          tapSequence={chestData.tapSequence}
+          onClaim={handleChestClaim}
+          onDismiss={handleChestDismiss}
+        />
+      </Suspense>
     );
   }
 
@@ -3611,7 +3733,7 @@ export default function Arena() {
                   className={`arena-sprite-tile ${p.sprite ? 'arena-sprite-tile-has-img' : ''} ${p.knockedOut ? 'arena-sprite-tile-ko' : ''} ${uid === user?.id ? 'arena-sprite-tile-me' : ''}`}
                   style={{
                     width: `${effectiveConfig.playerTileSize * viewScale}px`,
-                    height: `${effectiveConfig.playerTileSize * viewScale}px`,
+                    height: `${effectiveConfig.playerTileSize * viewScale * (p.spriteHeight || 1)}px`,
                     marginLeft: idx > 0 ? `${effectiveConfig.playerTileGap * viewScale * gapScale}px` : undefined,
                     ...(p.sprite ? {} : { backgroundColor: SPRITE_COLORS[idx % SPRITE_COLORS.length] }),
                   }}
@@ -3653,6 +3775,24 @@ export default function Arena() {
             </div>
           </div>
         )}
+        {bonusResultBanner && bonusResultBanner.type === 'rage' && (
+          <div className="arena-bonus-result-banner" onClick={() => setBonusResultBanner(null)}>
+            <div className="arena-bonus-result-content arena-bonus-rage">
+              <div className="arena-bonus-result-title">{'\uD83D\uDD25'} RAGE!</div>
+              <div className="arena-bonus-result-desc">{bonusResultBanner.name} enters a rage! +{bonusResultBanner.rageDamageBonus || 2} melee damage, resistance to physical damage ({bonusResultBanner.usesLeft} uses left)</div>
+            </div>
+          </div>
+        )}
+        {bonusResultBanner && bonusResultBanner.type === 'rage_ended' && (
+          <div className="arena-bonus-result-banner" onClick={() => setBonusResultBanner(null)}>
+            <div className="arena-bonus-result-content arena-bonus-rage-ended">
+              <div className="arena-bonus-result-title">{'\uD83D\uDCA8'} Rage Fades</div>
+              <div className="arena-bonus-result-desc">
+                {bonusResultBanner.name}'s rage subsides{bonusResultBanner.reason === 'no_attack' ? ' — no attack made and no damage taken' : ''}.
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Monster turn skipped banner (stunned) */}
         {monsterSkipBanner && (
@@ -3666,7 +3806,7 @@ export default function Arena() {
         )}
 
         {/* Bottom UI — actions + timer */}
-        <div className="arena-bottom-ui">
+        <div className={`arena-bottom-ui ${myStats?.raging ? 'arena-bottom-raging' : ''}`}>
 
           {/* Quick Emote Bar */}
           {activeEncounter && isParticipant && quickBarEmotes.length > 0 && (
@@ -3691,8 +3831,8 @@ export default function Arena() {
             </div>
           )}
 
-          {/* Resource Bar — Spell Slots, Channel Divinity & Ki (visible to all participants) */}
-          {activeEncounter && isParticipant && myStats && (myStats.spellSlots?.length > 0 || myStats.channelDivinityMax > 0 || myStats.kiPointsMax > 0) && (
+          {/* Resource Bar — Spell Slots, Channel Divinity, Ki & Rage (visible to all participants) */}
+          {activeEncounter && isParticipant && myStats && (myStats.spellSlots?.length > 0 || myStats.channelDivinityMax > 0 || myStats.kiPointsMax > 0 || myStats.huntersMarkFreeUsesMax > 0 || myStats.rageUsesMax > 0) && (
             <div className="arena-resource-bar">
               {(myStats.spellSlots || []).map((slot, idx) => (
                 <div key={idx} className="arena-resource-group">
@@ -3728,6 +3868,32 @@ export default function Arena() {
                       <span
                         key={i}
                         className={`arena-resource-pip arena-resource-pip-ki ${i < myStats.kiPointsMax - (myStats.kiPointsUsed || 0) ? 'arena-resource-pip-full' : 'arena-resource-pip-empty'}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {myStats.huntersMarkFreeUsesMax > 0 && (
+                <div className="arena-resource-group">
+                  <span className="arena-resource-label">HM</span>
+                  <div className="arena-resource-pips">
+                    {Array.from({ length: myStats.huntersMarkFreeUsesMax }, (_, i) => (
+                      <span
+                        key={i}
+                        className={`arena-resource-pip arena-resource-pip-hm ${i < myStats.huntersMarkFreeUsesMax - (myStats.huntersMarkFreeUsesUsed || 0) ? 'arena-resource-pip-full' : 'arena-resource-pip-empty'}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {myStats.rageUsesMax > 0 && (
+                <div className="arena-resource-group">
+                  <span className="arena-resource-label">Rage</span>
+                  <div className="arena-resource-pips">
+                    {Array.from({ length: Math.min(myStats.rageUsesMax, 6) }, (_, i) => (
+                      <span
+                        key={i}
+                        className={`arena-resource-pip arena-resource-pip-rage ${i < myStats.rageUsesMax - (myStats.rageUsesUsed || 0) ? 'arena-resource-pip-full' : 'arena-resource-pip-empty'}`}
                       />
                     ))}
                   </div>
@@ -3813,6 +3979,15 @@ export default function Arena() {
                       onClick={() => { playSound('buttonTap'); handlePatientDefense(); }}
                     >
                       {'\uD83D\uDEE1'} Patient Defense
+                      <span className="arena-action-tag arena-action-tag-bonus">BONUS</span>
+                    </button>
+                  )}
+                  {availableBonusActions.find(a => a.type === 'rage') && (
+                    <button
+                      className="arena-btn arena-btn-rage"
+                      onClick={() => { playSound('buttonTap'); handleRage(); }}
+                    >
+                      {'\uD83D\uDD25'} Rage ({availableBonusActions.find(a => a.type === 'rage').usesLeft})
                       <span className="arena-action-tag arena-action-tag-bonus">BONUS</span>
                     </button>
                   )}
@@ -4416,6 +4591,30 @@ export default function Arena() {
           </div>
         )}
 
+        {/* Rage Concentration Warning Modal */}
+        {rageConcentrationWarning && (
+          <div className="arena-potion-overlay" onClick={() => setRageConcentrationWarning(false)}>
+            <div className="arena-potion-modal arena-concentration-modal" onClick={e => e.stopPropagation()}>
+              <div className="arena-potion-header">
+                <span>{'\uD83D\uDD25'} Rage Warning</span>
+                <button className="arena-potion-close" onClick={() => setRageConcentrationWarning(false)}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+              <div className="arena-concentration-conflict-body">
+                <p>You're concentrating on <strong>{myStats?.concentration}</strong>.</p>
+                <p>Entering Rage will end your concentration.</p>
+              </div>
+              <div className="arena-concentration-conflict-actions">
+                <button className="arena-concentration-btn-cancel" onClick={() => setRageConcentrationWarning(false)}>Cancel</button>
+                <button className="arena-concentration-btn-confirm" onClick={confirmRage}>Rage Anyway</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Healing Word Target Modal */}
         {healingWordTargetModal && (
           <div className="arena-potion-overlay" onClick={() => setHealingWordTargetModal(false)}>
@@ -4965,7 +5164,9 @@ function parseDamageNotation(notation) {
   return { dice: match[1], modifier: parseInt(match[2] || '0', 10) };
 }
 
-/** Replace **text** with <strong>text</strong> for narration display */
+/** Replace **text** with <strong>text</strong> and ~~text~~ with <s>text</s> for narration display */
 function formatBold(text) {
-  return (text || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  return (text || '')
+    .replace(/~~(.+?)~~/g, '<s>$1</s>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 }

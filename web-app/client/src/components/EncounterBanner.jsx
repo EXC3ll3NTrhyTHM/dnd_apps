@@ -266,7 +266,8 @@ export default function EncounterBanner({
                   <div key={uid} className="enc-reward-row">
                     <span className="enc-reward-name">{r.name}</span>
                     <span className="enc-reward-values">
-                      +{r.xp} XP &middot; +{r.gold} gold
+                      +{r.xp} XP
+                      {r.chest ? ' \u00b7 Treasure Chest' : ` \u00b7 +${r.gold} gold`}
                       {r.share ? ` (${r.share}%)` : ''}
                     </span>
                     {r.killingBlow && <span className="enc-reward-badge">Killing Blow</span>}
@@ -910,6 +911,19 @@ export function useEncounterEvents(locationId, userId) {
                 type: 'encounter',
                 subtype: 'combat',
                 text: `The **${rem.name}** effect has worn off.`,
+                timestamp: new Date().toISOString(),
+              });
+            }
+            if (fx.rageExpired) {
+              const rageText = fx.rageExpiredReason === 'no_attack'
+                ? `**${fx.rageExpiredName || 'The barbarian'}'s** rage fades — no attack made and no damage taken.`
+                : `**${fx.rageExpiredName || 'The barbarian'}'s** rage has subsided.`;
+              addNarration({
+                id: `enc_rage_expired_${Date.now()}`,
+                role: 'system',
+                type: 'encounter',
+                subtype: 'combat',
+                text: rageText,
                 timestamp: new Date().toISOString(),
               });
             }

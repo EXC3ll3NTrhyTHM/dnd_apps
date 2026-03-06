@@ -151,7 +151,8 @@ function awardGold(userId, username, amount, metadata = {}) {
   wallets[userId].last_updated = new Date().toISOString();
   saveWallets(wallets);
 
-  logTransaction(userId, username, 'achievement_reward', amount, wallets[userId].balance, metadata);
+  const txType = metadata.type || 'achievement_reward';
+  logTransaction(userId, username, txType, amount, wallets[userId].balance, metadata);
   return wallets[userId];
 }
 

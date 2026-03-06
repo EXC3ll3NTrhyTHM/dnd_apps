@@ -265,11 +265,12 @@ router.post('/:encounterId/join', authRequired, (req, res) => {
   const fallbackData = aliasId ? getPlayerData(userId) : null;
   const username = playerData?.characterName || fallbackData?.characterName || req.user.global_name || req.user.username;
   const sprite = playerData?.sprite || fallbackData?.sprite || null;
+  const spriteHeight = playerData?.spriteHeight || fallbackData?.spriteHeight || null;
   const { roll } = req.body || {};
 
   // Atomic join + initiative when roll is provided
   if (typeof roll === 'number' && roll >= 1 && roll <= 20) {
-    const result = joinWithInitiative(req.params.encounterId, userId, username, req.user.avatar, sprite, roll);
+    const result = joinWithInitiative(req.params.encounterId, userId, username, req.user.avatar, sprite, roll, spriteHeight);
     if (result.error) return res.status(400).json({ error: result.error });
 
     const encounter = result.encounter;
@@ -331,7 +332,7 @@ router.post('/:encounterId/join', authRequired, (req, res) => {
   }
 
   // Fallback: join without roll (legacy)
-  const result = joinEncounter(req.params.encounterId, userId, username, req.user.avatar, sprite);
+  const result = joinEncounter(req.params.encounterId, userId, username, req.user.avatar, sprite, spriteHeight);
   if (result.error) {
     return res.status(400).json({ error: result.error });
   }
@@ -1064,7 +1065,7 @@ router.get('/monsters/arena', authRequired, (req, res) => {
  * Returns: { rolls, total } where rolls = raw die faces, total = sum(rolls) + modifier
  */
 router.post('/roll-broadcast', authRequired, (req, res) => {
-  const { notation, modifier, color, label, locationId, colorset, material, advantageType } = req.body;
+  const { notation, modifier, color, label, locationId, colorset, material, advantageType, sound } = req.body;
   if (locationId !== 'the_arena') {
     return res.status(400).json({ error: 'Roll broadcasts are arena-only.' });
   }
@@ -1172,6 +1173,7 @@ router.post('/roll-broadcast', authRequired, (req, res) => {
           material: material || 'plastic',
           label: label || '',
           advantageType: advantageType || undefined,
+          sound: sound || undefined,
         });
         broadcastToLocationExcept(req, locationId, {
           type: 'fate_deliberation_end',
@@ -1205,6 +1207,7 @@ router.post('/roll-broadcast', authRequired, (req, res) => {
           material: material || 'plastic',
           label: label || '',
           advantageType: advantageType || undefined,
+          sound: sound || undefined,
         });
         broadcastToLocationExcept(req, locationId, {
           type: 'fate_deliberation_end',
@@ -1235,6 +1238,7 @@ router.post('/roll-broadcast', authRequired, (req, res) => {
     material: material || 'plastic',
     label: label || '',
     advantageType: advantageType || undefined,
+    sound: sound || undefined,
   });
 
   res.json({ rolls, total });
@@ -1282,7 +1286,7 @@ function handleTurnAdvance(req, encounter, turnResult) {
   const locationId = encounter.locationId;
 
   if (turnResult.type === 'victory') {
-    const rewardResults = distributeRewards(turnResult.victoryResult.rewards, encounter.monster?.id);
+    const rewardResults = distributeRewards(turnResult.victoryResult.rewards, encounter.monster?.id, encounter.monster?.cr);
     const completedGoals = rewardResults._completedGoals || {};
     delete rewardResults._completedGoals;
 
@@ -1338,6 +1342,23 @@ function handleTurnAdvance(req, encounter, turnResult) {
   }
 
   if (turnResult.type === 'turn_skipped') {
+    // Broadcast rage ended if applicable
+    if (turnResult.rageEndedThisTurn) {
+      broadcastToLocation(req, locationId, {
+        type: 'encounter_condition_tick',
+        locationId,
+        encounterId: encounter.id,
+        conditionEffects: {
+          removed: [],
+          dotEffects: [],
+          rageExpired: true,
+          rageExpiredName: turnResult.rageEndedThisTurn,
+          rageExpiredReason: 'no_attack',
+        },
+        encounter: getPublicState(encounter),
+      });
+    }
+
     // Player is stunned/incapacitated — broadcast skip and auto-advance
     broadcastToLocation(req, locationId, {
       type: 'encounter_turn_skip',
@@ -1357,10 +1378,27 @@ function handleTurnAdvance(req, encounter, turnResult) {
   }
 
   if (turnResult.type === 'next_turn') {
+    // Broadcast rage ended (no attack + no damage taken last turn)
+    if (turnResult.rageEndedThisTurn) {
+      broadcastToLocation(req, locationId, {
+        type: 'encounter_condition_tick',
+        locationId,
+        encounterId: encounter.id,
+        conditionEffects: {
+          removed: [],
+          dotEffects: [],
+          rageExpired: true,
+          rageExpiredName: turnResult.rageEndedThisTurn,
+          rageExpiredReason: 'no_attack',
+        },
+        encounter: getPublicState(encounter),
+      });
+    }
+
     // Broadcast player condition effects (DoT damage, expired conditions) if any
     if (turnResult.conditionEffects) {
       const effects = turnResult.conditionEffects;
-      if (effects.dotEffects.length > 0 || effects.removed.length > 0) {
+      if (effects.dotEffects.length > 0 || effects.removed.length > 0 || effects.rageExpired) {
         broadcastToLocation(req, locationId, {
           type: 'encounter_condition_tick',
           locationId,
@@ -1529,7 +1567,7 @@ function handleRoundResult(req, encounter, roundResult) {
 
   // Victory
   if (roundResult.victory) {
-    const rewardResults = distributeRewards(roundResult.victory.rewards, encounter.monster?.id);
+    const rewardResults = distributeRewards(roundResult.victory.rewards, encounter.monster?.id, encounter.monster?.cr);
     const completedGoals = rewardResults._completedGoals || {};
     delete rewardResults._completedGoals;
 

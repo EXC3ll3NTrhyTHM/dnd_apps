@@ -93,7 +93,7 @@
     },
     "high_roller": {
       "at": "2026-02-25T07:55:24.883Z",
-      "claimed": false
+      "claimed": "2026-03-05T06:39:17.534Z"
     }
   },
   "1472286665417560167": {
@@ -166,6 +166,14 @@
     },
     "monster_slayer": {
       "at": "2026-02-28T08:05:33.030Z",
+      "claimed": false
+    },
+    "marcels_pen_pal": {
+      "at": "2026-03-06T03:08:40.900Z",
+      "claimed": false
+    },
+    "night_owl": {
+      "at": "2026-03-06T03:09:13.647Z",
       "claimed": false
     }
   }

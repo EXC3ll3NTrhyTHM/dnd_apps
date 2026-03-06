@@ -7,11 +7,18 @@
  */
 
 const crypto = require('crypto');
+const fs_debug = require('fs');
+const RAGE_LOG = '/mnt/c/Users/corpo/npc-bot/web-app/rage_debug.log';
+function rageLog(msg) {
+  const line = `[${new Date().toISOString()}] ${msg}\n`;
+  try { fs_debug.appendFileSync(RAGE_LOG, line); } catch {}
+  console.log('[RAGE]', msg);
+}
 const { getMonster } = require('./monsters');
 const { getCharacterSheet } = require('./characterSheets');
 const { getAllWeapons, rollD20, rollDamage } = require('./weapons');
 const { awardQuestXp, incrementLifetimeStat, incrementDailyStat, getLevel, getXpRecord } = require('./xp');
-const { awardGold } = require('./economy');
+const { generateChest } = require('./chests');
 const { ARENA_DAILY_GOALS } = require('./arenaGoals');
 const { addCondition, removeCondition, hasCondition, getAttackModifiers, getDefenseModifiers, canAct, applyDotDamage, tickConditions, resolveEndOfTurnSaves, getConditionsPublic, getPendingDots } = require('./conditions');
 
@@ -185,7 +192,7 @@ function findPlayerEncounter(userId) {
   return null;
 }
 
-function joinEncounter(encounterId, userId, username, avatar, sprite) {
+function joinEncounter(encounterId, userId, username, avatar, sprite, spriteHeight) {
   const encounter = activeEncounters.get(encounterId);
   if (!encounter) return { error: 'Encounter not found.' };
   if (encounter.phase === 'ended') return { error: 'This encounter has ended.' };
@@ -212,6 +219,7 @@ function joinEncounter(encounterId, userId, username, avatar, sprite) {
       name: username,
       avatar: avatar || null,
       sprite: sprite || null,
+      spriteHeight: spriteHeight || null,
       maxHp: sheet.hp || 10,
       currentHp: sheet.hp || 10,
       ac: sheet.ac || 10,
@@ -273,6 +281,17 @@ function joinEncounter(encounterId, userId, username, avatar, sprite) {
       concentration: null,
       ensnaringStrikeActive: false,
       huntersMarkActive: false,
+      // 2024 Favored Enemy: free Hunter's Mark casts (scale with Ranger level)
+      huntersMarkFreeUsesMax: (() => {
+        const rangerLvl = (sheet.classes || []).find(c => c.name === 'Ranger')?.level || 0;
+        if (rangerLvl >= 17) return 6;
+        if (rangerLvl >= 13) return 5;
+        if (rangerLvl >= 9) return 4;
+        if (rangerLvl >= 5) return 3;
+        if (rangerLvl >= 1) return 2;
+        return 0;
+      })(),
+      huntersMarkFreeUsesUsed: 0,
       // CON mod for concentration saves
       conMod: (() => {
         const con = sheet.stats?.find(s => s.abbr === 'CON');
@@ -296,6 +315,30 @@ function joinEncounter(encounterId, userId, username, avatar, sprite) {
         return ml >= 17 ? '1d10' : ml >= 11 ? '1d8' : ml >= 5 ? '1d6' : '1d4';
       })(),
       stunningStrikeActive: false,
+      // Rage (Barbarian)
+      hasRage: (sheet.classes || []).some(c => c.name === 'Barbarian'),
+      rageUsesMax: (() => {
+        const bl = (sheet.classes || []).find(c => c.name === 'Barbarian')?.level || 0;
+        if (bl >= 20) return 999; // Unlimited
+        if (bl >= 17) return 6;
+        if (bl >= 12) return 5;
+        if (bl >= 6) return 4;
+        if (bl >= 3) return 3;
+        if (bl >= 1) return 2;
+        return 0;
+      })(),
+      rageUsesUsed: 0,
+      raging: false,
+      rageStartRound: null,
+      rageAttackedThisTurn: false,
+      rageTookDamageThisTurn: false,
+      rageDamageBonus: (() => {
+        const bl = (sheet.classes || []).find(c => c.name === 'Barbarian')?.level || 0;
+        if (bl >= 16) return 4;
+        if (bl >= 9) return 3;
+        if (bl >= 1) return 2;
+        return 0;
+      })(),
       conditions: [],
     };
   } else {
@@ -304,6 +347,7 @@ function joinEncounter(encounterId, userId, username, avatar, sprite) {
       name: username,
       avatar: avatar || null,
       sprite: sprite || null,
+      spriteHeight: spriteHeight || null,
       maxHp: 10,
       currentHp: 10,
       ac: 10,
@@ -366,7 +410,7 @@ function joinEncounter(encounterId, userId, username, avatar, sprite) {
 }
 
 // Atomic join + initiative: player joins AND rolls initiative in one step
-function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll) {
+function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll, spriteHeight) {
   const encounter = activeEncounters.get(encounterId);
   if (!encounter) return { error: 'Encounter not found.' };
   if (encounter.phase === 'ended') return { error: 'This encounter has ended.' };
@@ -392,6 +436,7 @@ function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll)
       name: username,
       avatar: avatar || null,
       sprite: sprite || null,
+      spriteHeight: spriteHeight || null,
       maxHp: sheet.hp || 10,
       currentHp: sheet.hp || 10,
       ac: sheet.ac || 10,
@@ -449,6 +494,17 @@ function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll)
       concentration: null,
       ensnaringStrikeActive: false,
       huntersMarkActive: false,
+      // 2024 Favored Enemy: free Hunter's Mark casts (scale with Ranger level)
+      huntersMarkFreeUsesMax: (() => {
+        const rangerLvl = (sheet.classes || []).find(c => c.name === 'Ranger')?.level || 0;
+        if (rangerLvl >= 17) return 6;
+        if (rangerLvl >= 13) return 5;
+        if (rangerLvl >= 9) return 4;
+        if (rangerLvl >= 5) return 3;
+        if (rangerLvl >= 1) return 2;
+        return 0;
+      })(),
+      huntersMarkFreeUsesUsed: 0,
       // CON mod for concentration saves
       conMod: (() => {
         const con = sheet.stats?.find(s => s.abbr === 'CON');
@@ -472,6 +528,30 @@ function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll)
         return ml >= 17 ? '1d10' : ml >= 11 ? '1d8' : ml >= 5 ? '1d6' : '1d4';
       })(),
       stunningStrikeActive: false,
+      // Rage (Barbarian)
+      hasRage: (sheet.classes || []).some(c => c.name === 'Barbarian'),
+      rageUsesMax: (() => {
+        const bl = (sheet.classes || []).find(c => c.name === 'Barbarian')?.level || 0;
+        if (bl >= 20) return 999; // Unlimited
+        if (bl >= 17) return 6;
+        if (bl >= 12) return 5;
+        if (bl >= 6) return 4;
+        if (bl >= 3) return 3;
+        if (bl >= 1) return 2;
+        return 0;
+      })(),
+      rageUsesUsed: 0,
+      raging: false,
+      rageStartRound: null,
+      rageAttackedThisTurn: false,
+      rageTookDamageThisTurn: false,
+      rageDamageBonus: (() => {
+        const bl = (sheet.classes || []).find(c => c.name === 'Barbarian')?.level || 0;
+        if (bl >= 16) return 4;
+        if (bl >= 9) return 3;
+        if (bl >= 1) return 2;
+        return 0;
+      })(),
       conditions: [],
     };
   } else {
@@ -479,6 +559,7 @@ function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll)
       name: username,
       avatar: avatar || null,
       sprite: sprite || null,
+      spriteHeight: spriteHeight || null,
       maxHp: 10,
       currentHp: 10,
       ac: 10,
@@ -920,6 +1001,7 @@ function resolveSingleAction(encounter, userId) {
   if (action === 'defend') {
     // 5e Dodge action: attacks against this player have disadvantage until their next turn
     player.dodging = true;
+    if (player.raging) rageLog(`ACTION: ${player.name} chose DODGE while raging (rageAttacked=${player.rageAttackedThisTurn}, tookDmg=${player.rageTookDamageThisTurn})`);
     return {
       type: 'defend', userId, name: player.name,
       text: `**${player.name}** takes the Dodge action. Attacks against them have **disadvantage** until their next turn.`,
@@ -945,6 +1027,12 @@ function resolveSingleAction(encounter, userId) {
   }
 
   if (action === 'attack') {
+    // Rage tracking: attacking (even a miss) sustains rage
+    if (player.raging) {
+      player.rageAttackedThisTurn = true;
+      rageLog(`ACTION: ${player.name} chose ATTACK while raging → rageAttackedThisTurn=true`);
+    }
+
     // 5e Advantage/Disadvantage: determine if player has advantage on this attack
     const advantageType = resolveAttackAdvantage(player, encounter.monster);
 
@@ -1069,6 +1157,13 @@ function resolveSingleAction(encounter, userId) {
         huntersMarkApplied = true;
       }
 
+      // Rage bonus damage — STR-based melee attacks only
+      let rageBonusApplied = false;
+      if (player.raging && player.rageDamageBonus && usedWeapon && !usedWeapon.ranged) {
+        damage += player.rageDamageBonus;
+        rageBonusApplied = true;
+      }
+
       encounter.monster.currentHp -= damage;
       player.totalDamage += damage;
 
@@ -1088,6 +1183,9 @@ function resolveSingleAction(encounter, userId) {
       }
       if (huntersMarkApplied) {
         text += ` **HUNTER'S MARK!** (+${huntersMarkDamage} damage)`;
+      }
+      if (rageBonusApplied) {
+        text += ` **RAGE!** (+${player.rageDamageBonus} damage)`;
       }
 
       // Ensnaring Strike trigger — on hit, force STR save, apply ensnared condition
@@ -1224,6 +1322,13 @@ function resolveSingleAction(encounter, userId) {
  * Returns { type: 'victory' | 'defeat' | 'fled' | 'next_turn', ... }
  */
 function advanceTurn(encounter) {
+  let rageEndedThisTurn = null;
+  const curEntry = encounter.initiativeOrder[encounter.currentTurnIndex];
+  const hasRagingPlayer = Object.values(encounter.participants).some(p => p.raging);
+  if (hasRagingPlayer) {
+    rageLog(`ADVANCE_TURN: currentIndex=${encounter.currentTurnIndex} currentEntry=${curEntry?.type}:${curEntry?.id || curEntry?.type} round=${encounter.round} initOrder=[${encounter.initiativeOrder.map(e => e.type + ':' + (e.id || e.type)).join(', ')}]`);
+  }
+
   // Check if monster is dead
   if (encounter.monster.currentHp <= 0) {
     encounter.monster.currentHp = 0;
@@ -1319,6 +1424,31 @@ function advanceTurn(encounter) {
       nextPlayer.bonusActionUsed = false;
       nextPlayer.sneakAttackUsed = false;
 
+      // Check if Rage has expired (10 rounds)
+      if (nextPlayer.raging && nextPlayer.rageStartRound != null &&
+          encounter.round - nextPlayer.rageStartRound >= 10) {
+        nextPlayer.raging = false;
+        nextPlayer.rageStartRound = null;
+        if (!conditionEffects) conditionEffects = { removed: [], dotEffects: [] };
+        conditionEffects.rageExpired = true;
+        conditionEffects.rageExpiredName = nextPlayer.name;
+      }
+
+      // 5e Rage: ends if the barbarian didn't attack a hostile creature
+      // and didn't take damage since their last turn
+      if (nextPlayer.raging) {
+        rageLog(`TURN_START: ${nextPlayer.name} | raging=${nextPlayer.raging} | attacked=${nextPlayer.rageAttackedThisTurn} | tookDmg=${nextPlayer.rageTookDamageThisTurn} | round=${encounter.round}`);
+      }
+      if (nextPlayer.raging && !nextPlayer.rageAttackedThisTurn && !nextPlayer.rageTookDamageThisTurn) {
+        rageLog(`RAGE_END: ${nextPlayer.name} rage ending — no attack and no damage taken`);
+        nextPlayer.raging = false;
+        nextPlayer.rageStartRound = null;
+        rageEndedThisTurn = nextPlayer.name;
+      }
+      // Reset rage tracking flags for this new turn
+      nextPlayer.rageAttackedThisTurn = false;
+      nextPlayer.rageTookDamageThisTurn = false;
+
       // Stunned/incapacitated: skip this player's turn
       if (!canAct(nextPlayer)) {
         encounter.currentTurnIndex = nextIndex;
@@ -1331,6 +1461,7 @@ function advanceTurn(encounter) {
           conditionEffects,
           round: encounter.round,
           newRound,
+          rageEndedThisTurn,
         };
       }
     }
@@ -1354,6 +1485,7 @@ function advanceTurn(encounter) {
     round: encounter.round,
     newRound,
     conditionEffects,
+    rageEndedThisTurn,
   };
 }
 
@@ -1611,6 +1743,7 @@ function resolveMonsterTurn(encounter) {
 
       let hit = false;
       let damage = 0;
+      let damageInfo = null;
       let text = '';
 
       // Pick random flavor text
@@ -1633,11 +1766,13 @@ function resolveMonsterTurn(encounter) {
         }
 
         // Apply damage
-        const damageInfo = applyDamageToPlayer(targetPlayer, damage);
+        damageInfo = applyDamageToPlayer(targetPlayer, damage, attack.type);
 
         text = attackTextTemplate.replace('{target}', `**${targetPlayer.name}**`) +
           ` **${totalAttack}** vs AC ${effectiveAC} — **Hit!** ` +
-          `**${targetPlayer.name}** takes **${damage} ${attack.type} damage.** ` +
+          (damageInfo.rageResisted
+            ? `**${targetPlayer.name}** takes **~~${damage}~~ ${damageInfo.actualDamage} ${attack.type} damage** *(halved by Rage!)* `
+            : `**${targetPlayer.name}** takes **${damage} ${attack.type} damage.** `) +
           `(HP: ${targetPlayer.currentHp}/${targetPlayer.maxHp})`;
 
         if (damageInfo.knocked) {
@@ -1685,7 +1820,7 @@ function resolveMonsterTurn(encounter) {
         total: totalAttack,
         effectiveAC,
         hit,
-        damage,
+        damage: hit && damageInfo ? (damageInfo.actualDamage ?? damage) : damage,
         isNat20,
         isNat1,
         knocked: targetPlayer.knockedOut && hit,
@@ -1830,6 +1965,7 @@ function resolveMonsterWithRolls(encounterId, rollData) {
 
     let hit = false;
     let damage = 0;
+    let damageInfo = null;
     let text = '';
 
     const attackTextTemplate = monster.attackTexts[Math.floor(Math.random() * monster.attackTexts.length)]
@@ -1854,11 +1990,13 @@ function resolveMonsterWithRolls(encounterId, rollData) {
       }
 
       // Apply damage
-      const damageInfo = applyDamageToPlayer(targetPlayer, damage);
+      damageInfo = applyDamageToPlayer(targetPlayer, damage, setup.damageType);
 
       text = attackTextTemplate.replace('{target}', `**${targetPlayer.name}**`) +
         ` **${totalAttack}** vs AC ${setup.targetAC} — **Hit!** ` +
-        `**${targetPlayer.name}** takes **${damage} ${setup.damageType} damage.** ` +
+        (damageInfo.rageResisted
+          ? `**${targetPlayer.name}** takes **~~${damage}~~ ${damageInfo.actualDamage} ${setup.damageType} damage** *(halved by Rage!)* `
+          : `**${targetPlayer.name}** takes **${damage} ${setup.damageType} damage.** `) +
         `(HP: ${targetPlayer.currentHp}/${targetPlayer.maxHp})`;
 
       if (damageInfo.knocked) {
@@ -1910,7 +2048,7 @@ function resolveMonsterWithRolls(encounterId, rollData) {
       total: totalAttack,
       effectiveAC: setup.targetAC,
       hit,
-      damage,
+      damage: hit && damageInfo ? (damageInfo.actualDamage ?? damage) : damage,
       isNat20,
       isNat1,
       knocked: targetPlayer.knockedOut && hit,
@@ -2204,8 +2342,21 @@ function getMonsterSaveBonus(monster, ability) {
  * Apply damage to a player, handling dying state transitions and concentration saves.
  * Returns { knocked, concentrationBroken, brokenConcentration, conSave }.
  */
-function applyDamageToPlayer(player, damage) {
+function applyDamageToPlayer(player, damage, damageType) {
   if (player.knockedOut) return { knocked: true };
+
+  // Rage tracking: taking damage sustains rage
+  if (player.raging) {
+    rageLog(`DAMAGE: ${player.name} took ${damage} ${damageType} damage while raging → rageTookDamageThisTurn=true`);
+    player.rageTookDamageThisTurn = true;
+  }
+
+  // Rage resistance: halve bludgeoning, piercing, slashing damage
+  let rageResisted = false;
+  if (player.raging && damageType && ['bludgeoning', 'piercing', 'slashing'].includes(damageType)) {
+    damage = Math.floor(damage / 2);
+    rageResisted = true;
+  }
 
   player.currentHp -= damage;
 
@@ -2224,7 +2375,12 @@ function applyDamageToPlayer(player, damage) {
       player.ensnaringStrikeActive = false;
       player.huntersMarkActive = false;
     }
-    return { knocked: true, concentrationBroken, brokenConcentration, conSave };
+    // KO ends rage
+    if (player.raging) {
+      player.raging = false;
+      player.rageStartRound = null;
+    }
+    return { knocked: true, concentrationBroken, brokenConcentration, conSave, rageResisted, actualDamage: damage };
   }
 
   // CON save for concentration (DC = max of 10 or half damage taken)
@@ -2235,7 +2391,7 @@ function applyDamageToPlayer(player, damage) {
     conSave = { dc, conMod, pending: true };
   }
 
-  return { knocked: false, concentrationBroken, brokenConcentration, conSave };
+  return { knocked: false, concentrationBroken, brokenConcentration, conSave, rageResisted, actualDamage: damage };
 }
 
 /**
@@ -2407,7 +2563,7 @@ function resolveVictory(encounter, lastAttacks) {
  * Distribute rewards (XP and gold) to participants.
  * Called after resolveVictory. Returns level-up and achievement info.
  */
-function distributeRewards(rewards, monsterId) {
+function distributeRewards(rewards, monsterId, monsterCr) {
   const results = {};
 
   for (const [userId, reward] of Object.entries(rewards)) {
@@ -2416,9 +2572,10 @@ function distributeRewards(rewards, monsterId) {
     // Award XP
     awardQuestXp(userId, reward.name, 'combat_encounter', reward.xp);
 
-    // Award gold
+    // Generate treasure chest instead of direct gold award
+    let chest = null;
     if (reward.gold > 0) {
-      awardGold(userId, reward.name, reward.gold, { source: 'combat_encounter' });
+      chest = generateChest(userId, reward.name, monsterCr || 1, reward.gold);
     }
 
     // Track lifetime stats
@@ -2466,6 +2623,7 @@ function distributeRewards(rewards, monsterId) {
     results[userId] = {
       ...reward,
       levelUp: levelAfter > levelBefore ? { newLevel: levelAfter } : null,
+      chest: chest || null,
     };
   }
 
@@ -2603,6 +2761,7 @@ function getPublicState(encounter) {
       name: p.name,
       avatar: p.avatar || null,
       sprite: p.sprite || null,
+      spriteHeight: p.spriteHeight || null,
       maxHp: p.maxHp,
       currentHp: p.currentHp,
       ac: p.ac,
@@ -2626,7 +2785,7 @@ function getPublicState(encounter) {
       spellSlots: p.spellSlots || [],
       classNames: p.classNames || [],
       classFeatures: p.classFeatures || [],
-      hasAvailableSpells: (p.classFeatures || []).includes('Spellcasting') &&
+      hasAvailableSpells: !p.raging && (p.classFeatures || []).includes('Spellcasting') &&
         Object.values(SPELL_DEFINITIONS).some(spell =>
           spell.actionType === 'action' &&
           spell.classes?.some(c => (p.classNames || []).includes(c)) &&
@@ -2658,6 +2817,8 @@ function getPublicState(encounter) {
       // Concentration & buff states
       ensnaringStrikeActive: p.ensnaringStrikeActive || false,
       huntersMarkActive: p.huntersMarkActive || false,
+      huntersMarkFreeUsesMax: p.huntersMarkFreeUsesMax || 0,
+      huntersMarkFreeUsesUsed: p.huntersMarkFreeUsesUsed || 0,
       concentration: p.concentration ? { spellId: p.concentration.spellId } : null,
       // Ki Points (Monk)
       hasKiPoints: p.hasKiPoints || false,
@@ -2665,6 +2826,12 @@ function getPublicState(encounter) {
       kiPointsUsed: p.kiPointsUsed || 0,
       kiSaveDC: p.kiSaveDC || 0,
       stunningStrikeActive: p.stunningStrikeActive || false,
+      // Rage (Barbarian)
+      hasRage: p.hasRage || false,
+      rageUsesMax: p.rageUsesMax || 0,
+      rageUsesUsed: p.rageUsesUsed || 0,
+      raging: p.raging || false,
+      rageDamageBonus: p.rageDamageBonus || 0,
       // Pre-bonus actions (only for current turn holder)
       availablePreBonusActions: userId === currentTurnUserId
         ? getAvailableBonusActions(encounter, userId).filter(a => a.type !== 'offhand_attack' && a.type !== 'flurry_of_blows')
@@ -2979,6 +3146,7 @@ function resolveMonsterEscapeWithRolls(encounterId, escapeRolls, clientDotRolls)
 function resolveCastSpell(encounter, userId, spellId, rollData) {
   const player = encounter.participants[userId];
   if (!player) return { error: 'Not a participant.' };
+  if (player.raging) return { error: 'Cannot cast spells while raging.' };
 
   const spell = SPELL_DEFINITIONS[spellId];
   if (!spell) return { error: 'Unknown spell.' };
@@ -3041,8 +3209,17 @@ function getAvailableBonusActions(encounter, userId) {
     }
   }
 
+  // Rage (Barbarian — enter rage, uses limited per long rest)
+  if (player.hasRage && !player.raging && (player.rageUsesUsed || 0) < (player.rageUsesMax || 0)) {
+    actions.push({
+      type: 'rage',
+      usesLeft: (player.rageUsesMax || 0) - (player.rageUsesUsed || 0),
+    });
+  }
+
   // Healing Word (bonus action spell — Bard/Cleric only)
-  if (player.classFeatures?.includes('Spellcasting') &&
+  // Raging prevents spellcasting
+  if (!player.raging && player.classFeatures?.includes('Spellcasting') &&
     SPELL_DEFINITIONS.healing_word.classes.some(c => (player.classNames || []).includes(c))) {
     const hw = SPELL_DEFINITIONS.healing_word;
     const hasSlot = (player.spellSlots || []).some(s => s.level >= hw.level && s.used < s.total);
@@ -3062,9 +3239,9 @@ function getAvailableBonusActions(encounter, userId) {
     }
   }
 
-  // Ensnaring Strike (Paladin/Ranger bonus action spell)
+  // Ensnaring Strike (Paladin/Ranger bonus action spell) — raging prevents spellcasting
   const es = SPELL_DEFINITIONS.ensnaring_strike;
-  if (es.classes.some(c => (player.classNames || []).includes(c)) && !player.ensnaringStrikeActive) {
+  if (!player.raging && es.classes.some(c => (player.classNames || []).includes(c)) && !player.ensnaringStrikeActive) {
     const hasSlot = (player.spellSlots || []).some(s => s.level >= es.level && s.used < s.total);
     if (hasSlot) {
       actions.push({
@@ -3075,11 +3252,12 @@ function getAvailableBonusActions(encounter, userId) {
     }
   }
 
-  // Hunter's Mark (Ranger bonus action concentration spell)
+  // Hunter's Mark (Ranger bonus action concentration spell) — raging prevents spellcasting
   const hm = SPELL_DEFINITIONS.hunters_mark;
-  if (hm.classes.some(c => (player.classNames || []).includes(c)) && !player.huntersMarkActive) {
+  if (!player.raging && hm.classes.some(c => (player.classNames || []).includes(c)) && !player.huntersMarkActive) {
+    const hasFreeUse = (player.huntersMarkFreeUsesUsed || 0) < (player.huntersMarkFreeUsesMax || 0);
     const hasSlot = (player.spellSlots || []).some(s => s.level >= hm.level && s.used < s.total);
-    if (hasSlot) {
+    if (hasFreeUse || hasSlot) {
       actions.push({
         type: 'hunters_mark',
         spellName: hm.name,
@@ -3141,7 +3319,43 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
     };
   }
 
+  if (bonusAction === 'rage') {
+    if (!player.hasRage) return { error: 'You don\'t have Rage.' };
+    if (player.raging) return { error: 'Already raging.' };
+    if ((player.rageUsesUsed || 0) >= (player.rageUsesMax || 0)) return { error: 'No Rage uses remaining.' };
+
+    player.raging = true;
+    player.rageStartRound = encounter.round;
+    player.rageUsesUsed = (player.rageUsesUsed || 0) + 1;
+    player.bonusActionUsed = true;
+
+    // Rage breaks concentration (can't concentrate while raging)
+    if (player.concentration) {
+      if (player.concentration.conditionId) {
+        const concTarget = player.concentration.targetId === 'monster'
+          ? encounter.monster
+          : encounter.participants[player.concentration.targetId];
+        if (concTarget) {
+          removeCondition(concTarget, player.concentration.conditionId);
+        }
+      }
+      player.concentration = null;
+      player.ensnaringStrikeActive = false;
+      player.huntersMarkActive = false;
+    }
+
+    const usesLeft = (player.rageUsesMax || 0) - (player.rageUsesUsed || 0);
+    return {
+      type: 'rage',
+      userId, name: player.name,
+      usesLeft,
+      rageDamageBonus: player.rageDamageBonus || 2,
+      text: `**${player.name}** enters a **RAGE!** Primal fury surges through their body! (+${player.rageDamageBonus || 2} melee damage, resistance to physical damage)`,
+    };
+  }
+
   if (bonusAction === 'healing_word') {
+    if (player.raging) return { error: 'Cannot cast spells while raging.' };
     const result = resolveCastSpell(encounter, userId, 'healing_word', data);
     if (result.error) return result;
     player.bonusActionUsed = true;
@@ -3149,6 +3363,9 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
   }
 
   if (bonusAction === 'offhand_attack') {
+    // Rage tracking: offhand attack sustains rage
+    if (player.raging) player.rageAttackedThisTurn = true;
+
     // Swap to offhand weapon if provided
     const weaponId = data.weaponId;
     let wpn = null;
@@ -3257,6 +3474,13 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
         huntersMarkApplied = true;
       }
 
+      // Rage bonus damage — STR-based melee attacks only (offhand is always melee)
+      let rageBonusApplied = false;
+      if (player.raging && player.rageDamageBonus) {
+        damage += player.rageDamageBonus;
+        rageBonusApplied = true;
+      }
+
       encounter.monster.currentHp = Math.max(0, encounter.monster.currentHp - damage);
       player.totalDamage = (player.totalDamage || 0) + damage;
 
@@ -3271,6 +3495,9 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
       }
       if (huntersMarkApplied) {
         text += ` **HUNTER'S MARK!** (+${huntersMarkDamage} damage)`;
+      }
+      if (rageBonusApplied) {
+        text += ` **RAGE!** (+${player.rageDamageBonus} damage)`;
       }
     } else {
       text = `**${player.name}** swings their ${player.weaponName} (offhand)...${advLabel} **${totalAttack}** vs AC ${encounter.monster.ac} — **Miss!**`;
@@ -3296,6 +3523,7 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
   }
 
   if (bonusAction === 'ensnaring_strike') {
+    if (player.raging) return { error: 'Cannot cast spells while raging.' };
     const spell = SPELL_DEFINITIONS.ensnaring_strike;
     if (!spell.classes.some(c => (player.classNames || []).includes(c))) {
       return { error: 'Your class cannot cast Ensnaring Strike.' };
@@ -3334,15 +3562,21 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
 
   // Hunter's Mark (Ranger — mark target for +1d6 per hit, concentration)
   if (bonusAction === 'hunters_mark') {
+    if (player.raging) return { error: 'Cannot cast spells while raging.' };
     const spell = SPELL_DEFINITIONS.hunters_mark;
     if (!spell.classes.some(c => (player.classNames || []).includes(c))) {
       return { error: "Your class cannot cast Hunter's Mark." };
     }
 
-    // Consume spell slot
-    const slot = (player.spellSlots || []).find(s => s.level >= spell.level && s.used < s.total);
-    if (!slot) return { error: 'No spell slots remaining.' };
-    slot.used++;
+    // 2024 Favored Enemy: use free cast first, then spell slot
+    const hasFreeUse = (player.huntersMarkFreeUsesUsed || 0) < (player.huntersMarkFreeUsesMax || 0);
+    if (hasFreeUse) {
+      player.huntersMarkFreeUsesUsed++;
+    } else {
+      const slot = (player.spellSlots || []).find(s => s.level >= spell.level && s.used < s.total);
+      if (!slot) return { error: 'No spell slots or free uses remaining.' };
+      slot.used++;
+    }
 
     // Break existing concentration (drop old condition from target)
     if (player.concentration && player.concentration.conditionId) {
@@ -3375,6 +3609,9 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
     if (!player.hasKiPoints) return { error: 'You don\'t have Ki Points.' };
     if (player.kiPointsUsed >= player.kiPointsMax) return { error: 'No Ki Points remaining.' };
     if (player.action !== 'attack') return { error: 'Flurry of Blows requires an Attack action first.' };
+
+    // Rage tracking: flurry attacks sustain rage
+    if (player.raging) player.rageAttackedThisTurn = true;
 
     player.kiPointsUsed++;
     player.bonusActionUsed = true;

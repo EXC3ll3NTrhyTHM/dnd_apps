@@ -182,11 +182,12 @@ function SpellSaveResult({ data, onDismiss }) {
 }
 
 function DamageResult({ data, onDismiss }) {
-  const { damage, isCrit, monsterHp, newHp, attacker, defender, smiteDamage, sneakAttackDamage, huntersMarkDamage } = data;
+  const { damage, isCrit, monsterHp, newHp, attacker, defender, smiteDamage, sneakAttackDamage, huntersMarkDamage, rageDamage, rageResisted, originalDamage } = data;
   const hasSmite = smiteDamage > 0;
   const hasSneakAttack = sneakAttackDamage > 0;
   const hasHuntersMark = huntersMarkDamage > 0;
-  const bonusDmg = (smiteDamage || 0) + (sneakAttackDamage || 0) + (huntersMarkDamage || 0);
+  const hasRage = rageDamage > 0;
+  const bonusDmg = (smiteDamage || 0) + (sneakAttackDamage || 0) + (huntersMarkDamage || 0) + (rageDamage || 0);
   const weaponDmg = bonusDmg > 0 ? damage - bonusDmg : damage;
 
   // Build breakdown label
@@ -194,15 +195,16 @@ function DamageResult({ data, onDismiss }) {
   if (hasSmite) parts.push(`${smiteDamage} radiant`);
   if (hasSneakAttack) parts.push(`${sneakAttackDamage} sneak`);
   if (hasHuntersMark) parts.push(`${huntersMarkDamage} mark`);
-  let breakdownLabel = 'damage';
-  if (parts.length > 0) {
+  if (hasRage) parts.push(`${rageDamage} rage`);
+  let breakdownLabel = rageResisted ? `${originalDamage} halved by Rage` : 'damage';
+  if (!rageResisted && parts.length > 0) {
     breakdownLabel = `${weaponDmg} + ${parts.join(' + ')}`;
   }
 
   // Result banner text and style
-  const bannerClass = hasSmite ? 'rro-smite' : hasSneakAttack ? 'rro-sneak-attack' : hasHuntersMark ? 'rro-hunters-mark' : isCrit ? 'rro-crit' : 'rro-hit';
-  const bannerText = hasSmite ? 'DIVINE SMITE!' : hasSneakAttack ? `${damage} DAMAGE` : isCrit ? 'CRITICAL DAMAGE!' : `${damage} DAMAGE`;
-  const backdropClass = hasSmite ? 'rro-backdrop-smite' : hasSneakAttack ? 'rro-backdrop-sneak' : hasHuntersMark ? 'rro-backdrop-hunters-mark' : '';
+  const bannerClass = rageResisted ? 'rro-rage-resist' : hasSmite ? 'rro-smite' : hasSneakAttack ? 'rro-sneak-attack' : hasHuntersMark ? 'rro-hunters-mark' : hasRage ? 'rro-rage' : isCrit ? 'rro-crit' : 'rro-hit';
+  const bannerText = rageResisted ? `RAGE RESISTS! ${damage} DAMAGE` : hasSmite ? 'DIVINE SMITE!' : hasSneakAttack ? `${damage} DAMAGE` : hasRage ? `RAGE! ${damage} DAMAGE` : isCrit ? 'CRITICAL DAMAGE!' : `${damage} DAMAGE`;
+  const backdropClass = rageResisted ? 'rro-backdrop-rage-resist' : hasSmite ? 'rro-backdrop-smite' : hasSneakAttack ? 'rro-backdrop-sneak' : hasHuntersMark ? 'rro-backdrop-hunters-mark' : hasRage ? 'rro-backdrop-rage' : '';
 
   return (
     <div className={`rro-backdrop ${backdropClass}`} onClick={onDismiss}>
@@ -211,7 +213,9 @@ function DamageResult({ data, onDismiss }) {
           <div className="rro-side rro-fly-left">
             <Avatar src={attacker?.avatar} name={attacker?.name} />
             <div className="rro-side-name">{attacker?.name}</div>
-            <div className="rro-side-number rro-damage-num">{'\u2694\uFE0F'} {damage}</div>
+            <div className="rro-side-number rro-damage-num">
+              {'\u2694\uFE0F'} {rageResisted && <span className="rro-strikethrough">{originalDamage}</span>} {damage}
+            </div>
             <div className="rro-side-label">
               {breakdownLabel}
             </div>

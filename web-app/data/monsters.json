@@ -36,7 +36,7 @@
     ],
     "spriteScale": 0.45,
     "spriteOffsetX": -4,
-    "spriteOffsetY": 248,
+    "spriteOffsetY": 334,
     "initiativeBonus": 2,
     "savingThrows": {
       "STR": 0,
@@ -133,7 +133,7 @@
     "initiativeBonus": 0,
     "spriteScale": 0.55,
     "spriteOffsetX": 0,
-    "spriteOffsetY": 242,
+    "spriteOffsetY": 346,
     "savingThrows": {
       "STR": 0,
       "DEX": 2,
@@ -181,7 +181,7 @@
     "initiativeBonus": 2,
     "spriteScale": 0.75,
     "spriteOffsetX": 8,
-    "spriteOffsetY": 226,
+    "spriteOffsetY": 308,
     "savingThrows": {
       "STR": 3,
       "DEX": 2,
@@ -227,9 +227,9 @@
       "{target} barely rolls out of the way of the crushing blow."
     ],
     "initiativeBonus": -1,
-    "spriteScale": 0.75,
+    "spriteScale": 0.9,
     "spriteOffsetX": 0,
-    "spriteOffsetY": 202,
+    "spriteOffsetY": 274,
     "savingThrows": {
       "STR": 4,
       "DEX": -1,

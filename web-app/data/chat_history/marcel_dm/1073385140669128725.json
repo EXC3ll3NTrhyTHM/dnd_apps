@@ -1,0 +1,72 @@
+[
+  {
+    "id": "77e6ba29-3d16-4f71-aa0e-e2caa45e07a0",
+    "role": "player",
+    "userId": "1073385140669128725",
+    "playerName": "Nalyd",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/1073385140669128725/51ac15ff7014507f61f37b076668f847.png",
+    "text": "What up cel",
+    "timestamp": "2026-03-06T03:09:13.609Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "7a77ed68-6c0d-43a3-8d29-34f907412a03",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Yo Nalyd, what's good? 🎭",
+    "emotion": "idle",
+    "timestamp": "2026-03-06T03:09:19.350Z"
+  },
+  {
+    "id": "5ecd31ac-43ba-47dc-9c71-9d4a9a7f4893",
+    "role": "player",
+    "userId": "1073385140669128725",
+    "playerName": "Nalyd",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/1073385140669128725/51ac15ff7014507f61f37b076668f847.png",
+    "text": "Just chillin",
+    "timestamp": "2026-03-06T03:15:23.054Z",
+    "reactions": {
+      "👀": [
+        "marcel",
+        "1073385140669128725"
+      ]
+    }
+  },
+  {
+    "id": "58b219f3-8f56-4919-948b-4a05b91d9eb5",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Nice, same here. Keeping the digital lights on, lurking in the background. You need anything or just saying hey?",
+    "emotion": "idle",
+    "timestamp": "2026-03-06T03:15:27.652Z"
+  },
+  {
+    "id": "d8f051a6-6bf9-49b2-95bb-11b75a2f6705",
+    "role": "player",
+    "userId": "1073385140669128725",
+    "playerName": "Nalyd",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/1073385140669128725/51ac15ff7014507f61f37b076668f847.png",
+    "text": "Just saying hey",
+    "timestamp": "2026-03-06T03:47:22.391Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "b6d95f19-dc16-42ac-8ea9-e9f8c0741230",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Appreciate it, man. 🤙 Hit me up whenever.",
+    "emotion": "idle",
+    "timestamp": "2026-03-06T03:47:25.630Z"
+  }
+]

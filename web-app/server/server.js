@@ -39,6 +39,7 @@ const encounterRoutes = require('./routes/encounters');
 const fishingRoutes = require('./routes/fishing');
 const petRoutes = require('./routes/pets');
 const emoteRoutes = require('./routes/emotes');
+const chestRoutes = require('./routes/chests');
 
 const app = express();
 const server = http.createServer(app);
@@ -133,6 +134,7 @@ app.use('/api/encounters', encounterRoutes);
 app.use('/api/fishing', fishingRoutes);
 app.use('/api/pets', petRoutes);
 app.use('/api/emotes', emoteRoutes);
+app.use('/api/chests', chestRoutes);
 
 // Start encounter timeout checker
 encounterRoutes.startTimeoutChecker(app);

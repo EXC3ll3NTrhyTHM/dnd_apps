@@ -1393,5 +1393,56 @@
     "text": "Oh hell yeah, that's a solid homebrew. Let me break it down:\n\n**Ignition Form Analysis**\n\n| Boost | Impact |\n|-------|--------|\n| +2 AC (15→17) | Nice survivability, on par with heavy armor now |\n| +2 attack/damage | Essentially a +2 weapon, solid |\n| +1d6 fire on hits | THIS is the damage fix. 3.5 avg per hit adds up fast |\n| +15 speed (40→55) | Anime as hell, love it |\n| Willburst Blast | 3d6 line AoE with prone. Monk-Kamehameha. |\n| Final Spark | 6d6 nuke + ally buff. Clutch finisher. |\n\n**Transformed Damage Math**\n\nWithout ki:\n- Attack: 1d6+3+2 = ~8.5 + 1d6 fire = ~12\n- Bonus unarmed: 1d4+3+2 = ~7.5 + 1d6 fire = ~11\n- **Total: ~23 damage/round**\n\nThat's nearly DOUBLE his base output. Now he's keeping up with martials.\n\n**The Good**\n- 1/long rest is perfect. Big moment, not spammable\n- Duration (1 min) means he gets a full combat\n- Final Spark ending the form is smart design, prevents \"save nuke for last\"\n- Scales fine since it's flat bonuses\n\n**Potential Issues**\n- At level 5 with Extra Attack + Flurry, he's doing 4 attacks with +1d6 fire each. That's 4d6 extra fire (~14 damage). Might feel *really* good compared to party.\n- Does Willburst Blast cost an action? If yes, good. If free, maybe too much.\n\n**Verdict:** This is well designed. The form is carrying him at level 3 as intended. Just watch level 5, the scaling might make him the nova king when transformed.\n\nIs he having more fun when he pops it?",
     "emotion": "idle",
     "timestamp": "2026-02-24T22:21:08.709Z"
+  },
+  {
+    "id": "bb85c31f-64ac-4fb9-8fd2-f50d97ec4ac1",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "What library do we use for the animated emotes in the arena?",
+    "timestamp": "2026-03-05T03:08:12.989Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "1e325fac-fb19-4930-8865-f4a23a52307e",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "Hello?",
+    "timestamp": "2026-03-05T03:09:44.516Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "3185d30e-e7fb-4f9b-b487-43ca7c021971",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "Hello",
+    "timestamp": "2026-03-06T03:10:00.111Z",
+    "reactions": {
+      "👀": [
+        "marcel"
+      ]
+    }
+  },
+  {
+    "id": "6509e2f7-e7c2-48ad-a3ab-52751b8a7630",
+    "role": "npc",
+    "npc": "marcel",
+    "npcDisplayName": "Marcel",
+    "text": "Hey! Sorry for the delay, was digging through the project structure.\n\nFor the animated emotes in the arena, it's actually **pure CSS animations** on static images, not a dedicated animation library. The effect is done with:\n\n**Approach:**\n- Static emote images (PNG/WebP) in `/images/emotes/`\n- CSS keyframe animation (`emote-spring-float`) for the Clash Royale-style spring pop-in → float up → fade out effect\n- `onAnimationEnd` callback in React to dismiss after the animation completes\n\n**Libraries used:**\n- **emoji-mart** (`@emoji-mart/react`) for the emoji picker UI/grid\n- The actual animation is vanilla CSS, no Lottie or GIF libraries\n\nSo it's basically: image + CSS transforms + opacity changes over 3 seconds. Pretty lightweight approach. Want me to pull up the actual CSS keyframes or the full component setup?",
+    "emotion": "idle",
+    "timestamp": "2026-03-06T03:11:14.423Z"
   }
 ]

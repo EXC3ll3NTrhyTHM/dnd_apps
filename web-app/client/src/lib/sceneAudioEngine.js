@@ -156,12 +156,11 @@ function fadeOutGain(gainNode, durationSec = 0.4) {
 }
 
 /**
- * Stop all active scene audio with optional fade-out.
+ * Internal helper — fade out and stop all active entries.
+ * Does NOT touch _generation so it's safe to call from unmount
+ * without invalidating a sibling SceneAudio's in-flight playSceneConfig.
  */
-export function stopAll(fadeMs = 400) {
-  console.warn('[SceneAudio] stopAll called', { active: _activeEntries.length, fadeMs, gen: _generation, stack: new Error().stack?.split('\n').slice(1, 4).map(s => s.trim()).join(' <- ') });
-  log('stopAll', { active: _activeEntries.length, fadeMs });
-  _generation++; // Invalidate any in-flight playSceneConfig calls
+function _stopEntries(fadeMs = 400) {
   const fadeSec = fadeMs / 1000;
   _activeEntries.forEach(entry => {
     if (entry.type === 'irregular') {
@@ -174,6 +173,28 @@ export function stopAll(fadeMs = 400) {
     }
   });
   _activeEntries = [];
+}
+
+/**
+ * Stop all active scene audio with optional fade-out.
+ */
+export function stopAll(fadeMs = 400) {
+  console.warn('[SceneAudio] stopAll called', { active: _activeEntries.length, fadeMs, gen: _generation, stack: new Error().stack?.split('\n').slice(1, 4).map(s => s.trim()).join(' <- ') });
+  log('stopAll', { active: _activeEntries.length, fadeMs });
+  _generation++; // Invalidate any in-flight playSceneConfig calls
+  _stopEntries(fadeMs);
+}
+
+/**
+ * Stop all active scene audio WITHOUT incrementing generation.
+ * Used by SceneAudio unmount — stops the audio but doesn't invalidate
+ * a sibling SceneAudio's in-flight playSceneConfig (e.g. arena unmounts
+ * while dojo's SceneAudio is loading buffers).
+ */
+export function stopPlayback(fadeMs = 400) {
+  console.warn('[SceneAudio] stopPlayback called (soft)', { active: _activeEntries.length, fadeMs, gen: _generation });
+  log('stopPlayback', { active: _activeEntries.length, fadeMs });
+  _stopEntries(fadeMs);
 }
 
 /**

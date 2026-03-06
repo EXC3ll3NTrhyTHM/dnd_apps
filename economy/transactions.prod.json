@@ -10004,6 +10004,848 @@
         "source": "combat_encounter"
       },
       "timestamp": "2026-03-01T05:49:11.700Z"
+    },
+    {
+      "id": "tx_1772389433865_fosez0",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 937,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_crit"
+      },
+      "timestamp": "2026-03-01T18:23:53.865Z"
+    },
+    {
+      "id": "tx_1772392280701_iqfy5o",
+      "user_id": "424061511833747467",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 962,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-01T19:11:20.701Z"
+    },
+    {
+      "id": "tx_1772392299686_5c3420",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 977,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-03-01T19:11:39.686Z"
+    },
+    {
+      "id": "tx_1772392301836_q4b4p2",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 982,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-03-01T19:11:41.836Z"
+    },
+    {
+      "id": "tx_1772392302356_kp79al",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 992,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-03-01T19:11:42.356Z"
+    },
+    {
+      "id": "tx_1772392326445_b1fn0p",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -25,
+      "balance_after": 967,
+      "metadata": {
+        "item_id": "item_blunt",
+        "item_name": "Blunt",
+        "source": "web_app"
+      },
+      "timestamp": "2026-03-01T19:12:06.445Z"
+    },
+    {
+      "id": "tx_1772429856790_yyh3d9",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 992,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-02T05:37:36.790Z"
+    },
+    {
+      "id": "tx_1772430304324_yko2a5",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 1017,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-02T05:45:04.324Z"
+    },
+    {
+      "id": "tx_1772435852609_4qk6sn",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 1022,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_crit"
+      },
+      "timestamp": "2026-03-02T07:17:32.609Z"
+    },
+    {
+      "id": "tx_1772436261830_alf4mf",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 13,
+      "balance_after": 1035,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-02T07:24:21.830Z"
+    },
+    {
+      "id": "tx_1772436261958_rbpd88",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 27,
+      "balance_after": 1093,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-02T07:24:21.958Z"
+    },
+    {
+      "id": "tx_1772436269982_r225v9",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 1108,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-03-02T07:24:29.982Z"
+    },
+    {
+      "id": "tx_1772436270647_wxffr8",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 1113,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_crit"
+      },
+      "timestamp": "2026-03-02T07:24:30.647Z"
+    },
+    {
+      "id": "tx_1772436270871_18h08e",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 1045,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-03-02T07:24:30.871Z"
+    },
+    {
+      "id": "tx_1772436271189_u88zys",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 1118,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-03-02T07:24:31.189Z"
+    },
+    {
+      "id": "tx_1772436271938_mwfkzs",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 1128,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-03-02T07:24:31.938Z"
+    },
+    {
+      "id": "tx_1772436409923_y1ez2g",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 1138,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-02T07:26:49.923Z"
+    },
+    {
+      "id": "tx_1772436525435_klczbl",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 1143,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-02T07:28:45.435Z"
+    },
+    {
+      "id": "tx_1772436525641_ztgsfy",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 1050,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-02T07:28:45.641Z"
+    },
+    {
+      "id": "tx_1772436531468_7pvbfv",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 1168,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-03-02T07:28:51.468Z"
+    },
+    {
+      "id": "tx_1772436531916_er3m90",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 1065,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-03-02T07:28:51.916Z"
+    },
+    {
+      "id": "tx_1772436586465_b26uxc",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 1073,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-02T07:29:46.465Z"
+    },
+    {
+      "id": "tx_1772436590110_h5dujk",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 1098,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-03-02T07:29:50.110Z"
+    },
+    {
+      "id": "tx_1772436591734_9undw1",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 1103,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-03-02T07:29:51.734Z"
+    },
+    {
+      "id": "tx_1772650725056_64m35m",
+      "user_id": "228241331296665600",
+      "username": "Acacia",
+      "type": "achievement_reward",
+      "amount": 21,
+      "balance_after": 1189,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-04T18:58:45.056Z"
+    },
+    {
+      "id": "tx_1772650725223_qkn0zn",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 19,
+      "balance_after": 1122,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-04T18:58:45.223Z"
+    },
+    {
+      "id": "tx_1772650733689_1yg7as",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 1132,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-03-04T18:58:53.689Z"
+    },
+    {
+      "id": "tx_1772650735179_r12e1p",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 1137,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-03-04T18:58:55.179Z"
+    },
+    {
+      "id": "tx_1772686763738_3pdusn",
+      "user_id": "test_user",
+      "username": "TestPlayer",
+      "type": "treasure_chest",
+      "amount": 54,
+      "balance_after": 54,
+      "metadata": {
+        "source": "treasure_chest",
+        "type": "treasure_chest",
+        "chestRarity": "rare"
+      },
+      "timestamp": "2026-03-05T04:59:23.738Z"
+    },
+    {
+      "id": "tx_1772687098551_r8lw42",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 1162,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-05T05:04:58.551Z"
+    },
+    {
+      "id": "tx_1772687437046_r5dkqt",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 1170,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-05T05:10:37.046Z"
+    },
+    {
+      "id": "tx_1772687718054_pbxn6i",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 1178,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-05T05:15:18.054Z"
+    },
+    {
+      "id": "tx_1772687888881_37lpdh",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 1186,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-05T05:18:08.881Z"
+    },
+    {
+      "id": "tx_1772688068588_j0jpqq",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 1194,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-05T05:21:08.588Z"
+    },
+    {
+      "id": "tx_1772688080469_yqndej",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 1219,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-03-05T05:21:20.469Z"
+    },
+    {
+      "id": "tx_1772688081603_rdyxyl",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 1224,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_crit"
+      },
+      "timestamp": "2026-03-05T05:21:21.604Z"
+    },
+    {
+      "id": "tx_1772688081917_y8cc3s",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 1239,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-03-05T05:21:21.917Z"
+    },
+    {
+      "id": "tx_1772688146320_unnzot",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 1247,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-05T05:22:26.320Z"
+    },
+    {
+      "id": "tx_1772688372036_c32sse",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "achievement_reward",
+      "amount": 8,
+      "balance_after": 1255,
+      "metadata": {
+        "source": "combat_encounter"
+      },
+      "timestamp": "2026-03-05T05:26:12.036Z"
+    },
+    {
+      "id": "tx_1772691856294_35nz7t",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 1265,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-03-05T06:24:16.294Z"
+    },
+    {
+      "id": "tx_1772691856921_s5ocib",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 1270,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_killing_blow"
+      },
+      "timestamp": "2026-03-05T06:24:16.921Z"
+    },
+    {
+      "id": "tx_1772691857289_npwiv8",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 5,
+      "balance_after": 1275,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_crit"
+      },
+      "timestamp": "2026-03-05T06:24:17.289Z"
+    },
+    {
+      "id": "tx_1772691857713_uliguv",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 15,
+      "balance_after": 1290,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_untouchable"
+      },
+      "timestamp": "2026-03-05T06:24:17.713Z"
+    },
+    {
+      "id": "tx_1772691969529_3owwpb",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 25,
+      "balance_after": 1315,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_3"
+      },
+      "timestamp": "2026-03-05T06:26:09.529Z"
+    },
+    {
+      "id": "tx_1772692729715_5ngzqy",
+      "user_id": "228241331296665600",
+      "username": "Unknown",
+      "type": "achievement_reward",
+      "amount": 50,
+      "balance_after": 1239,
+      "metadata": {
+        "source": "dm_award"
+      },
+      "timestamp": "2026-03-05T06:38:49.715Z"
+    },
+    {
+      "id": "tx_1772692757525_ywcdq1",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 50,
+      "balance_after": 1289,
+      "metadata": {
+        "source": "achievement",
+        "achievement": "high_roller"
+      },
+      "timestamp": "2026-03-05T06:39:17.525Z"
+    },
+    {
+      "id": "tx_1772692767491_k8xtdw",
+      "user_id": "228241331296665600",
+      "username": "badbeachpeach",
+      "type": "achievement_reward",
+      "amount": 10,
+      "balance_after": 1299,
+      "metadata": {
+        "source": "arena_daily_goal",
+        "goal": "arena_win_1"
+      },
+      "timestamp": "2026-03-05T06:39:27.491Z"
+    },
+    {
+      "id": "tx_1772697606704_keplwy",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "treasure_chest",
+      "amount": 7,
+      "balance_after": 1322,
+      "metadata": {
+        "source": "treasure_chest",
+        "type": "treasure_chest",
+        "chestRarity": "uncommon"
+      },
+      "timestamp": "2026-03-05T08:00:06.704Z"
+    },
+    {
+      "id": "tx_1772697689768_oynsmv",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "treasure_chest",
+      "amount": 6,
+      "balance_after": 1328,
+      "metadata": {
+        "source": "treasure_chest",
+        "type": "treasure_chest",
+        "chestRarity": "uncommon"
+      },
+      "timestamp": "2026-03-05T08:01:29.768Z"
+    },
+    {
+      "id": "tx_1772724188532_scskiz",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "treasure_chest",
+      "amount": 7,
+      "balance_after": 1335,
+      "metadata": {
+        "source": "treasure_chest",
+        "type": "treasure_chest",
+        "chestRarity": "uncommon"
+      },
+      "timestamp": "2026-03-05T15:23:08.532Z"
+    },
+    {
+      "id": "tx_1772731369555_qupm3t",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "treasure_chest",
+      "amount": 3,
+      "balance_after": 1338,
+      "metadata": {
+        "source": "treasure_chest",
+        "type": "treasure_chest",
+        "chestRarity": "common"
+      },
+      "timestamp": "2026-03-05T17:22:49.555Z"
+    },
+    {
+      "id": "tx_1772752767166_mvn96q",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "treasure_chest",
+      "amount": 19,
+      "balance_after": 1357,
+      "metadata": {
+        "source": "treasure_chest",
+        "type": "treasure_chest",
+        "chestRarity": "common"
+      },
+      "timestamp": "2026-03-05T23:19:27.166Z"
+    },
+    {
+      "id": "tx_1772753487540_nelgaf",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "treasure_chest",
+      "amount": 6,
+      "balance_after": 1363,
+      "metadata": {
+        "source": "treasure_chest",
+        "type": "treasure_chest",
+        "chestRarity": "common"
+      },
+      "timestamp": "2026-03-05T23:31:27.540Z"
+    },
+    {
+      "id": "tx_1772753841330_javbtm",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -100,
+      "balance_after": 1263,
+      "metadata": {
+        "item_id": "potion_greater_healing",
+        "item_name": "Potion of Greater Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-03-05T23:37:21.330Z"
+    },
+    {
+      "id": "tx_1772753842773_8gy5xb",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -100,
+      "balance_after": 1163,
+      "metadata": {
+        "item_id": "potion_greater_healing",
+        "item_name": "Potion of Greater Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-03-05T23:37:22.773Z"
+    },
+    {
+      "id": "tx_1772753843519_2th7nq",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -100,
+      "balance_after": 1063,
+      "metadata": {
+        "item_id": "potion_greater_healing",
+        "item_name": "Potion of Greater Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-03-05T23:37:23.519Z"
+    },
+    {
+      "id": "tx_1772753848048_tc0ee8",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -100,
+      "balance_after": 963,
+      "metadata": {
+        "item_id": "potion_greater_healing",
+        "item_name": "Potion of Greater Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-03-05T23:37:28.048Z"
+    },
+    {
+      "id": "tx_1772753848518_gjfwpn",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -100,
+      "balance_after": 863,
+      "metadata": {
+        "item_id": "potion_greater_healing",
+        "item_name": "Potion of Greater Healing",
+        "source": "web_app"
+      },
+      "timestamp": "2026-03-05T23:37:28.518Z"
+    },
+    {
+      "id": "tx_1772753900653_ok42xx",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "purchase",
+      "amount": -500,
+      "balance_after": 363,
+      "metadata": {
+        "item_id": "dice_bloodmoon",
+        "item_name": "Blood Moon Dice",
+        "source": "web_app"
+      },
+      "timestamp": "2026-03-05T23:38:20.653Z"
+    },
+    {
+      "id": "tx_1772754213608_ngpnv5",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "treasure_chest",
+      "amount": 28,
+      "balance_after": 391,
+      "metadata": {
+        "source": "treasure_chest",
+        "type": "treasure_chest",
+        "chestRarity": "rare"
+      },
+      "timestamp": "2026-03-05T23:43:33.608Z"
+    },
+    {
+      "id": "tx_1772754259775_pw1vmz",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 411,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "glowfin"
+      },
+      "timestamp": "2026-03-05T23:44:19.775Z"
+    },
+    {
+      "id": "tx_1772754259812_hf9oul",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "fishing_sale",
+      "amount": 20,
+      "balance_after": 411,
+      "metadata": {
+        "fish": "glowfin",
+        "fish_name": "Glowfin"
+      },
+      "timestamp": "2026-03-05T23:44:19.812Z"
+    },
+    {
+      "id": "tx_1772754276002_rsp2t3",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "achievement_reward",
+      "amount": 20,
+      "balance_after": 431,
+      "metadata": {
+        "source": "fishing_sale",
+        "fish": "glowfin"
+      },
+      "timestamp": "2026-03-05T23:44:36.002Z"
+    },
+    {
+      "id": "tx_1772754276029_knuje5",
+      "user_id": "424061511833747467",
+      "username": "excellentrhythm",
+      "type": "fishing_sale",
+      "amount": 20,
+      "balance_after": 431,
+      "metadata": {
+        "fish": "glowfin",
+        "fish_name": "Glowfin"
+      },
+      "timestamp": "2026-03-05T23:44:36.029Z"
+    },
+    {
+      "id": "tx_1772754639807_dkhbow",
+      "user_id": "424061511833747467",
+      "username": "Tyren",
+      "type": "treasure_chest",
+      "amount": 59,
+      "balance_after": 490,
+      "metadata": {
+        "source": "treasure_chest",
+        "type": "treasure_chest",
+        "chestRarity": "rare"
+      },
+      "timestamp": "2026-03-05T23:50:39.807Z"
     }
   ]
 }

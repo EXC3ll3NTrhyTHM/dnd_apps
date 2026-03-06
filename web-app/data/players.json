@@ -4,19 +4,20 @@
     "avatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
     "displayName": "excellentrhythm",
     "lastReadTimestamps": {
-      "dragons_hollow": "2026-02-28T09:01:30.630Z",
-      "the_barracks": "2026-02-27T03:37:04.445Z",
+      "dragons_hollow": "2026-03-05T23:38:25.870Z",
+      "the_barracks": "2026-03-01T19:18:12.700Z",
       "the_veil": "2026-02-27T05:02:23.597Z",
       "the_collective": "2026-02-26T07:30:34.131Z",
       "the_dojo": "2026-02-28T03:49:11.400Z",
-      "the_cottage": "2026-02-27T05:01:40.930Z",
-      "marcel_dm_424061511833747467": "2026-02-27T05:01:52.276Z",
+      "the_cottage": "2026-03-02T00:15:52.835Z",
+      "marcel_dm_424061511833747467": "2026-03-06T03:10:04.781Z",
       "marcel_dm_228241331296665600": "2026-02-18T02:30:01.606Z",
-      "marcel_dm_765978025937469481": "2026-02-13T19:44:42.005Z"
+      "marcel_dm_765978025937469481": "2026-03-06T03:10:40.648Z",
+      "marcel_dm_1073385140669128725": "2026-03-06T03:16:58.602Z"
     },
     "pushDesired": true,
-    "lastSeen": "2026-03-01T06:56:53.794Z",
-    "lastLocation": "the_arena",
+    "lastSeen": "2026-03-06T03:16:55.722Z",
+    "lastLocation": "marcel_dm_1073385140669128725",
     "sprite": "the_architect_sprite.webp",
     "ownedDice": [
       "default",
@@ -26,14 +27,15 @@
       "acid",
       "black",
       "fire",
-      "psychic"
+      "psychic",
+      "bloodmoon"
     ],
-    "equippedDice": "psychic",
+    "equippedDice": "bloodmoon",
     "favoriteEmotes": [
       "flexed_biceps",
       "screaming",
-      "fire",
-      "ember_laugh"
+      "ember_laugh",
+      "party_face"
     ]
   },
   "228241331296665600": {
@@ -41,11 +43,11 @@
     "avatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
     "displayName": "badbeachpeach",
     "lastReadTimestamps": {
-      "the_cottage": "2026-02-28T01:17:06.718Z",
-      "the_dojo": "2026-02-28T01:08:03.962Z",
-      "the_collective": "2026-02-28T01:03:10.332Z",
-      "the_veil": "2026-02-28T01:03:21.936Z",
-      "dragons_hollow": "2026-02-28T02:41:55.076Z",
+      "the_cottage": "2026-03-05T06:29:32.719Z",
+      "the_dojo": "2026-03-05T06:29:38.914Z",
+      "the_collective": "2026-03-05T06:29:44.847Z",
+      "the_veil": "2026-03-05T06:29:50.851Z",
+      "dragons_hollow": "2026-03-05T06:30:01.245Z",
       "marcel_dm_228241331296665600": "2026-02-28T01:25:55.537Z"
     },
     "mutedChannels": [
@@ -53,8 +55,8 @@
       "the_dojo",
       "dragons_hollow"
     ],
-    "lastSeen": "2026-02-28T02:41:55.018Z",
-    "lastLocation": "dragons_hollow",
+    "lastSeen": "2026-03-05T06:38:06.171Z",
+    "lastLocation": "the_arena",
     "sprite": "acacia_sprite.webp",
     "pushDesired": true,
     "ownedDice": [
@@ -64,33 +66,41 @@
     "equippedDice": "fire",
     "favoriteEmotes": [
       "fire",
-      "smirk",
       "crying",
-      "ember_laugh"
+      "ember_laugh",
+      "rage"
     ]
   },
   "1073385140669128725": {
     "characterName": "Nalyd",
     "avatar": "https://cdn.discordapp.com/avatars/1073385140669128725/51ac15ff7014507f61f37b076668f847.png",
     "sprite": "nalyd_sprite.webp?v=20260217",
-    "lastSeen": "2026-03-01T02:59:06.339Z",
-    "lastLocation": "the_dojo",
+    "lastSeen": "2026-03-06T04:14:58.507Z",
+    "lastLocation": "marcel_dm_1073385140669128725",
     "lastReadTimestamps": {
       "the_dojo": "2026-03-01T02:58:16.639Z",
       "the_barracks": "2026-02-14T19:28:44.597Z",
       "the_collective": "2026-02-14T19:29:02.620Z",
-      "dragons_hollow": "2026-02-28T08:12:22.933Z"
+      "dragons_hollow": "2026-02-28T08:12:22.933Z",
+      "marcel_dm_1073385140669128725": "2026-03-06T04:14:58.561Z",
+      "marcel_dm_424061511833747467": "2026-03-06T03:47:35.213Z"
     },
     "displayName": "Smok3y"
   },
   "765978025937469481": {
     "characterName": "Aly",
-    "avatar": "https://cdn.discordapp.com/avatars/765978025937469481/7851491c550a47550e04e43c55495be4.png"
+    "avatar": "https://cdn.discordapp.com/avatars/765978025937469481/7851491c550a47550e04e43c55495be4.png",
+    "lastSeen": "2026-03-03T22:56:45.942Z",
+    "lastLocation": "the_veil",
+    "lastReadTimestamps": {
+      "the_veil": "2026-03-03T22:54:14.018Z"
+    }
   },
   "1374906408046166036": {
     "characterName": "Tyren",
     "avatar": "https://cdn.discordapp.com/avatars/1374906408046166036/899cd122ccd4a669215553a19055800b.png",
     "sprite": "tyren_sprite.webp",
+    "spriteHeight": 1.4,
     "lastReadTimestamps": {
       "the_barracks": "2026-02-16T12:40:29.217Z"
     },

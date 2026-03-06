@@ -1,0 +1,439 @@
+/* ================================================
+   Treasure Chest Overlay — Tap-to-open system
+   z-index 600 (same tier as level-up)
+   ================================================ */
+
+.chest-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(15, 10, 5, 0.94) 0%, rgba(0, 0, 0, 0.98) 70%);
+  animation: chest-entrance 0.5s ease-out forwards;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.chest-overlay.chest-exiting {
+  animation: chest-exit 0.6s ease-in forwards;
+}
+
+/* ── Three.js canvas container ── */
+
+.chest-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chest-canvas canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* ── Rarity glow ring behind chest ── */
+
+.chest-glow {
+  position: absolute;
+  z-index: 1;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  filter: blur(40px);
+  opacity: 0.5;
+  transition: background 0.4s ease, opacity 0.4s ease, box-shadow 0.4s ease;
+  pointer-events: none;
+}
+
+.chest-glow-common    { background: #8B7355; box-shadow: 0 0 60px 20px rgba(139,115,85,0.3); }
+.chest-glow-uncommon  { background: #2ecc71; box-shadow: 0 0 80px 30px rgba(46,204,113,0.35); opacity: 0.6; }
+.chest-glow-rare      { background: #3498db; box-shadow: 0 0 100px 35px rgba(52,152,219,0.4); opacity: 0.7; }
+.chest-glow-epic      { background: #9b59b6; box-shadow: 0 0 120px 40px rgba(155,89,182,0.45); opacity: 0.8; }
+.chest-glow-legendary { background: #f39c12; box-shadow: 0 0 140px 50px rgba(243,156,18,0.5); opacity: 0.9; }
+
+/* ── Rarity label ── */
+
+.chest-rarity-label {
+  position: absolute;
+  top: 28%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Cinzel', 'Times New Roman', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  text-align: center;
+  transition: color 0.4s ease, text-shadow 0.4s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.chest-rarity-common    { color: #8B7355; text-shadow: 0 0 10px rgba(139,115,85,0.5); }
+.chest-rarity-uncommon  { color: #2ecc71; text-shadow: 0 0 15px rgba(46,204,113,0.6); }
+.chest-rarity-rare      { color: #3498db; text-shadow: 0 0 20px rgba(52,152,219,0.6); }
+.chest-rarity-epic      { color: #9b59b6; text-shadow: 0 0 25px rgba(155,89,182,0.7); }
+.chest-rarity-legendary { color: #f39c12; text-shadow: 0 0 30px rgba(243,156,18,0.8); }
+
+/* ── Tap prompt ── */
+
+.chest-tap-prompt {
+  position: absolute;
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Cinzel', 'Times New Roman', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  animation: chest-tap-pulse 1.5s ease-in-out infinite;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Tap counter dots */
+.chest-tap-dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.chest-tap-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chest-tap-dot.filled {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.4);
+}
+
+/* ── God rays for epic/legendary ── */
+
+.chest-rays {
+  position: absolute;
+  inset: -50%;
+  opacity: 0;
+  animation: chest-rays-rotate 10s linear infinite;
+  pointer-events: none;
+}
+
+.chest-rays.active {
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+
+.chest-rays-epic {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg, rgba(155,89,182,0.05) 10deg, transparent 20deg,
+    transparent 60deg, rgba(155,89,182,0.04) 70deg, transparent 80deg,
+    transparent 120deg, rgba(155,89,182,0.05) 130deg, transparent 140deg,
+    transparent 180deg, rgba(155,89,182,0.04) 190deg, transparent 200deg,
+    transparent 240deg, rgba(155,89,182,0.05) 250deg, transparent 260deg,
+    transparent 300deg, rgba(155,89,182,0.04) 310deg, transparent 320deg,
+    transparent 360deg
+  );
+}
+
+.chest-rays-legendary {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg, rgba(243,156,18,0.07) 10deg, transparent 20deg,
+    transparent 60deg, rgba(243,156,18,0.05) 70deg, transparent 80deg,
+    transparent 120deg, rgba(243,156,18,0.07) 130deg, transparent 140deg,
+    transparent 180deg, rgba(243,156,18,0.05) 190deg, transparent 200deg,
+    transparent 240deg, rgba(243,156,18,0.07) 250deg, transparent 260deg,
+    transparent 300deg, rgba(243,156,18,0.05) 310deg, transparent 320deg,
+    transparent 360deg
+  );
+}
+
+/* ── Opening burst particles ── */
+
+.chest-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  top: 45%;
+  left: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chest-particle.burst {
+  animation: chest-particle-burst 1.2s ease-out forwards;
+  animation-delay: var(--p-delay, 0s);
+}
+
+.chest-particle-common    { background: radial-gradient(circle, #c4a96a 0%, #8B7355 50%, transparent 100%); box-shadow: 0 0 4px 1px rgba(139,115,85,0.5); }
+.chest-particle-uncommon  { background: radial-gradient(circle, #5dde9e 0%, #2ecc71 50%, transparent 100%); box-shadow: 0 0 4px 1px rgba(46,204,113,0.5); }
+.chest-particle-rare      { background: radial-gradient(circle, #6cb3e6 0%, #3498db 50%, transparent 100%); box-shadow: 0 0 4px 1px rgba(52,152,219,0.5); }
+.chest-particle-epic      { background: radial-gradient(circle, #bf7fdb 0%, #9b59b6 50%, transparent 100%); box-shadow: 0 0 4px 1px rgba(155,89,182,0.5); }
+.chest-particle-legendary { background: radial-gradient(circle, #f7c948 0%, #f39c12 50%, transparent 100%); box-shadow: 0 0 4px 1px rgba(243,156,18,0.5); }
+
+/* Larger glowing orb particles */
+.chest-particle-orb {
+  width: 12px;
+  height: 12px;
+  animation-duration: 1.6s;
+}
+.chest-particle-orb.chest-particle-common    { box-shadow: 0 0 10px 4px rgba(139,115,85,0.6); }
+.chest-particle-orb.chest-particle-uncommon  { box-shadow: 0 0 10px 4px rgba(46,204,113,0.6); }
+.chest-particle-orb.chest-particle-rare      { box-shadow: 0 0 10px 4px rgba(52,152,219,0.6); }
+.chest-particle-orb.chest-particle-epic      { box-shadow: 0 0 10px 4px rgba(155,89,182,0.6); }
+.chest-particle-orb.chest-particle-legendary { box-shadow: 0 0 10px 4px rgba(243,156,18,0.6); }
+
+/* Screen flash on open */
+.chest-flash {
+  position: absolute;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.chest-flash.active {
+  animation: chest-flash-anim 0.6s ease-out forwards;
+}
+
+/* ── Reveal phase — item cards ── */
+
+.chest-reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+  text-align: center;
+}
+
+.chest-reveal-card {
+  animation: chest-card-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+  transform: scale(0.8) translateY(20px);
+}
+
+.chest-reveal-icon {
+  font-size: 56px;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 0 12px rgba(255,255,255,0.3));
+}
+
+.chest-reveal-name {
+  font-family: 'Cinzel', 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  margin-bottom: 4px;
+}
+
+.chest-reveal-type {
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+.chest-reveal-gold-amount {
+  font-family: 'Cinzel', 'Times New Roman', serif;
+  font-size: 42px;
+  font-weight: 900;
+  color: #d4af37;
+  text-shadow: 0 0 20px rgba(212,175,55,0.6);
+}
+
+.chest-reveal-gold-label {
+  font-size: 14px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(212,175,55,0.7);
+  margin-top: 4px;
+}
+
+.chest-reveal-tap-hint {
+  position: absolute;
+  bottom: 15%;
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: chest-tap-pulse 1.5s ease-in-out infinite;
+}
+
+/* Rarity borders on item cards */
+.chest-reveal-border-common    { border-color: #8B7355; }
+.chest-reveal-border-uncommon  { border-color: #2ecc71; }
+.chest-reveal-border-rare      { border-color: #3498db; }
+.chest-reveal-border-epic      { border-color: #9b59b6; }
+.chest-reveal-border-legendary { border-color: #f39c12; }
+
+/* ── Summary phase ── */
+
+.chest-summary {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  animation: chest-card-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.chest-summary-title {
+  font-family: 'Cinzel', 'Times New Roman', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #d4af37;
+  margin-bottom: 20px;
+  text-shadow: 0 0 15px rgba(212,175,55,0.4);
+}
+
+.chest-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+  margin-bottom: 24px;
+}
+
+.chest-summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.chest-summary-item-icon {
+  font-size: 28px;
+}
+
+.chest-summary-item-name {
+  font-size: 11px;
+  color: rgba(255,255,255,0.8);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.chest-claim-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 48px;
+  font-family: 'Cinzel', 'Times New Roman', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #1a1a2e;
+  background: linear-gradient(135deg, #d4af37, #f7c948);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(212,175,55,0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chest-claim-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 10px rgba(212,175,55,0.3);
+}
+
+.chest-claim-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Keyframes ── */
+
+@keyframes chest-entrance {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes chest-exit {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes chest-tap-pulse {
+  0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+  50%      { opacity: 1; transform: translateX(-50%) scale(1.04); }
+}
+
+@keyframes chest-rays-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes chest-particle-burst {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--p-x, 0px), var(--p-y, -80px)) scale(0.2);
+  }
+}
+
+@keyframes chest-flash-anim {
+  0%  { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+@keyframes chest-card-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ── Chest spin animation (applied via JS) ── */
+
+@keyframes chest-spin {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}

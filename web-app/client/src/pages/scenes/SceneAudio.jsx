@@ -9,7 +9,7 @@
 import { useEffect, useRef } from 'react';
 import { useAudioMuted } from '../../hooks/useAudioSettings';
 import {
-  playSceneConfig, stopAll, setSceneMuted,
+  playSceneConfig, stopAll, stopPlayback, setSceneMuted,
   suspendScene, resumeScene, clearBufferCache,
 } from '../../lib/sceneAudioEngine';
 
@@ -112,14 +112,14 @@ export function SceneAudio({ config, enabled = true }) {
     };
   }, [configKey, enabled]);
 
-  // Unmount-only cleanup: free buffer memory.
-  // Don't call stopAll here — it increments _generation which can make
-  // the NEXT SceneAudio's in-flight playSceneConfig go stale (e.g. arena
-  // unmounts while dojo's SceneAudio is loading buffers). playSceneConfig
-  // already calls stopAll internally, so old sources get cleaned up.
+  // Unmount-only cleanup: stop audio and free buffer memory.
+  // Uses stopPlayback (not stopAll) so it doesn't increment _generation —
+  // this avoids making a sibling SceneAudio's in-flight playSceneConfig
+  // go stale (e.g. arena unmounts while dojo's SceneAudio is loading buffers).
   useEffect(() => {
     return () => {
-      console.warn('[SceneAudio] Unmount cleanup — clearing buffer cache');
+      console.warn('[SceneAudio] Unmount cleanup — stopping playback & clearing buffer cache');
+      stopPlayback(300);
       clearBufferCache();
     };
   }, []);
