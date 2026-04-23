@@ -237,7 +237,7 @@ function DamageResult({ data, onDismiss }) {
 }
 
 function HealResult({ data, onDismiss }) {
-  const { healAmount, potionName, isSpell, diceNotation, diceRoll, spellMod, healer, target, newHp, maxHp, revived } = data;
+  const { healAmount, potionName, isSpell, diceNotation, diceRoll, spellMod, discipleBonus, healer, target, newHp, maxHp, revived } = data;
   const icon = isSpell || potionName === 'Lay on Hands' ? '\u2728' : '\uD83E\uDDEA';
 
   return (
@@ -249,7 +249,10 @@ function HealResult({ data, onDismiss }) {
             <div className="rro-side-name">{healer?.name}</div>
             <div className="rro-side-number rro-heal-num">{icon} {potionName || 'Potion'}</div>
             {diceNotation ? (
-              <div className="rro-side-label">{'\uD83C\uDFB2'} {diceRoll}{spellMod ? ` + ${spellMod}` : ''} = +{healAmount} HP</div>
+              <>
+                <div className="rro-side-label">{'\uD83C\uDFB2'} {diceRoll}{spellMod ? ` + ${spellMod}` : ''}{discipleBonus ? ` + ${discipleBonus}` : ''} = +{healAmount} HP</div>
+                {discipleBonus ? <div className="rro-side-sublabel">Disciple of Life +{discipleBonus}</div> : null}
+              </>
             ) : (
               <div className="rro-side-label">+{healAmount} HP</div>
             )}

@@ -1,19 +1,19 @@
 {
   "424061511833747467": {
     "username": "excellentrhythm",
-    "total_caught": 19,
-    "total_escaped": 4,
-    "total_sold": 12,
-    "gold_earned": 176,
+    "total_caught": 23,
+    "total_escaped": 5,
+    "total_sold": 14,
+    "gold_earned": 204,
     "catches": {
       "ironjaw": 3,
       "mudcarp": 3,
-      "silver_trout": 4,
-      "ember_bass": 2,
-      "glowfin": 6,
-      "shadow_eel": 1
+      "silver_trout": 5,
+      "ember_bass": 3,
+      "glowfin": 7,
+      "shadow_eel": 2
     },
-    "last_catch": "2026-03-05T23:44:31.674Z",
+    "last_catch": "2026-03-10T06:33:33.709Z",
     "biggest_catch": {
       "fishId": "ember_bass",
       "name": "Ember Bass",

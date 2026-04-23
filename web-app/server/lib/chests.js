@@ -7,7 +7,20 @@
  */
 
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const { awardGold, addItemToInventory, getInventory, loadCatalog } = require('./economy');
+
+const PLAYERS_PATH = path.resolve(__dirname, '..', '..', 'data', 'players.json');
+function loadPlayers() {
+  try { return JSON.parse(fs.readFileSync(PLAYERS_PATH, 'utf-8')); }
+  catch { return {}; }
+}
+function savePlayers(data) {
+  const tmp = PLAYERS_PATH + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+  fs.renameSync(tmp, PLAYERS_PATH);
+}
 
 // ============================================
 // IN-MEMORY PENDING CHESTS
@@ -251,13 +264,50 @@ function claimChest(chestId, userId) {
   console.log(`[Chest] Wallet after award:`, walletAfter?.balance);
 
   // Award items (skip bonus_gold pseudo-items)
+  let diceAwarded = 0;
   for (const item of chest.items) {
     if (item.type === 'bonus_gold') continue;
     addItemToInventory(userId, { id: item.id, name: item.name, type: item.type });
+
+    // Dice sets: add colorset to player's ownedDice (mirrors shop.js logic)
+    if (item.type === 'dice_set') {
+      diceAwarded++;
+      try {
+        const catalog = loadCatalog();
+        const catalogItem = catalog.categories?.dice_sets?.items?.find(d => d.id === item.id);
+        if (catalogItem?.colorset) {
+          const players = loadPlayers();
+          if (!players[userId]) players[userId] = {};
+          const p = players[userId];
+          if (!p.ownedDice) p.ownedDice = ['default'];
+          if (!p.ownedDice.includes(catalogItem.colorset)) {
+            p.ownedDice.push(catalogItem.colorset);
+          }
+          if (!p.equippedDice || p.equippedDice === 'default') {
+            p.equippedDice = catalogItem.colorset;
+          }
+          savePlayers(players);
+        }
+      } catch (e) { console.error('[chest dice_set]', e.message); }
+    }
+  }
+
+  // Track dice set achievements
+  let newAchievements = [];
+  if (diceAwarded > 0) {
+    try {
+      const xp = require('./xp');
+      for (let i = 0; i < diceAwarded; i++) {
+        xp.incrementLifetimeStat(userId, chest.username, 'dice_sets_collected');
+      }
+    } catch (e) { console.error('[chest xp]', e.message); }
+    try {
+      newAchievements = require('./achievements').checkAchievements(userId, chest.username, 'dice_sets_collected').newAchievements || [];
+    } catch (e) { console.error('[chest achievements]', e.message); }
   }
 
   pendingChests.delete(chestId);
-  return { success: true, gold: totalGold, items: chest.items, rarity: chest.rarity };
+  return { success: true, gold: totalGold, items: chest.items, rarity: chest.rarity, newAchievements };
 }
 
 /**

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '../hooks/useApi';
+import LevelUpOverlay from './LevelUpOverlay';
 import '../styles/fishing.css';
 
 const RARITY_COLORS = {
@@ -55,6 +56,7 @@ export default function FishingOverlay({ onClose }) {
   const [achievements, setAchievements] = useState([]);
   const [sellLoading, setSellLoading] = useState(false);
   const [resultReady, setResultReady] = useState(false);
+  const [levelUp, setLevelUp] = useState(null);
 
   // Guards against double-firing handleCatchSuccess during rapid taps
   const confirmingRef = useRef(false);
@@ -256,6 +258,7 @@ export default function FishingOverlay({ onClose }) {
 
       setCatchResult(data.fish);
       setAchievements(data.newAchievements || []);
+      if (data.levelUp) setLevelUp(data.levelUp.newLevel);
       setPhase('reveal');
 
       // Auto-transition to interactive result after reveal plays
@@ -298,6 +301,7 @@ export default function FishingOverlay({ onClose }) {
     setFishData(null);
     setCatchResult(null);
     setAchievements([]);
+    setLevelUp(null);
     setError(null);
     setPhase('idle');
     loadInventory();
@@ -547,6 +551,15 @@ export default function FishingOverlay({ onClose }) {
             Try Again
           </button>
         </div>
+      )}
+
+      {/* ---- LEVEL UP OVERLAY ---- */}
+      {levelUp && (
+        <LevelUpOverlay
+          key={levelUp}
+          level={levelUp}
+          onDismiss={() => setLevelUp(null)}
+        />
       )}
     </div>
   );

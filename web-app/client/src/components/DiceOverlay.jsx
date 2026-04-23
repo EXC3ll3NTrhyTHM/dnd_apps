@@ -27,12 +27,8 @@ let _prevGeoCount = 0;
 let _totalTexturesCreated = 0;
 let _totalTexturesDisposed = 0;
 
-function logStats(action, detail) {
-  console.log(
-    `%c[DiceBox] %c${action}%c  ${detail || ''}` +
-    `\n  created: ${_stats.created}  rolls: ${_stats.rolls}  configUpdates: ${_stats.configUpdates}  lost: ${_stats.lost}`,
-    'color: #888', 'color: #f5a623; font-weight: bold', 'color: #ccc'
-  );
+function logStats(/* action, detail */) {
+  // Logging disabled
 }
 
 /**
@@ -71,12 +67,12 @@ function logMemoryDelta(label) {
   const triangles = ri.render?.triangles || 0;
   // Rough GPU memory estimate: each texture ~1MB (1024x1024 RGBA)
   const estimatedGpuMB = (tex * 4 * 1024 * 1024 / (1024 * 1024)).toFixed(1);
-  console.log(
-    `[Memory] ${label}: textures ${_prevTexCount}→${tex} (${texDelta >= 0 ? '+' : ''}${texDelta}), ` +
-    `geometries ${_prevGeoCount}→${geo} (${geoDelta >= 0 ? '+' : ''}${geoDelta}), ` +
-    `cache: ${cache}, triangles: ${triangles}, ~GPU: ${estimatedGpuMB}MB, ` +
-    `cumulative created/disposed: ${_totalTexturesCreated}/${_totalTexturesDisposed}`
-  );
+  // console.log(
+  //   `[Memory] ${label}: textures ${_prevTexCount}→${tex} (${texDelta >= 0 ? '+' : ''}${texDelta}), ` +
+  //   `geometries ${_prevGeoCount}→${geo} (${geoDelta >= 0 ? '+' : ''}${geoDelta}), ` +
+  //   `cache: ${cache}, triangles: ${triangles}, ~GPU: ${estimatedGpuMB}MB, ` +
+  //   `cumulative created/disposed: ${_totalTexturesCreated}/${_totalTexturesDisposed}`
+  // );
   _prevTexCount = tex;
   _prevGeoCount = geo;
 }
@@ -156,10 +152,10 @@ function trackedClearDice(box, label) {
   _totalTexturesDisposed += meshTexDisposed + cacheDisposed;
   try { target.clearDice(); } catch (e) { console.warn('[DiceBox] clearDice error:', e); }
   const texAfter = target.renderer?.info?.memory?.textures || 0;
-  console.log(
-    `[DiceBox] clearDice (${label}): textures ${texBefore}→${texAfter} (freed ${texBefore - texAfter}), ` +
-    `mesh-tex: ${meshTexDisposed}, cache: ${cacheDisposed}, geos: ${geosDisposed}`
-  );
+  // console.log(
+  //   `[DiceBox] clearDice (${label}): textures ${texBefore}→${texAfter} (freed ${texBefore - texAfter}), ` +
+  //   `mesh-tex: ${meshTexDisposed}, cache: ${cacheDisposed}, geos: ${geosDisposed}`
+  // );
 }
 
 /**
@@ -315,7 +311,7 @@ async function acquireBox(containerId, config) {
       targetMaterial !== _currentConfig.material ||
       (targetColorset === 'custom' && targetCustomJson !== currentCustomJson);
 
-    console.log(`[DiceDiag] REUSE PATH — needsUpdate: ${needsUpdate}, target: ${targetColorset}/${targetMaterial}, current: ${_currentConfig.colorset}/${_currentConfig.material}`);
+    // console.log(`[DiceDiag] REUSE PATH — needsUpdate: ${needsUpdate}, target: ${targetColorset}/${targetMaterial}, current: ${_currentConfig.colorset}/${_currentConfig.material}`);
     debugDiceState('REUSE PATH (before any update)', _box);
 
     if (needsUpdate) {
@@ -336,7 +332,7 @@ async function acquireBox(containerId, config) {
           const texAfterUpdate = _box.renderer?.info?.memory?.textures || 0;
           const updateDelta = texAfterUpdate - texBeforeUpdate;
           _totalTexturesCreated += Math.max(0, updateDelta);
-          console.log(`[DiceBox] updateConfig: textures ${texBeforeUpdate}→${texAfterUpdate} (+${updateDelta})`);
+          // console.log(`[DiceBox] updateConfig: textures ${texBeforeUpdate}→${texAfterUpdate} (+${updateDelta})`);
           _stats.configUpdates++;
           _currentConfig = {
             colorset: targetColorset,
@@ -429,8 +425,9 @@ async function acquireBox(containerId, config) {
 }
 
 // ── DEBUG: Dice diagnostics ──────────────────────────────────────────
-function debugDiceState(label, box) {
-  if (!box) { console.log(`[DiceDiag] ${label}: box is null`); return; }
+function debugDiceState(/* label, box */) {
+  return; // Logging disabled
+  // if (!box) { console.log(`[DiceDiag] ${label}: box is null`); return; }
 
   // Scene children
   const meshes = [];
@@ -745,7 +742,7 @@ export default function DiceOverlay({
           const texSummary = Array.isArray(texInfo)
             ? texInfo.map((t, i) => `[${i}]: name=${t?.name}, hasTexture=${!!t?.texture}, hasBump=${!!t?.bump}, src=${t?.source?.split('/').pop() || 'none'}`)
             : `name=${texInfo?.name}, hasTexture=${!!texInfo?.texture}, hasBump=${!!texInfo?.bump}, src=${texInfo?.source?.split('/').pop() || 'none'}`;
-          console.log(`[DiceDiag] Colorset texture data:`, texSummary, 'colorset:', cd.name || _currentConfig.colorset);
+          // console.log(`[DiceDiag] Colorset texture data:`, texSummary, 'colorset:', cd.name || _currentConfig.colorset);
         }
 
         // Pre-compile shaders so the first rendered frame has valid materials
@@ -761,10 +758,10 @@ export default function DiceOverlay({
         _totalTexturesDisposed += preRollMeshTex + preRollCache;
         const preRollTexAfter = box.renderer?.info?.memory?.textures || 0;
         if (preRollMeshTex + preRollCache > 0) {
-          console.log(
-            `[DiceBox] Pre-roll cleanup: textures ${preRollTexBefore}→${preRollTexAfter} ` +
-            `(freed ${preRollTexBefore - preRollTexAfter}), mesh-tex: ${preRollMeshTex}, cache: ${preRollCache}`
-          );
+          // console.log(
+          //   `[DiceBox] Pre-roll cleanup: textures ${preRollTexBefore}→${preRollTexAfter} ` +
+          //   `(freed ${preRollTexBefore - preRollTexAfter}), mesh-tex: ${preRollMeshTex}, cache: ${preRollCache}`
+          // );
         }
 
         const rollNotation = buildNotation(n, fv);

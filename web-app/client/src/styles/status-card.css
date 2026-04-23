@@ -1,0 +1,213 @@
+/* ============================================
+   STATUS CARD OVERLAY — tap player/monster row
+   ============================================ */
+
+@keyframes status-card-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes status-card-scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.status-card-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: status-card-fadeIn 200ms ease-out;
+}
+
+.status-card {
+  background: rgba(26, 26, 26, 0.92);
+  max-width: 320px;
+  width: 85vw;
+  max-height: 70vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  z-index: 301;
+  animation: status-card-scaleIn 200ms ease-out;
+  padding: 16px;
+}
+
+.status-card-player {
+  border-color: rgba(234, 179, 8, 0.5);
+}
+
+.status-card-enemy {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* ---- Header ---- */
+
+.status-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.status-card-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.status-card-avatar-fallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.status-card-name {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ---- Divider ---- */
+
+.status-card-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 10px 0;
+}
+
+/* ---- Health ---- */
+
+.status-card-health {
+  margin-bottom: 4px;
+}
+
+.status-card-health-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-card-hp-bar {
+  height: 10px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.status-card-hp-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 300ms ease;
+}
+
+.status-card-hp-text {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: right;
+}
+
+.status-card-ac-text {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: right;
+  margin-top: 2px;
+}
+
+/* ---- Conditions ---- */
+
+.status-card-section-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-card-conditions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.status-card-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.status-card-pill-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.status-card-pill-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.status-card-pill-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.status-card-pill-desc {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+.status-card-pill-duration {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 3px;
+}
+
+.status-card-no-conditions {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-style: italic;
+  padding: 8px 0;
+}
+
+/* ---- Close button ---- */
+
+.status-card-close {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms;
+}
+
+.status-card-close:active {
+  background: rgba(255, 255, 255, 0.15);
+}

@@ -10,6 +10,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { getAudioMuted } from '../hooks/useAudioSettings';
 import { ensureContext } from '../hooks/useUiSounds';
 import '../styles/chest.css';
@@ -70,18 +73,23 @@ function playTapSound(tapIndex) {
   try {
     const ctx = ensureContext();
     if (!ctx) return;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.value = TAP_PITCHES[tapIndex] || 400;
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+    const base = TAP_PITCHES[tapIndex] || 400;
+    const triplet = [base, base * 1.25, base * 1.5];
     const t = ctx.currentTime;
-    gain.gain.setValueAtTime(0, t);
-    gain.gain.linearRampToValueAtTime(0.12, t + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-    osc.start(t);
-    osc.stop(t + 0.2);
+    triplet.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const start = t + i * 0.06;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.6, start + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.15);
+      osc.start(start);
+      osc.stop(start + 0.2);
+    });
   } catch { /* silent */ }
 }
 
@@ -101,7 +109,7 @@ function playUpgradeSound() {
       gain.connect(ctx.destination);
       const start = t + i * 0.06;
       gain.gain.setValueAtTime(0, start);
-      gain.gain.linearRampToValueAtTime(0.1, start + 0.02);
+      gain.gain.linearRampToValueAtTime(0.6, start + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.001, start + 0.25);
       osc.start(start);
       osc.stop(start + 0.3);
@@ -114,19 +122,18 @@ let _preloadedBuffers = null;
 
 async function preloadOpenSounds() {
   if (_preloadedBuffers) return;
+  _preloadedBuffers = {};
   try {
     const ctx = ensureContext();
     if (!ctx) return;
-    const [cheerResp, partyResp] = await Promise.all([
-      fetch('/sounds/arena/sfx/crowd-cheer.mp3'),
-      fetch('/sounds/emotes/party.mp3'),
+    // Load each independently so one failure doesn't kill both
+    await Promise.all([
+      fetch('/sounds/arena/sfx/crowd-cheer.mp3')
+        .then(r => r.arrayBuffer()).then(ab => ctx.decodeAudioData(ab))
+        .then(buf => { _preloadedBuffers.cheer = buf; })
+        .catch(() => {}),
     ]);
-    const [cheerBuf, partyBuf] = await Promise.all([
-      cheerResp.arrayBuffer().then(ab => ctx.decodeAudioData(ab)),
-      partyResp.arrayBuffer().then(ab => ctx.decodeAudioData(ab)),
-    ]);
-    _preloadedBuffers = { cheer: cheerBuf, party: partyBuf };
-  } catch { /* silent — will fall back to no sound */ }
+  } catch { /* silent */ }
 }
 
 function playOpenSound() {
@@ -135,21 +142,59 @@ function playOpenSound() {
     const ctx = ensureContext();
     if (!ctx || !_preloadedBuffers) return;
     // Play crowd cheer
-    const cheerSrc = ctx.createBufferSource();
-    cheerSrc.buffer = _preloadedBuffers.cheer;
-    const cheerGain = ctx.createGain();
-    cheerGain.gain.value = 0.35;
-    cheerSrc.connect(cheerGain);
-    cheerGain.connect(ctx.destination);
-    cheerSrc.start(0);
-    // Play party blower
-    const partySrc = ctx.createBufferSource();
-    partySrc.buffer = _preloadedBuffers.party;
-    const partyGain = ctx.createGain();
-    partyGain.gain.value = 0.4;
-    partySrc.connect(partyGain);
-    partyGain.connect(ctx.destination);
-    partySrc.start(0);
+    if (_preloadedBuffers.cheer) {
+      const cheerSrc = ctx.createBufferSource();
+      cheerSrc.buffer = _preloadedBuffers.cheer;
+      const cheerGain = ctx.createGain();
+      cheerGain.gain.value = 1.0;
+      cheerSrc.connect(cheerGain);
+      cheerGain.connect(ctx.destination);
+      cheerSrc.start(0);
+    }
+    // Synthesized chest creak/unlatch — two layered noise bursts
+    const t = ctx.currentTime;
+    // Layer 1: woody creak (low bandpass)
+    const creakLen = 0.6;
+    const creakBuf = ctx.createBuffer(1, ctx.sampleRate * creakLen, ctx.sampleRate);
+    const creakData = creakBuf.getChannelData(0);
+    for (let i = 0; i < creakData.length; i++) {
+      creakData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.25));
+    }
+    const creakSrc = ctx.createBufferSource();
+    creakSrc.buffer = creakBuf;
+    const creakFilter = ctx.createBiquadFilter();
+    creakFilter.type = 'lowpass';
+    creakFilter.frequency.value = 800;
+    creakFilter.Q.value = 1;
+    const creakGain = ctx.createGain();
+    creakGain.gain.setValueAtTime(1.0, t);
+    creakGain.gain.exponentialRampToValueAtTime(0.001, t + creakLen);
+    creakSrc.connect(creakFilter);
+    creakFilter.connect(creakGain);
+    creakGain.connect(ctx.destination);
+    creakSrc.start(t);
+    creakSrc.stop(t + creakLen);
+    // Layer 2: metallic latch click (high bandpass, short)
+    const clickLen = 0.15;
+    const clickBuf = ctx.createBuffer(1, ctx.sampleRate * clickLen, ctx.sampleRate);
+    const clickData = clickBuf.getChannelData(0);
+    for (let i = 0; i < clickData.length; i++) {
+      clickData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.03));
+    }
+    const clickSrc = ctx.createBufferSource();
+    clickSrc.buffer = clickBuf;
+    const clickFilter = ctx.createBiquadFilter();
+    clickFilter.type = 'bandpass';
+    clickFilter.frequency.value = 3000;
+    clickFilter.Q.value = 2;
+    const clickGain = ctx.createGain();
+    clickGain.gain.setValueAtTime(0.8, t);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, t + clickLen);
+    clickSrc.connect(clickFilter);
+    clickFilter.connect(clickGain);
+    clickGain.connect(ctx.destination);
+    clickSrc.start(t);
+    clickSrc.stop(t + clickLen);
   } catch { /* silent */ }
 }
 
@@ -166,7 +211,7 @@ function playRevealChime() {
     gain.connect(ctx.destination);
     const t = ctx.currentTime;
     gain.gain.setValueAtTime(0, t);
-    gain.gain.linearRampToValueAtTime(0.08, t + 0.02);
+    gain.gain.linearRampToValueAtTime(0.5, t + 0.02);
     gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
     osc.start(t);
     osc.stop(t + 0.5);
@@ -242,6 +287,37 @@ export default function ChestOpenOverlay({ chestId, rarity, gold, items, tapSequ
     rimLight.position.set(2, 0, -2);
     scene.add(rimLight);
 
+    // Rarity-colored glow backdrop — visible soft halo behind the chest
+    const glowCanvas = document.createElement('canvas');
+    glowCanvas.width = 128;
+    glowCanvas.height = 128;
+    const glowCtx = glowCanvas.getContext('2d');
+    const gradient = glowCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.5)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    glowCtx.fillStyle = gradient;
+    glowCtx.fillRect(0, 0, 128, 128);
+    const glowTexture = new THREE.CanvasTexture(glowCanvas);
+
+    const backGlowMat = new THREE.SpriteMaterial({
+      map: glowTexture,
+      color: RARITY_COLORS.common,
+      transparent: true,
+      opacity: 0.7,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const backGlow = new THREE.Sprite(backGlowMat);
+    backGlow.scale.set(5, 5, 1);
+    backGlow.position.set(0, 0.3, -1.2);
+    scene.add(backGlow);
+
+    // Interior glow light — starts off, ramps up when lid opens
+    const interiorLight = new THREE.PointLight(RARITY_COLORS[rarity] || 0xffffff, 0, 5);
+    interiorLight.position.set(0, 0.3, 0);
+    scene.add(interiorLight);
+
     let chestModel = null;
     let lidBone = null;
     let lidRestQuat = null; // bone's rest quaternion
@@ -272,6 +348,35 @@ export default function ChestOpenOverlay({ chestId, rarity, gold, items, tapSequ
       }
     });
 
+    // ── Sparkle particles ──
+    const sparkCount = 30;
+    const sparkGeo = new THREE.BufferGeometry();
+    const sparkPositions = new Float32Array(sparkCount * 3);
+    const sparkVelocities = [];
+    for (let i = 0; i < sparkCount; i++) {
+      sparkPositions[i * 3] = (Math.random() - 0.5) * 0.5;
+      sparkPositions[i * 3 + 1] = 0.3 + Math.random() * 1.2;
+      sparkPositions[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
+      sparkVelocities.push(0.2 + Math.random() * 0.3);
+    }
+    sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkPositions, 3));
+    const sparkMat = new THREE.PointsMaterial({
+      color: RARITY_COLORS[rarity] || 0xffffff,
+      size: 0.05,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      opacity: 0,
+    });
+    const sparkles = new THREE.Points(sparkGeo, sparkMat);
+    sparkles.visible = false;
+    scene.add(sparkles);
+
+    // Glow activation state
+    const glowState = { active: false, startTime: 0 };
+    // Deferred open: waits for last spin to finish before opening lid
+    const pendingOpen = { waiting: false, callback: null };
+
     sceneRef.current = {
       mainLight,
       get chestModel() { return chestModel; },
@@ -279,9 +384,15 @@ export default function ChestOpenOverlay({ chestId, rarity, gold, items, tapSequ
       spinTween,
       lidTween,
       triggerSpin() {
+        const currentY = chestModel ? chestModel.rotation.y : 0;
         spinTween.active = true;
-        spinTween.startY = chestModel ? chestModel.rotation.y : 0;
-        spinTween.targetY = spinTween.startY + Math.PI * 2;
+        spinTween.startY = currentY;
+        // Always target a multiple of 2π so it lands front-facing
+        spinTween.targetY = (Math.floor(currentY / (Math.PI * 2)) + 1) * (Math.PI * 2);
+        // Ensure at least a half rotation for visual satisfaction
+        if (spinTween.targetY - currentY < Math.PI) {
+          spinTween.targetY += Math.PI * 2;
+        }
         spinTween.progress = 0;
       },
       openLid() {
@@ -298,11 +409,55 @@ export default function ChestOpenOverlay({ chestId, rarity, gold, items, tapSequ
       updateLightColor(color) {
         mainLight.color.setHex(color);
         mainLight.intensity = 2;
+        backGlowMat.color.setHex(color);
       },
       escalateJiggle(tapNum) {
         jiggleIntensity = 1 + tapNum * 0.6;
       },
+      activateGlow() {
+        sparkles.visible = true;
+        glowState.active = true;
+        glowState.startTime = elapsed;
+      },
+      showOnlyBacklight() {
+        // Hide chest, sparkles, and all lights except the backlight glow sprite
+        if (chestModel) chestModel.visible = false;
+        sparkles.visible = false;
+        glowState.active = false;
+        mainLight.intensity = 0;
+        ambient.intensity = 0;
+        dirLight.intensity = 0;
+        dirLight2.intensity = 0;
+        fillLight.intensity = 0;
+        rimLight.intensity = 0;
+        interiorLight.intensity = 0;
+      },
+      deferOpen(callback) {
+        if (spinTween.active && chestModel) {
+          // Retarget spin to land at the next full rotation (default position)
+          const currentY = chestModel.rotation.y;
+          spinTween.targetY = Math.ceil(currentY / (Math.PI * 2)) * Math.PI * 2;
+          if (spinTween.targetY <= currentY) spinTween.targetY += Math.PI * 2;
+          pendingOpen.waiting = true;
+          pendingOpen.callback = callback;
+        } else {
+          callback();
+        }
+      },
     };
+
+    // ── Bloom post-processing ──
+    const rtParams = { format: THREE.RGBAFormat, type: THREE.HalfFloatType };
+    const renderTarget = new THREE.WebGLRenderTarget(width, height, rtParams);
+    const composer = new EffectComposer(renderer, renderTarget);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(width, height),
+      0.8,  // strength
+      0.5,  // radius
+      0.3   // threshold
+    );
+    composer.addPass(bloomPass);
 
     // Animation loop
     let frameId;
@@ -317,8 +472,8 @@ export default function ChestOpenOverlay({ chestId, rarity, gold, items, tapSequ
 
       if (mixer) mixer.update(dt);
 
-      // Idle jiggle — something trying to escape
-      if (chestModel && !spinTween.active) {
+      // Idle jiggle — something trying to escape (stop once opened)
+      if (chestModel && !spinTween.active && !glowState.active) {
         const jFreq = 8; // fast rattling
         const jAmp = 0.015 * jiggleIntensity;
         // Intermittent bursts: jiggle for ~0.4s every ~1.5s
@@ -340,7 +495,14 @@ export default function ChestOpenOverlay({ chestId, rarity, gold, items, tapSequ
         spinTween.progress = Math.min(spinTween.progress + dt * 2.5, 1);
         const ease = 1 - Math.pow(1 - spinTween.progress, 3);
         chestModel.rotation.y = spinTween.startY + (spinTween.targetY - spinTween.startY) * ease;
-        if (spinTween.progress >= 1) spinTween.active = false;
+        if (spinTween.progress >= 1) {
+          spinTween.active = false;
+          if (pendingOpen.waiting) {
+            pendingOpen.waiting = false;
+            pendingOpen.callback();
+            pendingOpen.callback = null;
+          }
+        }
       }
 
       // Lid open tween — quaternion slerp with overshoot bounce
@@ -355,7 +517,32 @@ export default function ChestOpenOverlay({ chestId, rarity, gold, items, tapSequ
         if (lidTween.progress >= 1) lidTween.active = false;
       }
 
-      renderer.render(scene, camera);
+      // ── Inner glow animation ──
+      if (glowState.active) {
+        const glowElapsed = elapsed - glowState.startTime;
+        const rampT = Math.min(glowElapsed / 0.3, 1); // 0→1 over 0.3s
+
+        // Ramp interior light
+        interiorLight.intensity = rampT * 8;
+
+        // Ramp sparkle opacity
+        sparkMat.opacity = rampT * 0.8;
+
+        // Animate sparkle positions upward
+        const pos = sparkGeo.attributes.position;
+        for (let i = 0; i < sparkCount; i++) {
+          let y = pos.getY(i) + sparkVelocities[i] * dt;
+          if (y > 1.85) {
+            y = 0.4 + Math.random() * 0.2;
+            pos.setX(i, (Math.random() - 0.5) * 0.3);
+            pos.setZ(i, (Math.random() - 0.5) * 0.3);
+          }
+          pos.setY(i, y);
+        }
+        pos.needsUpdate = true;
+      }
+
+      composer.render();
     }
     animate();
 
@@ -376,6 +563,12 @@ export default function ChestOpenOverlay({ chestId, rarity, gold, items, tapSequ
           }
         }
       });
+      sparkGeo.dispose();
+      sparkMat.dispose();
+      glowTexture.dispose();
+      backGlowMat.dispose();
+      composer.dispose();
+      renderTarget.dispose();
       renderer.dispose();
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
@@ -403,6 +596,7 @@ export default function ChestOpenOverlay({ chestId, rarity, gold, items, tapSequ
 
         playTapSound(tapIndex);
 
+
         // Trigger chest spin + escalate jiggle
         if (sceneRef.current) {
           sceneRef.current.triggerSpin();
@@ -419,21 +613,31 @@ export default function ChestOpenOverlay({ chestId, rarity, gold, items, tapSequ
         setCurrentRarity(nextRarity);
         setTapIndex(nextIndex);
       } else {
-        // Tap 6: open the chest (no spin)
+        // Tap 6: open the chest — defer until last spin finishes
         setTapIndex(nextIndex);
-        setPhase('opening');
-        playOpenSound();
-        setShowFlash(true);
-        setBurstActive(true);
-        if (sceneRef.current) sceneRef.current.openLid();
-
-        const t2 = setTimeout(() => setShowFlash(false), 600);
-        const t3 = setTimeout(() => {
-          setPhase('revealing');
-          setRevealIndex(0);
-          playRevealChime();
-        }, 2500);
-        timersRef.current.push(t2, t3);
+        const doOpen = () => {
+          setPhase('opening');
+          playOpenSound();
+          setShowFlash(true);
+          setBurstActive(true);
+          if (sceneRef.current) {
+            sceneRef.current.openLid();
+            sceneRef.current.activateGlow();
+          }
+          const t2 = setTimeout(() => setShowFlash(false), 600);
+          const t3 = setTimeout(() => {
+            if (sceneRef.current) sceneRef.current.showOnlyBacklight();
+            setPhase('revealing');
+            setRevealIndex(0);
+            playRevealChime();
+          }, 2500);
+          timersRef.current.push(t2, t3);
+        };
+        if (sceneRef.current) {
+          sceneRef.current.deferOpen(doOpen);
+        } else {
+          doOpen();
+        }
       }
     } else if (phase === 'revealing') {
       const nextReveal = revealIndex + 1;
@@ -469,12 +673,12 @@ export default function ChestOpenOverlay({ chestId, rarity, gold, items, tapSequ
       onClick={phase === 'tapping' || phase === 'revealing' ? handleTap : undefined}
     >
       {/* Three.js canvas */}
-      {(phase === 'tapping' || phase === 'opening') && (
+      {(phase === 'tapping' || phase === 'opening' || phase === 'revealing') && (
         <div className="chest-canvas" ref={canvasRef} />
       )}
 
       {/* Rarity glow */}
-      {(phase === 'tapping' || phase === 'opening') && (
+      {(phase === 'tapping' || phase === 'opening' || phase === 'revealing') && (
         <div className={`chest-glow chest-glow-${currentRarity}`} />
       )}
 

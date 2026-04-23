@@ -26,14 +26,14 @@
         "item_id": "ember_bass",
         "name": "Ember Bass",
         "type": "fish",
-        "quantity": 2,
+        "quantity": 3,
         "acquired_at": "2026-02-13T03:45:27.178Z"
       },
       {
         "item_id": "shadow_eel",
         "name": "Shadow Eel",
         "type": "fish",
-        "quantity": 1,
+        "quantity": 2,
         "acquired_at": "2026-02-14T21:23:09.347Z"
       },
       {
@@ -79,18 +79,116 @@
         "acquired_at": "2026-02-26T06:56:46.269Z"
       },
       {
-        "item_id": "potion_greater_healing",
-        "name": "Potion of Greater Healing",
-        "type": "potion",
-        "quantity": 4,
-        "acquired_at": "2026-03-05T23:37:21.343Z"
-      },
-      {
         "item_id": "dice_bloodmoon",
         "name": "Blood Moon Dice",
         "type": "dice_set",
         "quantity": 1,
         "acquired_at": "2026-03-05T23:38:20.666Z"
+      },
+      {
+        "item_id": "abyssal_lure",
+        "name": "Abyssal Lure",
+        "type": "bait",
+        "quantity": 2,
+        "acquired_at": "2026-03-06T04:36:55.761Z"
+      },
+      {
+        "item_id": "item_blunt",
+        "name": "Blunt",
+        "type": "consumable",
+        "quantity": 5,
+        "acquired_at": "2026-03-06T04:39:38.651Z"
+      },
+      {
+        "item_id": "potion_healing",
+        "name": "Potion of Healing",
+        "type": "potion",
+        "quantity": 5,
+        "acquired_at": "2026-03-06T04:53:01.262Z"
+      },
+      {
+        "item_id": "basic_worm",
+        "name": "Basic Worm",
+        "type": "bait",
+        "quantity": 7,
+        "acquired_at": "2026-03-06T05:03:03.244Z"
+      },
+      {
+        "item_id": "enchanted_grub",
+        "name": "Enchanted Grub",
+        "type": "bait",
+        "quantity": 5,
+        "acquired_at": "2026-03-06T06:48:46.699Z"
+      },
+      {
+        "item_id": "dice_radiant",
+        "name": "Radiant Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-07T00:51:56.405Z"
+      },
+      {
+        "item_id": "dice_thunder",
+        "name": "Thunder Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-07T00:51:56.419Z"
+      },
+      {
+        "item_id": "dice_water",
+        "name": "Tidal Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-07T00:51:56.438Z"
+      },
+      {
+        "item_id": "dice_force",
+        "name": "Force Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-10T05:19:54.995Z"
+      },
+      {
+        "item_id": "dice_rainbow",
+        "name": "Prismatic Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-10T05:19:55.031Z"
+      },
+      {
+        "item_id": "dice_inspired",
+        "name": "Bardic Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-10T05:19:55.064Z"
+      },
+      {
+        "item_id": "potion_greater_healing",
+        "name": "Potion of Greater Healing",
+        "type": "potion",
+        "quantity": 1,
+        "acquired_at": "2026-03-10T06:33:09.858Z"
+      },
+      {
+        "item_id": "dice_gold",
+        "name": "Golden Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-10T17:37:21.158Z"
+      },
+      {
+        "item_id": "dice_glitterparty",
+        "name": "Glitter Party Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-10T17:37:21.181Z"
+      },
+      {
+        "item_id": "dice_breebaby",
+        "name": "Breebaby Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-10T17:37:21.192Z"
       }
     ],
     "badges": [],
@@ -167,8 +265,36 @@
         "item_id": "potion_healing",
         "name": "Potion of Healing",
         "type": "potion",
-        "quantity": 3,
+        "quantity": 2,
         "acquired_at": "2026-02-28T01:15:01.618Z"
+      },
+      {
+        "item_id": "dice_dragons",
+        "name": "Dragon Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-08T05:50:19.403Z"
+      },
+      {
+        "item_id": "dice_glitterparty",
+        "name": "Glitter Party Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-08T05:50:19.414Z"
+      },
+      {
+        "item_id": "potion_superior_healing",
+        "name": "Potion of Superior Healing",
+        "type": "potion",
+        "quantity": 1,
+        "acquired_at": "2026-03-08T05:50:19.423Z"
+      },
+      {
+        "item_id": "dice_gold",
+        "name": "Golden Dice",
+        "type": "dice_set",
+        "quantity": 1,
+        "acquired_at": "2026-03-08T05:50:19.433Z"
       }
     ],
     "badges": [],
@@ -181,15 +307,8 @@
         "item_id": "item_blunt",
         "name": "Blunt",
         "type": "consumable",
-        "quantity": 1,
+        "quantity": 2,
         "acquired_at": "2026-02-16T19:01:34.650Z"
-      },
-      {
-        "item_id": "potion_healing",
-        "name": "Potion of Healing",
-        "type": "potion",
-        "quantity": 1,
-        "acquired_at": "2026-02-18T16:09:27.481Z"
       },
       {
         "item_id": "dice_thunder",
@@ -197,6 +316,13 @@
         "type": "dice_set",
         "quantity": 1,
         "acquired_at": "2026-03-01T03:29:46.156Z"
+      },
+      {
+        "item_id": "enchanted_grub",
+        "name": "Enchanted Grub",
+        "type": "bait",
+        "quantity": 1,
+        "acquired_at": "2026-03-10T05:19:51.439Z"
       }
     ],
     "badges": [],

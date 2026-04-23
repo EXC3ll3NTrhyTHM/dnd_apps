@@ -179,7 +179,7 @@ function _stopEntries(fadeMs = 400) {
  * Stop all active scene audio with optional fade-out.
  */
 export function stopAll(fadeMs = 400) {
-  console.warn('[SceneAudio] stopAll called', { active: _activeEntries.length, fadeMs, gen: _generation, stack: new Error().stack?.split('\n').slice(1, 4).map(s => s.trim()).join(' <- ') });
+  // console.warn('[SceneAudio] stopAll called', { active: _activeEntries.length, fadeMs, gen: _generation, stack: new Error().stack?.split('\n').slice(1, 4).map(s => s.trim()).join(' <- ') });
   log('stopAll', { active: _activeEntries.length, fadeMs });
   _generation++; // Invalidate any in-flight playSceneConfig calls
   _stopEntries(fadeMs);
@@ -192,7 +192,7 @@ export function stopAll(fadeMs = 400) {
  * while dojo's SceneAudio is loading buffers).
  */
 export function stopPlayback(fadeMs = 400) {
-  console.warn('[SceneAudio] stopPlayback called (soft)', { active: _activeEntries.length, fadeMs, gen: _generation });
+  // console.warn('[SceneAudio] stopPlayback called (soft)', { active: _activeEntries.length, fadeMs, gen: _generation });
   log('stopPlayback', { active: _activeEntries.length, fadeMs });
   _stopEntries(fadeMs);
 }
@@ -238,7 +238,7 @@ export function resumeScene() {
  */
 export async function playSceneConfig(config, { muted = false } = {}) {
   const src = config?.music?.src || config?.ambient?.[0]?.src || 'none';
-  console.warn('[SceneAudio] playSceneConfig called', { src, muted, gen: _generation, ctxState: ensureContext()?.state });
+  // console.warn('[SceneAudio] playSceneConfig called', { src, muted, gen: _generation, ctxState: ensureContext()?.state });
   log('playSceneConfig', { music: config?.music?.src, ambient: config?.ambient?.length, muted });
   _muted = muted;
 
@@ -247,7 +247,7 @@ export async function playSceneConfig(config, { muted = false } = {}) {
   // no audible output because the context is paused.
   const ctx = ensureContext();
   if (ctx && ctx.state === 'suspended') {
-    console.warn('[SceneAudio] Resuming suspended AudioContext');
+    // console.warn('[SceneAudio] Resuming suspended AudioContext');
     ctx.resume().catch(() => {});
   }
 
@@ -261,7 +261,7 @@ export async function playSceneConfig(config, { muted = false } = {}) {
   // Capture the generation at call time so we can detect if another
   // playSceneConfig or stopAll ran while we were loading buffers.
   const myGeneration = _generation;
-  console.warn('[SceneAudio] Loading buffers...', { myGeneration, tasks: config.music?.src || config.ambient?.map(a => a.src) });
+  // console.warn('[SceneAudio] Loading buffers...', { myGeneration, tasks: config.music?.src || config.ambient?.map(a => a.src) });
 
   // Collect all URLs to load
   const loadTasks = [];
@@ -284,16 +284,16 @@ export async function playSceneConfig(config, { muted = false } = {}) {
 
   // Load all buffers in parallel
   const buffers = await Promise.all(loadTasks.map(t => loadBuffer(t.src)));
-  console.warn('[SceneAudio] Buffers loaded', {
-    myGeneration, currentGen: _generation,
-    stale: _generation !== myGeneration,
-    results: loadTasks.map((t, i) => ({ src: t.src, loaded: !!buffers[i], sizeMB: buffers[i] ? (buffers[i].length * buffers[i].numberOfChannels * 4 / 1024 / 1024).toFixed(1) : 0 })),
-  });
+  // console.warn('[SceneAudio] Buffers loaded', {
+  //   myGeneration, currentGen: _generation,
+  //   stale: _generation !== myGeneration,
+  //   results: loadTasks.map((t, i) => ({ src: t.src, loaded: !!buffers[i], sizeMB: buffers[i] ? (buffers[i].length * buffers[i].numberOfChannels * 4 / 1024 / 1024).toFixed(1) : 0 })),
+  // });
 
   // After the async gap: if another playSceneConfig or stopAll was called
   // while we were loading, this call is stale — don't start any sources.
   if (_generation !== myGeneration) {
-    console.warn('[SceneAudio] STALE — bailing out!', { myGeneration, current: _generation });
+    // console.warn('[SceneAudio] STALE — bailing out!', { myGeneration, current: _generation });
     log('playSceneConfig stale after buffer load, bailing', { myGeneration, current: _generation });
     return () => {};
   }
@@ -302,7 +302,7 @@ export async function playSceneConfig(config, { muted = false } = {}) {
 
   loadTasks.forEach((task, i) => {
     const buffer = buffers[i];
-    if (!buffer) { console.warn('[SceneAudio] Skipping null buffer for', task.src); return; }
+    if (!buffer) { /* console.warn('[SceneAudio] Skipping null buffer for', task.src); */ return; }
 
     if (task.irregular) {
       const entry = startIrregular(buffer, task.volume, task.irregularPause);
@@ -313,7 +313,7 @@ export async function playSceneConfig(config, { muted = false } = {}) {
     }
   });
 
-  console.warn('[SceneAudio] Started', newEntries.length, 'sources, muted:', _muted);
+  // console.warn('[SceneAudio] Started', newEntries.length, 'sources, muted:', _muted);
   _activeEntries = newEntries;
 
   // Return cleanup function
@@ -330,7 +330,7 @@ export async function playSceneConfig(config, { muted = false } = {}) {
  * @param {string[]} [keepUrls] - URLs to keep in cache (e.g. currently playing)
  */
 export function clearBufferCache(keepUrls = []) {
-  console.warn('[SceneAudio] clearBufferCache called', { cacheSize: _bufferCache.size, keepUrls, stack: new Error().stack?.split('\n').slice(1, 4).map(s => s.trim()).join(' <- ') });
+  // console.warn('[SceneAudio] clearBufferCache called', { cacheSize: _bufferCache.size, keepUrls, stack: new Error().stack?.split('\n').slice(1, 4).map(s => s.trim()).join(' <- ') });
   const keepSet = new Set(keepUrls);
   let cleared = 0;
   for (const url of [..._bufferCache.keys()]) {

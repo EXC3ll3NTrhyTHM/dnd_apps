@@ -13,7 +13,7 @@ import {
   suspendScene, resumeScene, clearBufferCache,
 } from '../../lib/sceneAudioEngine';
 
-export function SceneAudio({ config, enabled = true }) {
+export function SceneAudio({ config, enabled = true, keepAudioOnUnmount = false }) {
   const muted = useAudioMuted();
   const mutedRef = useRef(muted);
   mutedRef.current = muted;
@@ -21,6 +21,8 @@ export function SceneAudio({ config, enabled = true }) {
   const configRef = useRef(config);
   configRef.current = config;
   const activeRef = useRef(true);
+  const keepAudioRef = useRef(keepAudioOnUnmount);
+  keepAudioRef.current = keepAudioOnUnmount;
 
   // Stable key so the effect only re-runs when config *content* changes
   const configKey = config ? JSON.stringify(config) : '';
@@ -36,18 +38,18 @@ export function SceneAudio({ config, enabled = true }) {
   // on unmount (see separate effect below). This prevents the race condition where
   // cleanup kills audio that the next config's playSceneConfig is trying to start.
   useEffect(() => {
-    console.warn('[SceneAudio] Effect fired', { configKey, enabled });
-    if (!configKey || !enabled) { console.warn('[SceneAudio] Skipping — no config or disabled'); return; }
+    // console.warn('[SceneAudio] Effect fired', { configKey, enabled });
+    if (!configKey || !enabled) { /* console.warn('[SceneAudio] Skipping — no config or disabled'); */ return; }
 
     activeRef.current = true;
 
     // Play the new config (engine handles stopping old audio with crossfade)
     playSceneConfig(configRef.current, { muted: mutedRef.current })
       .then(cleanup => {
-        if (!activeRef.current) { console.warn('[SceneAudio] Effect cleanup ran before play resolved — stopping'); cleanup(); return; }
+        if (!activeRef.current) { cleanup(); return; }
         cleanupRef.current = cleanup;
       })
-      .catch(err => console.warn('[SceneAudio] Play error:', err));
+      .catch(() => {});
 
     // ── Visibility / focus handlers ──
     const onVisibility = () => {
@@ -91,7 +93,7 @@ export function SceneAudio({ config, enabled = true }) {
     window.addEventListener('speech-recognition-change', onSpeechChange);
 
     return () => {
-      console.warn('[SceneAudio] Config change cleanup', { configKey });
+      // console.warn('[SceneAudio] Config change cleanup', { configKey });
       activeRef.current = false;
       timers.forEach(clearTimeout);
       cleanupRef.current = null;
@@ -116,9 +118,12 @@ export function SceneAudio({ config, enabled = true }) {
   // Uses stopPlayback (not stopAll) so it doesn't increment _generation —
   // this avoids making a sibling SceneAudio's in-flight playSceneConfig
   // go stale (e.g. arena unmounts while dojo's SceneAudio is loading buffers).
+  // keepAudioOnUnmount: skips cleanup so a successor SceneAudio can continue
+  // the same track seamlessly (e.g. result screen → chest scene).
   useEffect(() => {
     return () => {
-      console.warn('[SceneAudio] Unmount cleanup — stopping playback & clearing buffer cache');
+      if (keepAudioRef.current) return;
+      // console.warn('[SceneAudio] Unmount cleanup — stopping playback & clearing buffer cache');
       stopPlayback(300);
       clearBufferCache();
     };

@@ -642,6 +642,15 @@
   color: var(--color-gold);
 }
 
+/* ---- Battle Area (wrapper constraining overlays to middle) ---- */
+
+.arena-battle-area {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
 /* ---- Battle Field (sprites area) ---- */
 
 .arena-battle-field {
@@ -700,8 +709,9 @@
 .arena-info-panel {
   display: flex;
   gap: 0;
-  padding: 8px 12px 4px;
+  padding: 14px 16px 10px;
   background: linear-gradient(180deg, #1a1510 0%, rgba(26, 21, 16, 0.95) 100%);
+  border-bottom: 2px solid var(--border-stitch);
   flex-shrink: 0;
   position: relative;
   z-index: 2;
@@ -711,25 +721,25 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
 }
 
 .arena-info-col-players {
-  padding-right: 10px;
+  padding-right: 12px;
 }
 
 .arena-info-col-enemies {
-  padding-left: 10px;
+  padding-left: 12px;
 }
 
 .arena-info-col-label {
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-secondary);
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .arena-info-col-players .arena-info-col-label {
@@ -750,13 +760,13 @@
 .arena-info-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 22px;
+  gap: 8px;
+  min-height: 28px;
 }
 
 .arena-info-avatar {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   flex-shrink: 0;
   object-fit: cover;
@@ -793,6 +803,25 @@
   color: #ef4444;
 }
 
+/* Summon info row (purple tinted) */
+.arena-info-row-summon {
+  opacity: 0.9;
+}
+.arena-info-row-summon .arena-info-hp-fill {
+  background: #c4b5fd !important;
+}
+.arena-info-avatar-summon {
+  font-size: 0.7rem !important;
+  background: rgba(196, 181, 253, 0.2) !important;
+}
+.arena-badge-summon-turns {
+  font-size: 0.55rem;
+  background: rgba(196, 181, 253, 0.3);
+  color: #c4b5fd;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
 .arena-info-name {
   font-size: 0.72rem;
   font-weight: 600;
@@ -806,9 +835,9 @@
 
 .arena-info-hp-track {
   flex: 1;
-  height: 6px;
+  height: 8px;
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
   min-width: 30px;
 }
@@ -820,7 +849,7 @@
 }
 
 .arena-info-hp-text {
-  font-size: 0.62rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
   font-weight: 500;
   white-space: nowrap;
@@ -921,7 +950,7 @@
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.35);
-  z-index: 80;
+  z-index: 98;
   pointer-events: none;
   animation: arena-announce-fade 1.5s ease-out forwards;
 }
@@ -1976,6 +2005,19 @@
   box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
 }
 
+/* Summon initiative entry (purple glow) */
+.arena-init-entry-summon {
+  border-color: #c4b5fd;
+  box-shadow: 0 0 6px rgba(196, 181, 253, 0.5);
+}
+.arena-init-entry-summon.arena-init-entry-current {
+  box-shadow: 0 0 12px rgba(196, 181, 253, 0.8);
+}
+.arena-init-avatar-summon {
+  font-size: 0.8rem !important;
+  background: rgba(196, 181, 253, 0.2) !important;
+}
+
 .arena-init-avatar {
   width: 28px;
   height: 28px;
@@ -2023,7 +2065,7 @@
    ============================================ */
 
 .rro-backdrop {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 90;
   display: flex;
@@ -2141,6 +2183,14 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.rro-side-sublabel {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  opacity: 0.75;
+  margin-top: 2px;
 }
 
 .rro-clash {
@@ -2574,6 +2624,22 @@
   text-transform: none;
 }
 
+.arena-badge-multi {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.arena-badge-multi-count {
+  font-size: 0.5rem;
+  opacity: 0.85;
+}
+
+.arena-badge-spiritual-weapon {
+  background: rgba(212, 175, 55, 0.3);
+  color: #f0d060;
+}
+
 .arena-badge-stunned {
   background: rgba(234, 179, 8, 0.25);
   color: #fde047;
@@ -2615,6 +2681,18 @@
   color: #4ade80;
   font-size: 0.65rem;
   animation: condition-pulse 1.5s ease-in-out infinite;
+}
+
+.arena-badge-guiding-bolt {
+  background: rgba(250, 204, 21, 0.25);
+  color: #fde68a;
+  font-size: 0.65rem;
+  animation: guiding-bolt-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes guiding-bolt-pulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(250, 204, 21, 0.3); }
+  50% { box-shadow: 0 0 10px rgba(250, 204, 21, 0.6); }
 }
 
 .arena-badge-inspiration {
@@ -3506,6 +3584,13 @@
   font-weight: 600;
 }
 
+.arena-spell-card-sublabel {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+  margin-top: 2px;
+}
+
 .arena-spell-card-save {
   color: rgba(255, 255, 255, 0.5);
 }
@@ -3964,6 +4049,11 @@
   border: 2px solid #9ca3af;
   box-shadow: 0 0 20px rgba(107, 114, 128, 0.3);
 }
+.arena-bonus-summon-expired {
+  background: rgba(196, 181, 253, 0.15);
+  border: 2px solid #c4b5fd;
+  box-shadow: 0 0 20px rgba(196, 181, 253, 0.3);
+}
 
 .arena-ability-btn-hunters-mark {
   background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
@@ -4372,4 +4462,114 @@
   color: #c4b5fd;
   font-weight: 600;
   cursor: pointer;
+}
+
+/* ── Preserve Life Modal ── */
+.arena-preserve-life-pool {
+  text-align: center;
+  padding: 8px;
+  font-size: 0.95rem;
+  color: #d1d5db;
+}
+.arena-preserve-life-remaining {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #4ade80;
+}
+.arena-preserve-life-hint {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-style: italic;
+  padding: 0 8px 4px;
+}
+.arena-preserve-life-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.arena-preserve-life-row .arena-potion-item-name {
+  flex: 1;
+}
+.arena-preserve-life-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.arena-preserve-life-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.arena-preserve-life-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.arena-preserve-life-amount {
+  min-width: 24px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #4ade80;
+}
+
+/* ── Bless Target Selection ── */
+.arena-bless-selected {
+  background: rgba(74, 222, 128, 0.15) !important;
+  border: 1px solid rgba(74, 222, 128, 0.4) !important;
+}
+
+/* ── Spiritual Weapon Indicator ── */
+.arena-spiritual-weapon-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: #c4b5fd;
+  margin: 4px 0;
+}
+
+/* ---- Summon Turn Panel ---- */
+.arena-summon-turn-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+}
+.arena-summon-turn-text {
+  color: #c4b5fd;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.arena-btn-summon-attack {
+  background: linear-gradient(135deg, #6d28d9, #7c3aed);
+  border: 1px solid #c4b5fd;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(196, 181, 253, 0.4);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.arena-btn-summon-attack:active {
+  transform: scale(0.96);
+  box-shadow: 0 0 6px rgba(196, 181, 253, 0.6);
 }

@@ -44,3 +44,15 @@
 [2026-03-02] Today was filled with warmth and laughter as I shared an intimate moment with Nalyd. We exchanged fiery tricks, my laughter echoing as we playfully challenged each other, igniting the night with magic and mischief.
 
 [2026-03-02] Today, the darkness taunted us with Maria's name, but I stood firm, refusing to let it control our fear. I sensed Nalyd wanting to leave to protect me, but I grasped his arm and reminded him that together we are stronger; we will face whatever comes.
+
+[2026-03-07] I reveled in sharing the success of my dojo with Nalyd, feeling the warmth of our banter. His exhaustion sparked a playful camaraderie, and I vowed to ignite his energy into our next challenge together.
+
+[2026-03-07] I shared a delightful piece of cake with Nalyd, the sweetness enhancing the playful banter between us. We exchanged flirtatious words, and I teased him about delivering a passionate declaration in Spanish next time—his reaction only added to my excitement.
+
+[2026-03-07] I spent a delightful night with Nalyd, teasing him about a fiery goodnight kiss before we drifted into a peaceful slumber together. This morning, I was grumpy at first, but the sight of him made me smile; I can feel an exciting adventure brewing for us today!
+
+[2026-03-07] Today, I shared a moment with Nalyd, discussing the growth of our kingdom amidst the gentle rain. His words made me reflect on the fragility of peace, but I couldn't help feeling invigorated, as I declared that we are warriors, ready to face any threat. Together, we ignite hope in the darkest hours.
+
+[2026-03-07] Today, Nalyd and I discussed the aftermath of Sythrall’s death and the darkness that might creep in to fill the power vacuum. I felt a surge of determination and affirmed my commitment to fight alongside him, no matter the cost, while promising to heed his serious warnings if the time ever came. Together, we are flames that refuse to be extinguished.
+
+[2026-03-07] Today, I had a delightful exchange with Nalyd about our impending arrival at the castle. His refusal to let me ignite it was both amusing and infuriating, but I feigned shock and promised to be "good" for now—though I fully plan to unleash my flames when the moment is right!

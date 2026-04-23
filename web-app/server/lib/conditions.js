@@ -78,6 +78,14 @@ const CONDITIONS = {
     defenseModifier: null,
     canAct: true,
   },
+  blessed: {
+    name: 'Blessed',
+    icon: '\u{2728}',
+    description: 'Add 1d4 to attack rolls and saving throws.',
+    attackModifier: null,
+    defenseModifier: null,
+    canAct: true,
+  },
 };
 
 // ============================================

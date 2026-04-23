@@ -186,8 +186,11 @@ router.post('/confirm', authRequired, (req, res) => {
     weight,
   });
 
-  // Award XP
+  // Award XP (detect level-up)
+  const levelBefore = xp.getLevel(userId, username);
   xp.dmAwardXp(userId, username, fish.xp, `fishing:${fish.id}`);
+  const levelAfter = xp.getLevel(userId, username);
+  const levelUp = levelAfter > levelBefore ? { newLevel: levelAfter } : null;
 
   // Update lifetime stats
   xp.incrementLifetimeStat(userId, username, 'fish_caught');
@@ -211,6 +214,7 @@ router.post('/confirm', authRequired, (req, res) => {
       weight,
     },
     newAchievements,
+    levelUp,
   });
 });
 

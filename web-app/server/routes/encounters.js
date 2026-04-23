@@ -1,3 +1,4 @@
+console.log('[DAMAGE DEBUG] encounters.js routes loaded');
 /**
  * Encounter API Routes
  *
@@ -38,6 +39,8 @@ const {
   monsterHasEscapeConditions,
   prepareMonsterEscape,
   resolveMonsterEscapeWithRolls,
+  resolveSummonAction,
+  destroySummon,
   setDmRollControl,
   setPendingRoll,
   getPendingRoll,
@@ -432,7 +435,11 @@ router.post('/:encounterId/initiative', authRequired, (req, res) => {
  */
 router.post('/:encounterId/action', authRequired, (req, res) => {
   const userId = req.user.id;
-  const { action, attackRoll, attackRoll2, damageTotal, potionId, targetId, healRoll, helpTargetId, smiteData, sneakAttackData, inspirationData, huntersMarkData, healAmount, spellId, saveRoll, weaponId, subAction, ensnaringStrike, ensnaringStrikeSaveRoll, stunningStrike, stunningStrikeSaveRoll } = req.body;
+  const { action, attackRoll, attackRoll2, damageTotal, potionId, targetId, healRoll, helpTargetId, smiteData, sneakAttackData, inspirationData, huntersMarkData, healAmount, spellId, saveRoll, weaponId, subAction, ensnaringStrike, ensnaringStrikeSaveRoll, stunningStrike, stunningStrikeSaveRoll, blessRoll, allocations, targetIds } = req.body;
+
+  if (action === 'attack') {
+    console.log(`[DAMAGE DEBUG ROUTE] received: action=${action}, damageTotal=${damageTotal}, typeof=${typeof damageTotal}`);
+  }
 
   if (!action) {
     return res.status(400).json({ error: 'action is required.' });
@@ -460,6 +467,9 @@ router.post('/:encounterId/action', authRequired, (req, res) => {
   if (typeof ensnaringStrikeSaveRoll === 'number') rollData.ensnaringStrikeSaveRoll = ensnaringStrikeSaveRoll;
   if (stunningStrike) rollData.stunningStrike = true;
   if (typeof stunningStrikeSaveRoll === 'number') rollData.stunningStrikeSaveRoll = stunningStrikeSaveRoll;
+  if (typeof blessRoll === 'number') rollData.blessRoll = blessRoll;
+  if (allocations) rollData.allocations = allocations;
+  if (targetIds) rollData.targetIds = targetIds;
 
   const result = submitAction(req.params.encounterId, userId, action, rollData);
   if (result.error) {
@@ -618,7 +628,7 @@ router.post('/:encounterId/bonus-action', authRequired, (req, res) => {
       return res.status(400).json({ error: 'Not in bonus action phase.' });
     }
 
-    const { bonusAction, potionId, healRoll, targetId, weaponId, attackRoll, attackRoll2, damageTotal, strikes, sneakAttackData, huntersMarkData } = req.body;
+    const { bonusAction, potionId, healRoll, targetId, weaponId, attackRoll, attackRoll2, damageTotal, strikes, sneakAttackData, huntersMarkData, spellId, initiativeRoll } = req.body;
 
     if (bonusAction === 'skip') {
       encounter.bonusActionPhase = false;
@@ -627,7 +637,7 @@ router.post('/:encounterId/bonus-action', authRequired, (req, res) => {
       return res.json({ success: true });
     }
 
-    const result = resolveBonusAction(encounter, userId, bonusAction, { potionId, healRoll, targetId, weaponId, attackRoll, attackRoll2, damageTotal, strikes, sneakAttackData, huntersMarkData });
+    const result = resolveBonusAction(encounter, userId, bonusAction, { potionId, healRoll, targetId, weaponId, attackRoll, attackRoll2, damageTotal, strikes, sneakAttackData, huntersMarkData, spellId, initiativeRoll });
     if (result.error) {
       return res.status(400).json({ error: result.error });
     }
@@ -676,9 +686,9 @@ router.post('/:encounterId/pre-bonus-action', authRequired, (req, res) => {
     return res.status(400).json({ error: 'Bonus action already used this turn.' });
   }
 
-  const { bonusAction, targetId, potionId, healRoll } = req.body;
+  const { bonusAction, targetId, potionId, healRoll, attackRoll, attackRoll2, damageTotal, spellId, initiativeRoll } = req.body;
 
-  const result = resolveBonusAction(encounter, userId, bonusAction, { potionId, healRoll, targetId });
+  const result = resolveBonusAction(encounter, userId, bonusAction, { potionId, healRoll, targetId, attackRoll, attackRoll2, damageTotal, spellId, initiativeRoll });
   if (result.error) {
     return res.status(400).json({ error: result.error });
   }
@@ -697,6 +707,53 @@ router.post('/:encounterId/pre-bonus-action', authRequired, (req, res) => {
   });
 
   res.json({ success: true });
+});
+
+/**
+ * POST /api/encounters/:encounterId/summon-action
+ * Submit an attack action for a summon entity on its own initiative turn.
+ * Body: { summonId, attackRoll, attackRoll2?, damageTotal, blessRoll? }
+ */
+router.post('/:encounterId/summon-action', authRequired, (req, res) => {
+  try {
+    const userId = req.user.id;
+    const encounter = getEncounter(req.params.encounterId);
+    if (!encounter) return res.status(404).json({ error: 'Encounter not found.' });
+
+    const { summonId, attackRoll, attackRoll2, damageTotal, blessRoll } = req.body;
+
+    // Validate the summon exists and belongs to this user
+    const summon = encounter.summons.find(s => s.id === summonId);
+    if (!summon) return res.status(404).json({ error: 'Summon not found.' });
+    if (summon.ownerId !== userId) return res.status(403).json({ error: 'Not your summon.' });
+
+    // Validate it's the summon's turn
+    const currentTurn = encounter.initiativeOrder[encounter.currentTurnIndex];
+    if (!currentTurn || currentTurn.id !== summonId || currentTurn.type !== 'summon') {
+      return res.status(400).json({ error: "It is not this summon's turn." });
+    }
+
+    const result = resolveSummonAction(encounter, summonId, { attackRoll, attackRoll2, damageTotal, blessRoll });
+    if (result.error) return res.status(400).json({ error: result.error });
+
+    // Broadcast summon attack result
+    broadcastToLocation(req, encounter.locationId, {
+      type: 'encounter_summon_result',
+      locationId: encounter.locationId,
+      encounterId: encounter.id,
+      result,
+      encounter: getPublicState(encounter),
+    });
+
+    // Advance turn after summon acts
+    const turnResult = advanceTurn(encounter);
+    handleTurnAdvance(req, encounter, turnResult);
+
+    res.json({ success: true, result });
+  } catch (err) {
+    console.error('[summon-action] Crash:', err.stack || err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 /**
@@ -1414,6 +1471,18 @@ function handleTurnAdvance(req, encounter, turnResult) {
 
     if (turnResult.entry.type === 'monster') {
       handleMonsterTurn(req, encounter);
+    } else if (turnResult.entry.type === 'summon') {
+      // Summon's turn — broadcast turn start so owner can act
+      broadcastToLocation(req, locationId, {
+        type: 'encounter_turn_start',
+        locationId,
+        encounterId: encounter.id,
+        currentTurn: turnResult.entry,
+        turnDeadline: encounter.turnDeadline,
+        round: encounter.round,
+        newRound: turnResult.newRound || false,
+        encounter: getPublicState(encounter),
+      });
     } else {
       broadcastToLocation(req, locationId, {
         type: 'encounter_turn_start',
@@ -1426,6 +1495,24 @@ function handleTurnAdvance(req, encounter, turnResult) {
         encounter: getPublicState(encounter),
       });
     }
+  }
+
+  // Handle summon expired — auto-advance
+  if (turnResult.type === 'summon_expired') {
+    broadcastToLocation(req, locationId, {
+      type: 'encounter_summon_expired',
+      locationId,
+      encounterId: encounter.id,
+      summonName: turnResult.summonName,
+      ownerId: turnResult.ownerId,
+      encounter: getPublicState(encounter),
+    });
+    // Auto-advance to next turn
+    setTimeout(() => {
+      const nextResult = advanceTurn(encounter);
+      handleTurnAdvance(req, encounter, nextResult);
+    }, 1500);
+    return;
   }
 }
 
@@ -1658,8 +1745,23 @@ function startTimeoutChecker(app) {
           continue;
         }
 
-        // Current player's turn timed out — skip with "hesitates" message
+        // Current entry's turn timed out
         const currentEntry = encounter.initiativeOrder[encounter.currentTurnIndex];
+        if (currentEntry && currentEntry.type === 'summon') {
+          // Summon turn timed out — auto-resolve attack server-side
+          const { resolveSummonAction } = require('../lib/encounters');
+          const result = resolveSummonAction(encounter, currentEntry.id, {});
+          broadcastToLocation(fakeReq, encounter.locationId, {
+            type: 'encounter_summon_result',
+            locationId: encounter.locationId,
+            encounterId: encounter.id,
+            result,
+            encounter: getPublicState(encounter),
+          });
+          const turnResult = advanceTurn(encounter);
+          handleTurnAdvance(fakeReq, encounter, turnResult);
+          continue;
+        }
         if (currentEntry && currentEntry.type === 'player') {
           broadcastToLocation(fakeReq, encounter.locationId, {
             type: 'encounter_turn_result',

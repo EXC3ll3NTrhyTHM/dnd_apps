@@ -133,7 +133,7 @@
     "initiativeBonus": 0,
     "spriteScale": 0.55,
     "spriteOffsetX": 0,
-    "spriteOffsetY": 346,
+    "spriteOffsetY": 258,
     "savingThrows": {
       "STR": 0,
       "DEX": 2,
@@ -181,7 +181,7 @@
     "initiativeBonus": 2,
     "spriteScale": 0.75,
     "spriteOffsetX": 8,
-    "spriteOffsetY": 308,
+    "spriteOffsetY": 238,
     "savingThrows": {
       "STR": 3,
       "DEX": 2,
@@ -227,9 +227,9 @@
       "{target} barely rolls out of the way of the crushing blow."
     ],
     "initiativeBonus": -1,
-    "spriteScale": 0.9,
+    "spriteScale": 0.65,
     "spriteOffsetX": 0,
-    "spriteOffsetY": 274,
+    "spriteOffsetY": 228,
     "savingThrows": {
       "STR": 4,
       "DEX": -1,

@@ -71,7 +71,7 @@ export async function preloadDiceSounds() {
 
   _loaded = _diceBuffers.length > 0;
   _loading = false;
-  console.log(`[DiceAudio] Preload complete. Dice: ${_diceBuffers.length}, Surfaces: ${_surfaceBuffers.length}`);
+  // console.log(`[DiceAudio] Preload complete. Dice: ${_diceBuffers.length}, Surfaces: ${_surfaceBuffers.length}`);
 }
 
 function playBuffer(buffer, volume) {

@@ -47,7 +47,7 @@ const SPELL_DEFINITIONS = {
     healDice: '1d4',
     range: 'ally',
     description: 'A soothing word of healing carried on the wind',
-    classes: ['Bard', 'Cleric'],
+    classes: ['Bard'],
   },
   thunderwave: {
     name: 'Thunderwave',
@@ -86,10 +86,52 @@ const SPELL_DEFINITIONS = {
     level: 1,
     actionType: 'action',
     effectType: 'heal',
-    healDice: '2d8',
-    range: 'touch',
+    healDice: '1d8',
+    range: 'ally',
     description: 'A creature you touch regains hit points',
-    classes: ['Ranger'],
+    classes: ['Cleric', 'Paladin', 'Ranger', 'Druid'],
+  },
+  sacred_flame: {
+    name: 'Sacred Flame',
+    level: 0,
+    actionType: 'action',
+    effectType: 'save_damage',
+    saveAbility: 'DEX',
+    damageDice: '1d8',
+    damageType: 'radiant',
+    description: 'Flame-like radiance descends on a creature',
+    classes: ['Cleric'],
+  },
+  guiding_bolt: {
+    name: 'Guiding Bolt',
+    level: 1,
+    actionType: 'action',
+    effectType: 'attack_damage',
+    damageDice: '4d6',
+    damageType: 'radiant',
+    extraEffect: 'advantage_next_attack',
+    description: 'A flash of light streaks toward a creature. Next attack against it has advantage.',
+    classes: ['Cleric'],
+  },
+  spiritual_weapon: {
+    name: 'Spiritual Weapon',
+    level: 2,
+    actionType: 'bonus',
+    effectType: 'summon_weapon',
+    damageDice: '1d8',
+    damageType: 'force',
+    description: 'A spectral weapon appears and strikes a foe. Attacks each turn as a bonus action.',
+    classes: ['Cleric'],
+  },
+  bless: {
+    name: 'Bless',
+    level: 1,
+    actionType: 'action',
+    effectType: 'buff_allies',
+    concentration: true,
+    maxTargets: 3,
+    description: 'Up to 3 creatures add 1d4 to attack rolls and saving throws.',
+    classes: ['Cleric', 'Paladin'],
   },
 };
 
@@ -167,6 +209,8 @@ function spawnEncounter(locationId, monsterId, startedBy) {
     startedBy,
     startedAt: new Date().toISOString(),
     log: [],
+    // Summon entities (e.g. Spiritual Weapon)
+    summons: [],
     // DM roll control ("Fate's Hand")
     dmRollControl: false,
     pendingRoll: null,
@@ -277,6 +321,13 @@ function joinEncounter(encounterId, userId, username, avatar, sprite, spriteHeig
       channelDivinityUsed: 0,
       hasNaturesWrath: (sheet.classFeatures || []).includes('Channel Divinity') &&
         (sheet.classes || []).some(c => c.subclass === 'Oath of the Ancients'),
+      // Preserve Life pool (Life Domain Cleric: cleric level * 5)
+      preserveLifePool: (sheet.classFeatures || []).includes('Channel Divinity: Preserve Life')
+        ? ((sheet.classes || []).find(c => c.name === 'Cleric')?.level || 0) * 5
+        : 0,
+      // Spiritual Weapon tracking
+      spiritualWeaponActive: false,
+      spiritualWeaponTurnsLeft: 0,
       // Concentration tracking
       concentration: null,
       ensnaringStrikeActive: false,
@@ -384,6 +435,9 @@ function joinEncounter(encounterId, userId, username, avatar, sprite, spriteHeig
       channelDivinityMax: 0,
       channelDivinityUsed: 0,
       hasNaturesWrath: false,
+      preserveLifePool: 0,
+      spiritualWeaponActive: false,
+      spiritualWeaponTurnsLeft: 0,
       concentration: null,
       ensnaringStrikeActive: false,
       conMod: 0,
@@ -490,6 +544,13 @@ function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll,
       channelDivinityUsed: 0,
       hasNaturesWrath: (sheet.classFeatures || []).includes('Channel Divinity') &&
         (sheet.classes || []).some(c => c.subclass === 'Oath of the Ancients'),
+      // Preserve Life pool (Life Domain Cleric: cleric level * 5)
+      preserveLifePool: (sheet.classFeatures || []).includes('Channel Divinity: Preserve Life')
+        ? ((sheet.classes || []).find(c => c.name === 'Cleric')?.level || 0) * 5
+        : 0,
+      // Spiritual Weapon tracking
+      spiritualWeaponActive: false,
+      spiritualWeaponTurnsLeft: 0,
       // Concentration tracking
       concentration: null,
       ensnaringStrikeActive: false,
@@ -594,6 +655,9 @@ function joinWithInitiative(encounterId, userId, username, avatar, sprite, roll,
       channelDivinityMax: 0,
       channelDivinityUsed: 0,
       hasNaturesWrath: false,
+      preserveLifePool: 0,
+      spiritualWeaponActive: false,
+      spiritualWeaponTurnsLeft: 0,
       concentration: null,
       ensnaringStrikeActive: false,
       conMod: 0,
@@ -752,6 +816,13 @@ function submitAction(encounterId, userId, action, rollData) {
       encounter.lastActivity = Date.now();
       return { encounter, result };
     }
+    if (rollData?.subAction === 'preserve_life') {
+      const result = resolvePreserveLife(encounter, userId, rollData);
+      if (result.error) return result;
+      player.action = 'channel_divinity';
+      encounter.lastActivity = Date.now();
+      return { encounter, result };
+    }
     return { error: 'Unknown Channel Divinity option.' };
   }
 
@@ -812,13 +883,7 @@ function submitAction(encounterId, userId, action, rollData) {
       if (esSlot) {
         esSlot.used++;
         // Break existing concentration
-        if (player.concentration && player.concentration.conditionId) {
-          const oldTarget = player.concentration.targetId === 'monster'
-            ? encounter.monster
-            : encounter.participants[player.concentration.targetId];
-          if (oldTarget) removeCondition(oldTarget, player.concentration.conditionId);
-        }
-        player.huntersMarkActive = false;
+        breakConcentration(encounter, player);
         player.ensnaringStrikeActive = true;
         player.concentration = { spellId: 'ensnaring_strike', targetId: null, conditionId: null };
         player.bonusActionUsed = true;
@@ -832,6 +897,10 @@ function submitAction(encounterId, userId, action, rollData) {
     // Stunning Strike toggle (Monk)
     if (rollData.stunningStrike) player.stunningStrikeActive = true;
     if (typeof rollData.stunningStrikeSaveRoll === 'number') player.stunningStrikeSaveRoll = rollData.stunningStrikeSaveRoll;
+    // Bless d4 roll (client rolls visible d4 when blessed)
+    if (typeof rollData.blessRoll === 'number') {
+      player.blessRollValue = rollData.blessRoll;
+    }
   }
 
   encounter.lastActivity = Date.now();
@@ -992,6 +1061,11 @@ function resolveSingleAction(encounter, userId) {
       }
     }
 
+    // Destroy any summons owned by this player
+    if (player.spiritualWeaponActive) {
+      destroySummon(encounter, 'sw_' + userId);
+    }
+
     return {
       type: 'flee', userId, name: player.name,
       text: `**${player.name}** flees from the encounter!`,
@@ -1069,9 +1143,22 @@ function resolveSingleAction(encounter, userId) {
       player.inspiredBy = null;
     }
 
+    // Bless — auto d4 bonus to attack rolls
+    let blessBonus = 0;
+    if (hasCondition(player, 'blessed')) {
+      blessBonus = typeof player.blessRollValue === 'number'
+        ? player.blessRollValue
+        : rollDamage('1d4').total;
+      totalAttack += blessBonus;
+    }
+
     // Clear advantage after use
     if (player.advantageOnNextAttack) {
       player.advantageOnNextAttack = false;
+    }
+    // Guiding Bolt advantage consumed on any attack
+    if (encounter.monster.guidingBoltAdvantage) {
+      encounter.monster.guidingBoltAdvantage = false;
     }
 
     let hit = false;
@@ -1098,6 +1185,7 @@ function resolveSingleAction(encounter, userId) {
 
       if (typeof player.damageTotalValue === 'number') {
         damage = player.damageTotalValue;
+        console.log(`[DAMAGE DEBUG] ${player.name}: client-driven damage=${damage} (damageTotalValue)`);
       } else {
         const damageResult = rollDamage(player.damageNotation);
         damage = damageResult.total + player.damageMod;
@@ -1105,6 +1193,7 @@ function resolveSingleAction(encounter, userId) {
           const critExtra = rollDamage(player.damageNotation);
           damage += critExtra.total;
         }
+        console.log(`[DAMAGE DEBUG] ${player.name}: server-driven damage=${damage}`);
       }
 
       // Sneak Attack — once per turn, finesse/ranged weapon, advantage or ally present
@@ -1146,24 +1235,30 @@ function resolveSingleAction(encounter, userId) {
       // Hunter's Mark bonus damage — extra 1d6 on each hit against marked target
       if (player.huntersMarkActive && player.concentration?.spellId === 'hunters_mark') {
         if (player.huntersMarkData && typeof player.huntersMarkData.damage === 'number') {
-          // Client-driven roll (from 3D dice overlay)
+          // Client-driven: damage already included in damageTotalValue
           huntersMarkDamage = player.huntersMarkData.damage;
         } else {
           // Server-driven fallback
           const hmResult = rollDamage('1d6');
           huntersMarkDamage = hmResult.total;
+          damage += huntersMarkDamage;
         }
-        damage += huntersMarkDamage;
         huntersMarkApplied = true;
       }
 
       // Rage bonus damage — STR-based melee attacks only
       let rageBonusApplied = false;
       if (player.raging && player.rageDamageBonus && usedWeapon && !usedWeapon.ranged) {
-        damage += player.rageDamageBonus;
+        if (typeof player.damageTotalValue !== 'number') {
+          damage += player.rageDamageBonus;
+          console.log(`[DAMAGE DEBUG] ${player.name}: server added rage bonus +${player.rageDamageBonus}, damage now=${damage}`);
+        } else {
+          console.log(`[DAMAGE DEBUG] ${player.name}: rage bonus SKIPPED (client already included), damage stays=${damage}`);
+        }
         rageBonusApplied = true;
       }
 
+      console.log(`[DAMAGE DEBUG] ${player.name}: FINAL damage=${damage}, monsterHp=${encounter.monster.currentHp} → ${encounter.monster.currentHp - damage}`);
       encounter.monster.currentHp -= damage;
       player.totalDamage += damage;
 
@@ -1186,6 +1281,9 @@ function resolveSingleAction(encounter, userId) {
       }
       if (rageBonusApplied) {
         text += ` **RAGE!** (+${player.rageDamageBonus} damage)`;
+      }
+      if (blessBonus > 0) {
+        text += ` *(+${blessBonus} Bless)*`;
       }
 
       // Ensnaring Strike trigger — on hit, force STR save, apply ensnared condition
@@ -1300,6 +1398,7 @@ function resolveSingleAction(encounter, userId) {
     delete player.ensnaringStrikeSaveRoll;
     delete player.stunningStrikeSaveRoll;
     delete player.huntersMarkData;
+    delete player.blessRollValue;
 
     return {
       type: 'attack', userId, name: player.name,
@@ -1309,6 +1408,7 @@ function resolveSingleAction(encounter, userId) {
       sneakAttackApplied, sneakAttackDamage,
       huntersMarkApplied, huntersMarkDamage,
       inspirationBonus, inspirationDie,
+      blessBonus,
       ensnaringStrikeResult,
       stunningStrikeResult,
     };
@@ -1361,7 +1461,7 @@ function advanceTurn(encounter) {
     newRound = true;
   }
 
-  // Skip knocked-out and stabilized players (dying players still get turns for death saves)
+  // Skip knocked-out players and dead/expired summons
   let attempts = 0;
   while (attempts < encounter.initiativeOrder.length) {
     const entry = encounter.initiativeOrder[nextIndex];
@@ -1369,6 +1469,21 @@ function advanceTurn(encounter) {
       const p = encounter.participants[entry.id];
       if (p && p.knockedOut) {
         nextIndex++;
+        if (nextIndex >= encounter.initiativeOrder.length) {
+          nextIndex = 0;
+          newRound = true;
+        }
+        attempts++;
+        continue;
+      }
+    }
+    // Skip summons whose owner is knocked out (weapon dissipates)
+    if (entry.type === 'summon') {
+      const owner = encounter.participants[entry.ownerId];
+      if (owner && owner.knockedOut) {
+        // Remove the summon
+        destroySummon(encounter, entry.id);
+        // After splice, nextIndex now points to the next entry (or wraps)
         if (nextIndex >= encounter.initiativeOrder.length) {
           nextIndex = 0;
           newRound = true;
@@ -1467,6 +1582,27 @@ function advanceTurn(encounter) {
     }
   }
 
+  // Handle summon turn — tick duration, check expiry
+  if (nextEntry && nextEntry.type === 'summon') {
+    const summon = encounter.summons.find(s => s.id === nextEntry.id);
+    if (summon) {
+      summon.turnsLeft--;
+      if (summon.turnsLeft <= 0) {
+        // Summon expired
+        destroySummon(encounter, summon.id);
+        encounter.lastActivity = Date.now();
+        return {
+          type: 'summon_expired',
+          entry: nextEntry,
+          summonName: summon.name,
+          ownerId: summon.ownerId,
+          round: encounter.round,
+          newRound,
+        };
+      }
+    }
+  }
+
   // Note: Monster conditions are ticked AFTER monster attacks (in resolveMonsterTurn /
   // resolveMonsterWithRolls), not here. Ticking here would remove conditions like
   // "mockery" before the monster gets to attack with disadvantage.
@@ -1476,7 +1612,7 @@ function advanceTurn(encounter) {
   encounter.lastActivity = Date.now();
 
   const nextEntryDebug = encounter.initiativeOrder[nextIndex];
-  console.log('[ES_DEBUG] advanceTurn → next:', nextEntryDebug?.type, nextEntryDebug?.type === 'player' ? nextEntryDebug?.id : '',
+  console.log('[ES_DEBUG] advanceTurn → next:', nextEntryDebug?.type, nextEntryDebug?.type === 'player' ? nextEntryDebug?.id : nextEntryDebug?.type === 'summon' ? nextEntryDebug?.id : '',
     'round:', encounter.round, 'monsterConditions:', (encounter.monster.conditions || []).map(c => c.id).join(', ') || 'none');
 
   return {
@@ -1782,9 +1918,17 @@ function resolveMonsterTurn(encounter) {
         // Handle concentration — KO auto-breaks (no save), otherwise flag pending
         if (damageInfo.concentrationBroken && damageInfo.brokenConcentration) {
           const conc = damageInfo.brokenConcentration;
-          const concTarget = conc.targetId === 'monster' ? monster : encounter.participants[conc.targetId];
-          if (concTarget && conc.conditionId) {
-            removeCondition(concTarget, conc.conditionId);
+          // Multi-target concentration (Bless): remove condition from all targets
+          if (conc.spellId === 'bless' && conc.targetIds) {
+            for (const tid of conc.targetIds) {
+              const t = encounter.participants[tid];
+              if (t) removeCondition(t, 'blessed');
+            }
+          } else {
+            const concTarget = conc.targetId === 'monster' ? monster : encounter.participants[conc.targetId];
+            if (concTarget && conc.conditionId) {
+              removeCondition(concTarget, conc.conditionId);
+            }
           }
           const spellName = SPELL_DEFINITIONS[conc.spellId]?.name || 'a spell';
           concentrationSaves.push({
@@ -1857,15 +2001,45 @@ function prepareMonsterAttacks(encounter) {
   const activePlayers = Object.entries(encounter.participants)
     .filter(([, p]) => isActiveForCombat(p));
 
-  if (activePlayers.length === 0) return { attacks: [], rollerId: null };
+  // Add active summons to the target pool (equal aggro weight, base 1)
+  const activeTargets = [...activePlayers];
+  for (const summon of (encounter.summons || [])) {
+    activeTargets.push([summon.id, {
+      name: summon.name,
+      ac: summon.ac,
+      totalDamage: 0,
+      isSummon: true,
+      summonRef: summon,
+    }]);
+  }
 
-  const targets = pickTargets(activePlayers, monster.multiattack);
+  if (activeTargets.length === 0) return { attacks: [], rollerId: null };
+
+  const targets = pickTargets(activeTargets, monster.multiattack);
   const attacks = [];
   let index = 0;
   const monsterAttackMods = getAttackModifiers(monster);
 
   for (const attack of monster.attacks) {
     for (const [targetId, targetPlayer] of targets) {
+      // Handle summon targets
+      if (targetPlayer.isSummon) {
+        attacks.push({
+          index,
+          name: attack.name,
+          bonus: attack.bonus,
+          damageDice: attack.damage,
+          damageType: attack.type,
+          targetId,
+          targetName: targetPlayer.name,
+          targetAC: targetPlayer.ac,
+          targetType: 'summon',
+          advantage: false,
+          disadvantage: monsterAttackMods.hasDisadvantage,
+        });
+        index++;
+        continue;
+      }
       if (!isActiveForCombat(targetPlayer)) continue;
       const effectiveAC = targetPlayer.ac;
       // 5e: Check advantage/disadvantage from conditions
@@ -1893,8 +2067,12 @@ function prepareMonsterAttacks(encounter) {
     }
   }
 
-  // First target rolls the monster's dice
-  const rollerId = attacks.length > 0 ? attacks[0].targetId : null;
+  // First real-player target rolls the monster's dice (skip summon IDs)
+  const firstPlayerAttack = attacks.find(a => a.targetType !== 'summon');
+  const rollerId = firstPlayerAttack
+    ? firstPlayerAttack.targetId
+    : (Object.keys(encounter.participants).find(id => isActiveForCombat(encounter.participants[id]))
+       || Object.keys(encounter.participants)[0] || null);
   return { attacks, rollerId };
 }
 
@@ -1943,6 +2121,76 @@ function resolveMonsterWithRolls(encounterId, rollData) {
   for (const roll of rollData) {
     const setup = encounter.monsterAttackSetup?.attacks?.[roll.index];
     if (!setup) continue;
+
+    // Handle summon targets separately
+    if (setup.targetType === 'summon') {
+      const summon = encounter.summons.find(s => s.id === setup.targetId);
+      if (!summon) continue;
+
+      let attackRoll, usedRoll;
+      if (setup.advantage || setup.disadvantage) {
+        attackRoll = typeof roll.attackRoll === 'number' ? roll.attackRoll : rollD20();
+        const attackRoll2 = typeof roll.attackRoll2 === 'number' ? roll.attackRoll2 : rollD20();
+        usedRoll = setup.advantage ? Math.max(attackRoll, attackRoll2) : Math.min(attackRoll, attackRoll2);
+      } else {
+        attackRoll = typeof roll.attackRoll === 'number' ? roll.attackRoll : rollD20();
+        usedRoll = attackRoll;
+      }
+
+      const totalAttack = usedRoll + setup.bonus;
+      const isNat20 = usedRoll === 20;
+      const isNat1 = usedRoll === 1;
+      let hit = false;
+      let damage = 0;
+      let text = '';
+      let destroyed = false;
+
+      const attackTextTemplate = monster.attackTexts[Math.floor(Math.random() * monster.attackTexts.length)]
+        || `The ${monster.name} attacks {target}!`;
+      const missTextTemplate = monster.missTexts[Math.floor(Math.random() * monster.missTexts.length)]
+        || `{target} avoids the attack.`;
+
+      if (isNat1) {
+        text = missTextTemplate.replace('{target}', `**${summon.name}**`) +
+          ` *(The ${monster.name} rolled a nat 1!)*`;
+      } else if (isNat20 || totalAttack >= summon.ac) {
+        hit = true;
+        damage = typeof roll.damageTotal === 'number' ? roll.damageTotal : 0;
+        if (damage === 0 && typeof roll.damageTotal !== 'number') {
+          const damageResult = rollDamage(setup.damageDice);
+          damage = damageResult.total;
+          if (isNat20) damage += rollDamage(setup.damageDice).total;
+        }
+        summon.hp -= damage;
+        text = attackTextTemplate.replace('{target}', `**${summon.name}**`) +
+          ` **${totalAttack}** vs AC ${summon.ac} — **Hit!** ` +
+          `**${summon.name}** takes **${damage} ${setup.damageType} damage.** (HP: ${Math.max(0, summon.hp)}/${summon.maxHp})`;
+
+        if (summon.hp <= 0) {
+          destroyed = true;
+          text += `\n**${summon.name}** shatters into fragments of light!`;
+          destroySummon(encounter, summon.id);
+        }
+      } else {
+        text = missTextTemplate.replace('{target}', `**${summon.name}**`) +
+          ` **${totalAttack}** vs AC ${summon.ac} — **Miss!**`;
+      }
+
+      results.push({
+        attackIndex: roll.index,
+        attackName: setup.name,
+        targetId: setup.targetId,
+        targetName: summon.name,
+        targetType: 'summon',
+        attackRoll: usedRoll,
+        totalAttack,
+        isNat20, isNat1,
+        hit, damage, damageType: setup.damageType,
+        destroyed,
+        text,
+      });
+      continue;
+    }
 
     const targetPlayer = encounter.participants[setup.targetId];
     if (!targetPlayer) continue;
@@ -2001,6 +2249,11 @@ function resolveMonsterWithRolls(encounterId, rollData) {
 
       if (damageInfo.knocked) {
         text += `\n**${targetPlayer.name}** has been knocked out!`;
+        // Destroy any summons owned by this player
+        if (targetPlayer.spiritualWeaponActive) {
+          destroySummon(encounter, 'sw_' + setup.targetId);
+          text += `\n**${targetPlayer.name}'s Spiritual Weapon** dissipates!`;
+        }
       }
 
       // Handle concentration — KO auto-breaks (no save), otherwise flag pending
@@ -2184,14 +2437,7 @@ function resolveConcentrationSaves(encounterId, saveRolls) {
     const player = encounter.participants[sr.userId];
 
     if (!saved && player && player.concentration) {
-      const conc = player.concentration;
-      const concTarget = conc.targetId === 'monster' ? monster : encounter.participants[conc.targetId];
-      if (concTarget && conc.conditionId) {
-        removeCondition(concTarget, conc.conditionId);
-      }
-      player.concentration = null;
-      player.ensnaringStrikeActive = false;
-      player.huntersMarkActive = false;
+      breakConcentration(encounter, player);
     }
 
     results.push({
@@ -2246,6 +2492,9 @@ function isStillInFight(p) {
 function resolveAttackAdvantage(attacker, defender) {
   let hasAdvantage = !!attacker.advantageOnNextAttack;
   let hasDisadvantage = false;
+
+  // Guiding Bolt: next attack against this monster has advantage
+  if (defender.guidingBoltAdvantage) hasAdvantage = true;
 
   // Attacker conditions (e.g., frightened, poisoned → disadvantage)
   const attackMods = getAttackModifiers(attacker);
@@ -2371,6 +2620,8 @@ function applyDamageToPlayer(player, damage, damageType) {
     if (player.concentration) {
       concentrationBroken = true;
       brokenConcentration = { ...player.concentration };
+      // Note: actual condition removal happens in the caller since we need encounter context
+      // for multi-target concentration (Bless). The caller checks concentrationBroken.
       player.concentration = null;
       player.ensnaringStrikeActive = false;
       player.huntersMarkActive = false;
@@ -2461,6 +2712,139 @@ function resolvePotionUse(encounter, userId, potionId, targetId, healRoll) {
     targetId: effectiveTargetId, targetName: target.name,
     potionName: potion.name, healAmount, revived,
     newHp: target.currentHp, maxHp: target.maxHp,
+    text,
+  };
+}
+
+/**
+ * Destroy a summon entity — remove from encounter.summons, initiative order, clear owner flag.
+ */
+function destroySummon(encounter, summonId) {
+  const summonIdx = encounter.summons.findIndex(s => s.id === summonId);
+  if (summonIdx !== -1) {
+    const summon = encounter.summons[summonIdx];
+    // Clear owner's spiritualWeaponActive flag
+    const owner = encounter.participants[summon.ownerId];
+    if (owner) {
+      owner.spiritualWeaponActive = false;
+    }
+    encounter.summons.splice(summonIdx, 1);
+  }
+  // Remove from initiative order
+  const initIdx = encounter.initiativeOrder.findIndex(e => e.id === summonId);
+  if (initIdx !== -1) {
+    encounter.initiativeOrder.splice(initIdx, 1);
+    if (initIdx < encounter.currentTurnIndex) {
+      encounter.currentTurnIndex--;
+    } else if (initIdx === encounter.currentTurnIndex) {
+      encounter.currentTurnIndex--;
+    }
+  }
+}
+
+/**
+ * Resolve a summon's attack action on its own turn.
+ * Checks buff interactions: Guiding Bolt, Bless, Prone.
+ */
+function resolveSummonAction(encounter, summonId, data) {
+  const summon = encounter.summons.find(s => s.id === summonId);
+  if (!summon) return { error: 'Summon not found.' };
+
+  const owner = encounter.participants[summon.ownerId];
+  if (!owner) return { error: 'Summon owner not found.' };
+
+  const monster = encounter.monster;
+
+  // Determine advantage/disadvantage from buff interactions
+  let hasAdvantage = false;
+  let hasDisadvantage = false;
+
+  // Guiding Bolt: next attack against this monster has advantage (consumes flag)
+  if (monster.guidingBoltAdvantage) {
+    hasAdvantage = true;
+  }
+
+  // Prone: melee attacks have advantage against prone targets
+  if (hasCondition(monster, 'prone')) {
+    hasAdvantage = true;
+  }
+
+  // Cancel if both
+  let advantageType = 'normal';
+  if (hasAdvantage && hasDisadvantage) advantageType = 'normal';
+  else if (hasAdvantage) advantageType = 'advantage';
+  else if (hasDisadvantage) advantageType = 'disadvantage';
+
+  // Roll attack
+  let attackRoll, attackRoll2;
+  if (advantageType !== 'normal') {
+    attackRoll = typeof data.attackRoll === 'number' ? data.attackRoll : rollD20();
+    attackRoll2 = typeof data.attackRoll2 === 'number' ? data.attackRoll2 : rollD20();
+  } else {
+    attackRoll = typeof data.attackRoll === 'number' ? data.attackRoll : rollD20();
+    attackRoll2 = null;
+  }
+
+  let usedRoll = attackRoll;
+  if (advantageType === 'advantage' && attackRoll2 !== null) {
+    usedRoll = Math.max(attackRoll, attackRoll2);
+  } else if (advantageType === 'disadvantage' && attackRoll2 !== null) {
+    usedRoll = Math.min(attackRoll, attackRoll2);
+  }
+
+  // Bless: if summon itself has blessed condition, +1d4 to attack roll
+  let blessBonus = 0;
+  if (hasCondition(summon, 'blessed')) {
+    blessBonus = typeof data.blessRoll === 'number' ? data.blessRoll : (Math.floor(Math.random() * 4) + 1);
+  }
+
+  const totalAttack = usedRoll + summon.attackBonus + blessBonus;
+  const isNat20 = usedRoll === 20;
+  const isNat1 = usedRoll === 1;
+
+  // Consume guiding bolt after use
+  if (monster.guidingBoltAdvantage) {
+    monster.guidingBoltAdvantage = false;
+  }
+
+  let hit = false;
+  let damage = 0;
+
+  if (isNat1) {
+    // miss
+  } else if (isNat20 || totalAttack >= monster.ac) {
+    hit = true;
+    damage = typeof data.damageTotal === 'number'
+      ? data.damageTotal
+      : rollDamage(summon.damageDice).total + summon.spellcastingMod;
+    if (isNat20) damage += rollDamage(summon.damageDice).total;
+    monster.currentHp -= damage;
+    // Credit damage to the owner
+    owner.totalDamage += damage;
+  }
+
+  const advLabel = advantageType === 'advantage' ? ' *(with advantage)*' : advantageType === 'disadvantage' ? ' *(with disadvantage)*' : '';
+  const blessLabel = blessBonus > 0 ? ` *(+${blessBonus} Bless)*` : '';
+  let text = `**${summon.name}** strikes!${advLabel}${blessLabel} `;
+  if (isNat1) {
+    text += `**NAT 1!** The spectral weapon misses!`;
+  } else if (hit) {
+    text += isNat20
+      ? `**NAT 20! CRITICAL!** Deals **${damage} force damage!**`
+      : `**${totalAttack}** vs AC ${monster.ac} — **Hit!** Deals **${damage} force damage!**`;
+  } else {
+    text += `**${totalAttack}** vs AC ${monster.ac} — **Miss!**`;
+  }
+
+  return {
+    type: 'summon_attack',
+    summonId: summon.id, summonName: summon.name,
+    ownerId: summon.ownerId, ownerName: summon.ownerName,
+    attackRoll: usedRoll, attackRoll2, attackBonus: summon.attackBonus,
+    blessBonus,
+    totalAttack, hit, isNat20, isNat1,
+    damage, damageType: summon.damageType,
+    advantageType,
     text,
   };
 }
@@ -2814,6 +3198,10 @@ function getPublicState(encounter) {
       channelDivinityMax: p.channelDivinityMax || 0,
       channelDivinityUsed: p.channelDivinityUsed || 0,
       hasNaturesWrath: p.hasNaturesWrath || false,
+      // Preserve Life (Life Domain Cleric)
+      preserveLifePool: p.preserveLifePool || 0,
+      // Spiritual Weapon
+      spiritualWeaponActive: p.spiritualWeaponActive || false,
       // Concentration & buff states
       ensnaringStrikeActive: p.ensnaringStrikeActive || false,
       huntersMarkActive: p.huntersMarkActive || false,
@@ -2858,6 +3246,7 @@ function getPublicState(encounter) {
       creatureType: encounter.monster.creatureType || 'beast',
       savingThrows: encounter.monster.savingThrows || {},
       disadvantageOnNextAttack: encounter.monster.disadvantageOnNextAttack || false,
+      guidingBoltAdvantage: encounter.monster.guidingBoltAdvantage || false,
       conditions: getConditionsPublic(encounter.monster),
     },
     round: encounter.round,
@@ -2876,6 +3265,12 @@ function getPublicState(encounter) {
         Object.entries(encounter.initiativeRolls || {}).map(([uid, data]) => [uid, { total: data.total, roll: data.roll, modifier: data.modifier }])
       )
       : null,
+    summons: (encounter.summons || []).map(s => ({
+      id: s.id, ownerId: s.ownerId, ownerName: s.ownerName,
+      name: s.name, hp: s.hp, maxHp: s.maxHp, ac: s.ac,
+      turnsLeft: s.turnsLeft, summonType: s.summonType,
+      conditions: getConditionsPublic(s),
+    })),
   };
 }
 
@@ -2896,9 +3291,12 @@ function resolveSaveDamageSpell(encounter, player, userId, spell, spellId, rollD
 
   let damage = 0;
   if (!saved) {
+    // Toll the Dead: use d12 if monster is already damaged
+    const effectiveDamageDice = (spell.damageDiceOnDamaged && monster.currentHp < monster.maxHp)
+      ? spell.damageDiceOnDamaged : spell.damageDice;
     damage = typeof rollData?.damageTotal === 'number'
       ? rollData.damageTotal
-      : rollDamage(spell.damageDice).total;
+      : rollDamage(effectiveDamageDice).total;
     monster.currentHp -= damage;
     player.totalDamage += damage;
   }
@@ -2940,7 +3338,13 @@ function resolveHealSpell(encounter, player, userId, spell, spellId, rollData) {
   const healRoll = typeof rollData?.healRoll === 'number'
     ? rollData.healRoll
     : rollDamage(spell.healDice).total;
-  const healAmount = healRoll + player.spellcastingMod;
+
+  // Disciple of Life: +2 + spell level on leveled healing spells
+  let discipleBonus = 0;
+  if ((player.classFeatures || []).includes('Disciple of Life') && spell.level > 0) {
+    discipleBonus = 2 + spell.level;
+  }
+  const healAmount = healRoll + player.spellcastingMod + discipleBonus;
 
   let revived = false;
   if (target.knockedOut) {
@@ -2952,9 +3356,10 @@ function resolveHealSpell(encounter, player, userId, spell, spellId, rollData) {
   }
 
   const targetName = targetId === userId ? player.name : target.name;
+  const discipleText = discipleBonus > 0 ? ` (+${discipleBonus} Disciple of Life)` : '';
   const text = revived
-    ? `**${player.name}** casts **${spell.name}** on **${targetName}**! They regain consciousness with **${target.currentHp} HP!**`
-    : `**${player.name}** casts **${spell.name}** on **${targetName}**, restoring **${healAmount} HP!** (${target.currentHp}/${target.maxHp})`;
+    ? `**${player.name}** casts **${spell.name}** on **${targetName}**! They regain consciousness with **${target.currentHp} HP!**${discipleText}`
+    : `**${player.name}** casts **${spell.name}** on **${targetName}**, restoring **${healAmount} HP!**${discipleText} (${target.currentHp}/${target.maxHp})`;
 
   return {
     type: 'cast_spell', spellId,
@@ -2963,6 +3368,216 @@ function resolveHealSpell(encounter, player, userId, spell, spellId, rollData) {
     healAmount, revived,
     spellName: spell.name,
     newHp: target.currentHp, maxHp: target.maxHp,
+    text,
+  };
+}
+
+/**
+ * Resolve a spell attack (Guiding Bolt). Rolls attack vs AC, applies damage on hit.
+ */
+function resolveAttackSpell(encounter, player, userId, spell, spellId, rollData) {
+  const monster = encounter.monster;
+
+  // 5e Advantage/Disadvantage for spell attacks (Guiding Bolt on monster, conditions, etc.)
+  const advantageType = resolveAttackAdvantage(player, monster);
+
+  let attackRoll, attackRoll2;
+  if (advantageType !== 'normal') {
+    attackRoll = typeof rollData?.attackRoll === 'number' ? rollData.attackRoll : rollD20();
+    attackRoll2 = typeof rollData?.attackRoll2 === 'number' ? rollData.attackRoll2 : rollD20();
+  } else {
+    attackRoll = typeof rollData?.attackRoll === 'number' ? rollData.attackRoll : rollD20();
+    attackRoll2 = null;
+  }
+
+  let usedRoll = attackRoll;
+  if (advantageType === 'advantage' && attackRoll2 !== null) {
+    usedRoll = Math.max(attackRoll, attackRoll2);
+  } else if (advantageType === 'disadvantage' && attackRoll2 !== null) {
+    usedRoll = Math.min(attackRoll, attackRoll2);
+  }
+
+  const totalAttack = usedRoll + player.spellAttackBonus;
+  const isNat20 = usedRoll === 20;
+  const isNat1 = usedRoll === 1;
+  const ac = monster.ac;
+
+  // Clear advantage after use
+  if (player.advantageOnNextAttack) {
+    player.advantageOnNextAttack = false;
+  }
+  if (monster.guidingBoltAdvantage) {
+    monster.guidingBoltAdvantage = false;
+  }
+
+  let hit = false;
+  let damage = 0;
+
+  if (isNat1) {
+    // Auto miss
+  } else if (isNat20 || totalAttack >= ac) {
+    hit = true;
+    damage = typeof rollData?.damageTotal === 'number'
+      ? rollData.damageTotal
+      : rollDamage(spell.damageDice).total;
+    if (isNat20) {
+      damage += rollDamage(spell.damageDice).total;
+    }
+    monster.currentHp -= damage;
+    player.totalDamage += damage;
+
+    // Guiding Bolt: next attack against this monster has advantage
+    if (spell.extraEffect === 'advantage_next_attack') {
+      monster.guidingBoltAdvantage = true;
+    }
+  }
+
+  const advLabel = advantageType === 'advantage' ? ' *(with advantage)*' : advantageType === 'disadvantage' ? ' *(with disadvantage)*' : '';
+  let text;
+  if (isNat1) {
+    text = `**${player.name}** casts **${spell.name}**...${advLabel} **NAT 1!** The bolt of light flies wide!`;
+  } else if (hit) {
+    text = isNat20
+      ? `**${player.name}** casts **${spell.name}**...${advLabel} **NAT 20! CRITICAL HIT!** A brilliant flash deals **${damage} ${spell.damageType} damage!**`
+      : `**${player.name}** casts **${spell.name}**...${advLabel} **${totalAttack}** vs AC ${ac} — **Hit!** Deals **${damage} ${spell.damageType} damage!**`;
+    if (spell.extraEffect === 'advantage_next_attack') {
+      text += ` The ${monster.name} glimmers with light — the next attack has **advantage!**`;
+    }
+  } else {
+    text = `**${player.name}** casts **${spell.name}**...${advLabel} **${totalAttack}** vs AC ${ac} — **Miss!** The bolt streaks past harmlessly.`;
+  }
+
+  return {
+    type: 'cast_spell', spellId,
+    userId, name: player.name,
+    spellName: spell.name,
+    attackRoll: usedRoll, attackRoll2, spellAttackBonus: player.spellAttackBonus,
+    totalAttack, ac, hit, isNat20, isNat1,
+    damage, damageType: spell.damageType,
+    extraEffect: hit ? (spell.extraEffect || null) : null,
+    advantageType,
+    text,
+  };
+}
+
+/**
+ * Resolve a buff_allies spell (Bless). Multi-target selection, adds condition.
+ */
+function resolveBlessSpell(encounter, player, userId, spell, spellId, rollData) {
+  const targetIds = rollData?.targetIds || [];
+  if (targetIds.length === 0) return { error: 'No targets selected.' };
+  if (targetIds.length > (spell.maxTargets || 3)) return { error: `Too many targets (max ${spell.maxTargets || 3}).` };
+
+  // Break existing concentration if any
+  breakConcentration(encounter, player);
+
+  const names = [];
+  for (const tid of targetIds) {
+    let target = encounter.participants[tid];
+    if (!target) target = (encounter.summons || []).find(s => s.id === tid);
+    if (!target || target.knockedOut) continue;
+    addCondition(target, 'blessed', {
+      durationType: 'concentration',
+      source: player.name,
+      sourceUserId: userId,
+    });
+    names.push(target.name);
+  }
+
+  player.concentration = { spellId: 'bless', targetIds };
+
+  const text = `**${player.name}** casts **Bless** on **${names.join(', ')}!** They add 1d4 to attack rolls and saving throws.`;
+  return {
+    type: 'cast_spell', spellId,
+    userId, name: player.name,
+    spellName: spell.name,
+    targetIds, targetNames: names,
+    text,
+  };
+}
+
+/**
+ * Break concentration — removes conditions from all concentration targets.
+ */
+function breakConcentration(encounter, player) {
+  if (!player.concentration) return;
+  const conc = player.concentration;
+
+  if (conc.spellId === 'bless' && conc.targetIds) {
+    // Multi-target concentration: remove blessed from all targets (including summons)
+    for (const tid of conc.targetIds) {
+      let target = encounter.participants[tid];
+      if (!target) target = (encounter.summons || []).find(s => s.id === tid);
+      if (target) removeCondition(target, 'blessed');
+    }
+  } else if (conc.conditionId) {
+    // Single-target concentration (ensnaring strike, etc.)
+    const target = conc.targetId === 'monster'
+      ? encounter.monster
+      : encounter.participants[conc.targetId];
+    if (target) removeCondition(target, conc.conditionId);
+  }
+
+  // Clear buff states
+  if (conc.spellId === 'hunters_mark') player.huntersMarkActive = false;
+  if (conc.spellId === 'ensnaring_strike') player.ensnaringStrikeActive = false;
+  player.concentration = null;
+}
+
+/**
+ * Resolve Channel Divinity: Preserve Life.
+ * Distribute clericLevel * 5 HP pool among allies (capped at half their max HP).
+ */
+function resolvePreserveLife(encounter, userId, rollData) {
+  const player = encounter.participants[userId];
+  if (!player) return { error: 'Not a participant.' };
+  if (!(player.classFeatures || []).includes('Channel Divinity: Preserve Life')) {
+    return { error: "You do not have Channel Divinity: Preserve Life." };
+  }
+
+  const remaining = (player.channelDivinityMax || 0) - (player.channelDivinityUsed || 0);
+  if (remaining <= 0) return { error: 'No Channel Divinity uses remaining.' };
+
+  const allocations = rollData?.allocations || [];
+  if (allocations.length === 0) return { error: 'No healing allocations provided.' };
+
+  // Pool = cleric level * 5
+  const clericLevel = player.preserveLifePool || 15; // fallback to 15 (level 3)
+  let poolRemaining = clericLevel;
+
+  const healed = [];
+  for (const { targetId, amount } of allocations) {
+    if (amount <= 0 || poolRemaining <= 0) continue;
+    const target = encounter.participants[targetId];
+    if (!target) continue;
+
+    // Cap: can't heal above half max HP
+    const halfMax = Math.floor(target.maxHp / 2);
+    const maxHeal = Math.max(0, halfMax - target.currentHp);
+    if (maxHeal <= 0 && !target.knockedOut) continue;
+
+    const actualHeal = Math.min(amount, poolRemaining, target.knockedOut ? amount : maxHeal);
+    poolRemaining -= actualHeal;
+
+    if (target.knockedOut) {
+      target.knockedOut = false;
+      target.currentHp = Math.min(target.maxHp, actualHeal);
+    } else {
+      target.currentHp = Math.min(target.maxHp, target.currentHp + actualHeal);
+    }
+    healed.push({ name: target.name, amount: actualHeal, newHp: target.currentHp });
+  }
+
+  player.channelDivinityUsed++;
+
+  const healSummary = healed.map(h => `**${h.name}** +${h.amount} HP`).join(', ');
+  const text = `**${player.name}** channels divine energy — **Preserve Life!** ${healSummary}`;
+
+  return {
+    type: 'preserve_life',
+    userId, name: player.name,
+    healed,
+    poolUsed: clericLevel - poolRemaining,
     text,
   };
 }
@@ -3169,6 +3784,12 @@ function resolveCastSpell(encounter, userId, spellId, rollData) {
   if (spell.effectType === 'heal') {
     return resolveHealSpell(encounter, player, userId, spell, spellId, rollData);
   }
+  if (spell.effectType === 'attack_damage') {
+    return resolveAttackSpell(encounter, player, userId, spell, spellId, rollData);
+  }
+  if (spell.effectType === 'buff_allies') {
+    return resolveBlessSpell(encounter, player, userId, spell, spellId, rollData);
+  }
   return { error: 'Unknown spell effect type.' };
 }
 
@@ -3266,6 +3887,25 @@ function getAvailableBonusActions(encounter, userId) {
     }
   }
 
+  // Spiritual Weapon (Cleric bonus action — cast only, attacks on summon's own turn)
+  const sw = SPELL_DEFINITIONS.spiritual_weapon;
+  if (!player.raging && sw.classes.some(c => (player.classNames || []).includes(c))) {
+    if (!player.spiritualWeaponActive) {
+      // Not active — offer cast if has level 2 slot
+      const hasSlot = (player.spellSlots || []).some(s => s.level >= sw.level && s.used < s.total);
+      if (hasSlot) {
+        actions.push({
+          type: 'spiritual_weapon_cast',
+          spellName: 'Spiritual Weapon',
+          damageDice: sw.damageDice,
+          damageType: sw.damageType,
+          spellAttackBonus: player.spellAttackBonus,
+          spellcastingMod: player.spellcastingMod,
+        });
+      }
+    }
+  }
+
   // Flurry of Blows (Monk, post-attack only — requires ki)
   if (player.hasKiPoints && player.kiPointsUsed < player.kiPointsMax && player.action === 'attack') {
     actions.push({
@@ -3330,19 +3970,7 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
     player.bonusActionUsed = true;
 
     // Rage breaks concentration (can't concentrate while raging)
-    if (player.concentration) {
-      if (player.concentration.conditionId) {
-        const concTarget = player.concentration.targetId === 'monster'
-          ? encounter.monster
-          : encounter.participants[player.concentration.targetId];
-        if (concTarget) {
-          removeCondition(concTarget, player.concentration.conditionId);
-        }
-      }
-      player.concentration = null;
-      player.ensnaringStrikeActive = false;
-      player.huntersMarkActive = false;
-    }
+    breakConcentration(encounter, player);
 
     const usesLeft = (player.rageUsesMax || 0) - (player.rageUsesUsed || 0);
     return {
@@ -3360,6 +3988,70 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
     if (result.error) return result;
     player.bonusActionUsed = true;
     return result;
+  }
+
+  // Spiritual Weapon — cast (summons entity with own initiative turn, no attack on cast)
+  if (bonusAction === 'spiritual_weapon_cast') {
+    if (player.raging) return { error: 'Cannot cast spells while raging.' };
+    if (player.spiritualWeaponActive) return { error: 'Spiritual Weapon already active.' };
+    const sw = SPELL_DEFINITIONS.spiritual_weapon;
+    const slot = (player.spellSlots || []).find(s => s.level >= sw.level && s.used < s.total);
+    if (!slot) return { error: 'No spell slots remaining.' };
+    slot.used++;
+
+    player.spiritualWeaponActive = true;
+    player.bonusActionUsed = true;
+
+    // Create summon entity
+    const summon = {
+      id: 'sw_' + userId,
+      ownerId: userId,
+      ownerName: player.name,
+      name: player.name + "'s Spiritual Weapon",
+      summonType: 'spiritual_weapon',
+      hp: 20,
+      maxHp: 20,
+      ac: 10,
+      damageDice: '1d8',
+      damageType: 'force',
+      attackBonus: player.spellAttackBonus,
+      spellcastingMod: player.spellcastingMod,
+      turnsLeft: 10,
+    };
+    encounter.summons.push(summon);
+
+    // Roll initiative for the summon and insert into initiative order
+    const initRoll = typeof data.initiativeRoll === 'number' ? data.initiativeRoll : rollD20();
+    const initTotal = initRoll; // Summons have no DEX modifier
+    const initEntry = {
+      id: summon.id, name: summon.name, type: 'summon',
+      ownerId: userId, summonType: 'spiritual_weapon',
+      roll: initRoll, modifier: 0, total: initTotal,
+    };
+
+    // Sorted insert (higher initiative goes first)
+    let insertIdx = encounter.initiativeOrder.length;
+    for (let i = 0; i < encounter.initiativeOrder.length; i++) {
+      if (initTotal > encounter.initiativeOrder[i].total) {
+        insertIdx = i;
+        break;
+      }
+    }
+    encounter.initiativeOrder.splice(insertIdx, 0, initEntry);
+    if (insertIdx <= encounter.currentTurnIndex) {
+      encounter.currentTurnIndex++;
+    }
+
+    const text = `**${player.name}** summons a **Spiritual Weapon!** A spectral mace materializes and floats menacingly! *(20 HP, AC 10 — it will attack on its own turn)*`;
+
+    return {
+      type: 'spiritual_weapon_cast',
+      userId, name: player.name,
+      summon: { id: summon.id, name: summon.name, hp: summon.hp, maxHp: summon.maxHp, ac: summon.ac },
+      initiativeRoll: initRoll,
+      initiativeTotal: initTotal,
+      text,
+    };
   }
 
   if (bonusAction === 'offhand_attack') {
@@ -3399,13 +4091,25 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
       usedRoll = Math.min(attackRoll, attackRoll2);
     }
 
-    const totalAttack = usedRoll + player.attackBonus;
+    let totalAttack = usedRoll + player.attackBonus;
     const isNat20 = usedRoll === 20;
     const isNat1 = usedRoll === 1;
+
+    // Bless bonus on offhand attacks
+    let offhandBlessBonus = 0;
+    if (hasCondition(player, 'blessed')) {
+      offhandBlessBonus = typeof data.blessRoll === 'number'
+        ? data.blessRoll
+        : rollDamage('1d4').total;
+      totalAttack += offhandBlessBonus;
+    }
 
     // Clear advantage after use
     if (player.advantageOnNextAttack) {
       player.advantageOnNextAttack = false;
+    }
+    if (encounter.monster.guidingBoltAdvantage) {
+      encounter.monster.guidingBoltAdvantage = false;
     }
 
     let hit = false;
@@ -3466,18 +4170,21 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
       // Hunter's Mark bonus damage on offhand hit
       if (player.huntersMarkActive && player.concentration?.spellId === 'hunters_mark') {
         if (data.huntersMarkData && typeof data.huntersMarkData.damage === 'number') {
+          // Client-driven: damage already included in damageTotal
           huntersMarkDamage = data.huntersMarkData.damage;
         } else {
           huntersMarkDamage = rollDamage('1d6').total;
+          damage += huntersMarkDamage;
         }
-        damage += huntersMarkDamage;
         huntersMarkApplied = true;
       }
 
       // Rage bonus damage — STR-based melee attacks only (offhand is always melee)
       let rageBonusApplied = false;
       if (player.raging && player.rageDamageBonus) {
-        damage += player.rageDamageBonus;
+        if (typeof data.damageTotal !== 'number') {
+          damage += player.rageDamageBonus;
+        }
         rageBonusApplied = true;
       }
 
@@ -3535,17 +4242,7 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
     slot.used++;
 
     // Break existing concentration (drop old condition from target)
-    if (player.concentration && player.concentration.conditionId) {
-      const oldTarget = player.concentration.targetId === 'monster'
-        ? encounter.monster
-        : encounter.participants[player.concentration.targetId];
-      if (oldTarget) {
-        removeCondition(oldTarget, player.concentration.conditionId);
-      }
-    }
-
-    // Clear old concentration buffs and set the new buff
-    player.huntersMarkActive = false;
+    breakConcentration(encounter, player);
     player.ensnaringStrikeActive = true;
     player.concentration = { spellId: 'ensnaring_strike', targetId: null, conditionId: null };
     player.bonusActionUsed = true;
@@ -3578,17 +4275,8 @@ function resolveBonusAction(encounter, userId, bonusAction, data) {
       slot.used++;
     }
 
-    // Break existing concentration (drop old condition from target)
-    if (player.concentration && player.concentration.conditionId) {
-      const oldTarget = player.concentration.targetId === 'monster'
-        ? encounter.monster
-        : encounter.participants[player.concentration.targetId];
-      if (oldTarget) {
-        removeCondition(oldTarget, player.concentration.conditionId);
-      }
-    }
-    // Clear old concentration buffs
-    player.ensnaringStrikeActive = false;
+    // Break existing concentration
+    breakConcentration(encounter, player);
 
     // Set the mark
     player.huntersMarkActive = true;
@@ -3737,6 +4425,8 @@ module.exports = {
   monsterHasEscapeConditions,
   prepareMonsterEscape,
   resolveMonsterEscapeWithRolls,
+  resolveSummonAction,
+  destroySummon,
   setDmRollControl,
   setPendingRoll,
   getPendingRoll,
