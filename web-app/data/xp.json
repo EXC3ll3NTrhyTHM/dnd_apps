@@ -2,28 +2,29 @@
   "424061511833747467": {
     "user_id": "424061511833747467",
     "username": "excellentrhythm",
-    "total_xp": 54724,
-    "last_updated": "2026-03-16T00:22:24.459Z",
+    "total_xp": 54839,
+    "last_updated": "2026-04-27T00:38:37.078Z",
     "daily": {
-      "date": "2026-03-15",
-      "messages_sent": 0,
+      "date": "2026-04-26",
+      "messages_sent": 9,
       "reactions_given": 0,
       "locations_visited": [
-        "the_arena",
-        "dragons_hollow"
+        "the_veil",
+        "dragons_hollow",
+        "the_arena"
       ],
       "login_claimed": true,
-      "arena_wins": 3,
-      "arena_kills": 2,
+      "arena_wins": 0,
+      "arena_kills": 0,
       "arena_crits": 0,
       "arena_untouchable": 0,
-      "arena_potions": 4,
+      "arena_potions": 0,
       "arena_goals_claimed": [],
-      "gold_spend_xp": 25
+      "gold_spend_xp": 0
     },
     "gold_conversion_done": false,
     "lifetime": {
-      "messages_sent": 220,
+      "messages_sent": 229,
       "reactions_given": 14,
       "locations_visited": [
         "the_cottage",
@@ -43,10 +44,10 @@
       "shop_purchases": 94,
       "gifs_sent": 11,
       "images_sent": 1,
-      "dice_rolls": 2442,
+      "dice_rolls": 2450,
       "profiles_viewed": 42,
       "stats_inspected": 9,
-      "encounters_joined": 646,
+      "encounters_joined": 647,
       "encounters_won": 266,
       "monsters_killed": 219,
       "total_combat_damage": 40052,

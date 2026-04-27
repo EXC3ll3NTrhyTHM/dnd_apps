@@ -78,6 +78,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
   onDiceRoll,
   onUseItem,
   onOpenEmotes,
+  onNpcSpeak,
   locationId,
 }) {
   const [shifted, setShifted] = useState(false);
@@ -129,7 +130,7 @@ const CustomKeyboard = memo(function CustomKeyboard({
 
   // Keep callback refs current so the delegation handler stays stable
   const refs = useRef({});
-  refs.current = { onKey, onBackspace, onSubmit, onClose, onPaste, onLeft, onRight, playSound, disabled, onModeChange, onNpcMention, onGroupMention, onPlayerMention, onToggleMic, onGifSelect, onImagePick, onSwipeWord, onSwipeReplace, onUseItem, onOpenEmotes };
+  refs.current = { onKey, onBackspace, onSubmit, onClose, onPaste, onLeft, onRight, playSound, disabled, onModeChange, onNpcMention, onGroupMention, onPlayerMention, onToggleMic, onGifSelect, onImagePick, onSwipeWord, onSwipeReplace, onUseItem, onOpenEmotes, onNpcSpeak };
 
   const shiftedRef = useRef(false);
   const symbolsRef = useRef(false);
@@ -1004,6 +1005,15 @@ const CustomKeyboard = memo(function CustomKeyboard({
     } else if (action === 'open-dice') {
       playKeyTap();
       onModeChange('dice');
+    } else if (action === 'open-npc-speak') {
+      playKeyTap();
+      onModeChange('npc-speak');
+    } else if (action === 'npc-speak') {
+      playKeyTap();
+      const npcId = btn.dataset.npcId;
+      const npc = (npcs || []).find(n => n.id === npcId);
+      if (npc) refs.current.onNpcSpeak?.(npc);
+      onModeChange('extras');
     } else if (action === 'open-items') {
       playKeyTap();
       onModeChange('items');
@@ -1445,6 +1455,20 @@ const CustomKeyboard = memo(function CustomKeyboard({
               </svg>
               <span>Dice</span>
             </button>
+            <button
+              className="ck-extras-btn"
+              data-action="open-npc-speak"
+              type="button"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                <line x1="12" y1="19" x2="12" y2="23" />
+                <line x1="8" y1="23" x2="16" y2="23" />
+                <path d="M5 8l-3-3M19 8l3-3" />
+              </svg>
+              <span>NPC Speak</span>
+            </button>
           </div>
         ) : mode === 'items' ? (
           <div className="ck-items-panel">
@@ -1477,6 +1501,37 @@ const CustomKeyboard = memo(function CustomKeyboard({
                     Use
                   </button>
                 </div>
+              ))}
+            </div>
+          </div>
+        ) : mode === 'npc-speak' ? (
+          <div className="ck-npcs-panel">
+            <div className="ck-npcs-header">
+              <button className="ck-npcs-back" data-action="back-to-extras" type="button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+              <span className="ck-npcs-label">NPC Speak</span>
+            </div>
+            <div className="ck-npcs-grid">
+              {(npcs || []).map(npc => (
+                <button
+                  key={npc.id}
+                  className="ck-npcs-item"
+                  data-action="npc-speak"
+                  data-npc-id={npc.id}
+                  type="button"
+                >
+                  <NpcPortrait
+                    npcId={npc.id}
+                    emotion={npcEmotions?.[npc.id] || 'idle'}
+                    size={44}
+                  />
+                  <span className="ck-npcs-name">
+                    {npc.displayName.split(' ')[0]}
+                  </span>
+                </button>
               ))}
             </div>
           </div>

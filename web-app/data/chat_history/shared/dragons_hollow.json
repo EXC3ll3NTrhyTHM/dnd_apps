@@ -3790,5 +3790,154 @@
     "playerAvatar": "https://cdn.discordapp.com/avatars/228241331296665600/094b14d6d53f151c20aa3d8b2725103a.png",
     "text": "😇",
     "timestamp": "2026-02-28T02:32:46.084Z"
+  },
+  {
+    "id": "59a196ca-d2b3-445b-aec1-f055817625f6",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Bonesy Hey bud",
+    "timestamp": "2026-04-26T23:40:35.903Z"
+  },
+  {
+    "id": "53fd7dad-94d6-452b-a45c-fd6b5e85f56d",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Heeeyyy, what’s good, maaaan? You need some good vibes or a snack? I gotchu! ✌️",
+    "emotion": "happy",
+    "timestamp": "2026-04-26T23:40:36.918Z"
+  },
+  {
+    "id": "6c401eb7-b01c-4d52-a6cc-6e5a8652146f",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Bonesy !voice @Bonesy Hey bro",
+    "timestamp": "2026-04-26T23:56:23.134Z"
+  },
+  {
+    "id": "f7e89bd5-f2e9-4f4c-9312-1acaba09d35e",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Yo yo, I'm right here, my dude! What's on your mind? You hungry? I got some rad snacks to share!",
+    "emotion": "happy",
+    "timestamp": "2026-04-26T23:56:24.631Z",
+    "audioUrl": "/api/voice/cache/50928f66-0d58-4e84-a1c5-6fa2041396ce.wav"
+  },
+  {
+    "id": "8b7ad0f3-e945-4d0c-999c-66caeea135d7",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "Nah I'm @Bonesy !voice",
+    "timestamp": "2026-04-26T23:57:26.341Z"
+  },
+  {
+    "id": "f8103a94-71b0-4396-aefa-b5c78843f517",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Whoa, maaaan, time travel? That's heavy! 😂 But seriously, what’s up with that? You got some cool vibes to share?",
+    "emotion": "thoughtful",
+    "timestamp": "2026-04-26T23:57:27.301Z",
+    "audioUrl": "/api/voice/cache/fd3a4ff7-0f79-44dd-8b97-409142674e7a.wav"
+  },
+  {
+    "id": "cd2462db-3e0b-4d13-bdbc-c57542d5482c",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Kumo How it going? !voice",
+    "timestamp": "2026-04-26T23:58:27.971Z"
+  },
+  {
+    "id": "113da577-450a-4e4b-8d77-9992d77b8127",
+    "role": "npc",
+    "npc": "kumo",
+    "npcDisplayName": "Kumo",
+    "text": "I stand watch, as always. The dojo remains secure, and the students train hard. How is your journey treating you, Architect?",
+    "emotion": "idle",
+    "timestamp": "2026-04-26T23:58:29.551Z"
+  },
+  {
+    "id": "7a2ab773-c22b-47ff-b638-996c67f4c630",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "!voice @Kumo it is good",
+    "timestamp": "2026-04-26T23:59:28.334Z"
+  },
+  {
+    "id": "cb471b17-2d5a-417d-a98c-1b3bebfd8d96",
+    "role": "npc",
+    "npc": "kumo",
+    "npcDisplayName": "Kumo",
+    "text": "Good to hear. May your path be filled with strength and purpose. Remember, I stand ready should you need me.  \nWhat brings you here today?",
+    "emotion": "idle",
+    "timestamp": "2026-04-26T23:59:29.730Z",
+    "audioUrl": "/api/voice/cache/654dd35f-e738-49e3-b515-9681e08579d1.wav"
+  },
+  {
+    "id": "9829a86b-bfff-4aff-8bcf-ec390fb2bd01",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "!voice @Mira Oi mate how are ya",
+    "timestamp": "2026-04-27T00:00:30.088Z"
+  },
+  {
+    "id": "8cf52c29-14aa-4d5f-b4a9-7a1c77a84eda",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Oi, you! I'm just fine, thanks for asking! Keeping my eyes sharp and my hands quicker. What kind of mischief are you up to today?",
+    "emotion": "happy",
+    "timestamp": "2026-04-27T00:00:31.091Z",
+    "audioUrl": "/api/voice/cache/3e34876b-ee65-4ef6-b937-468bc98148cc.wav"
+  },
+  {
+    "id": "858c17a3-0581-4ac1-839e-a74b7ed4b33d",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Bonesy Hey",
+    "timestamp": "2026-04-27T00:11:09.174Z"
+  },
+  {
+    "id": "9898bddb-b882-4bb3-838c-ecaf3a3ab41b",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Heyy maaaan! What’s happening in your world? You wanna chill for a bit or grab a snack? I've got the good stuff! ✌️",
+    "emotion": "happy",
+    "timestamp": "2026-04-27T00:11:12.135Z"
+  },
+  {
+    "id": "0f0f9374-1d3a-486c-88a7-c089b606b3db",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "!voice @Mira oi mate how you doing",
+    "timestamp": "2026-04-27T00:20:40.383Z"
+  },
+  {
+    "id": "40735682-8baf-4716-9edb-6080268e91e8",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Oi, I'm doing just peachy! Keeping an eye on things and dodging any trouble that pops up. You know how it is! What about you?",
+    "emotion": "happy",
+    "timestamp": "2026-04-27T00:20:42.217Z",
+    "audioUrl": "/api/voice/cache/8ef1ac60-a5eb-4cd2-b3fa-ca245f75ab77.wav"
   }
 ]

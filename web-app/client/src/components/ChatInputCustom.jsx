@@ -89,6 +89,7 @@ export default function ChatInputCustom({
   onOpenEmotes,
   locationId,
   isDM,
+  onNpcSpeak,
 }) {
   const [text, setText] = useState(() => {
     if (!locationId) return '';
@@ -1032,6 +1033,14 @@ export default function ChatInputCustom({
     setCursorPos(newPos);
   }, []);
 
+  const handleNpcSpeak = useCallback((npc) => {
+    const insert = `!voice @${npc.displayName} `;
+    const prev = textRef.current;
+    const newText = prev.length && !prev.endsWith(' ') ? prev + ' ' + insert : prev + insert;
+    setText(newText);
+    setCursorPos(newText.length);
+  }, []);
+
   // Insert player @mention from the mention panel
   const handlePlayerMention = useCallback((player) => {
     bumpNpcFreq(player.id, locationId);
@@ -1331,6 +1340,7 @@ export default function ChatInputCustom({
         onDiceRoll={handleDiceRoll}
         onUseItem={handleUseItem}
         onOpenEmotes={onOpenEmotes}
+        onNpcSpeak={handleNpcSpeak}
         locationId={locationId}
         isDM={isDM}
       />

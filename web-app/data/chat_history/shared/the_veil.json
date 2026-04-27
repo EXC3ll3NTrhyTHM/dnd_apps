@@ -51,5 +51,23 @@
     "gifHeight": 112,
     "text": "kids karate GIF",
     "timestamp": "2026-02-27T03:35:54.972Z"
+  },
+  {
+    "id": "df507ede-a3da-40b9-b0a3-48709e9178ca",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Brynleaf Varrow Hello",
+    "timestamp": "2026-04-26T23:17:24.607Z"
+  },
+  {
+    "id": "28b73bbe-cc58-4c18-9eb4-095844b40118",
+    "role": "npc",
+    "npc": "brynleaf",
+    "npcDisplayName": "Brynleaf Varrow",
+    "text": "Aye, Architect. What's on yer mind? Speak up, I've got me hammers waitin' for a bit of action.",
+    "emotion": "idle",
+    "timestamp": "2026-04-26T23:17:25.913Z"
   }
 ]

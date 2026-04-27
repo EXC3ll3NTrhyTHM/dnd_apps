@@ -208,6 +208,39 @@ function ReactionPills({ reactions, currentUserId, onReact, messageId, npcs, pla
  * Own player messages are right-aligned.
  * Other players' messages are left-aligned with a distinct accent.
  */
+function VoicePlayButton({ audioUrl }) {
+  const [playing, setPlaying] = useState(false);
+  const audioRef = useRef(null);
+
+  const handlePlay = useCallback((e) => {
+    e.stopPropagation();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    const audio = new Audio(audioUrl);
+    audioRef.current = audio;
+    setPlaying(true);
+    audio.onended = () => setPlaying(false);
+    audio.onerror = () => setPlaying(false);
+    audio.play().catch(() => setPlaying(false));
+  }, [audioUrl]);
+
+  return (
+    <button
+      className={`chat-bubble-play-btn${playing ? ' chat-bubble-play-btn-active' : ''}`}
+      onClick={handlePlay}
+      title="Play voice"
+      type="button"
+    >
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+        <polygon points="5,3 19,12 5,21" />
+      </svg>
+      {playing ? 'Playing…' : 'Play voice'}
+    </button>
+  );
+}
+
 export default function ChatBubble({ message, npcs, players, groups, currentUserId, onLongPress, onReact, onNameTap }) {
   const navigate = useNavigate();
   const isPlayer = message.role === 'player';
@@ -502,7 +535,15 @@ export default function ChatBubble({ message, npcs, players, groups, currentUser
             </span>
           )}
           <p className="chat-bubble-text">
-            <HighlightedText text={message.text} npcs={npcs} players={players} groups={groups} />
+            {/^!voice\b/i.test(message.text) && (
+              <span className="voice-tag">!voice </span>
+            )}
+            <HighlightedText
+              text={message.text.replace(/^!voice\s*/i, '')}
+              npcs={npcs}
+              players={players}
+              groups={groups}
+            />
           </p>
           {reactionPills}
         </div>
@@ -552,6 +593,7 @@ export default function ChatBubble({ message, npcs, players, groups, currentUser
             <p className="chat-bubble-text">
               <HighlightedText text={message.text} npcs={npcs} players={players} groups={groups} />
             </p>
+            {message.audioUrl && <VoicePlayButton audioUrl={message.audioUrl} />}
             {reactionPills}
           </>
         )}

@@ -23,6 +23,7 @@ const {
 const { getTypingInLocation, setNpcTyping } = require('../lib/typing');
 const { notifyPlayerMentions } = require('../lib/notifications');
 const clawdbotRoutes = require('./clawdbot');
+const { generateAndCacheTTS } = require('../lib/tts');
 
 const DM_USER_IDS = (process.env.DM_USER_IDS || '').split(',').filter(Boolean);
 
@@ -451,6 +452,9 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
     const history = loadHistory(locationId);
     const playerName = getPlayerName(req.user);
 
+    const isVoice = /!voice\b/i.test(message);
+    const llmMessage = isVoice ? message.replace(/!voice\s*/i, '').trim() : message;
+
     // Add player message to history
     const playerMsg = {
       id: crypto.randomUUID(),
@@ -464,7 +468,7 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
     history.push(playerMsg);
 
     // Pick which NPC(s) should respond — only @mentioned NPCs (groups expand to members)
-    const respondingNpcs = await pickRespondingNpc(locationNpcs, message, history, location.groups);
+    const respondingNpcs = await pickRespondingNpc(locationNpcs, llmMessage, history, location.groups);
 
     // Check for Marcel (Clawdbot) mention specifically
     const isMarcelMentioned = message.toLowerCase().includes('@marcel');
@@ -538,7 +542,7 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
 
     // Generate response from each responding NPC
     for (const npcName of respondingNpcs) {
-      const result = await generateResponse(npcName, playerName, message, history, locationContext);
+      const result = await generateResponse(npcName, playerName, llmMessage, history, locationContext);
 
       const npcMsg = {
         id: crypto.randomUUID(),
@@ -549,6 +553,14 @@ router.post('/locations/:locationId/message', authRequired, async (req, res) => 
         emotion: result.emotion,
         timestamp: new Date().toISOString()
       };
+
+      if (isVoice) {
+        try {
+          npcMsg.audioUrl = await generateAndCacheTTS(result.text, npcName);
+        } catch (err) {
+          console.error('[TTS]', err.message);
+        }
+      }
 
       history.push(npcMsg);
       responses.push(npcMsg);
@@ -640,6 +652,9 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
     const playerName = getPlayerName(req.user);
     const registry = loadNpcRegistry();
 
+    const isVoice = /!voice\b/i.test(message);
+    const llmMessage = isVoice ? message.replace(/!voice\s*/i, '').trim() : message;
+
     // Add player message to history
     const playerMsg = {
       id: crypto.randomUUID(),
@@ -662,7 +677,7 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
     };
 
     // Generate response from the targeted NPC
-    const result = await generateResponse(npcName, playerName, message, history, locationContext);
+    const result = await generateResponse(npcName, playerName, llmMessage, history, locationContext);
 
     const npcMsg = {
       id: crypto.randomUUID(),
@@ -673,6 +688,14 @@ router.post('/locations/:locationId/npc/:npcName/message', authRequired, async (
       emotion: result.emotion,
       timestamp: new Date().toISOString()
     };
+
+    if (isVoice) {
+      try {
+        npcMsg.audioUrl = await generateAndCacheTTS(result.text, npcName);
+      } catch (err) {
+        console.error('[TTS]', err.message);
+      }
+    }
 
     history.push(npcMsg);
     saveHistory(locationId, history);

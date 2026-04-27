@@ -694,6 +694,34 @@
   font-weight: 600;
 }
 
+.voice-tag {
+  color: rgba(196, 149, 106, 0.5);
+  font-style: italic;
+  font-size: 0.85em;
+  margin-right: 1px;
+}
+
+.chat-bubble-play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 4px 10px;
+  border: 1px solid rgba(196, 149, 106, 0.35);
+  border-radius: 12px;
+  background: rgba(196, 149, 106, 0.1);
+  color: rgba(196, 149, 106, 0.8);
+  font-size: 0.78em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.chat-bubble-play-btn:active,
+.chat-bubble-play-btn-active {
+  background: rgba(196, 149, 106, 0.25);
+  color: var(--color-gold);
+}
+
 /* ---- Mention Popup ---- */
 
 .mention-popup {
