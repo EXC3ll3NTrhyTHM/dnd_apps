@@ -5267,7 +5267,7 @@ export default function Arena() {
                 </button>
               </div>
               <div className="arena-concentration-conflict-body">
-                <p>You're concentrating on <strong>{myStats?.concentration}</strong>.</p>
+                <p>You're concentrating on <strong>{myStats?.concentration && (CONCENTRATION_SPELL_NAMES[myStats.concentration.spellId] || myStats.concentration.spellId)}</strong>.</p>
                 <p>Entering Rage will end your concentration.</p>
               </div>
               <div className="arena-concentration-conflict-actions">
