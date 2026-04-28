@@ -16,3 +16,4 @@ shopkeeper/.env.*
 
 # Backup files
 **/backups/
+web-app/data/
