@@ -2,16 +2,14 @@
   "424061511833747467": {
     "user_id": "424061511833747467",
     "username": "excellentrhythm",
-    "total_xp": 54839,
-    "last_updated": "2026-04-27T00:38:37.078Z",
+    "total_xp": 54908,
+    "last_updated": "2026-04-28T03:16:52.518Z",
     "daily": {
-      "date": "2026-04-26",
-      "messages_sent": 9,
-      "reactions_given": 0,
+      "date": "2026-04-27",
+      "messages_sent": 5,
+      "reactions_given": 2,
       "locations_visited": [
-        "the_veil",
-        "dragons_hollow",
-        "the_arena"
+        "dragons_hollow"
       ],
       "login_claimed": true,
       "arena_wins": 0,
@@ -24,8 +22,8 @@
     },
     "gold_conversion_done": false,
     "lifetime": {
-      "messages_sent": 229,
-      "reactions_given": 14,
+      "messages_sent": 234,
+      "reactions_given": 16,
       "locations_visited": [
         "the_cottage",
         "marcel_dm_424061511833747467",

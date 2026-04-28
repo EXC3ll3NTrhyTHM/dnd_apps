@@ -3939,5 +3939,109 @@
     "emotion": "happy",
     "timestamp": "2026-04-27T00:20:42.217Z",
     "audioUrl": "/api/voice/cache/8ef1ac60-a5eb-4cd2-b3fa-ca245f75ab77.wav"
+  },
+  {
+    "id": "9883376c-2163-4c61-857e-0145886505cf",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "!voice @Bonesy hello bonzie how are you",
+    "timestamp": "2026-04-27T19:02:43.057Z"
+  },
+  {
+    "id": "1ac0a35e-2f02-44b5-afae-1f8cf00b5015",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Hey, buddy! I'm just vibin', you know? Keeping it chill and enjoying the day. How about you, my dude? Everything good?",
+    "emotion": "happy",
+    "timestamp": "2026-04-27T19:02:44.416Z",
+    "audioUrl": "/api/voice/cache/f9331c34-f5ac-4708-9125-c2fe70c7e4fa.wav"
+  },
+  {
+    "id": "1da1b7c9-94ce-4b1f-ab1d-fddf0c16671d",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "!voice @Bonesy what kind of drinks are you having today anything good",
+    "timestamp": "2026-04-27T19:04:55.811Z"
+  },
+  {
+    "id": "5a5324c3-7926-491b-8cc1-7c16e575ca7a",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Oh, you know it, maaaan! I'm sippin' on some nice mead and maybe a little herbal tea on the side. Gotta keep the vibes right! Want some?",
+    "emotion": "happy",
+    "timestamp": "2026-04-27T19:04:57.571Z",
+    "audioUrl": "/api/voice/cache/955ce46f-5fa9-4aee-a604-2c72b2101d11.wav"
+  },
+  {
+    "id": "0fb14a90-5a1e-4f31-a73e-d3b2ebc61917",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "!voice @Mira Hey mira what are you having today",
+    "timestamp": "2026-04-27T19:05:53.681Z"
+  },
+  {
+    "id": "e7417302-febf-402a-95fc-4ab518ad08de",
+    "role": "npc",
+    "npc": "mira",
+    "npcDisplayName": "Mira",
+    "text": "Hey there! Just a little cheeky something to keep me going—maybe some spiced wine! Gotta keep the spirits high, you know? What about you?",
+    "emotion": "happy",
+    "timestamp": "2026-04-27T19:05:55.340Z",
+    "audioUrl": "/api/voice/cache/3cae8138-8f40-4bf2-81f5-100533c2285f.wav",
+    "reactions": {
+      "❤️": [
+        "424061511833747467"
+      ]
+    }
+  },
+  {
+    "id": "ee143801-1c7d-4007-810d-1fe36b331241",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "!voice @Nibby hey nibby how is the Tavern today",
+    "timestamp": "2026-04-27T19:06:55.694Z"
+  },
+  {
+    "id": "9f7e1211-599f-4885-9645-31f149c232ce",
+    "role": "npc",
+    "npc": "nibby",
+    "npcDisplayName": "Nibby",
+    "text": "Hey! The Tavern’s buzzing like always. Good vibes, good food, and even better people around. Just doing my ghostly watch, you know? What’s up with you?",
+    "emotion": "happy",
+    "timestamp": "2026-04-27T19:07:01.380Z",
+    "audioUrl": "/api/voice/cache/77ed12d1-27f1-46da-8253-ace2aa23398a.wav",
+    "reactions": {
+      "💀": [
+        "424061511833747467"
+      ]
+    }
+  },
+  {
+    "id": "cc61dbac-f157-4e1d-8656-be172a5bfa75",
+    "role": "player",
+    "userId": "424061511833747467",
+    "playerName": "The Architect",
+    "playerAvatar": "https://cdn.discordapp.com/avatars/424061511833747467/e06c792732f07ccf3bee1939bd2f044c.png",
+    "text": "@Bonesy Hey",
+    "timestamp": "2026-04-28T03:16:51.202Z"
+  },
+  {
+    "id": "22713988-d238-4576-8df8-02cd02e06af9",
+    "role": "npc",
+    "npc": "bonesy",
+    "npcDisplayName": "Bonesy",
+    "text": "Heyyy, what’s up, my friend? Just floating around, soaking in the good vibes. You need a snack or something? I got you! ✌️",
+    "emotion": "happy",
+    "timestamp": "2026-04-28T03:16:52.514Z"
   }
 ]

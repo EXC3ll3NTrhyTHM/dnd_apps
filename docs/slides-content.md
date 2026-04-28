@@ -1,18 +1,46 @@
 # Dragon's Hollow — Slide Content
-### Paste into Gamma, Canva, or PowerPoint
+### With image generation prompts per slide
+
+---
+
+## STYLE GUIDE (apply to all slides)
+
+**Color Palette:**
+- Background: `#1a1510`
+- Primary text: `#e8d5a3`
+- Headings / accent: `#c4956a`
+- Highlight: `#8b5e3c`
+- Code blocks: `#2a2218`
+
+**Fonts:** Cinzel or Cormorant Garamond (headings) · IM Fell English or Georgia (body)
+
+**Layout:** Text on a semi-transparent dark panel (like a scroll or stone plaque) overlaid on the generated background image.
+
+**Base prompt (shared across all slides):**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail
 
 ---
 
 ## SLIDE 1 — Title
 
-**Dragon's Hollow**
-AI-Powered NPC Voice System for Live D&D Campaigns
+**IMAGE PROMPT:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — glowing dragon sigil centerpiece, dramatic god-ray lighting from above, smoke curling upward, epic and mysterious
 
-Blake Simpson | Applied AI
+---
+
+**Dragon's Hollow**
+AI-Powered NPC Voice System for D&D App
+
+Blake Simpson | Big Data Anaylatics
 
 ---
 
 ## SLIDE 2 — Problem Description
+
+**IMAGE PROMPT:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — broken hourglass on a worn table, scattered polyhedral dice, a single dim candle casting long shadows, mood of frustration and silence
+
+---
 
 **The Problem:**
 Tabletop RPG players want immersive NPC interactions — but text-only chat makes every character feel the same. There's no voice, no personality, no "feel" to the conversation.
@@ -30,6 +58,11 @@ Build a system where AI NPCs have consistent personalities, speak in their own v
 
 ## SLIDE 3 — Why It's Interesting / Business Value
 
+**Theme:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — open merchant ledger filled with handwritten numbers, gold coins scattered, a quill dipped in ink, warm candlelight, prosperous and secretive atmosphere
+
+---
+
 **Why It Matters:**
 - The tabletop RPG market is ~$2.5B and growing (post-D&D 5e / Critical Role boom)
 - AI dungeon masters and NPC companions are an emerging product category
@@ -38,15 +71,19 @@ Build a system where AI NPCs have consistent personalities, speak in their own v
 **Technical Value:**
 - Demonstrates a full speech-in / speech-out pipeline for fictional characters
 - Shows how prompt engineering can replace fine-tuning for character consistency
-- The architecture is reusable: game NPCs, museum audio guides, interactive fiction, customer service personas
+- Architecture is reusable: game NPCs, museum audio guides, interactive fiction, customer service personas
 
-**The "Bonus" Angle:**
-This project hits the multimodal bonus requirement:
+**Multimodal Bonus:**
 > **Speech → Text → NPC Dialogue → Voice Narration** — a complete loop
 
 ---
 
 ## SLIDE 4 — Dataset / Inputs
+
+**Theme:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — open ancient spellbook with dense handwritten notes, floating softly glowing runes rising from the pages, ink pot and quill nearby, mystical and scholarly
+
+---
 
 **No training dataset required** — the system uses prompt-based conditioning instead of fine-tuning.
 
@@ -71,20 +108,30 @@ This project hits the multimodal bonus requirement:
 
 ## SLIDE 5 — Models Used
 
+**Theme:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — large arcane crystal orb on a stone pedestal emanating concentric sound wave rings in gold and amber light, ethereal and powerful
+
+---
+
 | Model | Purpose | Provider |
 |-------|---------|---------|
 | **GPT-4o-mini** | NPC dialogue generation | OpenAI |
-| **Gemini 2.5 Flash TTS** (`gemini-2.5-flash-preview-tts`) | Text-to-speech voice output | Google DeepMind |
-| **Web Speech API** (Google ASR) | Speech-to-text input from player microphone | Google / Browser-native |
+| **Gemini 2.5 Flash TTS** | Text-to-speech voice output | Google DeepMind |
+| **Web Speech API** (Google ASR) | Speech-to-text from player mic | Browser-native |
 
 **Why these models:**
 - GPT-4o-mini: fast, cost-effective, strong instruction-following for character roleplay
-- Gemini TTS: supports natural language prosody cues in brackets — uniquely suited to NPC-style expressive speech
-- Web Speech API: zero-setup STT, available on any modern mobile browser with no API key
+- Gemini TTS: supports natural language prosody cues in brackets — uniquely suited to NPC expressive speech
+- Web Speech API: zero-setup STT, works on any modern mobile browser with no API key
 
 ---
 
 ## SLIDE 6 — Pipeline Architecture
+
+**Theme:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — aged parchment map covered in dotted connecting lines and small illustrated nodes like a treasure map or battle plan, compass rose in the corner, top-down blueprint aesthetic
+
+---
 
 ```
 [ Player speaks ]
@@ -95,19 +142,15 @@ This project hits the multimodal bonus requirement:
        ↓
 [ Server detects !voice flag ]
        ↓
-[ Strip !voice prefix → send cleaned message to GPT-4o-mini ]
-[ With: NPC system prompt (SOUL + CONTEXT + MEMORY + journal) ]
-[ Plus: Voice Mode block (instructs short, cued speech output) ]
+[ Strip !voice → send to GPT-4o-mini with NPC persona + Voice Mode prompt ]
        ↓
 [ GPT returns: "[weary] Another day, another bloodstain on my floor." ]
        ↓
 [ Prepend TTS_ACCENT cue → send to Gemini 2.5 Flash TTS ]
        ↓
-[ Gemini returns PCM audio → wrapped in WAV ]
-[ Saved to server cache, URL attached to NPC message ]
+[ Gemini returns PCM audio → wrapped in WAV → cached on server ]
        ↓
-[ Client receives message with audioUrl ]
-[ "▶ Play voice" button appears on NPC's chat bubble ]
+[ Client receives message + audioUrl → ▶ Play voice button appears ]
 [ Player taps → audio plays ]
 ```
 
@@ -117,25 +160,25 @@ This project hits the multimodal bonus requirement:
 
 ## SLIDE 7 — Prompt / Input Design
 
+**Theme:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — ancient scroll unfurling dramatically, glowing golden text rising off the parchment like magic, soft light emanating from the words themselves
+
+---
+
 **Three layers of engineering:**
 
-### Layer 1 — Character System Prompt
-Each NPC's personality documents are loaded and assembled into a structured system prompt at runtime. The model is told it *is* the character (first person, never break character, respond as they would).
+**Layer 1 — Character System Prompt**
+Each NPC's personality documents (SOUL, CONTEXT, MEMORY, journal) are assembled into a structured system prompt at runtime. The model is told it *is* the character — first person, never break character.
 
-### Layer 2 — Voice Mode Block
-When `!voice` is detected, an extra block is appended to the system prompt:
-> *"This response will be spoken aloud via TTS. Keep to 1-3 short sentences. Use [cues] in brackets to control tone and pacing. Example: [gruff, dismissive] Yeah, don't think so, pal."*
+**Layer 2 — Voice Mode Block**
+When `!voice` is detected, an extra block instructs GPT to write speech-optimized output:
+> *"Keep to 1-3 short sentences. Use [cues] in brackets to control tone. Example: [gruff, dismissive] Yeah, don't think so, pal."*
 
-The LLM then writes speech-optimized output with embedded delivery instructions.
+**Layer 3 — TTS Accent Anchoring**
+Per-character accent string prepended to every TTS call:
 
-### Layer 3 — TTS Accent Anchoring
-A per-character accent description is prepended to every TTS call:
-
-**Kai (young fighter):**
-> `[loud, energetic young Chinese male voice — fast-talking, impulsive, always fired up. Talk like you're ready to fight RIGHT NOW.]`
-
-**Brynleaf (dwarven ranger):**
-> `[thick, heavy Scottish highland brogue — rough and weathered, speaks slow and deliberate with clipped consonants]`
+- **Kai:** `[loud, energetic young Chinese male voice — fast-talking, impulsive, always fired up]`
+- **Brynleaf:** `[thick, heavy Scottish highland brogue — rough and weathered, slow and deliberate]`
 
 Final TTS input = `{accent cue} + {LLM response with [cues]}`
 
@@ -143,19 +186,23 @@ Final TTS input = `{accent cue} + {LLM response with [cues]}`
 
 ## SLIDE 8 — Results
 
+**Theme:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — triumphant banner hanging in a candlelit great hall, heraldic crests and shields on the walls, warm golden light, sense of achievement and celebration
+
+---
+
 **What was built:**
 - 14 NPCs with distinct voices, accents, and personalities
 - Full `!voice` pipeline: player message → NPC text → spoken audio → play button in chat
 - Speech-to-text mic input in the message keyboard
-- NPC memory system: journal auto-updates after sessions so NPCs recall past events
+- NPC memory system: journal auto-updates so NPCs recall past events
 
-**Sample NPC voices (describe or show screenshots of chat bubbles with play buttons):**
+**Sample NPC voices:**
 - Bonesy (undead barkeep) → Enceladus voice, gravelly delivery
 - Kai (young fighter) → Alnilam voice, loud/energetic accent cue
 - Kumo (blacksmith) → Umbriel voice, deep/slow Japanese accent cue
 - Brynleaf (ranger) → Autonoe voice, Scottish brogue accent cue
 
-**Expressiveness comparison:**
 | Setup | Character Feel |
 |-------|---------------|
 | No accent, no cues | Generic, flat |
@@ -167,17 +214,22 @@ Final TTS input = `{accent cue} + {LLM response with [cues]}`
 
 ## SLIDE 9 — Evaluation
 
-### STT Evaluation
+**Theme:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — ornate brass scales of justice on a stone table, one side holding glowing vials, the other a flickering candle, alchemical and precise atmosphere
+
+---
+
+**STT Evaluation**
 
 | Condition | Quality |
 |-----------|---------|
 | Quiet room, clear speech | High — near-perfect |
-| Background noise | Medium — common word errors |
-| D&D proper nouns (NPC names, locations) | Low-medium — no domain vocab |
+| Background noise | Medium — word errors |
+| D&D proper nouns | Low-medium — no domain vocab |
 
-**Latency:** 200–400ms to final transcript
+Latency: 200–400ms to final transcript
 
-### TTS Evaluation
+**TTS Evaluation**
 
 | Metric | Observation |
 |--------|-------------|
@@ -186,19 +238,24 @@ Final TTS input = `{accent cue} + {LLM response with [cues]}`
 | Realism | Clearly synthetic but expressive |
 | Latency | 900–1800ms per generation |
 
-### End-to-End Latency
+**End-to-End Latency**
 
 | Step | Time |
 |------|------|
-| GPT-4o-mini response | 800–1500ms |
-| Gemini TTS generation | 900–1800ms |
+| GPT-4o-mini | 800–1500ms |
+| Gemini TTS | 900–1800ms |
 | **Total** | **1.8–3.3 seconds** |
 
 ---
 
 ## SLIDE 10 — Demo Video
 
-**[Embed YouTube/Drive thumbnail here]**
+**THeme:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — large mystical crystal ball on a velvet-draped table, glowing softly from within, showing a faint luminous reflection, scrying and revelation atmosphere
+
+---
+
+**[Embed video thumbnail here]**
 
 Demo shows:
 1. Opening the NPC Speak panel in the keyboard
@@ -206,7 +263,7 @@ Demo shows:
 3. `!voice @NpcName` auto-inserted into the message field
 4. Typing a message and sending
 5. NPC text response appearing with "▶ Play voice" button
-6. Tapping play — audio of the NPC speaking in character
+6. Tapping play — NPC speaks in character with accent
 
 **Link:** [YOUR VIDEO URL HERE]
 
@@ -214,54 +271,61 @@ Demo shows:
 
 ## SLIDE 11 — Limitations
 
-| Limitation | Impact | Possible Fix |
-|-----------|--------|-------------|
-| Gemini TTS latency (0.9–1.8s) | Noticeable wait on voice messages | Pre-generate or stream audio |
-| Browser autoplay policy | Audio requires explicit tap to play | Acceptable UX tradeoff |
-| STT struggles with D&D proper nouns | Names like "Okhan" often mistranscribed | Custom vocabulary / post-correction |
-| No voice fine-tuning — purely prompt-based | Accent cues are approximate, not exact | Fine-tune a local TTS model per character |
-| 5-minute audio cache TTL | Audio link expires | Increase TTL or store permanently |
-| Single language (en-US) | No multilingual support | Change `lang` param in STT, multilingual TTS |
+**Theme:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — cracked and weathered stone dungeon wall with a single dying torch mounted in an iron bracket, dim and foreboding, sense of obstacle and challenge
 
 ---
 
-## SLIDE 12 — GitHub & AI Tools Used
+| Limitation | Impact | Possible Fix |
+|-----------|--------|-------------|
+| TTS latency (0.9–1.8s) | Noticeable wait | Pre-generate or stream audio |
+| Browser autoplay policy | Requires tap to play | Acceptable UX tradeoff |
+| STT struggles with proper nouns | NPC names often wrong | Custom vocabulary |
+| Purely prompt-based accents | Approximate, not exact | Fine-tune local TTS per character |
+| 5-min audio cache TTL | Link expires | Increase TTL or store permanently |
+| English only | No multilingual support | Multilingual STT/TTS params |
+
+---
+
+## SLIDE 12 — GitHub & AI Tools
+
+**Theme:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — ancient stone tablet with deeply carved runic inscriptions glowing amber, chisel resting beside it, scholarly and archival atmosphere
+
+---
 
 **GitHub:** [YOUR REPO LINK]
 
-**AI Tools Used (Required Disclosure):**
+**AI Tools Used:**
 
 | Tool | How It Was Used |
 |------|----------------|
-| **Claude Code (Anthropic)** | Primary development assistant — wrote majority of backend routes, React components, and system architecture. Used throughout the entire build. |
-| **GPT-4o-mini (OpenAI)** | Runtime NPC dialogue generation (part of the product itself) |
-| **Gemini 2.5 Flash TTS (Google)** | Runtime NPC voice synthesis (part of the product itself) |
-| **Web Speech API** | Runtime speech-to-text input (part of the product itself) |
+| **Claude Code** | Primary dev assistant — backend, React components, architecture |
+| **GPT-4o-mini** | Runtime NPC dialogue (part of the product) |
+| **Gemini 2.5 Flash TTS** | Runtime NPC voice (part of the product) |
+| **Web Speech API** | Runtime player STT (part of the product) |
 
-**What was AI-assisted:**
-- Server route code (`server/routes/voice.js`, `server/lib/tts.js`)
-- React components (`CustomKeyboard.jsx`, `ChatBubble.jsx`, `ChatInputCustom.jsx`)
-- This written writeup and slide content
+**AI-assisted:** server routes, React components, writeup, slide content
 
-**What was human-designed:**
-- Overall concept and feature design
-- NPC character files (SOUL.md, CONTEXT.md, MEMORY.md per character)
-- TTS accent strings
-- System architecture decisions
+**Human-designed:** concept, NPC character files, accent strings, architecture decisions
 
 ---
 
-## SLIDE 13 (Bonus) — Multimodal Innovation
+## SLIDE 13 — Multimodal Bonus
+
+**Theme:**
+> Dark fantasy tavern aesthetic, deep charcoal and obsidian backgrounds, aged parchment texture overlaid at low opacity, gold and amber accent lighting from candles or torches, subtle arcane rune patterns faintly glowing in corners, ink-stained wood grain texture, no text, widescreen 16:9, cinematic mood lighting, high detail — three distinct streams of glowing light in gold, amber, and pale blue converging into a single radiant point at the center, magical convergence, awe-inspiring and cosmic
+
+---
 
 **This project qualifies for the multimodal bonus:**
 
-The full pipeline is:
-> **Voice Input → Speech-to-Text → NPC Dialogue Generation → Text-to-Speech Voice Output**
+> **Voice Input → Speech-to-Text → NPC Dialogue → Text-to-Speech Voice Output**
 
-Each modality transitions to the next:
-- Raw microphone audio → transcribed text (Google ASR)
-- Text + character context → in-character spoken dialogue (GPT-4o-mini)
-- Dialogue text + accent/delivery cues → synthesized character voice (Gemini TTS)
-- WAV audio → played through mobile browser
+Each modality feeds the next:
+- Microphone audio → transcribed text (Google ASR)
+- Text + character context → in-character dialogue with delivery cues (GPT-4o-mini)
+- Dialogue + accent cue → synthesized character voice (Gemini TTS)
+- WAV audio → played in mobile browser
 
-This is a working, deployed end-to-end multimodal speech pipeline integrated into a live application used by real players.
+A working, end-to-end multimodal speech pipeline in a live app used by real players.
