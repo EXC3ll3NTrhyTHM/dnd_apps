@@ -25,7 +25,7 @@ cloudflared tunnel run dragons-hollow
 ```
 
 ## pm2 (Process Manager)
-Both the app and tunnel are managed by pm2 so they survive reboots.
+Both the app and tunnel are managed by pm2 and configured to auto-start on reboot via systemd (`pm2-blake.service`).
 
 ```bash
 # Check status
@@ -41,6 +41,23 @@ pm2 restart cloudflare-tunnel
 
 # Stop everything
 pm2 stop all
+```
+
+### After code changes
+```bash
+cd /home/blake/code/dnd_apps/web-app
+npm run build
+pm2 restart dragons-hollow-app
+```
+
+### If you add new pm2 processes
+```bash
+pm2 save   # re-save the process list so it persists on reboot
+```
+
+### Remove auto-start
+```bash
+pm2 unstartup systemd
 ```
 
 ## Cloudflare Tunnel
