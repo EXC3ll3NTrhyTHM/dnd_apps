@@ -44,6 +44,9 @@ export function AuthProvider({ children }) {
 
   function login(token) {
     localStorage.setItem('dh_token', token);
+    // Ask the browser to keep our storage across quota pressure / inactivity.
+    // Auto-granted for installed PWAs; harmless elsewhere.
+    navigator.storage?.persist?.().catch(() => {});
     setLoading(true);
     return fetchMe(token);
   }

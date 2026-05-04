@@ -62,15 +62,16 @@ router.get('/callback', async (req, res) => {
       discriminator: discordUser.discriminator
     };
 
-    // Sign JWT (7 day expiry)
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+    // Sign JWT — long-lived so a device only has to OAuth once.
+    // No refresh-token system; revoking everyone requires rotating JWT_SECRET.
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '10y' });
 
     // Set HTTP-only cookie and redirect to frontend
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      maxAge: 10 * 365 * 24 * 60 * 60 * 1000 // ~10 years
     });
 
     // Redirect to frontend with token in URL for the SPA to grab
