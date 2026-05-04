@@ -17,12 +17,14 @@ export default function AuthCallback() {
       return;
     }
 
-    if (token) {
-      login(token);
-      navigate('/map', { replace: true });
-    } else {
+    if (!token) {
       navigate('/', { replace: true });
+      return;
     }
+
+    login(token).finally(() => {
+      navigate('/map', { replace: true });
+    });
   }, [searchParams, login, navigate]);
 
   return (

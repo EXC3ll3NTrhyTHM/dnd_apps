@@ -29,11 +29,14 @@ export function AuthProvider({ children }) {
       setWallet(data.wallet);
       setXpInfo(data.xp || null);
     } catch (err) {
-      // Token invalid, clear it
-      localStorage.removeItem('dh_token');
-      setUser(null);
-      setWallet(null);
-      setXpInfo(null);
+      // Only clear the token if the server explicitly rejected it.
+      // Network blips and 5xx must NOT log the user out.
+      if (err?.status === 401) {
+        localStorage.removeItem('dh_token');
+        setUser(null);
+        setWallet(null);
+        setXpInfo(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -41,7 +44,8 @@ export function AuthProvider({ children }) {
 
   function login(token) {
     localStorage.setItem('dh_token', token);
-    fetchMe(token);
+    setLoading(true);
+    return fetchMe(token);
   }
 
   async function logout() {

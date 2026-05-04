@@ -41,6 +41,15 @@ export default defineConfig({
         importScripts: ['/sw-push.js'],
         globPatterns: ['**/*.{js,css,html,ico,woff2}'],
         globIgnores: ['**/textures/**', '**/assets/dice-box/**'],
+        navigateFallbackDenylist: [
+          /^\/api\//,
+          /^\/sw(-push)?\.js$/,
+          /^\/manifest\.webmanifest$/,
+          /^\/uploads\//,
+          /^\/images\//,
+          /^\/sounds\//,
+          /^\/ws$/
+        ],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/cdn\.discordapp\.com\/.*/i,
