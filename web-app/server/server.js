@@ -153,12 +153,34 @@ app.get('/api/health', (req, res) => {
 // In production or test, serve the built React app
 if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
   const clientDist = path.join(__dirname, '..', 'client', 'dist');
-  app.use(express.static(clientDist));
+
+  // Files that must always revalidate so clients can discover new SW/manifest/index
+  const NO_CACHE_FILES = new Set([
+    'index.html',
+    'sw.js',
+    'sw-push.js',
+    'registerSW.js',
+    'manifest.webmanifest'
+  ]);
+  // Vite emits hashed asset filenames like `index-Daf458LO.js`
+  const HASHED_ASSET = /-[A-Za-z0-9_-]{8,}\.(js|css|woff2|png|jpg|jpeg|svg|ico)$/i;
+
+  app.use(express.static(clientDist, {
+    setHeaders(res, filePath) {
+      const base = path.basename(filePath);
+      if (NO_CACHE_FILES.has(base)) {
+        res.setHeader('Cache-Control', 'no-cache');
+      } else if (HASHED_ASSET.test(base)) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    }
+  }));
   // Images already served above via /images route
 
   // SPA fallback - serve index.html for all non-API routes
   app.get('*', (req, res) => {
     if (!req.path.startsWith('/api')) {
+      res.setHeader('Cache-Control', 'no-cache');
       res.sendFile(path.join(clientDist, 'index.html'));
     }
   });
