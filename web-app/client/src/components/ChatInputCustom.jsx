@@ -1184,14 +1184,14 @@ export default function ChatInputCustom({
         <div className="cki-row">
           <button
             type="button"
-            className={`chat-plus-btn${['extras', 'npcs', 'gifs', 'dice', 'items', 'monsters'].includes(kbMode) ? ' chat-plus-btn-active' : ''}`}
+            className={`chat-plus-btn${['extras', 'npcs', 'gifs', 'dice', 'items', 'monsters', 'emoji'].includes(kbMode) ? ' chat-plus-btn-active' : ''}`}
             onPointerDown={(e) => {
               e.preventDefault();
               if (!kbOpen) {
                 setKbOpen(true);
                 setKbMode('extras');
               } else {
-                setKbMode(['extras', 'npcs', 'gifs', 'dice', 'items', 'monsters'].includes(kbMode) ? 'keys' : 'extras');
+                setKbMode(['extras', 'npcs', 'gifs', 'dice', 'items', 'monsters', 'emoji'].includes(kbMode) ? 'keys' : 'extras');
               }
             }}
             aria-label="Extras menu"
@@ -1248,49 +1248,6 @@ export default function ChatInputCustom({
               />
             )}
           </div>
-          <button
-            type="button"
-            className={`chat-emoji-btn${kbMode === 'emoji' ? ' chat-emoji-btn-active' : ''}`}
-            aria-label={kbMode === 'emoji' ? 'Switch to keyboard' : 'Open emoji picker'}
-            onPointerDown={(e) => {
-              e.preventDefault();
-              if (!kbOpen) {
-                setKbOpen(true);
-                setKbMode('emoji');
-              } else {
-                setKbMode(kbMode === 'emoji' ? 'keys' : 'emoji');
-              }
-            }}
-          >
-            {kbMode === 'emoji' ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="4" width="20" height="16" rx="2" />
-                <line x1="6" y1="8" x2="6" y2="8" />
-                <line x1="10" y1="8" x2="10" y2="8" />
-                <line x1="14" y1="8" x2="14" y2="8" />
-                <line x1="18" y1="8" x2="18" y2="8" />
-                <line x1="6" y1="12" x2="6" y2="12" />
-                <line x1="18" y1="12" x2="18" y2="12" />
-                <line x1="8" y1="16" x2="16" y2="16" />
-              </svg>
-            ) : '😊'}
-          </button>
-          <button
-            type="button"
-            className="chat-emote-btn"
-            aria-label="Open emotes"
-            onPointerDown={(e) => {
-              e.preventDefault();
-              onOpenEmotes?.();
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-              <line x1="9" y1="9" x2="9.01" y2="9" />
-              <line x1="15" y1="9" x2="15.01" y2="9" />
-            </svg>
-          </button>
           {text.trim() && (
             <button
               type="button"
